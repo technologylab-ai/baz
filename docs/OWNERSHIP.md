@@ -171,6 +171,18 @@ interval plus one turn. Exact per-callback queue/handler timing needs
 `callback_timing`, which costs two clock reads per callback; otherwise those
 maxima stay zero. Worker mode keeps a full slot scan per turn for results.
 
+Each connection has separate receive and send operation cells, each with its
+own cancel cell. When a batch of finished responses drains, the loop first
+arms the next receive into the free input tail, compacting the consumed prefix
+beforehand when no frozen cell borrows request input, and then submits the
+send; by default the transport submits after every drain (`submit_batch`) so
+responses leave before the turn ends instead of at its poll. Bytes that arrive
+while that batch is still being sent, or while a flushed request waits to
+resume, are held and parsed after the batch completes. Closing cancels both
+operations and releases the slot only after every target and cancel
+completion has returned. `prearmed_receives`, `turns` and `idle_polls` in STATS
+show how often the overlap happened and how often the loop had to wait.
+
 The application promises a bounded, nonblocking callback. The framework cannot
 preempt it, isolate a crash or enforce wall-clock deadlines during it. Worker
 mode still separates finite blocking callbacks from the I/O owner but does not

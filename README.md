@@ -130,6 +130,7 @@ The default startup limits are explicit:
 | Borrow copy threshold | 256 bytes | `--borrow-copy-threshold`; borrowed spans up to this size are copied into the arena; 0 keeps every borrow a separate vector. |
 | Inline callbacks per event-loop turn | connections × batch limit, at most 8192 | `--callbacks-per-turn`; each connection gets at most its batch limit per turn from a FIFO ready ring. |
 | Deadline sweep | 100 ms | `--deadline-sweep-ms`; 1–1000; touched slots are checked sooner. |
+| Submit batch | 1 drain | `--submit-batch`; submit queued sends after this many drains within a turn; 0 submits only when the turn polls. |
 | Per-callback timing | off | `--callback-timing 1` records exact queue/handler maxima at two clock reads per callback. |
 | I/O shards | one per allowed CPU (Linux, at most 16), 1 (macOS) | `--shards`; 1–64, inline execution only; each shard reserves full slot storage and a shared counter keeps `--connections` the process-wide ceiling; `--shard-affinity 1` pins shard i to allowed CPU i. |
 | Logical response body | 16 MiB | `--max-response`; counted across flushes. |
@@ -144,8 +145,9 @@ Startup rejects inconsistent or over-budget configurations. The configured
 connection count bounds admitted slots, not the kernel TCP backlog. The server
 may accept one extra descriptor and immediately close it when all slots are
 occupied; it creates no extra request state and does not promise an HTTP 503.
-There is one data operation per connection and separately reserved cancellation
-capacity, bounded by `2 * (connections + 1)` operation records. Admission resumes
+Each connection has one receive and one send operation cell plus a cancel
+cell for each, `4 * connections + 2` operation records in all; the next
+receive is armed while the previous batch is still being sent. Admission resumes
 when the old application and transport owners have actually released a slot.
 
 The demo caps requested live bytes through its framework allocator at

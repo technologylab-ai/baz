@@ -29,8 +29,9 @@ UnsupportedTransferEncoding, ExpectationFailed, UnsupportedVersion.
 `src/transport.zig` exports selected `Backend`, `Socket` (i32 for POSIX MVP),
 `Completion { token: u64, result: i32 }` and `name`.
 Operations are addressed by caller-chosen cells: `cellCount(max_connections)`
-= `2 × (max_connections + 1)` fixed records. The server numbers them data
-cell = slot index, cancel cell = slots + index, then accept and cancel-accept.
+= `4 × max_connections + 2` fixed records. The server numbers them receive
+cell = slot index, send cell = slots + index, their cancel cells at 2 × slots
+and 3 × slots, then accept and cancel-accept.
 One cell never holds two live operations, so admission and completion matching
 are constant-time and the token is returned from the record.
 Backend methods: `init(allocator, max_connections: u16, port: u16, reuse_port: bool) !Backend`,
@@ -41,6 +42,7 @@ Backend methods: `init(allocator, max_connections: u16, port: u16, reuse_port: b
 `sendv(cell, token, socket, vectors: []const iovec_const) !void`,
 `cancel(cell, token, target_cell: u32) !void`,
 `poll(out: []Completion, timeout_ms: u32) !usize`,
+`flush() !void` to submit queued operations before the next poll,
 `close(cell, socket) void`, `shutdown(socket) void`, `port() u16`.
 Accepted sockets are returned as nonnegative completion results; zero recv is EOF;
 negative results are terminal OS failures. Cancellation reports target and
