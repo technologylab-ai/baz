@@ -251,18 +251,29 @@ pub const Parser = struct {
         assert(self.line_start <= self.scan);
         assert(self.scan <= bytes.len);
         const end = @min(bytes.len, limit);
-        while (self.scan < end) {
-            const c = bytes[self.scan];
-            if (c == '\n') {
-                if (self.scan == self.line_start or bytes[self.scan - 1] != '\r') return error.BadRequest;
-                const line = bytes[self.line_start .. self.scan - 1];
-                self.scan += 1;
-                self.line_start = self.scan;
-                return line;
-            }
-            if (self.scan > self.line_start and bytes[self.scan - 1] == '\r') return error.BadRequest;
-            self.scan += 1;
+        if (self.scan >= end) {
+            if (self.scan >= limit) return limit_error;
+            return null;
         }
+        // Vectorised search for the line end. A CR is legal only immediately
+        // before that LF; a CR anywhere else, or an LF without CR, is malformed.
+        // Bytes before `from` were classified by an earlier call except for the
+        // byte at scan - 1, whose CR-ness is decided by its successor.
+        const from = if (self.scan > self.line_start) self.scan - 1 else self.scan;
+        if (std.mem.findScalarPos(u8, bytes[0..end], self.scan, '\n')) |lf| {
+            if (lf == self.line_start) return error.BadRequest;
+            const cr = std.mem.findScalarPos(u8, bytes[0..lf], from, '\r') orelse return error.BadRequest;
+            if (cr != lf - 1) return error.BadRequest;
+            const line = bytes[self.line_start..cr];
+            self.scan = lf + 1;
+            self.line_start = self.scan;
+            return line;
+        }
+        if (std.mem.findScalarPos(u8, bytes[0..end], from, '\r')) |cr| {
+            // Only a CR as the final examined byte may still be followed by LF.
+            if (cr + 1 < end) return error.BadRequest;
+        }
+        self.scan = end;
         if (self.scan >= limit) return limit_error;
         return null;
     }
@@ -382,11 +393,34 @@ fn trim(bytes: []const u8) []const u8 {
     return std.mem.trim(u8, bytes, " \t");
 }
 
-fn tokenByte(c: u8) bool {
+fn tokenByteSlow(c: u8) bool {
     return std.ascii.isAlphanumeric(c) or switch (c) {
         '!', '#', '$', '%', '&', '\'', '*', '+', '-', '.', '^', '_', '`', '|', '~' => true,
         else => false,
     };
+}
+
+/// One table load per byte replaces the branch chains on the request path. The
+/// slow classifiers remain the definition; a test checks every byte agrees.
+const ByteClass = struct {
+    token: [256]bool,
+    /// RFC 3986 pchar/query octets except '%', which needs two hex digits.
+    path: [256]bool,
+    fn init() ByteClass {
+        @setEvalBranchQuota(20_000);
+        var class: ByteClass = .{ .token = undefined, .path = undefined };
+        for (0..256) |index| {
+            const c: u8 = @intCast(index);
+            class.token[index] = tokenByteSlow(c);
+            class.path[index] = unreserved(c) or subDelimiter(c) or c == ':' or c == '@' or c == '/' or c == '?';
+        }
+        return class;
+    }
+};
+const byte_class = ByteClass.init();
+
+fn tokenByte(c: u8) bool {
+    return byte_class.token[c];
 }
 
 fn isToken(bytes: []const u8) bool {
@@ -554,7 +588,7 @@ fn validatePath(bytes: []const u8) ParseError!void {
     var at: usize = 0;
     while (at < bytes.len) : (at += 1) {
         const c = bytes[at];
-        if (unreserved(c) or subDelimiter(c) or c == ':' or c == '@' or c == '/' or c == '?') continue;
+        if (byte_class.path[c]) continue;
         if (c == '%' and bytes.len - at >= 3 and hexDigit(bytes[at + 1]) != null and hexDigit(bytes[at + 2]) != null) {
             at += 2;
             continue;
@@ -737,6 +771,46 @@ test "strict malformed header and framing rejection never exposes a request" {
         var parser = Parser.init(.{});
         try testing.expectError(error.BadRequest, parser.parse(wire));
         try testing.expectError(error.BadRequest, parser.parse(wire));
+    }
+}
+
+test "byte class tables agree with the slow classifiers for every octet" {
+    for (0..256) |index| {
+        const c: u8 = @intCast(index);
+        try testing.expectEqual(tokenByteSlow(c), tokenByte(c));
+        try testing.expectEqual(unreserved(c) or subDelimiter(c) or c == ':' or c == '@' or c == '/' or c == '?', byte_class.path[c]);
+    }
+}
+
+test "vectorised line scanning rejects bare CR/LF at every fragment boundary" {
+    // Every CR position and every split must produce the same verdict as the
+    // whole-buffer parse, and a CR must never be rescanned into acceptance.
+    const good = "GET /a HTTP/1.1\r\nHost: x\r\nX-Long: abcdefghijklmnopqrstuvwxyz\r\n\r\n";
+    var wire: [good.len]u8 = undefined;
+    for (0..good.len) |position| {
+        for ([_]u8{ '\r', '\n' }) |octet| {
+            @memcpy(&wire, good);
+            wire[position] = octet;
+            var whole = Parser.init(.{});
+            const expected = whole.parse(&wire);
+            for (0..wire.len + 1) |split| {
+                var parser = Parser.init(.{});
+                const first = parser.parse(wire[0..split]) catch |err| {
+                    try testing.expectError(err, expected);
+                    continue;
+                };
+                if (first != null) {
+                    try testing.expect((try expected) != null);
+                    continue;
+                }
+                const second = parser.parse(&wire) catch |err| {
+                    try testing.expectError(err, expected);
+                    continue;
+                };
+                try testing.expectEqual((try expected) != null, second != null);
+                if (second) |request| try testing.expectEqual(good.len, request.consumed);
+            }
+        }
     }
 }
 
