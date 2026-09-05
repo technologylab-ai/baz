@@ -10,10 +10,22 @@ Current performance checkpoints:
 - `ca2eccf262632eda943615b119573c23e0f6e4fc`: inline and gather become defaults.
   A12-trial same-sweep comparison measured125k scalar-inline versus344k gather.
   Mac/Linux native wire/cancellation evidence is in reports/2026-09-05-gather.md.
-- Generic bounded response batching is implemented with default 16 inline
-  cells, a global 64-callback turn budget, delayed compaction and flush barriers.
-  Mac Debug/ReleaseSafe: 52 unit tests and 26 generic + 10 inline + 11 gather +
-  15 batch cases passed per mode. Linux throughput evidence is pending.
+- `b7ac35558dea3e418e7dab5e41b1d3bb9054ca73`: generic response batching,
+  default16 cells, global64-callback budget, deferred compaction and flush
+  barriers. Same-binary pipeline16: batch1 234k/s, batch16 1.22M/s. Separate
+  one-core experiment: Zig1.83M/s versus libreactor2.62M/s. All24+12 trials passed.
+- `5620905193e496af1c4b297a576c4fe7edd6c4a9`: separate multi-cell pending-cancel
+  witness; both Mac and Linux retained16 cells and drained every owner. Both
+  hosts pass52 tests in Debug/ReleaseSafe,26+10+11+16 wire cases,30k smoke bodies.
+- `3f1963f21a8d5c84b08efed94c90e1cbb9434330`: deeper client pipeline support
+  in the harness and distinct-body wire tests at32/64/128. All22 batch cases
+  pass on Mac/Linux; runtime server source is unchanged from5620905.
+  The24-trial one-core depth16/32/64/128 sweep passed, but Zig plateaued near
+  1.06–1.19M/s while libreactor reached7.41M/s at128. The depth16 control also
+  regressed versus the preceding sweep; retain its follow-up old/current binary
+  control before attributing that change to code. That control also varied:
+  unchanged current binary1.02–1.81M/s, original0.96–1.16M/s. It cannot isolate
+  a code regression; all6 trials passed and the variation remains explicit.
   Preserve all earlier checkpoints; do not relabel their data as the new code.
 
 Inline application callbacks must be bounded and nonblocking. Worker mode is
@@ -52,7 +64,8 @@ Budget tracks/refuses framework allocator growth and counts late attempts.
 It excludes libc/pthread metadata, actual stack mappings, kernel socket/ring
 storage, allocator overhead and application allocations; do not call it an RSS
 cap. No extra workers or request queues appear under load. Pipeline suffix
-compaction copies are measured and remain an optimization target.
+compaction happens only after batch completion, remains measured, and is still
+an optimization target for deeper client pipelines.
 
 Mac maxross is preferred for expensive portable work; Linux runtime uses
 `tools/verify_linux_ssh.sh omarx1`, which streams into a validated temporary
@@ -66,3 +79,17 @@ The first pinned implementation and native gate packet is in
 [reports/2026-09-05-mvp.md](reports/2026-09-05-mvp.md): 44 test executions in
 each mode and 26 integration cases per host. Full finite smoke runs validated
 30,000 responses per host in ReleaseSafe. See ROADMAP.md for remaining work.
+
+The next isolated architecture experiment is token-addressed Linux operation
+cells: preserve exact slot/generation/kind checks and cancellation reserve while
+removing admission/CQE searches. The single-owner thread, whole-slot scheduler
+scan, six per-request clock reads and generic header formatting remain current
+costs, not profiled bottlenecks. Tune server batch limits separately from client
+pipeline depth. I/O sharding, optional offload and dynamic release remain queued.
+
+Latest evidence is [the batching report](reports/2026-09-05-batch.md), including
+24 batch-limit,12 one-core,24 deeper-pipeline and6 old/current trials. All72
+baseline/client trials and the separate inline/gather checkpoints remain intact.
+All agents and timed runners finished. Use the final clean pushed documentation
+revision for local and Linux publication gates. Windows HTTP remains unimplemented;
+the sibling wiki's hosted Windows checks cover its lifecycle proofs only.

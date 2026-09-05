@@ -1,0 +1,2129 @@
+{
+  "schema_version": 1,
+  "tool": "zig-http-wrk-comparison",
+  "ok": true,
+  "started_utc": "2026-09-05T17:35:17.037456+00:00",
+  "configuration": {
+    "server_cpus": [
+      0
+    ],
+    "client_cpus": [
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "wrk": "/tmp/zig-http-compare.qHiBFl/bin/wrk",
+    "implementation_commit": "b7ac35558dea3e418e7dab5e41b1d3bb9054ca73",
+    "source_checkpoint": "b7ac35558dea3e418e7dab5e41b1d3bb9054ca73",
+    "servers": [
+      {
+        "name": "inline-batch-16",
+        "implementation": "zig-http",
+        "cwd": "/tmp/zig-http-compare.qHiBFl/batch-http",
+        "body": "Hello, World!",
+        "expected_execution": "inline_event_loop",
+        "command": [
+          "/tmp/zig-http-compare.qHiBFl/batch-http/zig-out/bin/zig-http",
+          "--port",
+          "8080",
+          "--connections",
+          "128",
+          "--execution",
+          "inline",
+          "--gather-send",
+          "1",
+          "--response-batch-limit",
+          "16",
+          "--duration-ms",
+          "120000"
+        ]
+      },
+      {
+        "name": "libreactor",
+        "cwd": "/tmp/zig-http-compare.qHiBFl",
+        "command": [
+          "/tmp/zig-http-compare.qHiBFl/bin/libreactor"
+        ],
+        "body": "Hello, World!"
+      }
+    ]
+  },
+  "harness_sha256": "565005c0ca350b5916cdf4b283af442ffdf8c368d5c6d6265f2030f25645f56f",
+  "lua_sha256": "0ef2373b525d6f026c09e0225dc826538aced80f4afb56b5914404630687560b",
+  "configuration_sha256": "2157aadfb7f35dbcc93b7292960d5cefa468141e7be39687117ba0a6954656ca",
+  "wrk_sha256": "d74f87d0d3fa3056b4fddb7e9c86e427c6013258c3387409f231c9d1bb5f8fb1",
+  "latency_model": "wrk corrected batch histogram; batch depth1 or16; closed loop",
+  "validation": "32 exact-body/header responses per trial before timed load; wrk framing/status during load",
+  "duration_seconds": 5,
+  "repeats": 3,
+  "threads": 4,
+  "seed": 20260905,
+  "connections": [
+    128
+  ],
+  "pipeline_depths": [
+    1,
+    16
+  ],
+  "environment": {
+    "uname": "Linux omarx1 7.1.9-arch1-2 #1 SMP PREEMPT_DYNAMIC Fri, 21 Aug 2026 22:18:59 +0000 x86_64 GNU/Linux",
+    "os_release": "NAME=\"Omarchy\"\nPRETTY_NAME=\"Omarchy\"\nID=omarchy\nID_LIKE=arch\nBUILD_ID=\"4.0.2\"\nVERSION_ID=\"4.0.2\"\nANSI_COLOR=\"38;2;158;206;106\"\nHOME_URL=\"https://omarchy.org/\"\nDOCUMENTATION_URL=\"https://learn.omacom.io/2/the-omarchy-manual\"\nSUPPORT_URL=\"https://discord.gg/tXFUdasqhY\"\nBUG_REPORT_URL=\"https://github.com/basecamp/omarchy/issues\"\nLOGO=omarchy\n",
+    "cpuinfo": "processor\t: 0\nvendor_id\t: GenuineIntel\ncpu family\t: 6\nmodel\t\t: 189\nmodel name\t: Intel(R) Core(TM) Ultra 7 258V\nstepping\t: 1\nmicrocode\t: 0x128\ncpu MHz\t\t: 3961.505\ncache size\t: 12288 KB\nphysical id\t: 0\nsiblings\t: 8\ncore id\t\t: 0\ncpu cores\t: 8\napicid\t\t: 0\ninitial apicid\t: 0\nfpu\t\t: yes\nfpu_exception\t: yes\ncpuid level\t: 35\nwp\t\t: yes\nflags\t\t: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf tsc_known_freq pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb ssbd ibrs ibpb stibp ibrs_enhanced tpr_shadow flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid rdt_a rdseed adx smap clflushopt clwb intel_pt sha_ni xsaveopt xsavec xgetbv1 xsaves split_lock_detect user_shstk avx_vnni lass lam wbnoinvd dtherm ida arat pln pts hwp hwp_notify hwp_act_window hwp_epp hwp_pkg_req hfi vnmi umip pku ospke waitpkg gfni vaes vpclmulqdq rdpid bus_lock_detect movdiri movdir64b fsrm md_clear serialize pconfig arch_lbr ibt flush_l1d arch_capabilities\nvmx flags\t: vnmi preemption_timer posted_intr invvpid ept_x_only ept_ad ept_1gb flexpriority apicv tsc_offset vtpr mtf vapic ept vpid unrestricted_guest vapic_reg vid ple shadow_vmcs pml ept_violation_ve ept_mode_based_exec tsc_scaling usr_wait_pause notify_vm_exiting ipi_virt\nbugs\t\t: monitor spectre_v1 spectre_v2 spec_store_bypass swapgs bhi spectre_v2_user vmscape\nbogomips\t: 6604.80\nclflush size\t: 64\ncache_alignment\t: 64\naddress sizes\t: 42 bits physical, 48 bits virtual\npower management:\n\nprocessor\t: 1\nvendor_id\t: GenuineIntel\ncpu family\t: 6\nmodel\t\t: 189\nmodel name\t: Intel(R) Core(TM) Ultra 7 258V\nstepping\t: 1\nmicrocode\t: 0x128\ncpu MHz\t\t: 3414.245\ncache size\t: 12288 KB\nphysical id\t: 0\nsiblings\t: 8\ncore id\t\t: 4\ncpu cores\t: 8\napicid\t\t: 8\ninitial apicid\t: 8\nfpu\t\t: yes\nfpu_exception\t: yes\ncpuid level\t: 35\nwp\t\t: yes\nflags\t\t: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf tsc_known_freq pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb ssbd ibrs ibpb stibp ibrs_enhanced tpr_shadow flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid rdt_a rdseed adx smap clflushopt clwb intel_pt sha_ni xsaveopt xsavec xgetbv1 xsaves split_lock_detect user_shstk avx_vnni lass lam wbnoinvd dtherm ida arat pln pts hwp hwp_notify hwp_act_window hwp_epp hwp_pkg_req hfi vnmi umip pku ospke waitpkg gfni vaes vpclmulqdq rdpid bus_lock_detect movdiri movdir64b fsrm md_clear serialize pconfig arch_lbr ibt flush_l1d arch_capabilities\nvmx flags\t: vnmi preemption_timer posted_intr invvpid ept_x_only ept_ad ept_1gb flexpriority apicv tsc_offset vtpr mtf vapic ept vpid unrestricted_guest vapic_reg vid ple shadow_vmcs pml ept_violation_ve ept_mode_based_exec tsc_scaling usr_wait_pause notify_vm_exiting ipi_virt\nbugs\t\t: monitor spectre_v1 spectre_v2 spec_store_bypass swapgs bhi spectre_v2_user vmscape\nbogomips\t: 6604.80\nclflush size\t: 64\ncache_alignment\t: 64\naddress sizes\t: 42 bits physical, 48 bits virtual\npower management:\n\nprocessor\t: 2\nvendor_id\t: GenuineIntel\ncpu family\t: 6\nmodel\t\t: 189\nmodel name\t: Intel(R) Core(TM) Ultra 7 258V\nstepping\t: 1\nmicrocode\t: 0x128\ncpu MHz\t\t: 2711.722\ncache size\t: 12288 KB\nphysical id\t: 0\nsiblings\t: 8\ncore id\t\t: 8\ncpu cores\t: 8\napicid\t\t: 16\ninitial apicid\t: 16\nfpu\t\t: yes\nfpu_exception\t: yes\ncpuid level\t: 35\nwp\t\t: yes\nflags\t\t: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf tsc_known_freq pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb ssbd ibrs ibpb stibp ibrs_enhanced tpr_shadow flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid rdt_a rdseed adx smap clflushopt clwb intel_pt sha_ni xsaveopt xsavec xgetbv1 xsaves split_lock_detect user_shstk avx_vnni lass lam wbnoinvd dtherm ida arat pln pts hwp hwp_notify hwp_act_window hwp_epp hwp_pkg_req hfi vnmi umip pku ospke waitpkg gfni vaes vpclmulqdq rdpid bus_lock_detect movdiri movdir64b fsrm md_clear serialize pconfig arch_lbr ibt flush_l1d arch_capabilities\nvmx flags\t: vnmi preemption_timer posted_intr invvpid ept_x_only ept_ad ept_1gb flexpriority apicv tsc_offset vtpr mtf vapic ept vpid unrestricted_guest vapic_reg vid ple shadow_vmcs pml ept_violation_ve ept_mode_based_exec tsc_scaling usr_wait_pause notify_vm_exiting ipi_virt\nbugs\t\t: monitor spectre_v1 spectre_v2 spec_store_bypass swapgs bhi spectre_v2_user vmscape\nbogomips\t: 6604.80\nclflush size\t: 64\ncache_alignment\t: 64\naddress sizes\t: 42 bits physical, 48 bits virtual\npower management:\n\nprocessor\t: 3\nvendor_id\t: GenuineIntel\ncpu family\t: 6\nmodel\t\t: 189\nmodel name\t: Intel(R) Core(TM) Ultra 7 258V\nstepping\t: 1\nmicrocode\t: 0x128\ncpu MHz\t\t: 1037.531\ncache size\t: 12288 KB\nphysical id\t: 0\nsiblings\t: 8\ncore id\t\t: 12\ncpu cores\t: 8\napicid\t\t: 24\ninitial apicid\t: 24\nfpu\t\t: yes\nfpu_exception\t: yes\ncpuid level\t: 35\nwp\t\t: yes\nflags\t\t: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf tsc_known_freq pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb ssbd ibrs ibpb stibp ibrs_enhanced tpr_shadow flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid rdt_a rdseed adx smap clflushopt clwb intel_pt sha_ni xsaveopt xsavec xgetbv1 xsaves split_lock_detect user_shstk avx_vnni lass lam wbnoinvd dtherm ida arat pln pts hwp hwp_notify hwp_act_window hwp_epp hwp_pkg_req hfi vnmi umip pku ospke waitpkg gfni vaes vpclmulqdq rdpid bus_lock_detect movdiri movdir64b fsrm md_clear serialize pconfig arch_lbr ibt flush_l1d arch_capabilities\nvmx flags\t: vnmi preemption_timer posted_intr invvpid ept_x_only ept_ad ept_1gb flexpriority apicv tsc_offset vtpr mtf vapic ept vpid unrestricted_guest vapic_reg vid ple shadow_vmcs pml ept_violation_ve ept_mode_based_exec tsc_scaling usr_wait_pause notify_vm_exiting ipi_virt\nbugs\t\t: monitor spectre_v1 spectre_v2 spec_store_bypass swapgs bhi spectre_v2_user vmscape\nbogomips\t: 6604.80\nclflush size\t: 64\ncache_alignment\t: 64\naddress sizes\t: 42 bits physical, 48 bits virtual\npower management:\n\nprocessor\t: 4\nvendor_id\t: GenuineIntel\ncpu family\t: 6\nmodel\t\t: 189\nmodel name\t: Intel(R) Core(TM) Ultra 7 258V\nstepping\t: 1\nmicrocode\t: 0x128\ncpu MHz\t\t: 3700.977\ncache size\t: 4096 KB\nphysical id\t: 0\nsiblings\t: 8\ncore id\t\t: 32\ncpu cores\t: 8\napicid\t\t: 64\ninitial apicid\t: 64\nfpu\t\t: yes\nfpu_exception\t: yes\ncpuid level\t: 35\nwp\t\t: yes\nflags\t\t: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf tsc_known_freq pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb ssbd ibrs ibpb stibp ibrs_enhanced tpr_shadow flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid rdt_a rdseed adx smap clflushopt clwb intel_pt sha_ni xsaveopt xsavec xgetbv1 xsaves split_lock_detect user_shstk avx_vnni lass lam wbnoinvd dtherm ida arat pln pts hwp hwp_notify hwp_act_window hwp_epp hwp_pkg_req hfi vnmi umip pku ospke waitpkg gfni vaes vpclmulqdq rdpid bus_lock_detect movdiri movdir64b fsrm md_clear serialize pconfig arch_lbr ibt flush_l1d arch_capabilities\nvmx flags\t: vnmi preemption_timer posted_intr invvpid ept_x_only ept_ad ept_1gb flexpriority apicv tsc_offset vtpr mtf vapic ept vpid unrestricted_guest vapic_reg vid ple shadow_vmcs pml ept_violation_ve ept_mode_based_exec tsc_scaling usr_wait_pause notify_vm_exiting ipi_virt\nbugs\t\t: monitor spectre_v1 spectre_v2 spec_store_bypass swapgs bhi spectre_v2_user vmscape\nbogomips\t: 6604.80\nclflush size\t: 64\ncache_alignment\t: 64\naddress sizes\t: 42 bits physical, 48 bits virtual\npower management:\n\nprocessor\t: 5\nvendor_id\t: GenuineIntel\ncpu family\t: 6\nmodel\t\t: 189\nmodel name\t: Intel(R) Core(TM) Ultra 7 258V\nstepping\t: 1\nmicrocode\t: 0x128\ncpu MHz\t\t: 2461.068\ncache size\t: 4096 KB\nphysical id\t: 0\nsiblings\t: 8\ncore id\t\t: 33\ncpu cores\t: 8\napicid\t\t: 66\ninitial apicid\t: 66\nfpu\t\t: yes\nfpu_exception\t: yes\ncpuid level\t: 35\nwp\t\t: yes\nflags\t\t: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf tsc_known_freq pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb ssbd ibrs ibpb stibp ibrs_enhanced tpr_shadow flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid rdt_a rdseed adx smap clflushopt clwb intel_pt sha_ni xsaveopt xsavec xgetbv1 xsaves split_lock_detect user_shstk avx_vnni lass lam wbnoinvd dtherm ida arat pln pts hwp hwp_notify hwp_act_window hwp_epp hwp_pkg_req hfi vnmi umip pku ospke waitpkg gfni vaes vpclmulqdq rdpid bus_lock_detect movdiri movdir64b fsrm md_clear serialize pconfig arch_lbr ibt flush_l1d arch_capabilities\nvmx flags\t: vnmi preemption_timer posted_intr invvpid ept_x_only ept_ad ept_1gb flexpriority apicv tsc_offset vtpr mtf vapic ept vpid unrestricted_guest vapic_reg vid ple shadow_vmcs pml ept_violation_ve ept_mode_based_exec tsc_scaling usr_wait_pause notify_vm_exiting ipi_virt\nbugs\t\t: monitor spectre_v1 spectre_v2 spec_store_bypass swapgs bhi spectre_v2_user vmscape\nbogomips\t: 6604.80\nclflush size\t: 64\ncache_alignment\t: 64\naddress sizes\t: 42 bits physical, 48 bits virtual\npower management:\n\nprocessor\t: 6\nvendor_id\t: GenuineIntel\ncpu family\t: 6\nmodel\t\t: 189\nmodel name\t: Intel(R) Core(TM) Ultra 7 258V\nstepping\t: 1\nmicrocode\t: 0x128\ncpu MHz\t\t: 784.338\ncache size\t: 4096 KB\nphysical id\t: 0\nsiblings\t: 8\ncore id\t\t: 34\ncpu cores\t: 8\napicid\t\t: 68\ninitial apicid\t: 68\nfpu\t\t: yes\nfpu_exception\t: yes\ncpuid level\t: 35\nwp\t\t: yes\nflags\t\t: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf tsc_known_freq pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb ssbd ibrs ibpb stibp ibrs_enhanced tpr_shadow flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid rdt_a rdseed adx smap clflushopt clwb intel_pt sha_ni xsaveopt xsavec xgetbv1 xsaves split_lock_detect user_shstk avx_vnni lass lam wbnoinvd dtherm ida arat pln pts hwp hwp_notify hwp_act_window hwp_epp hwp_pkg_req hfi vnmi umip pku ospke waitpkg gfni vaes vpclmulqdq rdpid bus_lock_detect movdiri movdir64b fsrm md_clear serialize pconfig arch_lbr ibt flush_l1d arch_capabilities\nvmx flags\t: vnmi preemption_timer posted_intr invvpid ept_x_only ept_ad ept_1gb flexpriority apicv tsc_offset vtpr mtf vapic ept vpid unrestricted_guest vapic_reg vid ple shadow_vmcs pml ept_violation_ve ept_mode_based_exec tsc_scaling usr_wait_pause notify_vm_exiting ipi_virt\nbugs\t\t: monitor spectre_v1 spectre_v2 spec_store_bypass swapgs bhi spectre_v2_user vmscape\nbogomips\t: 6604.80\nclflush size\t: 64\ncache_alignment\t: 64\naddress sizes\t: 42 bits physical, 48 bits virtual\npower management:\n\nprocessor\t: 7\nvendor_id\t: GenuineIntel\ncpu family\t: 6\nmodel\t\t: 189\nmodel name\t: Intel(R) Core(TM) Ultra 7 258V\nstepping\t: 1\nmicrocode\t: 0x128\ncpu MHz\t\t: 3617.345\ncache size\t: 4096 KB\nphysical id\t: 0\nsiblings\t: 8\ncore id\t\t: 35\ncpu cores\t: 8\napicid\t\t: 70\ninitial apicid\t: 70\nfpu\t\t: yes\nfpu_exception\t: yes\ncpuid level\t: 35\nwp\t\t: yes\nflags\t\t: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf tsc_known_freq pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb ssbd ibrs ibpb stibp ibrs_enhanced tpr_shadow flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid rdt_a rdseed adx smap clflushopt clwb intel_pt sha_ni xsaveopt xsavec xgetbv1 xsaves split_lock_detect user_shstk avx_vnni lass lam wbnoinvd dtherm ida arat pln pts hwp hwp_notify hwp_act_window hwp_epp hwp_pkg_req hfi vnmi umip pku ospke waitpkg gfni vaes vpclmulqdq rdpid bus_lock_detect movdiri movdir64b fsrm md_clear serialize pconfig arch_lbr ibt flush_l1d arch_capabilities\nvmx flags\t: vnmi preemption_timer posted_intr invvpid ept_x_only ept_ad ept_1gb flexpriority apicv tsc_offset vtpr mtf vapic ept vpid unrestricted_guest vapic_reg vid ple shadow_vmcs pml ept_violation_ve ept_mode_based_exec tsc_scaling usr_wait_pause notify_vm_exiting ipi_virt\nbugs\t\t: monitor spectre_v1 spectre_v2 spec_store_bypass swapgs bhi spectre_v2_user vmscape\nbogomips\t: 6604.80\nclflush size\t: 64\ncache_alignment\t: 64\naddress sizes\t: 42 bits physical, 48 bits virtual\npower management:\n\n",
+    "meminfo": "MemTotal:       32325236 kB\nMemFree:         4133580 kB\nMemAvailable:   11895696 kB\nBuffers:              40 kB\nCached:         10091164 kB\nSwapCached:         2824 kB\nActive:          9661416 kB\nInactive:       11723128 kB\nActive(anon):    8537448 kB\nInactive(anon):  3936700 kB\nActive(file):    1123968 kB\nInactive(file):  7786428 kB\nUnevictable:       67608 kB\nMlocked:             504 kB\nSwapTotal:      64649360 kB\nSwapFree:       57312068 kB\nZswap:                 0 kB\nZswapped:              0 kB\nDirty:              2320 kB\nWriteback:             0 kB\nAnonPages:      11076880 kB\nMapped:          1397672 kB\nShmem:           1181192 kB\nKReclaimable:     664424 kB\nSlab:            1076040 kB\nSReclaimable:     664424 kB\nSUnreclaim:       411616 kB\nKernelStack:       36016 kB\nPageTables:       168120 kB\nSecPageTables:      3320 kB\nNFS_Unstable:          0 kB\nBounce:                0 kB\nWritebackTmp:          0 kB\nCommitLimit:    80811976 kB\nCommitted_AS:   80015724 kB\nVmallocTotal:   34359738367 kB\nVmallocUsed:      239260 kB\nVmallocChunk:          0 kB\nPercpu:             5952 kB\nHardwareCorrupted:     0 kB\nAnonHugePages:   1689600 kB\nShmemHugePages:        0 kB\nShmemPmdMapped:        0 kB\nFileHugePages:    569344 kB\nFilePmdMapped:    491520 kB\nCmaTotal:              0 kB\nCmaFree:               0 kB\nUnaccepted:            0 kB\nBalloon:               0 kB\nGPUActive:       1912408 kB\nGPUReclaim:       593088 kB\nHugePages_Total:       0\nHugePages_Free:        0\nHugePages_Rsvd:        0\nHugePages_Surp:        0\nHugepagesize:       2048 kB\nHugetlb:               0 kB\nDirectMap4k:    17420480 kB\nDirectMap2M:    15597568 kB\nDirectMap1G:     1048576 kB\n",
+    "io_uring_disabled": "0",
+    "lscpu": "Architecture:                            x86_64\nCPU op-mode(s):                          32-bit, 64-bit\nAddress sizes:                           42 bits physical, 48 bits virtual\nByte Order:                              Little Endian\nCPU(s):                                  8\nOn-line CPU(s) list:                     0-7\nVendor ID:                               GenuineIntel\nModel name:                              Intel(R) Core(TM) Ultra 7 258V\nCPU family:                              6\nModel:                                   189\nThread(s) per core:                      1\nCore(s) per socket:                      8\nSocket(s):                               1\nStepping:                                1\nMicrocode version:                       0x128\nCPU(s) scaling MHz:                      64%\nCPU max MHz:                             4800.0000\nCPU min MHz:                             400.0000\nBogoMIPS:                                6604.80\nFlags:                                   fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf tsc_known_freq pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb ssbd ibrs ibpb stibp ibrs_enhanced tpr_shadow flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid rdt_a rdseed adx smap clflushopt clwb intel_pt sha_ni xsaveopt xsavec xgetbv1 xsaves split_lock_detect user_shstk avx_vnni lass lam wbnoinvd dtherm ida arat pln pts hwp hwp_notify hwp_act_window hwp_epp hwp_pkg_req hfi vnmi umip pku ospke waitpkg gfni vaes vpclmulqdq rdpid bus_lock_detect movdiri movdir64b fsrm md_clear serialize pconfig arch_lbr ibt flush_l1d arch_capabilities\nVirtualization:                          VT-x\nL1d cache:                               320 KiB (8 instances)\nL1i cache:                               512 KiB (8 instances)\nL2 cache:                                14 MiB (5 instances)\nL3 cache:                                12 MiB (1 instance)\nNUMA node(s):                            1\nNUMA node0 CPU(s):                       0-7\nVulnerability Gather data sampling:      Not affected\nVulnerability Ghostwrite:                Not affected\nVulnerability Indirect target selection: Not affected\nVulnerability Itlb multihit:             Not affected\nVulnerability L1tf:                      Not affected\nVulnerability Mds:                       Not affected\nVulnerability Meltdown:                  Not affected\nVulnerability Mmio stale data:           Not affected\nVulnerability Old microcode:             Not affected\nVulnerability Reg file data sampling:    Not affected\nVulnerability Retbleed:                  Not affected\nVulnerability Spec rstack overflow:      Not affected\nVulnerability Spec store bypass:         Mitigation; Speculative Store Bypass disabled via prctl\nVulnerability Spectre v1:                Mitigation; usercopy/swapgs barriers and __user pointer sanitization\nVulnerability Spectre v2:                Mitigation; Enhanced / Automatic IBRS; IBPB conditional; PBRSB-eIBRS Not affected; BHI BHI_DIS_S\nVulnerability Srbds:                     Not affected\nVulnerability Tsa:                       Not affected\nVulnerability Tsx async abort:           Not affected\nVulnerability Vmscape:                   Mitigation; IBPB before exit to userspace",
+    "python": "3.14.7 (main, Aug 10 2026, 07:46:56) [GCC 16.1.1 20260728]",
+    "frequency_policy": {
+      "/sys/devices/system/cpu/cpu7/cpufreq/scaling_governor": "powersave",
+      "/sys/devices/system/cpu/cpu5/cpufreq/scaling_governor": "powersave",
+      "/sys/devices/system/cpu/cpu3/cpufreq/scaling_governor": "powersave",
+      "/sys/devices/system/cpu/cpu1/cpufreq/scaling_governor": "powersave",
+      "/sys/devices/system/cpu/cpu6/cpufreq/scaling_governor": "powersave",
+      "/sys/devices/system/cpu/cpu4/cpufreq/scaling_governor": "powersave",
+      "/sys/devices/system/cpu/cpu2/cpufreq/scaling_governor": "powersave",
+      "/sys/devices/system/cpu/cpu0/cpufreq/scaling_governor": "powersave"
+    },
+    "boost_policy": {
+      "/sys/devices/system/cpu/intel_pstate/no_turbo": "0"
+    }
+  },
+  "trials": [
+    {
+      "index": 0,
+      "repeat": 0,
+      "server": "inline-batch-16",
+      "connections": 128,
+      "pipeline": 16,
+      "server_command": [
+        "taskset",
+        "-c",
+        "0",
+        "/tmp/zig-http-compare.qHiBFl/batch-http/zig-out/bin/zig-http",
+        "--port",
+        "8080",
+        "--connections",
+        "128",
+        "--execution",
+        "inline",
+        "--gather-send",
+        "1",
+        "--response-batch-limit",
+        "16",
+        "--duration-ms",
+        "120000"
+      ],
+      "preflight": {
+        "validated_responses": 32,
+        "exact_body": "Hello, World!",
+        "headers": {
+          "server": "zig-http",
+          "date": "Sat, 05 Sep 2026 17:35:18 GMT",
+          "content-type": "text/plain",
+          "content-length": "13",
+          "connection": "keep-alive"
+        },
+        "first_date": "Sat, 05 Sep 2026 17:35:17 GMT",
+        "last_date": "Sat, 05 Sep 2026 17:35:18 GMT"
+      },
+      "root_pid": 934340,
+      "warmup": {
+        "requests": 1840416,
+        "duration_us": 1017456,
+        "bytes": 288945312,
+        "connect_errors": 0,
+        "read_errors": 0,
+        "write_errors": 0,
+        "status_errors": 0,
+        "timeout_errors": 0,
+        "latency_mean_us": 2101.025,
+        "latency_p50_us": 2066.0,
+        "latency_p99_us": 4620.0,
+        "latency_max_us": 13623.0,
+        "latency_percentiles_sane": true,
+        "latency_model": "wrk corrected histogram of completed pipeline batches; not per-response or open-loop SLO latency",
+        "responses_per_second": 1808840.8737085436,
+        "ok": true
+      },
+      "client_command": [
+        "taskset",
+        "-c",
+        "3,4,5,6,7",
+        "/tmp/zig-http-compare.qHiBFl/bin/wrk",
+        "-d",
+        "5s",
+        "-t",
+        "4",
+        "-c",
+        "128",
+        "--timeout",
+        "2s",
+        "-s",
+        "/tmp/zig-http-compare.qHiBFl/batch-http/benchmarks/pipeline.lua",
+        "http://127.0.0.1:8080/plaintext",
+        "--",
+        "16"
+      ],
+      "stable_thread_set": true,
+      "result": {
+        "requests": 9201408,
+        "duration_us": 5019700,
+        "bytes": 1444621056,
+        "connect_errors": 0,
+        "read_errors": 0,
+        "write_errors": 0,
+        "status_errors": 0,
+        "timeout_errors": 0,
+        "latency_mean_us": 2070.271,
+        "latency_p50_us": 2050.0,
+        "latency_p99_us": 4504.0,
+        "latency_max_us": 12096.0,
+        "latency_percentiles_sane": true,
+        "latency_model": "wrk corrected histogram of completed pipeline batches; not per-response or open-loop SLO latency",
+        "responses_per_second": 1833059.3461760662,
+        "ok": true
+      },
+      "elapsed_seconds": 5.026171331002843,
+      "server_threads": [
+        {
+          "tid": 934340,
+          "pid": 934340,
+          "last_cpu": 0,
+          "cpu_seconds": 4.16,
+          "cpu_percent": 82.7667766584069
+        }
+      ],
+      "system_cpu": {
+        "cpu": {
+          "busy_percent": 42.416769420468555,
+          "iowait_percent": 0.2959309494451295
+        },
+        "cpu0": {
+          "busy_percent": 99.8019801980198,
+          "iowait_percent": 0.0
+        },
+        "cpu1": {
+          "busy_percent": 17.09741550695825,
+          "iowait_percent": 0.7952286282306164
+        },
+        "cpu2": {
+          "busy_percent": 18.163672654690618,
+          "iowait_percent": 0.5988023952095808
+        },
+        "cpu3": {
+          "busy_percent": 27.290836653386453,
+          "iowait_percent": 0.199203187250996
+        },
+        "cpu4": {
+          "busy_percent": 44.00785854616896,
+          "iowait_percent": 0.19646365422396855
+        },
+        "cpu5": {
+          "busy_percent": 44.488188976377955,
+          "iowait_percent": 0.1968503937007874
+        },
+        "cpu6": {
+          "busy_percent": 44.3579766536965,
+          "iowait_percent": 0.0
+        },
+        "cpu7": {
+          "busy_percent": 43.83561643835616,
+          "iowait_percent": 0.19569471624266144
+        }
+      },
+      "client_cpu_seconds": 5.5234760000000005,
+      "server_cpu_percent": 82.7667766584069,
+      "resident_kib_by_pid": {
+        "934340": 31464
+      },
+      "client_cpu_percent": 109.89430395915163,
+      "client_exit": 0,
+      "server_exit": 0,
+      "server_log": "READY port=8080 backend=io_uring connections=128 workers=0 execution=inline_event_loop gather_send=1 response_batch_limit=16 optimize=ReleaseSafe\nSTATS {\"execution\":\"inline_event_loop\",\"gather_send\":true,\"response_batch_limit\":16,\"response_batches\":690355,\"batched_finished_responses\":11045680,\"max_batch_responses\":16,\"scalar_send_operations\":0,\"gather_send_operations\":690355,\"send_completions\":690355,\"short_send_completions\":0,\"gather_cancel_requests\":0,\"gather_canceled_completions\":0,\"max_send_parts\":32,\"max_send_bytes\":2512,\"max_inline_callbacks_per_turn\":64,\"inline_dispatches\":11045680,\"worker_dispatches\":0,\"accepted\":261,\"completed\":11045680,\"rejected\":0,\"timeouts\":0,\"flushes\":0,\"resumed\":0,\"bytes_received\":541238160,\"bytes_sent\":1734171760,\"pipeline_copy_bytes\":0,\"live_connections\":0,\"peak_connections\":128,\"live_operations\":0,\"peak_operations\":129,\"max_loop_ns\":2563780,\"max_handler_ns\":222286,\"max_queue_ns\":11912472,\"max_request_ns\":28035492,\"workers\":0,\"allocation_calls_after_start\":0,\"framework_heap_peak_bytes\":29618624,\"framework_heap_limit_bytes\":536870912}\n",
+      "stats": {
+        "execution": "inline_event_loop",
+        "gather_send": true,
+        "response_batch_limit": 16,
+        "response_batches": 690355,
+        "batched_finished_responses": 11045680,
+        "max_batch_responses": 16,
+        "scalar_send_operations": 0,
+        "gather_send_operations": 690355,
+        "send_completions": 690355,
+        "short_send_completions": 0,
+        "gather_cancel_requests": 0,
+        "gather_canceled_completions": 0,
+        "max_send_parts": 32,
+        "max_send_bytes": 2512,
+        "max_inline_callbacks_per_turn": 64,
+        "inline_dispatches": 11045680,
+        "worker_dispatches": 0,
+        "accepted": 261,
+        "completed": 11045680,
+        "rejected": 0,
+        "timeouts": 0,
+        "flushes": 0,
+        "resumed": 0,
+        "bytes_received": 541238160,
+        "bytes_sent": 1734171760,
+        "pipeline_copy_bytes": 0,
+        "live_connections": 0,
+        "peak_connections": 128,
+        "live_operations": 0,
+        "peak_operations": 129,
+        "max_loop_ns": 2563780,
+        "max_handler_ns": 222286,
+        "max_queue_ns": 11912472,
+        "max_request_ns": 28035492,
+        "workers": 0,
+        "allocation_calls_after_start": 0,
+        "framework_heap_peak_bytes": 29618624,
+        "framework_heap_limit_bytes": 536870912
+      }
+    },
+    {
+      "index": 1,
+      "repeat": 1,
+      "server": "inline-batch-16",
+      "connections": 128,
+      "pipeline": 16,
+      "server_command": [
+        "taskset",
+        "-c",
+        "0",
+        "/tmp/zig-http-compare.qHiBFl/batch-http/zig-out/bin/zig-http",
+        "--port",
+        "8080",
+        "--connections",
+        "128",
+        "--execution",
+        "inline",
+        "--gather-send",
+        "1",
+        "--response-batch-limit",
+        "16",
+        "--duration-ms",
+        "120000"
+      ],
+      "preflight": {
+        "validated_responses": 32,
+        "exact_body": "Hello, World!",
+        "headers": {
+          "server": "zig-http",
+          "date": "Sat, 05 Sep 2026 17:35:25 GMT",
+          "content-type": "text/plain",
+          "content-length": "13",
+          "connection": "keep-alive"
+        },
+        "first_date": "Sat, 05 Sep 2026 17:35:24 GMT",
+        "last_date": "Sat, 05 Sep 2026 17:35:25 GMT"
+      },
+      "root_pid": 934401,
+      "warmup": {
+        "requests": 1869168,
+        "duration_us": 1014549,
+        "bytes": 293459376,
+        "connect_errors": 0,
+        "read_errors": 0,
+        "write_errors": 0,
+        "status_errors": 0,
+        "timeout_errors": 0,
+        "latency_mean_us": 2071.753,
+        "latency_p50_us": 2040.0,
+        "latency_p99_us": 4473.0,
+        "latency_max_us": 13928.0,
+        "latency_percentiles_sane": true,
+        "latency_model": "wrk corrected histogram of completed pipeline batches; not per-response or open-loop SLO latency",
+        "responses_per_second": 1842363.4541062089,
+        "ok": true
+      },
+      "client_command": [
+        "taskset",
+        "-c",
+        "3,4,5,6,7",
+        "/tmp/zig-http-compare.qHiBFl/bin/wrk",
+        "-d",
+        "5s",
+        "-t",
+        "4",
+        "-c",
+        "128",
+        "--timeout",
+        "2s",
+        "-s",
+        "/tmp/zig-http-compare.qHiBFl/batch-http/benchmarks/pipeline.lua",
+        "http://127.0.0.1:8080/plaintext",
+        "--",
+        "16"
+      ],
+      "stable_thread_set": true,
+      "result": {
+        "requests": 9419648,
+        "duration_us": 5022631,
+        "bytes": 1478884736,
+        "connect_errors": 0,
+        "read_errors": 0,
+        "write_errors": 0,
+        "status_errors": 0,
+        "timeout_errors": 0,
+        "latency_mean_us": 2026.837,
+        "latency_p50_us": 2004.0,
+        "latency_p99_us": 4309.0,
+        "latency_max_us": 14559.0,
+        "latency_percentiles_sane": true,
+        "latency_model": "wrk corrected histogram of completed pipeline batches; not per-response or open-loop SLO latency",
+        "responses_per_second": 1875440.9790406663,
+        "ok": true
+      },
+      "elapsed_seconds": 5.028927885985468,
+      "server_threads": [
+        {
+          "tid": 934401,
+          "pid": 934401,
+          "last_cpu": 0,
+          "cpu_seconds": 4.17,
+          "cpu_percent": 82.92025844357177
+        }
+      ],
+      "system_cpu": {
+        "cpu": {
+          "busy_percent": 39.73072215422277,
+          "iowait_percent": 0.04895960832313342
+        },
+        "cpu0": {
+          "busy_percent": 98.81656804733728,
+          "iowait_percent": 0.0
+        },
+        "cpu1": {
+          "busy_percent": 15.476190476190476,
+          "iowait_percent": 0.0
+        },
+        "cpu2": {
+          "busy_percent": 13.69047619047619,
+          "iowait_percent": 0.1984126984126984
+        },
+        "cpu3": {
+          "busy_percent": 22.574257425742573,
+          "iowait_percent": 0.0
+        },
+        "cpu4": {
+          "busy_percent": 42.94003868471954,
+          "iowait_percent": 0.0
+        },
+        "cpu5": {
+          "busy_percent": 41.47286821705426,
+          "iowait_percent": 0.0
+        },
+        "cpu6": {
+          "busy_percent": 41.13060428849902,
+          "iowait_percent": 0.0
+        },
+        "cpu7": {
+          "busy_percent": 41.31274131274131,
+          "iowait_percent": 0.0
+        }
+      },
+      "client_cpu_seconds": 5.363262000000001,
+      "server_cpu_percent": 82.92025844357177,
+      "resident_kib_by_pid": {
+        "934401": 31468
+      },
+      "client_cpu_percent": 106.64821849894189,
+      "client_exit": 0,
+      "server_exit": 0,
+      "server_log": "READY port=8080 backend=io_uring connections=128 workers=0 execution=inline_event_loop gather_send=1 response_batch_limit=16 optimize=ReleaseSafe\nSTATS {\"execution\":\"inline_event_loop\",\"gather_send\":true,\"response_batch_limit\":16,\"response_batches\":705785,\"batched_finished_responses\":11292560,\"max_batch_responses\":16,\"scalar_send_operations\":0,\"gather_send_operations\":705785,\"send_completions\":705785,\"short_send_completions\":0,\"gather_cancel_requests\":0,\"gather_canceled_completions\":0,\"max_send_parts\":32,\"max_send_bytes\":2512,\"max_inline_callbacks_per_turn\":64,\"inline_dispatches\":11292560,\"worker_dispatches\":0,\"accepted\":261,\"completed\":11292560,\"rejected\":0,\"timeouts\":0,\"flushes\":0,\"resumed\":0,\"bytes_received\":553335280,\"bytes_sent\":1772931920,\"pipeline_copy_bytes\":0,\"live_connections\":0,\"peak_connections\":128,\"live_operations\":0,\"peak_operations\":129,\"max_loop_ns\":939400,\"max_handler_ns\":192549,\"max_queue_ns\":14487461,\"max_request_ns\":25404002,\"workers\":0,\"allocation_calls_after_start\":0,\"framework_heap_peak_bytes\":29618624,\"framework_heap_limit_bytes\":536870912}\n",
+      "stats": {
+        "execution": "inline_event_loop",
+        "gather_send": true,
+        "response_batch_limit": 16,
+        "response_batches": 705785,
+        "batched_finished_responses": 11292560,
+        "max_batch_responses": 16,
+        "scalar_send_operations": 0,
+        "gather_send_operations": 705785,
+        "send_completions": 705785,
+        "short_send_completions": 0,
+        "gather_cancel_requests": 0,
+        "gather_canceled_completions": 0,
+        "max_send_parts": 32,
+        "max_send_bytes": 2512,
+        "max_inline_callbacks_per_turn": 64,
+        "inline_dispatches": 11292560,
+        "worker_dispatches": 0,
+        "accepted": 261,
+        "completed": 11292560,
+        "rejected": 0,
+        "timeouts": 0,
+        "flushes": 0,
+        "resumed": 0,
+        "bytes_received": 553335280,
+        "bytes_sent": 1772931920,
+        "pipeline_copy_bytes": 0,
+        "live_connections": 0,
+        "peak_connections": 128,
+        "live_operations": 0,
+        "peak_operations": 129,
+        "max_loop_ns": 939400,
+        "max_handler_ns": 192549,
+        "max_queue_ns": 14487461,
+        "max_request_ns": 25404002,
+        "workers": 0,
+        "allocation_calls_after_start": 0,
+        "framework_heap_peak_bytes": 29618624,
+        "framework_heap_limit_bytes": 536870912
+      }
+    },
+    {
+      "index": 2,
+      "repeat": 2,
+      "server": "inline-batch-16",
+      "connections": 128,
+      "pipeline": 16,
+      "server_command": [
+        "taskset",
+        "-c",
+        "0",
+        "/tmp/zig-http-compare.qHiBFl/batch-http/zig-out/bin/zig-http",
+        "--port",
+        "8080",
+        "--connections",
+        "128",
+        "--execution",
+        "inline",
+        "--gather-send",
+        "1",
+        "--response-batch-limit",
+        "16",
+        "--duration-ms",
+        "120000"
+      ],
+      "preflight": {
+        "validated_responses": 32,
+        "exact_body": "Hello, World!",
+        "headers": {
+          "server": "zig-http",
+          "date": "Sat, 05 Sep 2026 17:35:33 GMT",
+          "content-type": "text/plain",
+          "content-length": "13",
+          "connection": "keep-alive"
+        },
+        "first_date": "Sat, 05 Sep 2026 17:35:31 GMT",
+        "last_date": "Sat, 05 Sep 2026 17:35:33 GMT"
+      },
+      "root_pid": 934440,
+      "warmup": {
+        "requests": 1910080,
+        "duration_us": 1014195,
+        "bytes": 299882560,
+        "connect_errors": 0,
+        "read_errors": 0,
+        "write_errors": 0,
+        "status_errors": 0,
+        "timeout_errors": 0,
+        "latency_mean_us": 2016.289,
+        "latency_p50_us": 1998.0,
+        "latency_p99_us": 4193.0,
+        "latency_max_us": 10886.0,
+        "latency_percentiles_sane": true,
+        "latency_model": "wrk corrected histogram of completed pipeline batches; not per-response or open-loop SLO latency",
+        "responses_per_second": 1883345.9048802252,
+        "ok": true
+      },
+      "client_command": [
+        "taskset",
+        "-c",
+        "3,4,5,6,7",
+        "/tmp/zig-http-compare.qHiBFl/bin/wrk",
+        "-d",
+        "5s",
+        "-t",
+        "4",
+        "-c",
+        "128",
+        "--timeout",
+        "2s",
+        "-s",
+        "/tmp/zig-http-compare.qHiBFl/batch-http/benchmarks/pipeline.lua",
+        "http://127.0.0.1:8080/plaintext",
+        "--",
+        "16"
+      ],
+      "stable_thread_set": true,
+      "result": {
+        "requests": 9167040,
+        "duration_us": 5011274,
+        "bytes": 1439225280,
+        "connect_errors": 0,
+        "read_errors": 0,
+        "write_errors": 0,
+        "status_errors": 0,
+        "timeout_errors": 0,
+        "latency_mean_us": 2127.055,
+        "latency_p50_us": 2070.0,
+        "latency_p99_us": 5130.0,
+        "latency_max_us": 22868.0,
+        "latency_percentiles_sane": true,
+        "latency_model": "wrk corrected histogram of completed pipeline batches; not per-response or open-loop SLO latency",
+        "responses_per_second": 1829283.3319431345,
+        "ok": true
+      },
+      "elapsed_seconds": 5.017200731992489,
+      "server_threads": [
+        {
+          "tid": 934440,
+          "pid": 934440,
+          "last_cpu": 0,
+          "cpu_seconds": 4.14,
+          "cpu_percent": 82.51613242422285
+        }
+      ],
+      "system_cpu": {
+        "cpu": {
+          "busy_percent": 40.18231091401823,
+          "iowait_percent": 0.1970928800197093
+        },
+        "cpu0": {
+          "busy_percent": 99.01185770750988,
+          "iowait_percent": 0.0
+        },
+        "cpu1": {
+          "busy_percent": 17.892644135188867,
+          "iowait_percent": 0.1988071570576541
+        },
+        "cpu2": {
+          "busy_percent": 14.342629482071713,
+          "iowait_percent": 0.398406374501992
+        },
+        "cpu3": {
+          "busy_percent": 25.590551181102363,
+          "iowait_percent": 0.5905511811023622
+        },
+        "cpu4": {
+          "busy_percent": 41.6015625,
+          "iowait_percent": 0.1953125
+        },
+        "cpu5": {
+          "busy_percent": 40.99009900990099,
+          "iowait_percent": 0.19801980198019803
+        },
+        "cpu6": {
+          "busy_percent": 40.50880626223092,
+          "iowait_percent": 0.19569471624266144
+        },
+        "cpu7": {
+          "busy_percent": 40.8203125,
+          "iowait_percent": 0.0
+        }
+      },
+      "client_cpu_seconds": 5.355254,
+      "server_cpu_percent": 82.51613242422285,
+      "resident_kib_by_pid": {
+        "934440": 31464
+      },
+      "client_cpu_percent": 106.7378860457365,
+      "client_exit": 0,
+      "server_exit": 0,
+      "server_log": "READY port=8080 backend=io_uring connections=128 workers=0 execution=inline_event_loop gather_send=1 response_batch_limit=16 optimize=ReleaseSafe\nSTATS {\"execution\":\"inline_event_loop\",\"gather_send\":true,\"response_batch_limit\":16,\"response_batches\":692571,\"batched_finished_responses\":11081136,\"max_batch_responses\":16,\"scalar_send_operations\":0,\"gather_send_operations\":692571,\"send_completions\":692571,\"short_send_completions\":0,\"gather_cancel_requests\":0,\"gather_canceled_completions\":0,\"max_send_parts\":32,\"max_send_bytes\":2512,\"max_inline_callbacks_per_turn\":64,\"inline_dispatches\":11081136,\"worker_dispatches\":0,\"accepted\":261,\"completed\":11081136,\"rejected\":0,\"timeouts\":0,\"flushes\":0,\"resumed\":0,\"bytes_received\":542975504,\"bytes_sent\":1739738352,\"pipeline_copy_bytes\":0,\"live_connections\":0,\"peak_connections\":128,\"live_operations\":0,\"peak_operations\":129,\"max_loop_ns\":1800724,\"max_handler_ns\":312450,\"max_queue_ns\":22745552,\"max_request_ns\":22795783,\"workers\":0,\"allocation_calls_after_start\":0,\"framework_heap_peak_bytes\":29618624,\"framework_heap_limit_bytes\":536870912}\n",
+      "stats": {
+        "execution": "inline_event_loop",
+        "gather_send": true,
+        "response_batch_limit": 16,
+        "response_batches": 692571,
+        "batched_finished_responses": 11081136,
+        "max_batch_responses": 16,
+        "scalar_send_operations": 0,
+        "gather_send_operations": 692571,
+        "send_completions": 692571,
+        "short_send_completions": 0,
+        "gather_cancel_requests": 0,
+        "gather_canceled_completions": 0,
+        "max_send_parts": 32,
+        "max_send_bytes": 2512,
+        "max_inline_callbacks_per_turn": 64,
+        "inline_dispatches": 11081136,
+        "worker_dispatches": 0,
+        "accepted": 261,
+        "completed": 11081136,
+        "rejected": 0,
+        "timeouts": 0,
+        "flushes": 0,
+        "resumed": 0,
+        "bytes_received": 542975504,
+        "bytes_sent": 1739738352,
+        "pipeline_copy_bytes": 0,
+        "live_connections": 0,
+        "peak_connections": 128,
+        "live_operations": 0,
+        "peak_operations": 129,
+        "max_loop_ns": 1800724,
+        "max_handler_ns": 312450,
+        "max_queue_ns": 22745552,
+        "max_request_ns": 22795783,
+        "workers": 0,
+        "allocation_calls_after_start": 0,
+        "framework_heap_peak_bytes": 29618624,
+        "framework_heap_limit_bytes": 536870912
+      }
+    },
+    {
+      "index": 3,
+      "repeat": 1,
+      "server": "libreactor",
+      "connections": 128,
+      "pipeline": 16,
+      "server_command": [
+        "taskset",
+        "-c",
+        "0",
+        "/tmp/zig-http-compare.qHiBFl/bin/libreactor"
+      ],
+      "preflight": {
+        "validated_responses": 32,
+        "exact_body": "Hello, World!",
+        "headers": {
+          "server": "L",
+          "content-type": "text/plain",
+          "date": "Sat, 05 Sep 2026 17:35:40 GMT",
+          "content-length": "13"
+        },
+        "first_date": "Sat, 05 Sep 2026 17:35:39 GMT",
+        "last_date": "Sat, 05 Sep 2026 17:35:40 GMT"
+      },
+      "root_pid": 934502,
+      "warmup": {
+        "requests": 3364560,
+        "duration_us": 1017757,
+        "bytes": 423934560,
+        "connect_errors": 0,
+        "read_errors": 0,
+        "write_errors": 0,
+        "status_errors": 0,
+        "timeout_errors": 0,
+        "latency_mean_us": 335.91,
+        "latency_p50_us": 396.0,
+        "latency_p99_us": 0.0,
+        "latency_max_us": 2922.0,
+        "latency_percentiles_sane": false,
+        "latency_model": "wrk corrected histogram of completed pipeline batches; not per-response or open-loop SLO latency",
+        "responses_per_second": 3305857.881596491,
+        "ok": true
+      },
+      "client_command": [
+        "taskset",
+        "-c",
+        "3,4,5,6,7",
+        "/tmp/zig-http-compare.qHiBFl/bin/wrk",
+        "-d",
+        "5s",
+        "-t",
+        "4",
+        "-c",
+        "128",
+        "--timeout",
+        "2s",
+        "-s",
+        "/tmp/zig-http-compare.qHiBFl/batch-http/benchmarks/pipeline.lua",
+        "http://127.0.0.1:8080/plaintext",
+        "--",
+        "16"
+      ],
+      "stable_thread_set": true,
+      "result": {
+        "requests": 13136848,
+        "duration_us": 5018501,
+        "bytes": 1655242848,
+        "connect_errors": 0,
+        "read_errors": 0,
+        "write_errors": 0,
+        "status_errors": 0,
+        "timeout_errors": 0,
+        "latency_mean_us": 432.683,
+        "latency_p50_us": 492.0,
+        "latency_p99_us": 0.0,
+        "latency_max_us": 11560.0,
+        "latency_percentiles_sane": false,
+        "latency_model": "wrk corrected histogram of completed pipeline batches; not per-response or open-loop SLO latency",
+        "responses_per_second": 2617683.6469694837,
+        "ok": true
+      },
+      "elapsed_seconds": 5.025084869994316,
+      "server_threads": [
+        {
+          "tid": 934502,
+          "pid": 934502,
+          "last_cpu": 0,
+          "cpu_seconds": 0.0,
+          "cpu_percent": 0.0
+        },
+        {
+          "tid": 934503,
+          "pid": 934503,
+          "last_cpu": 0,
+          "cpu_seconds": 3.22,
+          "cpu_percent": 64.07851973261582
+        }
+      ],
+      "system_cpu": {
+        "cpu": {
+          "busy_percent": 55.92266275085658,
+          "iowait_percent": 0.17131669114047968
+        },
+        "cpu0": {
+          "busy_percent": 98.4251968503937,
+          "iowait_percent": 0.0
+        },
+        "cpu1": {
+          "busy_percent": 23.564356435643564,
+          "iowait_percent": 0.39603960396039606
+        },
+        "cpu2": {
+          "busy_percent": 23.320158102766797,
+          "iowait_percent": 0.5928853754940712
+        },
+        "cpu3": {
+          "busy_percent": 48.81422924901186,
+          "iowait_percent": 0.1976284584980237
+        },
+        "cpu4": {
+          "busy_percent": 62.23506743737958,
+          "iowait_percent": 0.0
+        },
+        "cpu5": {
+          "busy_percent": 63.4765625,
+          "iowait_percent": 0.0
+        },
+        "cpu6": {
+          "busy_percent": 62.278978388998034,
+          "iowait_percent": 0.0
+        },
+        "cpu7": {
+          "busy_percent": 64.61538461538461,
+          "iowait_percent": 0.19230769230769232
+        }
+      },
+      "client_cpu_seconds": 9.246056,
+      "server_cpu_percent": 64.07851973261582,
+      "resident_kib_by_pid": {
+        "934502": 1904,
+        "934503": 2196
+      },
+      "client_cpu_percent": 183.9980067841214,
+      "client_exit": 0,
+      "server_exit": -15,
+      "server_log": "Worker running on CPU 0\nlibreactor running with 1 worker processes\n"
+    },
+    {
+      "index": 4,
+      "repeat": 2,
+      "server": "libreactor",
+      "connections": 128,
+      "pipeline": 16,
+      "server_command": [
+        "taskset",
+        "-c",
+        "0",
+        "/tmp/zig-http-compare.qHiBFl/bin/libreactor"
+      ],
+      "preflight": {
+        "validated_responses": 32,
+        "exact_body": "Hello, World!",
+        "headers": {
+          "server": "L",
+          "content-type": "text/plain",
+          "date": "Sat, 05 Sep 2026 17:35:47 GMT",
+          "content-length": "13"
+        },
+        "first_date": "Sat, 05 Sep 2026 17:35:46 GMT",
+        "last_date": "Sat, 05 Sep 2026 17:35:47 GMT"
+      },
+      "root_pid": 934566,
+      "warmup": {
+        "requests": 3536320,
+        "duration_us": 1019834,
+        "bytes": 445576320,
+        "connect_errors": 0,
+        "read_errors": 0,
+        "write_errors": 0,
+        "status_errors": 0,
+        "timeout_errors": 0,
+        "latency_mean_us": 316.099,
+        "latency_p50_us": 373.0,
+        "latency_p99_us": 0.0,
+        "latency_max_us": 3054.0,
+        "latency_percentiles_sane": false,
+        "latency_model": "wrk corrected histogram of completed pipeline batches; not per-response or open-loop SLO latency",
+        "responses_per_second": 3467544.718061959,
+        "ok": true
+      },
+      "client_command": [
+        "taskset",
+        "-c",
+        "3,4,5,6,7",
+        "/tmp/zig-http-compare.qHiBFl/bin/wrk",
+        "-d",
+        "5s",
+        "-t",
+        "4",
+        "-c",
+        "128",
+        "--timeout",
+        "2s",
+        "-s",
+        "/tmp/zig-http-compare.qHiBFl/batch-http/benchmarks/pipeline.lua",
+        "http://127.0.0.1:8080/plaintext",
+        "--",
+        "16"
+      ],
+      "stable_thread_set": true,
+      "result": {
+        "requests": 13115584,
+        "duration_us": 5015625,
+        "bytes": 1652563584,
+        "connect_errors": 0,
+        "read_errors": 0,
+        "write_errors": 0,
+        "status_errors": 0,
+        "timeout_errors": 0,
+        "latency_mean_us": 427.388,
+        "latency_p50_us": 495.0,
+        "latency_p99_us": 0.0,
+        "latency_max_us": 4015.0,
+        "latency_percentiles_sane": false,
+        "latency_model": "wrk corrected histogram of completed pipeline batches; not per-response or open-loop SLO latency",
+        "responses_per_second": 2614945.096573209,
+        "ok": true
+      },
+      "elapsed_seconds": 5.022472659999039,
+      "server_threads": [
+        {
+          "tid": 934566,
+          "pid": 934566,
+          "last_cpu": 0,
+          "cpu_seconds": 0.0,
+          "cpu_percent": 0.0
+        },
+        {
+          "tid": 934567,
+          "pid": 934567,
+          "last_cpu": 0,
+          "cpu_seconds": 3.22,
+          "cpu_percent": 64.11184725096375
+        }
+      ],
+      "system_cpu": {
+        "cpu": {
+          "busy_percent": 55.40241201082944,
+          "iowait_percent": 0.09844942160964805
+        },
+        "cpu0": {
+          "busy_percent": 99.0138067061144,
+          "iowait_percent": 0.0
+        },
+        "cpu1": {
+          "busy_percent": 23.10756972111554,
+          "iowait_percent": 0.398406374501992
+        },
+        "cpu2": {
+          "busy_percent": 20.64128256513026,
+          "iowait_percent": 0.20040080160320642
+        },
+        "cpu3": {
+          "busy_percent": 49.112426035502956,
+          "iowait_percent": 0.0
+        },
+        "cpu4": {
+          "busy_percent": 61.10019646365422,
+          "iowait_percent": 0.0
+        },
+        "cpu5": {
+          "busy_percent": 63.40508806262231,
+          "iowait_percent": 0.19569471624266144
+        },
+        "cpu6": {
+          "busy_percent": 61.9140625,
+          "iowait_percent": 0.0
+        },
+        "cpu7": {
+          "busy_percent": 63.81322957198444,
+          "iowait_percent": 0.0
+        }
+      },
+      "client_cpu_seconds": 9.287120000000002,
+      "server_cpu_percent": 64.11184725096375,
+      "resident_kib_by_pid": {
+        "934566": 1908,
+        "934567": 2016
+      },
+      "client_cpu_percent": 184.91131019918342,
+      "client_exit": 0,
+      "server_exit": -15,
+      "server_log": "Worker running on CPU 0\nlibreactor running with 1 worker processes\n"
+    },
+    {
+      "index": 5,
+      "repeat": 0,
+      "server": "inline-batch-16",
+      "connections": 128,
+      "pipeline": 1,
+      "server_command": [
+        "taskset",
+        "-c",
+        "0",
+        "/tmp/zig-http-compare.qHiBFl/batch-http/zig-out/bin/zig-http",
+        "--port",
+        "8080",
+        "--connections",
+        "128",
+        "--execution",
+        "inline",
+        "--gather-send",
+        "1",
+        "--response-batch-limit",
+        "16",
+        "--duration-ms",
+        "120000"
+      ],
+      "preflight": {
+        "validated_responses": 32,
+        "exact_body": "Hello, World!",
+        "headers": {
+          "server": "zig-http",
+          "date": "Sat, 05 Sep 2026 17:35:55 GMT",
+          "content-type": "text/plain",
+          "content-length": "13",
+          "connection": "keep-alive"
+        },
+        "first_date": "Sat, 05 Sep 2026 17:35:54 GMT",
+        "last_date": "Sat, 05 Sep 2026 17:35:55 GMT"
+      },
+      "root_pid": 934592,
+      "warmup": {
+        "requests": 233280,
+        "duration_us": 1016790,
+        "bytes": 36624960,
+        "connect_errors": 0,
+        "read_errors": 0,
+        "write_errors": 0,
+        "status_errors": 0,
+        "timeout_errors": 0,
+        "latency_mean_us": 560.133,
+        "latency_p50_us": 535.0,
+        "latency_p99_us": 732.0,
+        "latency_max_us": 17090.0,
+        "latency_percentiles_sane": true,
+        "latency_model": "wrk corrected histogram of completed pipeline batches; not per-response or open-loop SLO latency",
+        "responses_per_second": 229427.90546720562,
+        "ok": true
+      },
+      "client_command": [
+        "taskset",
+        "-c",
+        "3,4,5,6,7",
+        "/tmp/zig-http-compare.qHiBFl/bin/wrk",
+        "-d",
+        "5s",
+        "-t",
+        "4",
+        "-c",
+        "128",
+        "--timeout",
+        "2s",
+        "-s",
+        "/tmp/zig-http-compare.qHiBFl/batch-http/benchmarks/pipeline.lua",
+        "http://127.0.0.1:8080/plaintext",
+        "--",
+        "1"
+      ],
+      "stable_thread_set": true,
+      "result": {
+        "requests": 966549,
+        "duration_us": 5017804,
+        "bytes": 151748193,
+        "connect_errors": 0,
+        "read_errors": 0,
+        "write_errors": 0,
+        "status_errors": 0,
+        "timeout_errors": 0,
+        "latency_mean_us": 657.349,
+        "latency_p50_us": 638.0,
+        "latency_p99_us": 1004.0,
+        "latency_max_us": 11396.0,
+        "latency_percentiles_sane": true,
+        "latency_model": "wrk corrected histogram of completed pipeline batches; not per-response or open-loop SLO latency",
+        "responses_per_second": 192623.9047997889,
+        "ok": true
+      },
+      "elapsed_seconds": 5.022799681988545,
+      "server_threads": [
+        {
+          "tid": 934592,
+          "pid": 934592,
+          "last_cpu": 0,
+          "cpu_seconds": 3.44,
+          "cpu_percent": 68.48770044195932
+        }
+      ],
+      "system_cpu": {
+        "cpu": {
+          "busy_percent": 45.60386473429951,
+          "iowait_percent": 0.07246376811594203
+        },
+        "cpu0": {
+          "busy_percent": 99.01185770750988,
+          "iowait_percent": 0.0
+        },
+        "cpu1": {
+          "busy_percent": 22.50996015936255,
+          "iowait_percent": 0.0
+        },
+        "cpu2": {
+          "busy_percent": 23.51778656126482,
+          "iowait_percent": 0.0
+        },
+        "cpu3": {
+          "busy_percent": 31.640625,
+          "iowait_percent": 0.0
+        },
+        "cpu4": {
+          "busy_percent": 46.958174904942965,
+          "iowait_percent": 0.19011406844106463
+        },
+        "cpu5": {
+          "busy_percent": 46.57794676806083,
+          "iowait_percent": 0.0
+        },
+        "cpu6": {
+          "busy_percent": 47.15909090909091,
+          "iowait_percent": 0.1893939393939394
+        },
+        "cpu7": {
+          "busy_percent": 46.78030303030303,
+          "iowait_percent": 0.0
+        }
+      },
+      "client_cpu_seconds": 5.351147999999995,
+      "server_cpu_percent": 68.48770044195932,
+      "resident_kib_by_pid": {
+        "934592": 31432
+      },
+      "client_cpu_percent": 106.53715733854344,
+      "client_exit": 0,
+      "server_exit": 0,
+      "server_log": "READY port=8080 backend=io_uring connections=128 workers=0 execution=inline_event_loop gather_send=1 response_batch_limit=16 optimize=ReleaseSafe\nSTATS {\"execution\":\"inline_event_loop\",\"gather_send\":true,\"response_batch_limit\":16,\"response_batches\":1200061,\"batched_finished_responses\":32,\"max_batch_responses\":16,\"scalar_send_operations\":0,\"gather_send_operations\":1200061,\"send_completions\":1200061,\"short_send_completions\":0,\"gather_cancel_requests\":0,\"gather_canceled_completions\":0,\"max_send_parts\":32,\"max_send_bytes\":2512,\"max_inline_callbacks_per_turn\":64,\"inline_dispatches\":1200091,\"worker_dispatches\":0,\"accepted\":261,\"completed\":1200091,\"rejected\":0,\"timeouts\":0,\"flushes\":0,\"resumed\":0,\"bytes_received\":58804299,\"bytes_sent\":188414287,\"pipeline_copy_bytes\":0,\"live_connections\":0,\"peak_connections\":128,\"live_operations\":0,\"peak_operations\":129,\"max_loop_ns\":1328800,\"max_handler_ns\":63109,\"max_queue_ns\":1794428,\"max_request_ns\":18707236,\"workers\":0,\"allocation_calls_after_start\":0,\"framework_heap_peak_bytes\":29618624,\"framework_heap_limit_bytes\":536870912}\n",
+      "stats": {
+        "execution": "inline_event_loop",
+        "gather_send": true,
+        "response_batch_limit": 16,
+        "response_batches": 1200061,
+        "batched_finished_responses": 32,
+        "max_batch_responses": 16,
+        "scalar_send_operations": 0,
+        "gather_send_operations": 1200061,
+        "send_completions": 1200061,
+        "short_send_completions": 0,
+        "gather_cancel_requests": 0,
+        "gather_canceled_completions": 0,
+        "max_send_parts": 32,
+        "max_send_bytes": 2512,
+        "max_inline_callbacks_per_turn": 64,
+        "inline_dispatches": 1200091,
+        "worker_dispatches": 0,
+        "accepted": 261,
+        "completed": 1200091,
+        "rejected": 0,
+        "timeouts": 0,
+        "flushes": 0,
+        "resumed": 0,
+        "bytes_received": 58804299,
+        "bytes_sent": 188414287,
+        "pipeline_copy_bytes": 0,
+        "live_connections": 0,
+        "peak_connections": 128,
+        "live_operations": 0,
+        "peak_operations": 129,
+        "max_loop_ns": 1328800,
+        "max_handler_ns": 63109,
+        "max_queue_ns": 1794428,
+        "max_request_ns": 18707236,
+        "workers": 0,
+        "allocation_calls_after_start": 0,
+        "framework_heap_peak_bytes": 29618624,
+        "framework_heap_limit_bytes": 536870912
+      }
+    },
+    {
+      "index": 6,
+      "repeat": 0,
+      "server": "libreactor",
+      "connections": 128,
+      "pipeline": 16,
+      "server_command": [
+        "taskset",
+        "-c",
+        "0",
+        "/tmp/zig-http-compare.qHiBFl/bin/libreactor"
+      ],
+      "preflight": {
+        "validated_responses": 32,
+        "exact_body": "Hello, World!",
+        "headers": {
+          "server": "L",
+          "content-type": "text/plain",
+          "date": "Sat, 05 Sep 2026 17:36:02 GMT",
+          "content-length": "13"
+        },
+        "first_date": "Sat, 05 Sep 2026 17:36:01 GMT",
+        "last_date": "Sat, 05 Sep 2026 17:36:02 GMT"
+      },
+      "root_pid": 934709,
+      "warmup": {
+        "requests": 3561872,
+        "duration_us": 1022062,
+        "bytes": 448795872,
+        "connect_errors": 0,
+        "read_errors": 0,
+        "write_errors": 0,
+        "status_errors": 0,
+        "timeout_errors": 0,
+        "latency_mean_us": 317.103,
+        "latency_p50_us": 355.0,
+        "latency_p99_us": 0.0,
+        "latency_max_us": 3231.0,
+        "latency_percentiles_sane": false,
+        "latency_model": "wrk corrected histogram of completed pipeline batches; not per-response or open-loop SLO latency",
+        "responses_per_second": 3484986.233711849,
+        "ok": true
+      },
+      "client_command": [
+        "taskset",
+        "-c",
+        "3,4,5,6,7",
+        "/tmp/zig-http-compare.qHiBFl/bin/wrk",
+        "-d",
+        "5s",
+        "-t",
+        "4",
+        "-c",
+        "128",
+        "--timeout",
+        "2s",
+        "-s",
+        "/tmp/zig-http-compare.qHiBFl/batch-http/benchmarks/pipeline.lua",
+        "http://127.0.0.1:8080/plaintext",
+        "--",
+        "16"
+      ],
+      "stable_thread_set": true,
+      "result": {
+        "requests": 13221168,
+        "duration_us": 5023672,
+        "bytes": 1665867168,
+        "connect_errors": 0,
+        "read_errors": 0,
+        "write_errors": 0,
+        "status_errors": 0,
+        "timeout_errors": 0,
+        "latency_mean_us": 435.376,
+        "latency_p50_us": 476.0,
+        "latency_p99_us": 0.0,
+        "latency_max_us": 11435.0,
+        "latency_percentiles_sane": false,
+        "latency_model": "wrk corrected histogram of completed pipeline batches; not per-response or open-loop SLO latency",
+        "responses_per_second": 2631773.7304505548,
+        "ok": true
+      },
+      "elapsed_seconds": 5.030640901997685,
+      "server_threads": [
+        {
+          "tid": 934709,
+          "pid": 934709,
+          "last_cpu": 0,
+          "cpu_seconds": 0.0,
+          "cpu_percent": 0.0
+        },
+        {
+          "tid": 934710,
+          "pid": 934710,
+          "last_cpu": 0,
+          "cpu_seconds": 3.23,
+          "cpu_percent": 64.20653079645092
+        }
+      ],
+      "system_cpu": {
+        "cpu": {
+          "busy_percent": 55.190989226248774,
+          "iowait_percent": 0.04897159647404505
+        },
+        "cpu0": {
+          "busy_percent": 98.62475442043223,
+          "iowait_percent": 0.0
+        },
+        "cpu1": {
+          "busy_percent": 22.664015904572565,
+          "iowait_percent": 0.0
+        },
+        "cpu2": {
+          "busy_percent": 22.61904761904762,
+          "iowait_percent": 0.0
+        },
+        "cpu3": {
+          "busy_percent": 49.7029702970297,
+          "iowait_percent": 0.0
+        },
+        "cpu4": {
+          "busy_percent": 61.08949416342413,
+          "iowait_percent": 0.0
+        },
+        "cpu5": {
+          "busy_percent": 61.94174757281554,
+          "iowait_percent": 0.0
+        },
+        "cpu6": {
+          "busy_percent": 61.86770428015564,
+          "iowait_percent": 0.0
+        },
+        "cpu7": {
+          "busy_percent": 61.82170542635659,
+          "iowait_percent": 0.1937984496124031
+        }
+      },
+      "client_cpu_seconds": 9.306899999999992,
+      "server_cpu_percent": 64.20653079645092,
+      "resident_kib_by_pid": {
+        "934709": 1884,
+        "934710": 2272
+      },
+      "client_cpu_percent": 185.00426051686952,
+      "client_exit": 0,
+      "server_exit": -15,
+      "server_log": "Worker running on CPU 0\nlibreactor running with 1 worker processes\n"
+    },
+    {
+      "index": 7,
+      "repeat": 1,
+      "server": "libreactor",
+      "connections": 128,
+      "pipeline": 1,
+      "server_command": [
+        "taskset",
+        "-c",
+        "0",
+        "/tmp/zig-http-compare.qHiBFl/bin/libreactor"
+      ],
+      "preflight": {
+        "validated_responses": 32,
+        "exact_body": "Hello, World!",
+        "headers": {
+          "server": "L",
+          "content-type": "text/plain",
+          "date": "Sat, 05 Sep 2026 17:36:09 GMT",
+          "content-length": "13"
+        },
+        "first_date": "Sat, 05 Sep 2026 17:36:08 GMT",
+        "last_date": "Sat, 05 Sep 2026 17:36:09 GMT"
+      },
+      "root_pid": 934749,
+      "warmup": {
+        "requests": 262373,
+        "duration_us": 1013970,
+        "bytes": 33058998,
+        "connect_errors": 0,
+        "read_errors": 0,
+        "write_errors": 0,
+        "status_errors": 0,
+        "timeout_errors": 0,
+        "latency_mean_us": 522.649,
+        "latency_p50_us": 462.0,
+        "latency_p99_us": 2499.0,
+        "latency_max_us": 7800.0,
+        "latency_percentiles_sane": true,
+        "latency_model": "wrk corrected histogram of completed pipeline batches; not per-response or open-loop SLO latency",
+        "responses_per_second": 258758.14866317544,
+        "ok": true
+      },
+      "client_command": [
+        "taskset",
+        "-c",
+        "3,4,5,6,7",
+        "/tmp/zig-http-compare.qHiBFl/bin/wrk",
+        "-d",
+        "5s",
+        "-t",
+        "4",
+        "-c",
+        "128",
+        "--timeout",
+        "2s",
+        "-s",
+        "/tmp/zig-http-compare.qHiBFl/batch-http/benchmarks/pipeline.lua",
+        "http://127.0.0.1:8080/plaintext",
+        "--",
+        "1"
+      ],
+      "stable_thread_set": true,
+      "result": {
+        "requests": 1113451,
+        "duration_us": 5014374,
+        "bytes": 140294826,
+        "connect_errors": 0,
+        "read_errors": 0,
+        "write_errors": 0,
+        "status_errors": 0,
+        "timeout_errors": 0,
+        "latency_mean_us": 574.4,
+        "latency_p50_us": 566.0,
+        "latency_p99_us": 851.0,
+        "latency_max_us": 7947.0,
+        "latency_percentiles_sane": true,
+        "latency_model": "wrk corrected histogram of completed pipeline batches; not per-response or open-loop SLO latency",
+        "responses_per_second": 222051.8453549735,
+        "ok": true
+      },
+      "elapsed_seconds": 5.019678443990415,
+      "server_threads": [
+        {
+          "tid": 934749,
+          "pid": 934749,
+          "last_cpu": 0,
+          "cpu_seconds": 0.0,
+          "cpu_percent": 0.0
+        },
+        {
+          "tid": 934750,
+          "pid": 934750,
+          "last_cpu": 0,
+          "cpu_seconds": 2.86,
+          "cpu_percent": 56.975761135138185
+        }
+      ],
+      "system_cpu": {
+        "cpu": {
+          "busy_percent": 52.31707317073171,
+          "iowait_percent": 0.17073170731707318
+        },
+        "cpu0": {
+          "busy_percent": 99.01185770750988,
+          "iowait_percent": 0.0
+        },
+        "cpu1": {
+          "busy_percent": 20.717131474103585,
+          "iowait_percent": 0.398406374501992
+        },
+        "cpu2": {
+          "busy_percent": 20.68273092369478,
+          "iowait_percent": 0.40160642570281124
+        },
+        "cpu3": {
+          "busy_percent": 42.9126213592233,
+          "iowait_percent": 0.3883495145631068
+        },
+        "cpu4": {
+          "busy_percent": 58.6073500967118,
+          "iowait_percent": 0.0
+        },
+        "cpu5": {
+          "busy_percent": 58.65384615384615,
+          "iowait_percent": 0.0
+        },
+        "cpu6": {
+          "busy_percent": 57.915057915057915,
+          "iowait_percent": 0.0
+        },
+        "cpu7": {
+          "busy_percent": 58.6073500967118,
+          "iowait_percent": 0.0
+        }
+      },
+      "client_cpu_seconds": 7.411189,
+      "server_cpu_percent": 56.975761135138185,
+      "resident_kib_by_pid": {
+        "934749": 1908,
+        "934750": 2292
+      },
+      "client_cpu_percent": 147.64270426271455,
+      "client_exit": 0,
+      "server_exit": -15,
+      "server_log": "Worker running on CPU 0\nlibreactor running with 1 worker processes\n"
+    },
+    {
+      "index": 8,
+      "repeat": 2,
+      "server": "inline-batch-16",
+      "connections": 128,
+      "pipeline": 1,
+      "server_command": [
+        "taskset",
+        "-c",
+        "0",
+        "/tmp/zig-http-compare.qHiBFl/batch-http/zig-out/bin/zig-http",
+        "--port",
+        "8080",
+        "--connections",
+        "128",
+        "--execution",
+        "inline",
+        "--gather-send",
+        "1",
+        "--response-batch-limit",
+        "16",
+        "--duration-ms",
+        "120000"
+      ],
+      "preflight": {
+        "validated_responses": 32,
+        "exact_body": "Hello, World!",
+        "headers": {
+          "server": "zig-http",
+          "date": "Sat, 05 Sep 2026 17:36:17 GMT",
+          "content-type": "text/plain",
+          "content-length": "13",
+          "connection": "keep-alive"
+        },
+        "first_date": "Sat, 05 Sep 2026 17:36:16 GMT",
+        "last_date": "Sat, 05 Sep 2026 17:36:17 GMT"
+      },
+      "root_pid": 934782,
+      "warmup": {
+        "requests": 222599,
+        "duration_us": 1013903,
+        "bytes": 34948043,
+        "connect_errors": 0,
+        "read_errors": 0,
+        "write_errors": 0,
+        "status_errors": 0,
+        "timeout_errors": 0,
+        "latency_mean_us": 563.087,
+        "latency_p50_us": 561.0,
+        "latency_p99_us": 737.0,
+        "latency_max_us": 4223.0,
+        "latency_percentiles_sane": true,
+        "latency_model": "wrk corrected histogram of completed pipeline batches; not per-response or open-loop SLO latency",
+        "responses_per_second": 219546.64302206424,
+        "ok": true
+      },
+      "client_command": [
+        "taskset",
+        "-c",
+        "3,4,5,6,7",
+        "/tmp/zig-http-compare.qHiBFl/bin/wrk",
+        "-d",
+        "5s",
+        "-t",
+        "4",
+        "-c",
+        "128",
+        "--timeout",
+        "2s",
+        "-s",
+        "/tmp/zig-http-compare.qHiBFl/batch-http/benchmarks/pipeline.lua",
+        "http://127.0.0.1:8080/plaintext",
+        "--",
+        "1"
+      ],
+      "stable_thread_set": true,
+      "result": {
+        "requests": 987283,
+        "duration_us": 5014901,
+        "bytes": 155003431,
+        "connect_errors": 0,
+        "read_errors": 0,
+        "write_errors": 0,
+        "status_errors": 0,
+        "timeout_errors": 0,
+        "latency_mean_us": 636.158,
+        "latency_p50_us": 628.0,
+        "latency_p99_us": 876.0,
+        "latency_max_us": 5124.0,
+        "latency_percentiles_sane": true,
+        "latency_model": "wrk corrected histogram of completed pipeline batches; not per-response or open-loop SLO latency",
+        "responses_per_second": 196869.88835871336,
+        "ok": true
+      },
+      "elapsed_seconds": 5.0201730959815904,
+      "server_threads": [
+        {
+          "tid": 934782,
+          "pid": 934782,
+          "last_cpu": 0,
+          "cpu_seconds": 3.43,
+          "cpu_percent": 68.32433731708478
+        }
+      ],
+      "system_cpu": {
+        "cpu": {
+          "busy_percent": 44.06370656370656,
+          "iowait_percent": 0.07239382239382239
+        },
+        "cpu0": {
+          "busy_percent": 98.62475442043223,
+          "iowait_percent": 0.0
+        },
+        "cpu1": {
+          "busy_percent": 19.08548707753479,
+          "iowait_percent": 0.0
+        },
+        "cpu2": {
+          "busy_percent": 18.93491124260355,
+          "iowait_percent": 0.19723865877712032
+        },
+        "cpu3": {
+          "busy_percent": 30.485436893203882,
+          "iowait_percent": 0.0
+        },
+        "cpu4": {
+          "busy_percent": 45.96622889305816,
+          "iowait_percent": 0.18761726078799248
+        },
+        "cpu5": {
+          "busy_percent": 46.69187145557656,
+          "iowait_percent": 0.0
+        },
+        "cpu6": {
+          "busy_percent": 46.299810246679314,
+          "iowait_percent": 0.18975332068311196
+        },
+        "cpu7": {
+          "busy_percent": 46.095238095238095,
+          "iowait_percent": 0.0
+        }
+      },
+      "client_cpu_seconds": 5.42406900000001,
+      "server_cpu_percent": 68.32433731708478,
+      "resident_kib_by_pid": {
+        "934782": 31464
+      },
+      "client_cpu_percent": 108.04545772219925,
+      "client_exit": 0,
+      "server_exit": 0,
+      "server_log": "READY port=8080 backend=io_uring connections=128 workers=0 execution=inline_event_loop gather_send=1 response_batch_limit=16 optimize=ReleaseSafe\nSTATS {\"execution\":\"inline_event_loop\",\"gather_send\":true,\"response_batch_limit\":16,\"response_batches\":1210113,\"batched_finished_responses\":32,\"max_batch_responses\":16,\"scalar_send_operations\":0,\"gather_send_operations\":1210113,\"send_completions\":1210113,\"short_send_completions\":0,\"gather_cancel_requests\":0,\"gather_canceled_completions\":0,\"max_send_parts\":32,\"max_send_bytes\":2512,\"max_inline_callbacks_per_turn\":64,\"inline_dispatches\":1210143,\"worker_dispatches\":0,\"accepted\":261,\"completed\":1210143,\"rejected\":0,\"timeouts\":0,\"flushes\":0,\"resumed\":0,\"bytes_received\":59296847,\"bytes_sent\":189992451,\"pipeline_copy_bytes\":0,\"live_connections\":0,\"peak_connections\":128,\"live_operations\":0,\"peak_operations\":129,\"max_loop_ns\":162208,\"max_handler_ns\":9059,\"max_queue_ns\":144512,\"max_request_ns\":16116010,\"workers\":0,\"allocation_calls_after_start\":0,\"framework_heap_peak_bytes\":29618624,\"framework_heap_limit_bytes\":536870912}\n",
+      "stats": {
+        "execution": "inline_event_loop",
+        "gather_send": true,
+        "response_batch_limit": 16,
+        "response_batches": 1210113,
+        "batched_finished_responses": 32,
+        "max_batch_responses": 16,
+        "scalar_send_operations": 0,
+        "gather_send_operations": 1210113,
+        "send_completions": 1210113,
+        "short_send_completions": 0,
+        "gather_cancel_requests": 0,
+        "gather_canceled_completions": 0,
+        "max_send_parts": 32,
+        "max_send_bytes": 2512,
+        "max_inline_callbacks_per_turn": 64,
+        "inline_dispatches": 1210143,
+        "worker_dispatches": 0,
+        "accepted": 261,
+        "completed": 1210143,
+        "rejected": 0,
+        "timeouts": 0,
+        "flushes": 0,
+        "resumed": 0,
+        "bytes_received": 59296847,
+        "bytes_sent": 189992451,
+        "pipeline_copy_bytes": 0,
+        "live_connections": 0,
+        "peak_connections": 128,
+        "live_operations": 0,
+        "peak_operations": 129,
+        "max_loop_ns": 162208,
+        "max_handler_ns": 9059,
+        "max_queue_ns": 144512,
+        "max_request_ns": 16116010,
+        "workers": 0,
+        "allocation_calls_after_start": 0,
+        "framework_heap_peak_bytes": 29618624,
+        "framework_heap_limit_bytes": 536870912
+      }
+    },
+    {
+      "index": 9,
+      "repeat": 0,
+      "server": "libreactor",
+      "connections": 128,
+      "pipeline": 1,
+      "server_command": [
+        "taskset",
+        "-c",
+        "0",
+        "/tmp/zig-http-compare.qHiBFl/bin/libreactor"
+      ],
+      "preflight": {
+        "validated_responses": 32,
+        "exact_body": "Hello, World!",
+        "headers": {
+          "server": "L",
+          "content-type": "text/plain",
+          "date": "Sat, 05 Sep 2026 17:36:24 GMT",
+          "content-length": "13"
+        },
+        "first_date": "Sat, 05 Sep 2026 17:36:23 GMT",
+        "last_date": "Sat, 05 Sep 2026 17:36:24 GMT"
+      },
+      "root_pid": 934803,
+      "warmup": {
+        "requests": 274577,
+        "duration_us": 1014058,
+        "bytes": 34596702,
+        "connect_errors": 0,
+        "read_errors": 0,
+        "write_errors": 0,
+        "status_errors": 0,
+        "timeout_errors": 0,
+        "latency_mean_us": 464.435,
+        "latency_p50_us": 459.0,
+        "latency_p99_us": 833.0,
+        "latency_max_us": 2435.0,
+        "latency_percentiles_sane": true,
+        "latency_model": "wrk corrected histogram of completed pipeline batches; not per-response or open-loop SLO latency",
+        "responses_per_second": 270770.50819578365,
+        "ok": true
+      },
+      "client_command": [
+        "taskset",
+        "-c",
+        "3,4,5,6,7",
+        "/tmp/zig-http-compare.qHiBFl/bin/wrk",
+        "-d",
+        "5s",
+        "-t",
+        "4",
+        "-c",
+        "128",
+        "--timeout",
+        "2s",
+        "-s",
+        "/tmp/zig-http-compare.qHiBFl/batch-http/benchmarks/pipeline.lua",
+        "http://127.0.0.1:8080/plaintext",
+        "--",
+        "1"
+      ],
+      "stable_thread_set": true,
+      "result": {
+        "requests": 1125057,
+        "duration_us": 5015429,
+        "bytes": 141757182,
+        "connect_errors": 0,
+        "read_errors": 0,
+        "write_errors": 0,
+        "status_errors": 0,
+        "timeout_errors": 0,
+        "latency_mean_us": 577.475,
+        "latency_p50_us": 563.0,
+        "latency_p99_us": 989.0,
+        "latency_max_us": 11176.0,
+        "latency_percentiles_sane": true,
+        "latency_model": "wrk corrected histogram of completed pipeline batches; not per-response or open-loop SLO latency",
+        "responses_per_second": 224319.1958255216,
+        "ok": true
+      },
+      "elapsed_seconds": 5.02077811898198,
+      "server_threads": [
+        {
+          "tid": 934803,
+          "pid": 934803,
+          "last_cpu": 0,
+          "cpu_seconds": 0.0,
+          "cpu_percent": 0.0
+        },
+        {
+          "tid": 934804,
+          "pid": 934804,
+          "last_cpu": 0,
+          "cpu_seconds": 2.85,
+          "cpu_percent": 56.76410971488758
+        }
+      ],
+      "system_cpu": {
+        "cpu": {
+          "busy_percent": 52.521315468940315,
+          "iowait_percent": 0.09744214372716199
+        },
+        "cpu0": {
+          "busy_percent": 98.62475442043223,
+          "iowait_percent": 0.0
+        },
+        "cpu1": {
+          "busy_percent": 22.42063492063492,
+          "iowait_percent": 0.3968253968253968
+        },
+        "cpu2": {
+          "busy_percent": 20.512820512820515,
+          "iowait_percent": 0.39447731755424065
+        },
+        "cpu3": {
+          "busy_percent": 41.91033138401559,
+          "iowait_percent": 0.0
+        },
+        "cpu4": {
+          "busy_percent": 58.49420849420849,
+          "iowait_percent": 0.0
+        },
+        "cpu5": {
+          "busy_percent": 60.03861003861004,
+          "iowait_percent": 0.19305019305019305
+        },
+        "cpu6": {
+          "busy_percent": 58.108108108108105,
+          "iowait_percent": 0.0
+        },
+        "cpu7": {
+          "busy_percent": 58.994197292069636,
+          "iowait_percent": 0.0
+        }
+      },
+      "client_cpu_seconds": 7.421631999999988,
+      "server_cpu_percent": 56.76410971488758,
+      "resident_kib_by_pid": {
+        "934803": 1896,
+        "934804": 1744
+      },
+      "client_cpu_percent": 147.81836249527015,
+      "client_exit": 0,
+      "server_exit": -15,
+      "server_log": "Worker running on CPU 0\nlibreactor running with 1 worker processes\n"
+    },
+    {
+      "index": 10,
+      "repeat": 1,
+      "server": "inline-batch-16",
+      "connections": 128,
+      "pipeline": 1,
+      "server_command": [
+        "taskset",
+        "-c",
+        "0",
+        "/tmp/zig-http-compare.qHiBFl/batch-http/zig-out/bin/zig-http",
+        "--port",
+        "8080",
+        "--connections",
+        "128",
+        "--execution",
+        "inline",
+        "--gather-send",
+        "1",
+        "--response-batch-limit",
+        "16",
+        "--duration-ms",
+        "120000"
+      ],
+      "preflight": {
+        "validated_responses": 32,
+        "exact_body": "Hello, World!",
+        "headers": {
+          "server": "zig-http",
+          "date": "Sat, 05 Sep 2026 17:36:32 GMT",
+          "content-type": "text/plain",
+          "content-length": "13",
+          "connection": "keep-alive"
+        },
+        "first_date": "Sat, 05 Sep 2026 17:36:31 GMT",
+        "last_date": "Sat, 05 Sep 2026 17:36:32 GMT"
+      },
+      "root_pid": 934878,
+      "warmup": {
+        "requests": 253424,
+        "duration_us": 1013316,
+        "bytes": 39787568,
+        "connect_errors": 0,
+        "read_errors": 0,
+        "write_errors": 0,
+        "status_errors": 0,
+        "timeout_errors": 0,
+        "latency_mean_us": 495.006,
+        "latency_p50_us": 491.0,
+        "latency_p99_us": 679.0,
+        "latency_max_us": 5166.0,
+        "latency_percentiles_sane": true,
+        "latency_model": "wrk corrected histogram of completed pipeline batches; not per-response or open-loop SLO latency",
+        "responses_per_second": 250093.75160364585,
+        "ok": true
+      },
+      "client_command": [
+        "taskset",
+        "-c",
+        "3,4,5,6,7",
+        "/tmp/zig-http-compare.qHiBFl/bin/wrk",
+        "-d",
+        "5s",
+        "-t",
+        "4",
+        "-c",
+        "128",
+        "--timeout",
+        "2s",
+        "-s",
+        "/tmp/zig-http-compare.qHiBFl/batch-http/benchmarks/pipeline.lua",
+        "http://127.0.0.1:8080/plaintext",
+        "--",
+        "1"
+      ],
+      "stable_thread_set": true,
+      "result": {
+        "requests": 1004576,
+        "duration_us": 5021055,
+        "bytes": 157718432,
+        "connect_errors": 0,
+        "read_errors": 0,
+        "write_errors": 0,
+        "status_errors": 0,
+        "timeout_errors": 0,
+        "latency_mean_us": 623.254,
+        "latency_p50_us": 622.0,
+        "latency_p99_us": 806.0,
+        "latency_max_us": 3184.0,
+        "latency_percentiles_sane": true,
+        "latency_model": "wrk corrected histogram of completed pipeline batches; not per-response or open-loop SLO latency",
+        "responses_per_second": 200072.69388604586,
+        "ok": true
+      },
+      "elapsed_seconds": 5.02613444198505,
+      "server_threads": [
+        {
+          "tid": 934878,
+          "pid": 934878,
+          "last_cpu": 0,
+          "cpu_seconds": 3.44,
+          "cpu_percent": 68.44225994562507
+        }
+      ],
+      "system_cpu": {
+        "cpu": {
+          "busy_percent": 42.819084524097846,
+          "iowait_percent": 0.07265681763138775
+        },
+        "cpu0": {
+          "busy_percent": 98.81656804733728,
+          "iowait_percent": 0.0
+        },
+        "cpu1": {
+          "busy_percent": 17.22772277227723,
+          "iowait_percent": 0.39603960396039606
+        },
+        "cpu2": {
+          "busy_percent": 16.10337972166998,
+          "iowait_percent": 0.0
+        },
+        "cpu3": {
+          "busy_percent": 28.962818003913895,
+          "iowait_percent": 0.0
+        },
+        "cpu4": {
+          "busy_percent": 45.19230769230769,
+          "iowait_percent": 0.0
+        },
+        "cpu5": {
+          "busy_percent": 46.13935969868173,
+          "iowait_percent": 0.0
+        },
+        "cpu6": {
+          "busy_percent": 44.656488549618324,
+          "iowait_percent": 0.0
+        },
+        "cpu7": {
+          "busy_percent": 45.17958412098299,
+          "iowait_percent": 0.0
+        }
+      },
+      "client_cpu_seconds": 5.4542299999999955,
+      "server_cpu_percent": 68.44225994562507,
+      "resident_kib_by_pid": {
+        "934878": 31444
+      },
+      "client_cpu_percent": 108.51739170442625,
+      "client_exit": 0,
+      "server_exit": 0,
+      "server_log": "READY port=8080 backend=io_uring connections=128 workers=0 execution=inline_event_loop gather_send=1 response_batch_limit=16 optimize=ReleaseSafe\nSTATS {\"execution\":\"inline_event_loop\",\"gather_send\":true,\"response_batch_limit\":16,\"response_batches\":1258216,\"batched_finished_responses\":32,\"max_batch_responses\":16,\"scalar_send_operations\":0,\"gather_send_operations\":1258216,\"send_completions\":1258216,\"short_send_completions\":0,\"gather_cancel_requests\":0,\"gather_canceled_completions\":0,\"max_send_parts\":32,\"max_send_bytes\":2512,\"max_inline_callbacks_per_turn\":64,\"inline_dispatches\":1258246,\"worker_dispatches\":0,\"accepted\":261,\"completed\":1258246,\"rejected\":0,\"timeouts\":0,\"flushes\":0,\"resumed\":0,\"bytes_received\":61653894,\"bytes_sent\":197544622,\"pipeline_copy_bytes\":0,\"live_connections\":0,\"peak_connections\":128,\"live_operations\":0,\"peak_operations\":129,\"max_loop_ns\":162807,\"max_handler_ns\":40084,\"max_queue_ns\":134415,\"max_request_ns\":21925887,\"workers\":0,\"allocation_calls_after_start\":0,\"framework_heap_peak_bytes\":29618624,\"framework_heap_limit_bytes\":536870912}\n",
+      "stats": {
+        "execution": "inline_event_loop",
+        "gather_send": true,
+        "response_batch_limit": 16,
+        "response_batches": 1258216,
+        "batched_finished_responses": 32,
+        "max_batch_responses": 16,
+        "scalar_send_operations": 0,
+        "gather_send_operations": 1258216,
+        "send_completions": 1258216,
+        "short_send_completions": 0,
+        "gather_cancel_requests": 0,
+        "gather_canceled_completions": 0,
+        "max_send_parts": 32,
+        "max_send_bytes": 2512,
+        "max_inline_callbacks_per_turn": 64,
+        "inline_dispatches": 1258246,
+        "worker_dispatches": 0,
+        "accepted": 261,
+        "completed": 1258246,
+        "rejected": 0,
+        "timeouts": 0,
+        "flushes": 0,
+        "resumed": 0,
+        "bytes_received": 61653894,
+        "bytes_sent": 197544622,
+        "pipeline_copy_bytes": 0,
+        "live_connections": 0,
+        "peak_connections": 128,
+        "live_operations": 0,
+        "peak_operations": 129,
+        "max_loop_ns": 162807,
+        "max_handler_ns": 40084,
+        "max_queue_ns": 134415,
+        "max_request_ns": 21925887,
+        "workers": 0,
+        "allocation_calls_after_start": 0,
+        "framework_heap_peak_bytes": 29618624,
+        "framework_heap_limit_bytes": 536870912
+      }
+    },
+    {
+      "index": 11,
+      "repeat": 2,
+      "server": "libreactor",
+      "connections": 128,
+      "pipeline": 1,
+      "server_command": [
+        "taskset",
+        "-c",
+        "0",
+        "/tmp/zig-http-compare.qHiBFl/bin/libreactor"
+      ],
+      "preflight": {
+        "validated_responses": 32,
+        "exact_body": "Hello, World!",
+        "headers": {
+          "server": "L",
+          "content-type": "text/plain",
+          "date": "Sat, 05 Sep 2026 17:36:39 GMT",
+          "content-length": "13"
+        },
+        "first_date": "Sat, 05 Sep 2026 17:36:38 GMT",
+        "last_date": "Sat, 05 Sep 2026 17:36:39 GMT"
+      },
+      "root_pid": 934898,
+      "warmup": {
+        "requests": 286623,
+        "duration_us": 1009881,
+        "bytes": 36114498,
+        "connect_errors": 0,
+        "read_errors": 0,
+        "write_errors": 0,
+        "status_errors": 0,
+        "timeout_errors": 0,
+        "latency_mean_us": 444.923,
+        "latency_p50_us": 439.0,
+        "latency_p99_us": 782.0,
+        "latency_max_us": 3500.0,
+        "latency_percentiles_sane": true,
+        "latency_model": "wrk corrected histogram of completed pipeline batches; not per-response or open-loop SLO latency",
+        "responses_per_second": 283818.58852676704,
+        "ok": true
+      },
+      "client_command": [
+        "taskset",
+        "-c",
+        "3,4,5,6,7",
+        "/tmp/zig-http-compare.qHiBFl/bin/wrk",
+        "-d",
+        "5s",
+        "-t",
+        "4",
+        "-c",
+        "128",
+        "--timeout",
+        "2s",
+        "-s",
+        "/tmp/zig-http-compare.qHiBFl/batch-http/benchmarks/pipeline.lua",
+        "http://127.0.0.1:8080/plaintext",
+        "--",
+        "1"
+      ],
+      "stable_thread_set": true,
+      "result": {
+        "requests": 1032301,
+        "duration_us": 5023436,
+        "bytes": 130069926,
+        "connect_errors": 0,
+        "read_errors": 0,
+        "write_errors": 0,
+        "status_errors": 0,
+        "timeout_errors": 0,
+        "latency_mean_us": 630.124,
+        "latency_p50_us": 589.0,
+        "latency_p99_us": 1817.0,
+        "latency_max_us": 11743.0,
+        "latency_percentiles_sane": true,
+        "latency_model": "wrk corrected histogram of completed pipeline batches; not per-response or open-loop SLO latency",
+        "responses_per_second": 205496.99448743847,
+        "ok": true
+      },
+      "elapsed_seconds": 5.028461317997426,
+      "server_threads": [
+        {
+          "tid": 934898,
+          "pid": 934898,
+          "last_cpu": 0,
+          "cpu_seconds": 0.0,
+          "cpu_percent": 0.0
+        },
+        {
+          "tid": 934899,
+          "pid": 934899,
+          "last_cpu": 0,
+          "cpu_seconds": 2.84,
+          "cpu_percent": 56.47850943658097
+        }
+      ],
+      "system_cpu": {
+        "cpu": {
+          "busy_percent": 60.00980151923548,
+          "iowait_percent": 0.098015192354815
+        },
+        "cpu0": {
+          "busy_percent": 98.62204724409449,
+          "iowait_percent": 0.0
+        },
+        "cpu1": {
+          "busy_percent": 34.80885311871227,
+          "iowait_percent": 0.2012072434607646
+        },
+        "cpu2": {
+          "busy_percent": 32.66533066132264,
+          "iowait_percent": 0.20040080160320642
+        },
+        "cpu3": {
+          "busy_percent": 51.945525291828794,
+          "iowait_percent": 0.0
+        },
+        "cpu4": {
+          "busy_percent": 65.18375241779498,
+          "iowait_percent": 0.19342359767891681
+        },
+        "cpu5": {
+          "busy_percent": 64.98054474708171,
+          "iowait_percent": 0.19455252918287938
+        },
+        "cpu6": {
+          "busy_percent": 64.72868217054264,
+          "iowait_percent": 0.1937984496124031
+        },
+        "cpu7": {
+          "busy_percent": 65.4368932038835,
+          "iowait_percent": 0.0
+        }
+      },
+      "client_cpu_seconds": 7.355157999999989,
+      "server_cpu_percent": 56.47850943658097,
+      "resident_kib_by_pid": {
+        "934898": 1908,
+        "934899": 1776
+      },
+      "client_cpu_percent": 146.27054947554345,
+      "client_exit": 0,
+      "server_exit": -15,
+      "server_log": "Worker running on CPU 0\nlibreactor running with 1 worker processes\n"
+    }
+  ],
+  "finished_utc": "2026-09-05T17:36:45.931835+00:00"
+}

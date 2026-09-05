@@ -177,6 +177,9 @@ capacity or an open-loop service-level measurement. The separate
 Round23 mrhttp/libreactor with wrk: our unchanged MVP is substantially slower,
 especially under pipelining. Subsequent inline/gather and batching experiments preserve that baseline. Its CPU budget, different callback/resource
 contracts and rejected tail-latency evidence are explicit.
+The subsequent [bounded batching report](reports/2026-09-05-batch.md) preserves
+inline/gather improvements, one-core comparisons, deeper-pipeline plateaus and
+run-to-run variation.
 The demo emits `STATS` JSON on clean shutdown: connection/operation peaks,
 refusals, timeouts, flush/resume counts, byte counters, maximum queue/handler/
 request-cycle durations, loop processing time, pipeline bytes copied,
