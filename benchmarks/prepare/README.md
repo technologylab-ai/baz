@@ -10,6 +10,15 @@ OpenSSL 3.6.3, and Zig 0.16.0. This generalized script preserves those source pi
 and optimization flags; it records the actual installed native compiler and
 OpenSSL rather than assuming their versions or promising identical binaries.
 
+The generalized script itself passed a complete run from commit
+`b8a3afe1bcfd7dd933060e1064cab55c4f7a41c3` on `omarx1`, September 5, 2026,
+16:33:49–16:34:45 UTC. All 67 recorded commands succeeded, including the offline
+mrpacker legacy install and exact Zig 0.16.0 ReleaseSafe build. No server or load
+generator was started. Its owned containers/processes were absent before the
+fresh temporary root was removed. This verifies preparation, not runtime HTTP
+behavior or performance. The preparation JSON SHA-256 is
+`a9e952d131deb59775ebcbdc4a06ff93603284d83fde8b60fd2065911c87da71`.
+
 Prerequisites: Python 3.9+, exact Zig 0.16.0, Git, curl, GCC/G++, gcc-ar/nm/ranlib,
 autoconf, automake, libtool, make, unzip, OpenSSL development headers/libraries,
 `taskset`, `lscpu`, and a usable Docker daemon. Seven distinct allowed logical CPUs
