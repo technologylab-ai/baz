@@ -1,32 +1,38 @@
 # HTTP experiment handoff — 2026-09-05
 
-Resumable branch: `perf/batch-quantum`, worktree
-`/Users/rs/code/github.com/technologylab.ai/zig-http-batchq`, based on tested
-operation-cell source2b971e14f5fd8ed9769b5cdefbea3d86c71d83fc.
-Parent Codex /root owns integration. The batch_quantum implementation agent
-finished and released its four source/test files. Current stage: source complete;
-native validation and the same-binary B16/B64 × Q64/Q256 comparison are pending.
-Do not label this new tuning runtime-verified or faster before those gates pass.
+Completed performance work is consolidated on `perf/batch-quantum` in
+`/Users/rs/code/github.com/technologylab.ai/zig-http-batchq` before main publication.
+Direct operation cells are preserved at adf24f380ac56b2ae142e514a1491be1e08d4a20
+on `perf/direct-operation-cells` / `zig-http-opcells`. Batch/quantum measured
+source is dbb639859e4c8503310933a2e53f0aaf45e2fca0. Both named worktrees and
+pushed branches are durable; `git worktree list` locates them after interruption.
 
-Startup limits now accept response cells1–64 and global inline callbacks1–256;
-defaults remain16/64. Larger static gather metadata increases requested startup
-heap even at batch16. Q alone changes no allocation. New finite fixtures cover
-320 native send spans,64 retained cells at cancellation, partial/flush/close
-ordering and cold service among seven backpressured depth128 pipelines.
+[Operation-cell evidence](reports/2026-09-05-operation-cells.md): both native
+gates passed 58 tests/mode,69 wire cases,8 comparator tests and30,000 smoke bodies.
+All 48 Linux paired trials passed. At 128 active clients,1024 reserved connections
+improved median throughput76%/29%/17% at depths1/16/128;128 reserved connections
+improved14%/4%/5%. Cold binding/close scans remain; startup heap is unchanged.
 
-The preceding direct-operation-cell comparison completed48/48 Linux trials at
-configured capacities128/1024 with128 active clients. Its exact results are being
-published from `perf/direct-operation-cells` in `zig-http-opcells`; the evidence
-agent owns that report only. No timed runner is active at this checkpoint.
-The remote `/tmp/zig-http-compare.PIwh35` contains pinned binaries used by both
-teams: preserve its wrk/libreactor tools until coordinated cleanup is possible.
-The external `.claude/worktrees/perf-architecture` remains separate and untouched.
+[Batch/callback evidence](reports/2026-09-05-batch-quantum.md): both native gates
+passed 59 tests/mode,77 wire cases,8 comparator tests and30,000 smoke bodies.
+All 24 same-binary matrix trials passed. At client depth128, B16/Q64 measured
+1.951M/s and B64/Q256 2.780M/s; full ranges remain in the packet. Requested heap
+is 31,100,880/59,805,648 bytes at B16/B64; Q alone adds no heap. Defaults16/64
+remain. Tests exercised320 native spans,64 retained cells during cancellation,
+partial/flush/close order, and bounded cold service amid seven hot pipelines.
 
-Use `git worktree list` and branch handoffs to resume after interruption. Before
-any heavy build/runtime/timed work acquire the execution host's atomic
-`/tmp/zig-http-measurement.lock`, inspect pre-existing measurement processes,
-and retain ownership through child cleanup. Windows HTTP gates are deferred
-by the user's current Mac/Linux tuning decision.
+Implementation/platform agents and both timed runners finished; all owned
+measurement locks were released. The evidence agent finished and verified both complete packets. Parent owns
+final publication gates; measured/native source is unchanged by the doc merge. No queued roadmap
+item implies a running agent. API release/offload, fault/combined-limit
+qualification, output representation/sharding, Mac/HTML/NIC/tail comparisons
+and Windows HTTP remain queued; this does not complete M4.
+
+The external `.claude/worktrees/perf-architecture` remains independent and
+untouched. Preserve shared `/tmp/zig-http-compare.PIwh35` tools: that agent also
+borrows wrk/libreactor. Acquire the host-local `/tmp/zig-http-measurement.lock`
+atomically before future builds/runtime/timing, check pre-existing processes,
+and hold through child cleanup. Windows tuning gates are deferred by the user.
 
 ## Historical evidence before this batch/quantum experiment
 
@@ -65,7 +71,7 @@ Current performance checkpoints:
 - `b7ac35558dea3e418e7dab5e41b1d3bb9054ca73`: generic response batching,
   default16 cells, global64-callback budget, deferred compaction and flush
   barriers. Same-binary pipeline16: batch1 234k/s, batch16 1.22M/s. Separate
-  one-core experiment: Zig1.83M/s versus libreactor2.62M/s. All24+12 trials passed.
+  one-core experiment: Zig1.83M/s versus libreactor2.62M/s. All 24+12 trials passed.
 - `5620905193e496af1c4b297a576c4fe7edd6c4a9`: separate multi-cell pending-cancel
   witness; both Mac and Linux retained16 cells and drained every owner. Both
   hosts pass52 tests in Debug/ReleaseSafe,26+10+11+16 wire cases,30k smoke bodies.

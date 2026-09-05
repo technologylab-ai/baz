@@ -1,0 +1,74 @@
+[
+  {
+    "name": "Apple SDK26.5 limits",
+    "path": "/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk/usr/include/limits.h",
+    "sha256": "4e09d7a2307887fe787c65e31d63747720c4d462b7ba3bf8f45e401d74f0b246",
+    "lines": [
+      {
+        "line": 158,
+        "text": "#define _XOPEN_IOV_MAX\t16"
+      },
+      {
+        "line": 159,
+        "text": "#define IOV_MAX\t\t1024"
+      }
+    ]
+  },
+  {
+    "name": "Zig0.16 std.c macOS conservative constant",
+    "path": "/Users/rs/.local/share/zigup/0.16.0/files/lib/std/c.zig",
+    "sha256": "f7062a55808aac78c515abd8bee5d36a596ee2de4116f61a51125107f84be158",
+    "lines": [
+      {
+        "line": 1322,
+        "text": "pub const IOV_MAX = switch (native_os) {"
+      },
+      {
+        "line": 1323,
+        "text": "    .linux => linux.IOV_MAX,"
+      },
+      {
+        "line": 1324,
+        "text": "    .emscripten => emscripten.IOV_MAX,"
+      },
+      {
+        "line": 1325,
+        "text": "    // https://github.com/SerenityOS/serenity/blob/098af0f846a87b651731780ff48420205fd33754/Kernel/API/POSIX/sys/uio.h#L16"
+      },
+      {
+        "line": 1326,
+        "text": "    .openbsd, .haiku, .illumos, .wasi, .serenity => 1024,"
+      },
+      {
+        "line": 1327,
+        "text": "    .driverkit, .ios, .maccatalyst, .macos, .tvos, .visionos, .watchos => 16,"
+      },
+      {
+        "line": 1328,
+        "text": "    .dragonfly, .netbsd, .freebsd => KERN.IOV_MAX,"
+      }
+    ]
+  },
+  {
+    "name": "Zig0.16 Linux syscall constant",
+    "path": "/Users/rs/.local/share/zigup/0.16.0/files/lib/std/os/linux.zig",
+    "sha256": "54d019f38778161dfd57e0da36fcf9ed0cd25e4ac792617dff2dc35b7513f185",
+    "lines": [
+      {
+        "line": 3676,
+        "text": "pub const IOV_MAX = 1024;"
+      }
+    ]
+  },
+  {
+    "name": "Zig0.16 bundled Linux UAPI",
+    "path": "/Users/rs/.local/share/zigup/0.16.0/files/lib/libc/include/any-linux-any/linux/uio.h",
+    "sha256": "23200c5630de57d794ab81e6ef3fc62ee4578bed6c45258d1288c001c1fbfb91",
+    "lines": [
+      {
+        "line": 46,
+        "text": "#define UIO_MAXIOV\t1024"
+      }
+    ]
+  }
+]

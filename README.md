@@ -254,9 +254,16 @@ pooled scans. This changes the low-level transport token contract; see
 the paired comparison report is complete.
 
 The batch/callback experiment exposes startup response-cell limits1–64 and a
-global callback budget1–256, retaining defaults16/64. Expanding the static
+global callback budget1–256, retaining defaults 16/64. Expanding the static
 gather maximum80→320 adds3840 bytes to each Slot and each Gather on the current
 64-bit hosts, including at batch16; Q alone adds no storage. Config.heapBytes
-accounts for actual types and startup counts. Native320-span and larger-budget
-evidence is pending in this source checkpoint. These are custom Linux/macOS
+accounts for actual types and startup counts. Native 320-span and larger-budget
+fixtures passed on Linux and macOS; see the batch/callback report. These are custom Linux/macOS
 sendmsg paths, not a portable std.Io vector-count guarantee.
+
+[Direct operation cells](reports/2026-09-05-operation-cells.md) preserve the
+48 paired Linux trials and native identity/cancellation gates. The separate
+[batch/callback matrix](reports/2026-09-05-batch-quantum.md) records24 same-binary
+trials: at client depth 128, B16/Q64 median 1.951M/s versus B64/Q256 2.780M/s.
+The latter reserves 59.8MB requested framework heap versus 31.1MB. Defaults16/64
+remain; this is an opt-in tuning surface with explicit resource costs.
