@@ -39,6 +39,8 @@ pub const Config = struct {
     deadline_sweep_ms: u32 = 100,
     /// I/O owners. 0 selects one per allowed CPU on Linux and 1 elsewhere.
     shards: u8 = 0,
+    /// Pin shard i to the i-th CPU the process may use (Linux only).
+    shard_affinity: bool = false,
     max_response_bytes: usize = 16 * 1024 * 1024,
     timeout_ms: u32 = 5000,
     shutdown_ms: u32 = 5000,
@@ -1177,6 +1179,182 @@ pub const Server = struct {
     }
 };
 
+/// Several independent I/O owners on one port. Each shard is a complete
+/// Server with its own listener (SO_REUSEPORT), transport, slots, arenas and
+/// counters; they share only the stop flags. Shard 0 runs on the calling
+/// thread, the others on startup-spawned threads with fixed stacks. Linux
+/// distributes connections across the listeners; macOS keeps one shard.
+pub const Cluster = struct {
+    allocator: std.mem.Allocator,
+    config: Config,
+    shards: []*Server,
+    threads: []?std.Thread,
+    failures: []?anyerror,
+    port_number: u16,
+
+    /// 0 selects one shard per CPU the process may run on (Linux), else 1.
+    pub fn resolveShards(config: Config) u8 {
+        if (config.shards != 0) return config.shards;
+        if (@import("builtin").os.tag == .linux) {
+            var set: std.os.linux.cpu_set_t = undefined;
+            if (std.os.linux.sched_getaffinity(0, @sizeOf(std.os.linux.cpu_set_t), &set) == 0) {
+                const count = std.os.linux.CPU_COUNT(set);
+                return @intCast(@min(@max(count, 1), 64));
+            }
+        }
+        return 1;
+    }
+
+    pub fn shardConfig(config: Config, shards: u8, index: u8, port_number: u16) Config {
+        assert(shards > 0 and index < shards);
+        var shard = config;
+        shard.shards = shards;
+        const base: u16 = config.connections / shards;
+        const extra: u16 = if (index < config.connections % shards) 1 else 0;
+        shard.connections = base + extra;
+        shard.port = port_number;
+        shard.reuse_port = shards > 1;
+        // Stacks for the other shards are reserved by the cluster, not per shard.
+        shard.memory_budget_bytes = std.math.maxInt(usize);
+        return shard;
+    }
+
+    pub fn validate(config: Config) !void {
+        try config.validate();
+        const shards = resolveShards(config);
+        if (shards == 0 or shards > 64 or shards > config.connections) return error.InvalidConfiguration;
+        if (shards > 1 and config.execution != .inline_event_loop) return error.InvalidConfiguration;
+        // XNU delivers every connection to the most recently bound reuse-port
+        // listener (observed 2026-09-05), so extra macOS shards only shrink
+        // admission. Distribution needs an acceptor mailbox there; not built.
+        if (shards > 1 and @import("builtin").os.tag != .linux) return error.InvalidConfiguration;
+        var heap: usize = 0;
+        for (0..shards) |index| heap = try std.math.add(usize, heap, try shardConfig(config, shards, @intCast(index), config.port).heapBytes());
+        const stacks = try std.math.mul(usize, config.worker_stack_bytes, config.workers + shards - 1);
+        if (try std.math.add(usize, heap, stacks) > config.memory_budget_bytes) return error.MemoryBudgetExceeded;
+    }
+
+    /// Requested framework heap across all shards; stacks are separate.
+    pub fn heapBytes(config: Config) !usize {
+        const shards = resolveShards(config);
+        var heap: usize = 0;
+        for (0..shards) |index| heap = try std.math.add(usize, heap, try shardConfig(config, shards, @intCast(index), config.port).heapBytes());
+        return heap;
+    }
+
+    pub fn init(allocator: std.mem.Allocator, config: Config, handler: api.Handler, application: ?*anyopaque) !*Cluster {
+        try validate(config);
+        const shards = resolveShards(config);
+        const self = try allocator.create(Cluster);
+        errdefer allocator.destroy(self);
+        const servers = try allocator.alloc(*Server, shards);
+        errdefer allocator.free(servers);
+        const threads = try allocator.alloc(?std.Thread, shards);
+        errdefer allocator.free(threads);
+        const failures = try allocator.alloc(?anyerror, shards);
+        errdefer allocator.free(failures);
+        @memset(threads, null);
+        @memset(failures, null);
+        var created: usize = 0;
+        errdefer for (servers[0..created]) |server| server.deinit();
+        var port_number = config.port;
+        for (servers, 0..) |*server, index| {
+            server.* = try Server.init(allocator, shardConfig(config, shards, @intCast(index), port_number), handler, application);
+            created += 1;
+            // A port chosen by the OS for the first shard binds every other one.
+            if (index == 0) port_number = server.*.backend.port();
+        }
+        self.* = .{ .allocator = allocator, .config = config, .shards = servers, .threads = threads, .failures = failures, .port_number = port_number };
+        return self;
+    }
+
+    pub fn port(self: *const Cluster) u16 {
+        return self.port_number;
+    }
+
+    fn shardMain(self: *Cluster, index: usize) void {
+        if (self.config.shard_affinity) pinToAllowedCpu(index);
+        self.shards[index].run() catch |err| {
+            self.failures[index] = err;
+        };
+    }
+
+    /// Pin the calling thread to the index-th CPU of the process's allowed set
+    /// (Linux). Other platforms leave placement to the scheduler.
+    fn pinToAllowedCpu(index: usize) void {
+        if (@import("builtin").os.tag != .linux) return;
+        const linux = std.os.linux;
+        var allowed: linux.cpu_set_t = undefined;
+        if (linux.sched_getaffinity(0, @sizeOf(linux.cpu_set_t), &allowed) != 0) return;
+        var seen: usize = 0;
+        for (allowed, 0..) |word, word_index| {
+            var bits = word;
+            while (bits != 0) : (bits &= bits - 1) {
+                if (seen == index) {
+                    const cpu = word_index * @bitSizeOf(usize) + @ctz(bits);
+                    var only: linux.cpu_set_t = @splat(0);
+                    only[cpu / @bitSizeOf(usize)] = @as(usize, 1) << @intCast(cpu % @bitSizeOf(usize));
+                    linux.sched_setaffinity(0, &only) catch {};
+                    return;
+                }
+                seen += 1;
+            }
+        }
+    }
+
+    pub fn start(self: *Cluster) !void {
+        for (self.shards) |server| try server.start();
+        var spawned: usize = 0;
+        errdefer {
+            for (self.shards) |server| server.requestStop();
+            for (self.threads[1 .. 1 + spawned]) |*thread| if (thread.*) |t| {
+                t.join();
+                thread.* = null;
+            };
+        }
+        for (self.threads[1..], 1..) |*thread, index| {
+            thread.* = try std.Thread.spawn(.{ .stack_size = self.config.worker_stack_bytes, .allocator = self.allocator }, shardMain, .{ self, index });
+            spawned += 1;
+        }
+    }
+
+    pub fn requestStop(self: *Cluster) void {
+        for (self.shards) |server| server.requestStop();
+    }
+
+    /// Runs shard 0 here until it stops, then stops and joins every other
+    /// shard. Any shard's failure is the cluster's failure; the caller must
+    /// then terminate the process because loans may remain outstanding.
+    pub fn run(self: *Cluster) !void {
+        if (self.config.shard_affinity) pinToAllowedCpu(0);
+        const first = self.shards[0].run();
+        self.requestStop();
+        for (self.threads[1..]) |*thread| if (thread.*) |t| {
+            t.join();
+            thread.* = null;
+        };
+        try first;
+        for (self.failures) |failure| if (failure) |err| return err;
+    }
+
+    pub fn stats(self: *const Cluster) Stats {
+        var total = self.shards[0].stats;
+        total.shards = @intCast(self.shards.len);
+        for (self.shards[1..]) |server| total.merge(server.stats);
+        return total;
+    }
+
+    pub fn deinit(self: *Cluster) void {
+        for (self.threads) |thread| assert(thread == null);
+        for (self.shards) |server| server.deinit();
+        const allocator = self.allocator;
+        allocator.free(self.failures);
+        allocator.free(self.threads);
+        allocator.free(self.shards);
+        allocator.destroy(self);
+    }
+};
+
 const SendSelection = struct { count: usize = 0, bytes: usize = 0 };
 
 /// Select one bounded write across framing and payload without coalescing
@@ -1370,6 +1548,37 @@ test "batch gather progress crosses part boundaries without copying" {
     try std.testing.expectEqualStrings("ader", vectorString(out[0]));
     try std.testing.expectEqualStrings("paylo", vectorString(out[1]));
     try std.testing.expectEqual(parts[34].base + 2, out[0].base);
+}
+
+test "cluster splits connections across shards and rejects unsupported topologies" {
+    const config: Config = .{ .connections = 128, .shards = 3 };
+    const first = Cluster.shardConfig(config, 3, 0, 9000);
+    const last = Cluster.shardConfig(config, 3, 2, 9000);
+    try std.testing.expectEqual(@as(u16, 43), first.connections);
+    try std.testing.expectEqual(@as(u16, 42), last.connections);
+    try std.testing.expect(first.reuse_port and last.reuse_port);
+    try std.testing.expectEqual(@as(u16, 9000), last.port);
+    try std.testing.expect(!Cluster.shardConfig(config, 1, 0, 1).reuse_port);
+    try std.testing.expectError(error.InvalidConfiguration, Cluster.validate(.{ .connections = 2, .shards = 3 }));
+    try std.testing.expectError(error.InvalidConfiguration, Cluster.validate(.{ .execution = .workers, .workers = 2, .shards = 2 }));
+    if (@import("builtin").os.tag != .linux) {
+        try std.testing.expectEqual(@as(u8, 1), Cluster.resolveShards(.{}));
+        try std.testing.expectError(error.InvalidConfiguration, Cluster.validate(.{ .shards = 2 }));
+    } else {
+        try std.testing.expect(Cluster.resolveShards(.{}) >= 1);
+        try Cluster.validate(.{ .shards = 2 });
+    }
+    const single = try Cluster.init(std.testing.allocator, .{ .connections = 2, .port = 0, .shards = 1 }, struct {
+        fn handle(_: *api.Context) api.Action {
+            unreachable;
+        }
+    }.handle, null);
+    defer single.deinit();
+    try std.testing.expectEqual(@as(usize, 1), single.shards.len);
+    try single.start();
+    single.requestStop();
+    try single.run();
+    try std.testing.expectEqual(@as(u16, 1), single.stats().shards);
 }
 
 test "stats merge sums counters, keeps maxima and leaves configuration alone" {

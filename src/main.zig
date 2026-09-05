@@ -2,12 +2,12 @@ const std = @import("std");
 const framework = @import("bounded_http");
 const api = framework.api;
 
-var active_server: ?*framework.Server = null;
+var active_cluster: ?*framework.Cluster = null;
 
 fn signalStop(_: std.posix.SIG) callconv(.c) void {
-    // The event loop checks this lock-free flag at least once per poll timeout.
-    // No allocation, logging, or framework callback from a signal handler.
-    if (active_server) |server| server.stop_requested.store(true, .release);
+    // Every shard's event loop checks its lock-free flag at least once per
+    // poll timeout. No allocation, logging, or framework callback here.
+    if (active_cluster) |cluster| for (cluster.shards) |server| server.stop_requested.store(true, .release);
 }
 
 const Demo = struct { html: []const u8, stall_ms: u32, execution: framework.Execution };
@@ -63,6 +63,8 @@ pub fn main(init: std.process.Init) !void {
             config.deadline_sweep_ms = try std.fmt.parseInt(u32, value, 10);
         } else if (std.mem.eql(u8, flag, "--shards")) {
             config.shards = try std.fmt.parseInt(u8, value, 10);
+        } else if (std.mem.eql(u8, flag, "--shard-affinity")) {
+            config.shard_affinity = if (std.mem.eql(u8, value, "1")) true else if (std.mem.eql(u8, value, "0")) false else return error.InvalidShardAffinity;
         } else if (std.mem.eql(u8, flag, "--socket-send-buffer")) {
             config.socket_send_buffer_bytes = try std.fmt.parseInt(u32, value, 10);
         } else if (std.mem.eql(u8, flag, "--stall-ms")) {
@@ -78,39 +80,48 @@ pub fn main(init: std.process.Init) !void {
         } else return error.UnknownArgument;
     }
     if (!workers_explicit) config.workers = if (config.execution == .workers) 2 else 0;
-    try config.validate();
+    try framework.Cluster.validate(config);
+    const shards = framework.Cluster.resolveShards(config);
     const html = try std.Io.Dir.cwd().readFileAlloc(init.io, index_path, init.gpa, .limited(65536));
     defer init.gpa.free(html);
     var demo: Demo = .{ .html = html, .stall_ms = stall_ms, .execution = config.execution };
-    var budget: framework.Budget = .{ .upstream = init.gpa, .limit_bytes = config.memory_budget_bytes - config.workers * config.worker_stack_bytes };
+    var budget: framework.Budget = .{ .upstream = init.gpa, .limit_bytes = config.memory_budget_bytes - (config.workers + shards - 1) * config.worker_stack_bytes };
     defer std.debug.assert(budget.live_bytes == 0);
-    const server = try framework.Server.init(budget.allocator(), config, handler, &demo);
-    defer server.deinit();
+    const cluster = try framework.Cluster.init(budget.allocator(), config, handler, &demo);
+    defer cluster.deinit();
     const action: std.posix.Sigaction = .{
         .handler = .{ .handler = signalStop },
         .mask = std.posix.sigemptyset(),
         .flags = 0,
     };
-    active_server = server;
-    defer active_server = null;
+    active_cluster = cluster;
+    defer active_cluster = null;
     std.posix.sigaction(.INT, &action, null);
     std.posix.sigaction(.TERM, &action, null);
-    try server.start();
+    try cluster.start();
     budget.sealed.store(true, .release);
-    std.debug.print("READY port={d} backend={s} connections={d} workers={d} execution={s} gather_send={d} response_batch_limit={d} optimize={s}\n", .{
-        server.backend.port(), framework.backend_name, config.connections, config.workers, @tagName(config.execution), @intFromBool(config.gather_send), config.effectiveBatchLimit(), @tagName(@import("builtin").mode),
+    std.debug.print("READY port={d} backend={s} connections={d} workers={d} execution={s} gather_send={d} response_batch_limit={d} shards={d} callbacks_per_turn={d} optimize={s}\n", .{
+        cluster.port(), framework.backend_name, config.connections, config.workers, @tagName(config.execution), @intFromBool(config.gather_send), config.effectiveBatchLimit(), shards, cluster.shards[0].stats.callbacks_per_turn, @tagName(@import("builtin").mode),
     });
-    server.run() catch |err| {
+    cluster.run() catch |err| {
         // A stuck callback or uncertain kernel submission still owns memory.
         // Terminate the process; never unwind live loans or kill a worker alone.
         // The counters name the retained owners for the shutdown diagnosis.
-        std.debug.print("FATAL {s}; retained loans require process termination; live_connections={d} live_operations={d}\n", .{ @errorName(err), server.stats.live_connections, server.stats.live_operations });
+        const partial = cluster.stats();
+        std.debug.print("FATAL {s}; retained loans require process termination; live_connections={d} live_operations={d}\n", .{ @errorName(err), partial.live_connections, partial.live_operations });
         std.c._exit(70);
     };
-    server.stats.allocation_calls_after_start = budget.late_calls.load(.acquire);
-    server.stats.framework_heap_peak_bytes = budget.peak_bytes;
-    server.stats.framework_heap_limit_bytes = budget.limit_bytes;
-    const stats = try std.json.Stringify.valueAlloc(init.gpa, server.stats, .{});
+    if (cluster.shards.len > 1) {
+        // Per-shard admission shows how the kernel distributed connections.
+        std.debug.print("SHARDS", .{});
+        for (cluster.shards) |shard| std.debug.print(" accepted={d}/completed={d}", .{ shard.stats.accepted, shard.stats.completed });
+        std.debug.print("\n", .{});
+    }
+    var merged = cluster.stats();
+    merged.allocation_calls_after_start = budget.late_calls.load(.acquire);
+    merged.framework_heap_peak_bytes = budget.peak_bytes;
+    merged.framework_heap_limit_bytes = budget.limit_bytes;
+    const stats = try std.json.Stringify.valueAlloc(init.gpa, merged, .{});
     defer init.gpa.free(stats);
     std.debug.print("STATS {s}\n", .{stats});
 }
