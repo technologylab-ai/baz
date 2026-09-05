@@ -59,6 +59,8 @@ pub fn main(init: std.process.Init) !void {
             config.callbacks_per_turn = try std.fmt.parseInt(u32, value, 10);
         } else if (std.mem.eql(u8, flag, "--callback-timing")) {
             config.callback_timing = if (std.mem.eql(u8, value, "1")) true else if (std.mem.eql(u8, value, "0")) false else return error.InvalidCallbackTiming;
+        } else if (std.mem.eql(u8, flag, "--submit-batch")) {
+            config.submit_batch = try std.fmt.parseInt(u16, value, 10);
         } else if (std.mem.eql(u8, flag, "--deadline-sweep-ms")) {
             config.deadline_sweep_ms = try std.fmt.parseInt(u32, value, 10);
         } else if (std.mem.eql(u8, flag, "--shards")) {

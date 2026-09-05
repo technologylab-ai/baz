@@ -140,11 +140,12 @@ pub const Backend = struct {
         try self.submitted(op, self.ring.cancel(cell, target_cell, 0));
     }
 
-    pub fn poll(self: *Backend, out: []Completion, timeout_ms: u32) !usize {
-        assert(out.len > 0 and timeout_ms <= std.math.maxInt(c_int));
+    /// Submit queued operations now so their effects start before the turn
+    /// ends; completions are still collected by poll.
+    pub fn flush(self: *Backend) !void {
         // submit() may already have published SQEs before enter is interrupted
         // or resource-constrained. Leave every ownership record intact. The next
-        // outer poll turn reuses the ring's pending SQ state, rather than creating
+        // submission reuses the ring's pending SQ state, rather than creating
         // duplicate operations or retrying in an unbounded loop here.
         _ = self.ring.submit() catch |err| switch (err) {
             error.SignalInterrupt, error.SystemResources => blk: {
@@ -153,6 +154,11 @@ pub const Backend = struct {
             },
             else => return err,
         };
+    }
+
+    pub fn poll(self: *Backend, out: []Completion, timeout_ms: u32) !usize {
+        assert(out.len > 0 and timeout_ms <= std.math.maxInt(c_int));
+        try self.flush();
         var cqes: [256]linux.io_uring_cqe = undefined;
         var count = try self.copyReady(cqes[0..@min(out.len, cqes.len)]);
         if (count == 0 and timeout_ms != 0) {

@@ -37,6 +37,9 @@ pub const Config = struct {
     callback_timing: bool = false,
     /// Interval of the full deadline sweep; touched slots are checked sooner.
     deadline_sweep_ms: u32 = 100,
+    /// Submit queued sends after this many drains within a turn so responses
+    /// leave before the turn ends; 0 submits only when the turn polls.
+    submit_batch: u16 = 1,
     /// I/O owners. 0 selects one per allowed CPU on Linux and 1 elsewhere.
     shards: u8 = 0,
     /// Pin shard i to the i-th CPU the process may use (Linux only).
@@ -105,7 +108,8 @@ pub const Config = struct {
             self.max_headers > 1024 or self.worker_stack_bytes < 65536 or
             self.response_batch_limit == 0 or self.response_batch_limit > 511 or
             self.borrow_copy_threshold > 4096 or self.callbacks_per_turn > 1 << 20 or
-            self.deadline_sweep_ms == 0 or self.deadline_sweep_ms > 1000 or self.shards > 64)
+            self.deadline_sweep_ms == 0 or self.deadline_sweep_ms > 1000 or self.shards > 64 or
+            self.submit_batch > 4096)
             return error.InvalidConfiguration;
         assert(self.maxSendParts() <= transport.max_vectors);
         const stacks = try std.math.mul(usize, self.worker_stack_bytes, self.workers);
@@ -154,6 +158,11 @@ pub const Stats = struct {
     live_operations: usize = 0,
     peak_operations: usize = 0,
     max_loop_ns: u64 = 0,
+    /// Event-loop turns and polls that found nothing ready and had to wait.
+    turns: u64 = 0,
+    idle_polls: u64 = 0,
+    /// Receives armed while the previous batch was still being sent.
+    prearmed_receives: u64 = 0,
     max_handler_ns: u64 = 0,
     max_queue_ns: u64 = 0,
     max_request_ns: u64 = 0,
@@ -183,7 +192,7 @@ pub const Stats = struct {
 
 const Phase = enum(u8) { io, ready, running, result };
 const SendMode = enum { response, interim, reject };
-const Kind = enum(u8) { accept = 1, recv, send, cancel, cancel_accept };
+const Kind = enum(u8) { accept = 1, recv, send, cancel_recv, cancel_send, cancel_accept };
 const accept_token: u64 = @intFromEnum(Kind.accept);
 const cancel_accept_token: u64 = @intFromEnum(Kind.cancel_accept);
 
@@ -224,9 +233,16 @@ const Slot = struct {
     state: [8]usize = @splat(0),
     action: api.Action = .close,
     event: api.Event = .request,
-    op_pending: bool = false,
-    cancel_pending: bool = false,
-    op_token: u64 = 0,
+    /// A receive into the free input tail and a send of the frozen batch may
+    /// be in flight together; each has its own cell and cancel cell.
+    recv_pending: bool = false,
+    recv_token: u64 = 0,
+    recv_cancel_pending: bool = false,
+    send_pending: bool = false,
+    send_token: u64 = 0,
+    send_cancel_pending: bool = false,
+    /// Some frozen cell borrows request input, so the input must not move.
+    batch_borrows_input: bool = false,
     closing: bool = false,
     deadline: u64 = 0,
     request_started: u64 = 0,
@@ -341,6 +357,8 @@ pub const Server = struct {
     date_second: u64 = std.math.maxInt(u64),
     /// Shared process-wide ceiling when running as a shard; null standalone.
     admission: ?*Admission = null,
+    /// Drains since the last explicit submission within the current turn.
+    drains_since_flush: u16 = 0,
 
     const clock_refresh_callbacks: u32 = 16;
 
@@ -460,19 +478,27 @@ pub const Server = struct {
         self.backend.wake();
     }
 
-    fn dataCell(self: *const Server, index: usize) u32 {
+    fn recvCell(self: *const Server, index: usize) u32 {
         assert(index < self.slots.len);
         return @intCast(index);
     }
-    fn cancelCell(self: *const Server, index: usize) u32 {
+    fn sendCell(self: *const Server, index: usize) u32 {
         assert(index < self.slots.len);
         return @intCast(self.slots.len + index);
     }
+    fn recvCancelCell(self: *const Server, index: usize) u32 {
+        assert(index < self.slots.len);
+        return @intCast(2 * self.slots.len + index);
+    }
+    fn sendCancelCell(self: *const Server, index: usize) u32 {
+        assert(index < self.slots.len);
+        return @intCast(3 * self.slots.len + index);
+    }
     fn acceptCell(self: *const Server) u32 {
-        return @intCast(2 * self.slots.len);
+        return @intCast(4 * self.slots.len);
     }
     fn cancelAcceptCell(self: *const Server) u32 {
-        return @intCast(2 * self.slots.len + 1);
+        return @intCast(4 * self.slots.len + 1);
     }
 
     fn sampleClock(self: *Server) void {
@@ -504,6 +530,7 @@ pub const Server = struct {
         const sweep_ns = @as(u64, self.config.deadline_sweep_ms) * 1_000_000;
         while (true) {
             self.inline_budget = self.stats.callbacks_per_turn;
+            self.drains_since_flush = 0;
             self.sampleClock();
             const turn_start = self.now;
             if (self.config.duration_ms != 0 and
@@ -556,7 +583,9 @@ pub const Server = struct {
                 self.stats.live_operations == 0) break;
             if (self.stopping and self.now >= self.stop_deadline) return error.ShutdownStalled;
             const local_ready = self.ready_count > 0 or (self.config.execution == .workers and self.anyResult());
+            self.stats.turns += 1;
             const count = try self.backend.poll(&completions, if (local_ready) 0 else 10);
+            if (count == 0 and !local_ready) self.stats.idle_polls += 1;
             self.sampleClock();
             const processing_start = self.now;
             for (completions[0..count]) |completion| try self.onCompletion(completion);
@@ -654,7 +683,7 @@ pub const Server = struct {
     fn operationAdded(self: *Server) void {
         self.stats.live_operations += 1;
         self.stats.peak_operations = @max(self.stats.peak_operations, self.stats.live_operations);
-        assert(self.stats.live_operations <= 2 * (self.slots.len + 1));
+        assert(self.stats.live_operations <= transport.cellCount(self.config.connections));
     }
 
     fn tokenFor(slot: *const Slot, index: usize, kind: Kind) u64 {
@@ -708,6 +737,7 @@ pub const Server = struct {
             slot.request_active = false;
             slot.batch_count = 0;
             slot.arena_used = 0;
+            slot.batch_borrows_input = false;
             slot.part_count = 0;
             slot.part = 0;
             slot.part_offset = 0;
@@ -727,14 +757,25 @@ pub const Server = struct {
         assert(index < self.slots.len);
         const slot = &self.slots[index];
         assert(slot.in_use and slot.generation == completion.token >> 32);
-        if (kind == .cancel) {
-            assert(slot.cancel_pending);
-            slot.cancel_pending = false;
+        if (kind == .cancel_recv) {
+            assert(slot.recv_cancel_pending);
+            slot.recv_cancel_pending = false;
             self.maybeFree(slot);
             return;
         }
-        assert(slot.op_pending and slot.op_token == completion.token);
-        slot.op_pending = false;
+        if (kind == .cancel_send) {
+            assert(slot.send_cancel_pending);
+            slot.send_cancel_pending = false;
+            self.maybeFree(slot);
+            return;
+        }
+        if (kind == .recv) {
+            assert(slot.recv_pending and slot.recv_token == completion.token);
+            slot.recv_pending = false;
+        } else {
+            assert(kind == .send and slot.send_pending and slot.send_token == completion.token);
+            slot.send_pending = false;
+        }
         if (kind == .send) {
             self.stats.send_completions += 1;
             if (completion.result > 0) {
@@ -756,7 +797,9 @@ pub const Server = struct {
                 assert(transferred <= slot.input.len - slot.received);
                 slot.received += transferred;
                 self.stats.bytes_received += transferred;
-                try self.parseRequest(index);
+                // Bytes that arrive while a batch is still being sent, or while
+                // a flushed request waits to resume, are parsed after that batch.
+                if (slot.batch_count == 0 and !slot.request_active) try self.parseRequest(index);
             },
             .send => {
                 assert(transferred <= slot.send_submitted_bytes);
@@ -768,21 +811,49 @@ pub const Server = struct {
         }
     }
 
+    /// Idle receive: nothing is buffered, sent or active for this connection.
     fn receive(self: *Server, index: usize) anyerror!void {
         const slot = &self.slots[index];
-        assert(!slot.op_pending and !slot.closing and slot.phase.load(.acquire) == .io);
+        assert(!slot.recv_pending and !slot.send_pending and !slot.closing and slot.phase.load(.acquire) == .io);
         assert(slot.batch_count == 0 and !slot.request_active and slot.input_cursor == 0);
         if (slot.received == slot.input.len) return self.reject(index, 413);
+        try self.armReceive(index);
+    }
+
+    fn armReceive(self: *Server, index: usize) anyerror!void {
+        const slot = &self.slots[index];
+        assert(!slot.recv_pending and !slot.closing and slot.received < slot.input.len);
         const token = tokenFor(slot, index, .recv);
-        try self.backend.recv(self.dataCell(index), token, slot.fd, slot.input[slot.received..]);
-        slot.op_pending = true;
-        slot.op_token = token;
+        try self.backend.recv(self.recvCell(index), token, slot.fd, slot.input[slot.received..]);
+        slot.recv_pending = true;
+        slot.recv_token = token;
         self.operationAdded();
+    }
+
+    /// Arm the next receive while the batch is sent, so the client's next
+    /// pipeline lands in the free input tail without waiting for the send.
+    /// The consumed prefix is compacted first when no frozen cell borrows it.
+    fn prearmReceive(self: *Server, index: usize) anyerror!void {
+        const slot = &self.slots[index];
+        if (slot.recv_pending or slot.closing or slot.request_active or slot.batch_borrows_input) return;
+        if (slot.input_cursor != 0) {
+            const remaining = slot.received - slot.input_cursor;
+            if (remaining != 0) {
+                std.mem.copyForwards(u8, slot.input[0..remaining], slot.input[slot.input_cursor..slot.received]);
+                self.stats.pipeline_copy_bytes += remaining;
+            }
+            slot.received = remaining;
+            slot.input_cursor = 0;
+            slot.parser.reset();
+        }
+        if (slot.received == slot.input.len) return;
+        try self.armReceive(index);
+        self.stats.prearmed_receives += 1;
     }
 
     fn parseRequest(self: *Server, index: usize) !void {
         const slot = &self.slots[index];
-        assert(!slot.request_active and !slot.op_pending and slot.input_cursor <= slot.received);
+        assert(!slot.request_active and !slot.send_pending and slot.input_cursor <= slot.received);
         assert(slot.batch_count < slot.cells.len);
         const parsed = slot.parser.parseInto(slot.input[slot.input_cursor..slot.received], &slot.request) catch |err| {
             // Earlier successful responses retain wire order before this error.
@@ -818,12 +889,35 @@ pub const Server = struct {
             slot.part = 0;
             slot.part_offset = 0;
             try self.sendNext(index);
-        } else try self.receive(index);
+        } else try self.receiveMore(index);
+    }
+
+    /// An incomplete request needs more bytes. A pre-armed receive already
+    /// covers that; otherwise reclaim the consumed prefix, which nothing
+    /// borrows once no batch is in flight, then arm or refuse a full buffer.
+    fn receiveMore(self: *Server, index: usize) anyerror!void {
+        const slot = &self.slots[index];
+        if (slot.recv_pending) return;
+        assert(slot.batch_count == 0 and !slot.request_active and !slot.send_pending);
+        if (slot.input_cursor != 0) {
+            const remaining = slot.received - slot.input_cursor;
+            if (remaining != 0) {
+                std.mem.copyForwards(u8, slot.input[0..remaining], slot.input[slot.input_cursor..slot.received]);
+                self.stats.pipeline_copy_bytes += remaining;
+            }
+            slot.received = remaining;
+            slot.input_cursor = 0;
+            // The parser's incremental state indexes the old base; re-parse the
+            // bounded suffix from the new one before the next completion.
+            slot.parser.reset();
+            if (remaining != 0) return self.parseRequest(index);
+        }
+        try self.receive(index);
     }
 
     fn dispatch(self: *Server, index: usize) void {
         const slot = &self.slots[index];
-        assert(slot.phase.load(.acquire) == .io and !slot.closing and !slot.op_pending);
+        assert(slot.phase.load(.acquire) == .io and !slot.closing and !slot.send_pending);
         if (self.config.callback_timing) slot.queued_at = nowNs();
         switch (self.config.execution) {
             .workers => {
@@ -951,6 +1045,11 @@ pub const Server = struct {
             cell.borrow_at = @intCast(writer.body_start);
             cell.borrowed = span;
         }
+        if (cell.borrowed.len != 0) {
+            const address = @intFromPtr(cell.borrowed.ptr);
+            const input_start = @intFromPtr(slot.input.ptr);
+            if (address >= input_start and address < input_start + slot.input.len) slot.batch_borrows_input = true;
+        }
         assert(end >= writer.base and end <= arena.len);
         cell.end = @intCast(end);
         slot.arena_used = end;
@@ -983,7 +1082,7 @@ pub const Server = struct {
     /// run, and each borrowed span is inserted where its cell recorded it.
     fn drainBatch(self: *Server, index: usize, next: BatchNext) anyerror!void {
         const slot = &self.slots[index];
-        assert(slot.batch_count > 0 and !slot.op_pending);
+        assert(slot.batch_count > 0 and !slot.send_pending);
         slot.batch_next = next;
         self.stats.response_batches += 1;
         self.stats.max_batch_responses = @max(self.stats.max_batch_responses, slot.batch_count);
@@ -1010,12 +1109,20 @@ pub const Server = struct {
         slot.part_count = count;
         slot.part = 0;
         slot.part_offset = 0;
+        if (next == .parse and count > 0) try self.prearmReceive(index);
         try self.sendNext(index);
+        if (count > 0 and self.config.submit_batch != 0) {
+            self.drains_since_flush += 1;
+            if (self.drains_since_flush >= self.config.submit_batch) {
+                self.drains_since_flush = 0;
+                try self.backend.flush();
+            }
+        }
     }
 
     fn sendNext(self: *Server, index: usize) anyerror!void {
         const slot = &self.slots[index];
-        assert(!slot.op_pending and !slot.closing);
+        assert(!slot.send_pending and !slot.closing);
         while (slot.part < slot.part_count) {
             const current = slot.parts[slot.part];
             if (current.len - slot.part_offset == 0) {
@@ -1025,7 +1132,7 @@ pub const Server = struct {
             }
             const token = tokenFor(slot, index, .send);
             const cap = @min(self.config.send_chunk, std.math.maxInt(i32));
-            const cell = self.dataCell(index);
+            const cell = self.sendCell(index);
             if (self.config.gather_send) {
                 const selection = selectSendParts(slot.parts[0..slot.part_count], slot.part, slot.part_offset, cap, slot.selection);
                 assert(selection.count > 0 and selection.bytes <= cap);
@@ -1052,8 +1159,8 @@ pub const Server = struct {
                 self.stats.max_send_parts = @max(self.stats.max_send_parts, 1);
             }
             self.stats.max_send_bytes = @max(self.stats.max_send_bytes, slot.send_submitted_bytes);
-            slot.op_pending = true;
-            slot.op_token = token;
+            slot.send_pending = true;
+            slot.send_token = token;
             self.operationAdded();
             return;
         }
@@ -1062,7 +1169,7 @@ pub const Server = struct {
                 slot.part_count = 0;
                 slot.part = 0;
                 slot.part_offset = 0;
-                try self.receive(index);
+                try self.receiveMore(index);
             },
             .reject => try self.beginClose(slot),
             .response => try self.completeBatch(index),
@@ -1071,7 +1178,7 @@ pub const Server = struct {
 
     fn completeBatch(self: *Server, index: usize) anyerror!void {
         const slot = &self.slots[index];
-        assert(!slot.op_pending and !slot.cancel_pending and slot.batch_count > 0);
+        assert(!slot.send_pending and !slot.send_cancel_pending and slot.batch_count > 0);
         assert(slot.part == slot.part_count and slot.part_offset == 0);
         const completed_at = self.now;
         var finished: usize = 0;
@@ -1083,6 +1190,7 @@ pub const Server = struct {
         self.stats.completed += finished;
         if (slot.batch_count > 1) self.stats.batched_finished_responses += finished;
         slot.batch_count = 0;
+        slot.batch_borrows_input = false;
         slot.part_count = 0;
         slot.part = 0;
         slot.part_offset = 0;
@@ -1107,8 +1215,9 @@ pub const Server = struct {
             .parse => {
                 assert(!slot.request_active and slot.input_cursor <= slot.received);
                 // No callback or transport retains the consumed prefix now.
-                // Move the suffix once per batch, never once per response.
-                if (slot.input_cursor != 0) {
+                // Move the suffix once per batch, never once per response; a
+                // pre-armed receive owns the tail, so compaction waits for it.
+                if (slot.input_cursor != 0 and !slot.recv_pending) {
                     const remaining = slot.received - slot.input_cursor;
                     if (remaining != 0) {
                         std.mem.copyForwards(u8, slot.input[0..remaining], slot.input[slot.input_cursor..slot.received]);
@@ -1118,7 +1227,7 @@ pub const Server = struct {
                     slot.input_cursor = 0;
                     slot.parser.reset();
                 }
-                if (slot.received == 0) try self.receive(index) else try self.parseRequest(index);
+                if (slot.input_cursor < slot.received) try self.parseRequest(index) else try self.receiveMore(index);
             },
         }
     }
@@ -1128,19 +1237,25 @@ pub const Server = struct {
         slot.closing = true;
         slot.cancelled.store(true, .release);
         if (slot.fd >= 0) self.backend.shutdown(slot.fd);
-        if (slot.op_pending and !slot.cancel_pending) {
-            const token = (slot.op_token & ~@as(u64, 255)) | @intFromEnum(Kind.cancel);
-            try self.backend.cancel(self.cancelCell(index), token, self.dataCell(index));
-            if (@as(u8, @truncate(slot.op_token)) == @intFromEnum(Kind.send) and slot.send_is_gather) {
+        if (slot.recv_pending and !slot.recv_cancel_pending) {
+            const token = (slot.recv_token & ~@as(u64, 255)) | @intFromEnum(Kind.cancel_recv);
+            try self.backend.cancel(self.recvCancelCell(index), token, self.recvCell(index));
+            slot.recv_cancel_pending = true;
+            self.operationAdded();
+        }
+        if (slot.send_pending and !slot.send_cancel_pending) {
+            const token = (slot.send_token & ~@as(u64, 255)) | @intFromEnum(Kind.cancel_send);
+            try self.backend.cancel(self.sendCancelCell(index), token, self.sendCell(index));
+            if (slot.send_is_gather) {
                 self.stats.gather_cancel_requests += 1;
                 assert(slot.batch_count <= slot.cells.len);
                 self.stats.max_canceled_batch_responses = @max(self.stats.max_canceled_batch_responses, slot.batch_count);
             }
-            slot.cancel_pending = true;
+            slot.send_cancel_pending = true;
             self.operationAdded();
         }
-        if (!slot.op_pending and slot.fd >= 0) {
-            self.backend.close(self.dataCell(index), slot.fd);
+        if (!slot.recv_pending and !slot.send_pending and slot.fd >= 0) {
+            self.backend.close(self.recvCell(index), slot.fd);
             slot.fd = -1;
         }
         // Release immediately when nothing is pending; otherwise the last
@@ -1149,11 +1264,12 @@ pub const Server = struct {
     }
 
     fn maybeFree(self: *Server, slot: *Slot) void {
-        if (!slot.closing or slot.op_pending or slot.cancel_pending or
+        if (!slot.closing or slot.recv_pending or slot.send_pending or
+            slot.recv_cancel_pending or slot.send_cancel_pending or
             slot.phase.load(.acquire) != .io) return;
         const index = (@intFromPtr(slot) - @intFromPtr(self.slots.ptr)) / @sizeOf(Slot);
         if (slot.fd >= 0) {
-            self.backend.close(self.dataCell(index), slot.fd);
+            self.backend.close(self.recvCell(index), slot.fd);
             slot.fd = -1;
         }
         assert(slot.in_use and self.stats.live_connections > 0);
@@ -1165,6 +1281,7 @@ pub const Server = struct {
         slot.input_cursor = 0;
         slot.request_active = false;
         slot.batch_count = 0;
+        slot.batch_borrows_input = false;
         slot.arena_used = 0;
         assert(self.free_count < self.free_slots.len);
         self.free_slots[self.free_count] = @intCast(index);

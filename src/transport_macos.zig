@@ -225,6 +225,9 @@ pub const Backend = struct {
         self.outstanding += 1;
     }
 
+    /// Nonblocking calls already ran at submission; nothing is queued.
+    pub fn flush(_: *Backend) !void {}
+
     fn collect(self: *Backend, out: []Completion) usize {
         var count: usize = 0;
         while (count < out.len and self.ready_count > 0) {

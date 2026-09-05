@@ -2,11 +2,12 @@
 //! Payloads are borrowed through terminal completion; ordinary socket I/O still
 //! copies between the kernel and userspace. This is not SEND_ZC / zero-copy RX.
 //!
-//! Operations are addressed by caller-chosen cells: `2 * (max_connections + 1)`
+//! Operations are addressed by caller-chosen cells: `4 * max_connections + 2`
 //! fixed records, so admission and completion matching never search. The caller
-//! owns the numbering (data cell, cancel cell, accept and cancel-accept cells)
-//! and never has two live operations in one cell. Gather vectors stay in the
-//! caller's stable storage until the terminal completion, canceled or not.
+//! owns the numbering (receive, send and their cancel cells per connection,
+//! plus accept and cancel-accept) and never has two live operations in one
+//! cell. Gather vectors stay in the caller's stable storage until the terminal
+//! completion, canceled or not.
 const std = @import("std");
 const builtin = @import("builtin");
 const c = std.c;
@@ -17,7 +18,7 @@ pub const Completion = struct { token: u64, result: i32 };
 pub const max_vectors: usize = 1024;
 
 pub fn cellCount(max_connections: u16) usize {
-    return (@as(usize, max_connections) + 1) * 2;
+    return @as(usize, max_connections) * 4 + 2;
 }
 
 pub const Backend = switch (builtin.os.tag) {
@@ -95,9 +96,10 @@ fn waitCompletion(backend: *Backend) !Completion {
     return error.CompletionDeadline;
 }
 
-// Test cell layout for two connections: data 0-1, cancel 2-3, accept 4, cancel-accept 5.
-const test_accept_cell = 4;
-const test_cancel_accept_cell = 5;
+// Test cell layout for two connections: recv 0-1, send 2-3, cancels 4-7,
+// accept 8, cancel-accept 9. The adapter does not interpret roles.
+const test_accept_cell = 8;
+const test_cancel_accept_cell = 9;
 
 test "transport rejects impossible capacity before creating a listener" {
     try std.testing.expectError(error.InvalidConnectionLimit, Backend.init(std.testing.allocator, 0, 0, false));
@@ -176,7 +178,7 @@ test "transport borrows receive and send buffers and accounts for EOF" {
     try std.testing.expectEqual(@as(isize, gather_expected.len), c.recv(client, &response, response.len, 0));
     try std.testing.expectEqualStrings(gather_expected, response[0..gather_expected.len]);
     try backend.recv(0, 25, peer, &buffer);
-    try backend.cancel(2, 26, 0);
+    try backend.cancel(4, 26, 0);
     var canceled_receive = false;
     var cancel_acknowledged = false;
     for (0..2) |_| {
@@ -211,7 +213,7 @@ test "wake is coalesced and does not consume a caller completion token" {
     var completions: [2]Completion = undefined;
     try std.testing.expectEqual(@as(usize, 0), try backend.poll(&completions, 100));
     // Cancelling an idle cell yields ENOENT: the record exists, no target does.
-    try backend.cancel(1, 31, 0);
+    try backend.cancel(2, 31, 0);
     const missing = try waitCompletion(&backend);
     try std.testing.expectEqual(@as(u64, 31), missing.token);
     try std.testing.expectEqual(-@as(i32, @intFromEnum(c.E.NOENT)), missing.result);
@@ -220,11 +222,11 @@ test "wake is coalesced and does not consume a caller completion token" {
 test "cancellation cells are finite and returned completions replenish them" {
     var backend = try Backend.init(std.testing.allocator, 1, 0, false);
     defer backend.deinit();
-    try backend.cancel(1, 41, 0);
-    try backend.cancel(3, 42, 2);
-    try std.testing.expectError(error.OperationCellBusy, backend.cancel(1, 43, 0));
+    try backend.cancel(2, 41, 0);
+    try backend.cancel(3, 42, 1);
+    try std.testing.expectError(error.OperationCellBusy, backend.cancel(2, 43, 0));
     for (0..2) |_| _ = try waitCompletion(&backend);
-    try backend.cancel(1, 43, 0);
+    try backend.cancel(2, 43, 0);
     const replenished = try waitCompletion(&backend);
     try std.testing.expectEqual(@as(u64, 43), replenished.token);
 }
