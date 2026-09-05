@@ -31,3 +31,6 @@ measurements. Function size/style cleanup, deterministic schedule/fault injectio
 fairness under sustained high connection counts, external dynamic buffer release,
 and full kernel/process resource accounting remain work; this is an applied
 TigerStyle experiment, not a claim of complete TigerStyle conformance.
+
+The first source-hashed native result is
+[the MVP receipt](../reports/2026-09-05-mvp.md).

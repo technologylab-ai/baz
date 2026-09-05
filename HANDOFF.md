@@ -39,3 +39,8 @@ when available; continue on omarx1 during travel outages. Windows is queued.
 Final validation details belong in reports/; preserve earlier failed/narrower
 results rather than silently relabeling them. All contributors finish before
 publication; no queued roadmap item implies a running agent.
+
+The first pinned implementation and native gate packet is in
+[reports/2026-09-05-mvp.md](reports/2026-09-05-mvp.md): 44 test executions in
+each mode and 26 integration cases per host. Full finite smoke runs validated
+30,000 responses per host in ReleaseSafe. See ROADMAP.md for remaining work.

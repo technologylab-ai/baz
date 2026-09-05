@@ -1,0 +1,1137 @@
+{
+  "date": "2026-09-05",
+  "input_tree_clean": true,
+  "linker_probe": "source_commit=6d622009abee5807eb0829e558c3173635e077ea\narchive_sha256=badcc9c0561315c16493da12b90dc061392022651a7ede88df9e6804b40de41e\ntransport_source_sha256=dfa97a8d5f68028775218c1bf529ce40e10fecd477a7f7305068c1195ee2f8a7\nlocal_worktree_status=''\nprobe_directory=/tmp/zig-http-linker-probe.i2XqvJKE\nutc_started=2026-09-05T14:51:36Z\nzig_path=/home/rs/.local/share/mise/shims/zig\n0.16.0\n.{\n    .zig_exe = \"/home/rs/.local/share/mise/installs/zig/0.16.0/zig\",\n    .lib_dir = \"/home/rs/.local/share/mise/installs/zig/0.16.0/lib\",\n    .std_dir = \"/home/rs/.local/share/mise/installs/zig/0.16.0/lib/std\",\n    .global_cache_dir = \"/home/rs/.cache/zig\",\n    .version = \"0.16.0\",\n    .target = \"x86_64-linux.7.1.9...7.1.9-gnu.2.44\",\n    .env = .{\n        .ZIG_GLOBAL_CACHE_DIR = null,\n        .ZIG_LOCAL_CACHE_DIR = null,\n        .ZIG_LIB_DIR = null,\n        .ZIG_LIBC = null,\n        .ZIG_BUILD_RUNNER = null,\n        .ZIG_BUILD_ERROR_STYLE = null,\n        .ZIG_BUILD_MULTILINE_ERRORS = null,\n        .ZIG_VERBOSE_LINK = null,\n        .ZIG_VERBOSE_CC = null,\n        .ZIG_DEBUG_CMD = null,\n        .ZIG_IS_DETECTING_LIBC_PATHS = null,\n        .ZIG_IS_TRYING_TO_NOT_CALL_ITSELF = null,\n        .NIX_CFLAGS_COMPILE = null,\n        .NIX_CFLAGS_LINK = null,\n        .NIX_LDFLAGS = null,\n        .C_INCLUDE_PATH = null,\n        .CPLUS_INCLUDE_PATH = null,\n        .LIBRARY_PATH = null,\n        .CC = null,\n        .NO_COLOR = null,\n        .CLICOLOR_FORCE = null,\n        .XDG_CACHE_HOME = null,\n        .LOCALAPPDATA = null,\n        .HOME = \"/home/rs\",\n        .PROGRAMDATA = null,\n        .HOMEBREW_PREFIX = null,\n    },\n}\nLinux omarx1 7.1.9-arch1-2 #1 SMP PREEMPT_DYNAMIC Fri, 21 Aug 2026 22:18:59 +0000 x86_64 GNU/Linux\nNAME=\"Omarchy\"\nPRETTY_NAME=\"Omarchy\"\nID=omarchy\nID_LIKE=arch\nBUILD_ID=\"4.0.2\"\nVERSION_ID=\"4.0.2\"\nANSI_COLOR=\"38;2;158;206;106\"\nHOME_URL=\"https://omarchy.org/\"\nDOCUMENTATION_URL=\"https://learn.omacom.io/2/the-omarchy-manual\"\nSUPPORT_URL=\"https://discord.gg/tXFUdasqhY\"\nBUG_REPORT_URL=\"https://github.com/basecamp/omarchy/issues\"\nLOGO=omarchy\nio_uring_disabled=0\nglibc 2.44\ngcc (GCC) 16.2.1 20260810\nCopyright (C) 2026 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\nArchitecture:                            x86_64\nCPU op-mode(s):                          32-bit, 64-bit\nAddress sizes:                           42 bits physical, 48 bits virtual\nByte Order:                              Little Endian\nCPU(s):                                  8\nOn-line CPU(s) list:                     0-7\nVendor ID:                               GenuineIntel\nModel name:                              Intel(R) Core(TM) Ultra 7 258V\nCPU family:                              6\nModel:                                   189\nThread(s) per core:                      1\nCore(s) per socket:                      8\nSocket(s):                               1\nStepping:                                1\nMicrocode version:                       0x128\nCPU(s) scaling MHz:                      55%\nCPU max MHz:                             4800.0000\nCPU min MHz:                             400.0000\nBogoMIPS:                                6604.80\nFlags:                                   fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf tsc_known_freq pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb ssbd ibrs ibpb stibp ibrs_enhanced tpr_shadow flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid rdt_a rdseed adx smap clflushopt clwb intel_pt sha_ni xsaveopt xsavec xgetbv1 xsaves split_lock_detect user_shstk avx_vnni lass lam wbnoinvd dtherm ida arat pln pts hwp hwp_notify hwp_act_window hwp_epp hwp_pkg_req hfi vnmi umip pku ospke waitpkg gfni vaes vpclmulqdq rdpid bus_lock_detect movdiri movdir64b fsrm md_clear serialize pconfig arch_lbr ibt flush_l1d arch_capabilities\nVirtualization:                          VT-x\nL1d cache:                               320 KiB (8 instances)\nL1i cache:                               512 KiB (8 instances)\nL2 cache:                                14 MiB (5 instances)\nL3 cache:                                12 MiB (1 instance)\nNUMA node(s):                            1\nNUMA node0 CPU(s):                       0-7\nVulnerability Gather data sampling:      Not affected\nVulnerability Ghostwrite:                Not affected\nVulnerability Indirect target selection: Not affected\nVulnerability Itlb multihit:             Not affected\nVulnerability L1tf:                      Not affected\nVulnerability Mds:                       Not affected\nVulnerability Meltdown:                  Not affected\nVulnerability Mmio stale data:           Not affected\nVulnerability Old microcode:             Not affected\nVulnerability Reg file data sampling:    Not affected\nVulnerability Retbleed:                  Not affected\nVulnerability Spec rstack overflow:      Not affected\nVulnerability Spec store bypass:         Mitigation; Speculative Store Bypass disabled via prctl\nVulnerability Spectre v1:                Mitigation; usercopy/swapgs barriers and __user pointer sanitization\nVulnerability Spectre v2:                Mitigation; Enhanced / Automatic IBRS; IBPB conditional; PBRSB-eIBRS Not affected; BHI BHI_DIS_S\nVulnerability Srbds:                     Not affected\nVulnerability Tsa:                       Not affected\nVulnerability Tsx async abort:           Not affected\nVulnerability Vmscape:                   Mitigation; IBPB before exit to userspace\ncrt_name=crt1.o crt_path=/usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib/crt1.o\ne4c262fda945a76df8aaefc8343a4d09dd2add671735a322797c7dfe9352645e  /usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib/crt1.o\ncrt_name=Scrt1.o crt_path=/usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib/Scrt1.o\n98d76691c6d97233c9e1a062f32ea2d7a89f047632156d1bf7b811727fb19921  /usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib/Scrt1.o\ncrt_name=crti.o crt_path=/usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib/crti.o\ncaf7f0c99019735e97e9bfabf52c376e86e1ef92d1b53a63c36a5bc2688e8fcc  /usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib/crti.o\ncrt_name=crtn.o crt_path=/usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib/crtn.o\n71236f0a232a3686adf2319f3ae172831e8fd8166b9f0764ed184bc4df11be3c  /usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib/crtn.o\ncrt_name=crtbegin.o crt_path=/usr/lib/gcc/x86_64-pc-linux-gnu/16/crtbegin.o\n2b44995703051fd5ee884e5095012b603767499309208531cf6ad4acfd5c8654  /usr/lib/gcc/x86_64-pc-linux-gnu/16/crtbegin.o\ncrt_name=crtbeginS.o crt_path=/usr/lib/gcc/x86_64-pc-linux-gnu/16/crtbeginS.o\n557581ba917a932911a5269f36d1c2f7f6924c88052a4cdd911c862b980678df  /usr/lib/gcc/x86_64-pc-linux-gnu/16/crtbeginS.o\ncrt_name=crtend.o crt_path=/usr/lib/gcc/x86_64-pc-linux-gnu/16/crtend.o\nbcbcd1dcbc7b235c96ab3ff1f06e5b7f44677fed502fa22c2a0b2f8360db71fd  /usr/lib/gcc/x86_64-pc-linux-gnu/16/crtend.o\ncrt_name=crtendS.o crt_path=/usr/lib/gcc/x86_64-pc-linux-gnu/16/crtendS.o\nbcbcd1dcbc7b235c96ab3ff1f06e5b7f44677fed502fa22c2a0b2f8360db71fd  /usr/lib/gcc/x86_64-pc-linux-gnu/16/crtendS.o\naa037454b5e8320521a32b278a3f4aff05fc79009ab5503f5d4a1b9a33b38c47  .zig-version\ndfa97a8d5f68028775218c1bf529ce40e10fecd477a7f7305068c1195ee2f8a7  src/transport.zig\nca09b2a8d61627926efe280ee79abb401bcff2004d30ef6f274d72358ffd747f  src/transport_linux.zig\nf48c7f4b1047331f95626aa0b3f097bb7efe60109c16695193a0ada74400ec6e  src/transport_macos.zig\ncase=debug_default command=timeout 180 zig test src/transport.zig -lc -ODebug\nerror: fatal linker error: unhandled relocation type R_X86_64_PC64 at offset 0x1c\n    note: in /usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib/crt1.o:.sframe\nerror: fatal linker error: unhandled relocation type R_X86_64_PC64 at offset 0x2c\n    note: in /usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib/crt1.o:.sframe\nerror: fatal linker error: unhandled relocation type R_X86_64_PC64 at offset 0x3c\n    note: in /usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib/crt1.o:.sframe\ncase=debug_default exit=1 utc_finished=2026-09-05T14:51:36Z\ncase=releasesafe_default command=timeout 180 zig test src/transport.zig -lc -OReleaseSafe\n1/6 transport.test.transport rejects impossible capacity before creating a listener...OK\n2/6 transport.test.accept cancellation drains target and cancellation acknowledgement separately...OK\n3/6 transport.test.transport borrows receive and send buffers and accounts for EOF...OK\n4/6 transport.test.wake is coalesced and does not consume a caller completion token...OK\n5/6 transport.test.cancellation admission is finite and returned completions replenish it...OK\n6/6 transport.test.a startup worker can wake a waiting I/O owner...OK\nAll 6 tests passed.\ncase=releasesafe_default exit=0 utc_finished=2026-09-05T14:51:46Z\ncase=debug_llvm_lld command=timeout 180 zig test src/transport.zig -lc -ODebug -fllvm -flld\n1/6 transport.test.transport rejects impossible capacity before creating a listener...OK\n2/6 transport.test.accept cancellation drains target and cancellation acknowledgement separately...OK\n3/6 transport.test.transport borrows receive and send buffers and accounts for EOF...OK\n4/6 transport.test.wake is coalesced and does not consume a caller completion token...OK\n5/6 transport.test.cancellation admission is finite and returned completions replenish it...OK\n6/6 transport.test.a startup worker can wake a waiting I/O owner...OK\nAll 6 tests passed.\ncase=debug_llvm_lld exit=0 utc_finished=2026-09-05T14:51:48Z\naa037454b5e8320521a32b278a3f4aff05fc79009ab5503f5d4a1b9a33b38c47  .zig-version\ndfa97a8d5f68028775218c1bf529ce40e10fecd477a7f7305068c1195ee2f8a7  src/transport.zig\nca09b2a8d61627926efe280ee79abb401bcff2004d30ef6f274d72358ffd747f  src/transport_linux.zig\nf48c7f4b1047331f95626aa0b3f097bb7efe60109c16695193a0ada74400ec6e  src/transport_macos.zig\nutc_completed=2026-09-05T14:51:48Z\nssh_exit=0\ncleanup_verified_exit=0\n",
+  "linux": {
+    "architecture": "x86_64",
+    "archive_boundary": "Clean committed tree streamed into validated temporary directory; remote checkout unchanged. Embedded smoke has no .git; enclosing wrapper supplies source commit.",
+    "command": "tools/verify_linux_ssh.sh omarx1",
+    "cpu": "Intel Core Ultra 7 258V",
+    "gcc": "16.2.1 20260810",
+    "glibc": "2.44",
+    "host": "omarx1",
+    "integration": {
+      "ok": true,
+      "passed": 26,
+      "platform": "linux",
+      "python": "3.14.7",
+      "schema_version": 1,
+      "seconds": 4.090676,
+      "server": "/tmp/zig-http.Ktj8eh/zig-out/bin/zig-http",
+      "sessions": [
+        {
+          "backend": "io_uring",
+          "phase": "wire",
+          "stats": {
+            "accepted": 32,
+            "allocation_calls_after_start": 0,
+            "bytes_received": 6820,
+            "bytes_sent": 8581,
+            "completed": 41,
+            "flushes": 8,
+            "framework_heap_limit_bytes": 534773760,
+            "framework_heap_peak_bytes": 216032,
+            "live_connections": 0,
+            "live_operations": 0,
+            "max_handler_ns": 1000087106,
+            "max_loop_ns": 156108,
+            "max_queue_ns": 70432,
+            "max_request_ns": 1000549521,
+            "peak_connections": 2,
+            "peak_operations": 2,
+            "pipeline_copy_bytes": 5653,
+            "rejected": 9,
+            "resumed": 8,
+            "timeouts": 0,
+            "workers": 2
+          }
+        },
+        {
+          "backend": "io_uring",
+          "phase": "capacity",
+          "stats": {
+            "accepted": 3,
+            "allocation_calls_after_start": 0,
+            "bytes_received": 104,
+            "bytes_sent": 157,
+            "completed": 1,
+            "flushes": 0,
+            "framework_heap_limit_bytes": 534773760,
+            "framework_heap_peak_bytes": 27648,
+            "live_connections": 0,
+            "live_operations": 0,
+            "max_handler_ns": 4633,
+            "max_loop_ns": 160240,
+            "max_queue_ns": 39661,
+            "max_request_ns": 265353,
+            "peak_connections": 2,
+            "peak_operations": 3,
+            "pipeline_copy_bytes": 0,
+            "rejected": 1,
+            "resumed": 0,
+            "timeouts": 0,
+            "workers": 2
+          }
+        },
+        {
+          "backend": "io_uring",
+          "phase": "combined_capacity",
+          "stats": {
+            "accepted": 5,
+            "allocation_calls_after_start": 0,
+            "bytes_received": 4388,
+            "bytes_sent": 4893,
+            "completed": 5,
+            "flushes": 4,
+            "framework_heap_limit_bytes": 534773760,
+            "framework_heap_peak_bytes": 54560,
+            "live_connections": 0,
+            "live_operations": 0,
+            "max_handler_ns": 2069,
+            "max_loop_ns": 149897,
+            "max_queue_ns": 40176,
+            "max_request_ns": 101495797,
+            "peak_connections": 4,
+            "peak_operations": 5,
+            "pipeline_copy_bytes": 0,
+            "rejected": 1,
+            "resumed": 4,
+            "timeouts": 0,
+            "workers": 2
+          }
+        },
+        {
+          "backend": "io_uring",
+          "phase": "deadlines",
+          "stats": {
+            "accepted": 4,
+            "allocation_calls_after_start": 0,
+            "bytes_received": 158,
+            "bytes_sent": 314,
+            "completed": 2,
+            "flushes": 0,
+            "framework_heap_limit_bytes": 535822336,
+            "framework_heap_peak_bytes": 54520,
+            "live_connections": 0,
+            "live_operations": 0,
+            "max_handler_ns": 600110731,
+            "max_loop_ns": 104336,
+            "max_queue_ns": 37753,
+            "max_request_ns": 133869,
+            "peak_connections": 1,
+            "peak_operations": 3,
+            "pipeline_copy_bytes": 0,
+            "rejected": 0,
+            "resumed": 0,
+            "timeouts": 2,
+            "workers": 1
+          }
+        },
+        {
+          "backend": "io_uring",
+          "phase": "slow_reader",
+          "stats": {
+            "accepted": 3,
+            "allocation_calls_after_start": 0,
+            "bytes_received": 2097305,
+            "bytes_sent": 66013,
+            "completed": 2,
+            "flushes": 1,
+            "framework_heap_limit_bytes": 534773760,
+            "framework_heap_peak_bytes": 16823584,
+            "live_connections": 0,
+            "live_operations": 0,
+            "max_handler_ns": 3858,
+            "max_loop_ns": 38947,
+            "max_queue_ns": 82330,
+            "max_request_ns": 178736,
+            "peak_connections": 2,
+            "peak_operations": 3,
+            "pipeline_copy_bytes": 0,
+            "rejected": 0,
+            "resumed": 0,
+            "timeouts": 1,
+            "workers": 2
+          }
+        },
+        {
+          "backend": "io_uring",
+          "phase": "shutdown",
+          "stats": {
+            "accepted": 2,
+            "allocation_calls_after_start": 0,
+            "bytes_received": 70,
+            "bytes_sent": 0,
+            "completed": 0,
+            "flushes": 0,
+            "framework_heap_limit_bytes": 534773760,
+            "framework_heap_peak_bytes": 54560,
+            "live_connections": 0,
+            "live_operations": 0,
+            "max_handler_ns": 300108946,
+            "max_loop_ns": 88612,
+            "max_queue_ns": 34586,
+            "max_request_ns": 0,
+            "peak_connections": 2,
+            "peak_operations": 4,
+            "pipeline_copy_bytes": 0,
+            "rejected": 0,
+            "resumed": 0,
+            "timeouts": 0,
+            "workers": 2
+          }
+        }
+      ],
+      "tests": [
+        {
+          "name": "plaintext",
+          "ok": true,
+          "seconds": 0.001363
+        },
+        {
+          "name": "head_then_keepalive",
+          "ok": true,
+          "seconds": 0.000426
+        },
+        {
+          "name": "startup_loaded_html",
+          "ok": true,
+          "seconds": 0.000404
+        },
+        {
+          "name": "unknown_route",
+          "ok": true,
+          "seconds": 0.000215
+        },
+        {
+          "name": "absolute_uri_case_insensitive_scheme_and_query",
+          "ok": true,
+          "seconds": 0.00054
+        },
+        {
+          "name": "fragmented_headers_and_binary_body",
+          "ok": true,
+          "seconds": 0.02343
+        },
+        {
+          "name": "exact_body_limit",
+          "ok": true,
+          "seconds": 0.001344
+        },
+        {
+          "name": "chunked_echo_and_pipeline_suffix",
+          "ok": true,
+          "seconds": 0.00122
+        },
+        {
+          "name": "expect_100_continue",
+          "ok": true,
+          "seconds": 0.000593
+        },
+        {
+          "name": "pipeline_16_and_connection_close",
+          "ok": true,
+          "seconds": 0.002981
+        },
+        {
+          "name": "multiple_flushes_partial_sends_and_resume",
+          "ok": true,
+          "seconds": 0.000685
+        },
+        {
+          "name": "oversize_content_length",
+          "ok": true,
+          "seconds": 0.00053
+        },
+        {
+          "name": "oversize_expect_without_100",
+          "ok": true,
+          "seconds": 0.000671
+        },
+        {
+          "name": "oversize_header_block",
+          "ok": true,
+          "seconds": 0.000456
+        },
+        {
+          "name": "conflicting_framing",
+          "ok": true,
+          "seconds": 0.000383
+        },
+        {
+          "name": "conflicting_lengths",
+          "ok": true,
+          "seconds": 0.000342
+        },
+        {
+          "name": "missing_host",
+          "ok": true,
+          "seconds": 0.000357
+        },
+        {
+          "name": "whitespace_before_field_colon",
+          "ok": true,
+          "seconds": 0.000301
+        },
+        {
+          "name": "unsupported_expectation",
+          "ok": true,
+          "seconds": 0.000294
+        },
+        {
+          "name": "cumulative_chunked_body_limit",
+          "ok": true,
+          "seconds": 0.000305
+        },
+        {
+          "name": "healthy_progress_while_other_worker_stalls",
+          "ok": true,
+          "seconds": 1.000724
+        },
+        {
+          "name": "connection_cap_and_recovery",
+          "ok": true,
+          "seconds": 0.221709
+        },
+        {
+          "name": "simultaneous_connection_and_body_limits_then_recovery",
+          "ok": true,
+          "seconds": 0.222136
+        },
+        {
+          "name": "incomplete_and_handler_deadlines_then_recovery",
+          "ok": true,
+          "seconds": 0.972894
+        },
+        {
+          "name": "slow_reader_bounded_output_and_deadline",
+          "ok": true,
+          "seconds": 1.299597
+        },
+        {
+          "name": "shutdown_with_live_receive_and_worker_borrows",
+          "ok": true,
+          "seconds": 0.318151
+        }
+      ],
+      "tool": "zig-http-integration"
+    },
+    "io_uring_disabled": 0,
+    "kernel": "7.1.9-arch1-2",
+    "os": "Omarchy 4.0.2",
+    "smoke": {
+      "asset": {
+        "bytes": 210,
+        "path": "assets/index.html",
+        "sha256": "fd2af64d44b0ee710911fe473d4549934ab721800361b0ae09ff379946796130"
+      },
+      "build": {
+        "binary": "/tmp/zig-http.Ktj8eh/zig-out/bin/zig-http",
+        "binary_sha256": "d092a31b8e509829e8c057adc399712a2d26b497fa48cbecad38157a30e4af4a",
+        "optimize": "ReleaseSafe",
+        "repository_commit": null,
+        "repository_status": null,
+        "zig_target": "0.16.0"
+      },
+      "child_cpu": {
+        "scope": "All reaped children, including server, clients and metadata commands; not isolated server CPU",
+        "system_seconds": 0.558943,
+        "user_seconds": 0.585882
+      },
+      "classification": "Python/client-bound smoke; not TechEmpower ranking, server capacity or SLO evidence",
+      "environment": {
+        "cpu": {
+          "logical_count": 8,
+          "model": "Intel(R) Core(TM) Ultra 7 258V",
+          "physical_count": null
+        },
+        "hostname": "omarx1",
+        "kernel_release": "7.1.9-arch1-2",
+        "kernel_version": "#1 SMP PREEMPT_DYNAMIC Fri, 21 Aug 2026 22:18:59 +0000",
+        "machine": "x86_64",
+        "network": "IPv4 TCP loopback; client and server share this host",
+        "physical_memory_bytes": 33101041664,
+        "platform": "Linux-7.1.9-arch1-2-x86_64-with-glibc2.44",
+        "python": "3.14.7",
+        "python_executable": "/usr/bin/python3",
+        "system": "Linux"
+      },
+      "ok": true,
+      "schema_version": 1,
+      "seconds": 0.663721,
+      "server": {
+        "backend": "io_uring",
+        "configuration": {
+          "connections": 128,
+          "duration_ms": 150000,
+          "max_body": 65536,
+          "max_header": 16384,
+          "port": 0,
+          "send_chunk": 65536,
+          "socket_send_buffer": 65536,
+          "stall_ms": 1000,
+          "timeout_ms": 5000,
+          "workers": 2
+        },
+        "port": 41111,
+        "ready": "READY port=41111 backend=io_uring connections=128 workers=2 optimize=ReleaseSafe",
+        "stats": {
+          "accepted": 24,
+          "allocation_calls_after_start": 0,
+          "bytes_received": 1510000,
+          "bytes_sent": 6830000,
+          "completed": 30000,
+          "flushes": 0,
+          "framework_heap_limit_bytes": 534773760,
+          "framework_heap_peak_bytes": 20073184,
+          "live_connections": 0,
+          "live_operations": 0,
+          "max_handler_ns": 101077,
+          "max_loop_ns": 169091,
+          "max_queue_ns": 1523409,
+          "max_request_ns": 2459256,
+          "peak_connections": 8,
+          "peak_operations": 9,
+          "pipeline_copy_bytes": 7563688,
+          "rejected": 0,
+          "resumed": 0,
+          "timeouts": 0,
+          "workers": 2
+        }
+      },
+      "started_utc": "2026-09-05T14:49:30.212233+00:00",
+      "tool": "zig-http-smoke-suite",
+      "warning": "Short closed-loop loopback runs without warmup/repetitions; keep safety assertions enabled and compare only matching environments",
+      "workloads": [
+        {
+          "command": [
+            "/usr/bin/python3",
+            "/tmp/zig-http.Ktj8eh/tools/benchmark.py",
+            "http://127.0.0.1:41111/plaintext",
+            "--connections",
+            "8",
+            "--requests",
+            "10000",
+            "--pipeline",
+            "1",
+            "--timeout",
+            "5",
+            "--deadline",
+            "38"
+          ],
+          "exit_code": 0,
+          "name": "plaintext_p1",
+          "result": {
+            "body_bytes": 130000,
+            "body_sha256": [
+              "dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a362182986f"
+            ],
+            "body_validation": "exact expected bytes",
+            "classification": "Python/client-bound smoke; not TechEmpower ranking or server capacity",
+            "client_cpu_per_wall": 1.647,
+            "client_cpu_seconds": 0.427671,
+            "completed": 10000,
+            "connections": 8,
+            "errors": [],
+            "latency_model": "closed-loop; each pipelined response measured from its batch send",
+            "machine": "x86_64",
+            "ok": true,
+            "p50_ms": 0.172409,
+            "p999_ms": 1.27547,
+            "p99_ms": 0.604402,
+            "pipeline": 1,
+            "platform": "Linux-7.1.9-arch1-2-x86_64-with-glibc2.44",
+            "python": "3.14.7",
+            "requested": 10000,
+            "requests_per_second": 38501.673,
+            "schema_version": 1,
+            "seconds": 0.259729,
+            "tool": "zig-http-python-smoke",
+            "url": "http://127.0.0.1:41111/plaintext"
+          },
+          "stderr": ""
+        },
+        {
+          "command": [
+            "/usr/bin/python3",
+            "/tmp/zig-http.Ktj8eh/tools/benchmark.py",
+            "http://127.0.0.1:41111/plaintext",
+            "--connections",
+            "8",
+            "--requests",
+            "10000",
+            "--pipeline",
+            "16",
+            "--timeout",
+            "5",
+            "--deadline",
+            "38"
+          ],
+          "exit_code": 0,
+          "name": "plaintext_p16",
+          "result": {
+            "body_bytes": 130000,
+            "body_sha256": [
+              "dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a362182986f"
+            ],
+            "body_validation": "exact expected bytes",
+            "classification": "Python/client-bound smoke; not TechEmpower ranking or server capacity",
+            "client_cpu_per_wall": 1.246,
+            "client_cpu_seconds": 0.100126,
+            "completed": 10000,
+            "connections": 8,
+            "errors": [],
+            "latency_model": "closed-loop; each pipelined response measured from its batch send",
+            "machine": "x86_64",
+            "ok": true,
+            "p50_ms": 0.697334,
+            "p999_ms": 2.448368,
+            "p99_ms": 1.806081,
+            "pipeline": 16,
+            "platform": "Linux-7.1.9-arch1-2-x86_64-with-glibc2.44",
+            "python": "3.14.7",
+            "requested": 10000,
+            "requests_per_second": 124398.61,
+            "schema_version": 1,
+            "seconds": 0.080387,
+            "tool": "zig-http-python-smoke",
+            "url": "http://127.0.0.1:41111/plaintext"
+          },
+          "stderr": ""
+        },
+        {
+          "command": [
+            "/usr/bin/python3",
+            "/tmp/zig-http.Ktj8eh/tools/benchmark.py",
+            "http://127.0.0.1:41111/index.html",
+            "--connections",
+            "8",
+            "--requests",
+            "10000",
+            "--pipeline",
+            "16",
+            "--timeout",
+            "5",
+            "--deadline",
+            "38",
+            "--expect-file",
+            "/tmp/zig-http.Ktj8eh/assets/index.html"
+          ],
+          "exit_code": 0,
+          "name": "html_p16",
+          "result": {
+            "body_bytes": 2100000,
+            "body_sha256": [
+              "fd2af64d44b0ee710911fe473d4549934ab721800361b0ae09ff379946796130"
+            ],
+            "body_validation": "exact expected bytes",
+            "classification": "Python/client-bound smoke; not TechEmpower ranking or server capacity",
+            "client_cpu_per_wall": 1.249,
+            "client_cpu_seconds": 0.100291,
+            "completed": 10000,
+            "connections": 8,
+            "errors": [],
+            "latency_model": "closed-loop; each pipelined response measured from its batch send",
+            "machine": "x86_64",
+            "ok": true,
+            "p50_ms": 0.696843,
+            "p999_ms": 1.994973,
+            "p99_ms": 1.600561,
+            "pipeline": 16,
+            "platform": "Linux-7.1.9-arch1-2-x86_64-with-glibc2.44",
+            "python": "3.14.7",
+            "requested": 10000,
+            "requests_per_second": 124488.353,
+            "schema_version": 1,
+            "seconds": 0.080329,
+            "tool": "zig-http-python-smoke",
+            "url": "http://127.0.0.1:41111/index.html"
+          },
+          "stderr": ""
+        }
+      ]
+    },
+    "verifier_log": "checkout_commit=6d622009abee5807eb0829e558c3173635e077ea (streamed tree; require clean status for publication)\nhost=omarx1 arch=x86_64 kernel=7.1.9-arch1-2 zig=0.16.0 io_uring_disabled=0\nNAME=\"Omarchy\"\nPRETTY_NAME=\"Omarchy\"\nID=omarchy\nID_LIKE=arch\nBUILD_ID=\"4.0.2\"\nVERSION_ID=\"4.0.2\"\nANSI_COLOR=\"38;2;158;206;106\"\nHOME_URL=\"https://omarchy.org/\"\nDOCUMENTATION_URL=\"https://learn.omacom.io/2/the-omarchy-manual\"\nSUPPORT_URL=\"https://discord.gg/tXFUdasqhY\"\nBUG_REPORT_URL=\"https://github.com/basecamp/omarchy/issues\"\nLOGO=omarchy\nBuild Summary: 14/14 steps succeeded; 44/44 tests passed\nverify success\n+- compile exe zig-http Debug native success 2s MaxRSS:355M\n+- zig fmt --check success\n+- run python3 success 43ms\n+- run test 13 pass (13 total) 35ms MaxRSS:10M\n|  +- compile test Debug native success 2s MaxRSS:356M\n+- run test 2 pass (2 total) 6ms MaxRSS:10M\n|  +- compile test Debug native success 2s MaxRSS:342M\n+- run test 1 pass (1 total) 6ms MaxRSS:10M\n|  +- compile test Debug native success 2s MaxRSS:320M\n+- run test 6 pass (6 total) 27ms MaxRSS:10M\n|  +- compile test Debug native success 2s MaxRSS:351M\n+- run test 22 pass (22 total) 62ms MaxRSS:10M\n   +- compile test Debug native success 3s MaxRSS:362M\n\nBuild Summary: 14/14 steps succeeded; 44/44 tests passed\nverify success\n+- compile exe zig-http ReleaseSafe native success 14s MaxRSS:460M\n+- zig fmt --check success\n+- run python3 success 55ms\n+- run test 13 pass (13 total) 13ms MaxRSS:6M\n|  +- compile test ReleaseSafe native success 13s MaxRSS:433M\n+- run test 2 pass (2 total) 3ms MaxRSS:6M\n|  +- compile test ReleaseSafe native success 18s MaxRSS:426M\n+- run test 1 pass (1 total) 3ms MaxRSS:6M\n|  +- compile test ReleaseSafe native success 13s MaxRSS:429M\n+- run test 6 pass (6 total) 25ms MaxRSS:6M\n|  +- compile test ReleaseSafe native success 13s MaxRSS:426M\n+- run test 22 pass (22 total) 31ms MaxRSS:6M\n   +- compile test ReleaseSafe native success 19s MaxRSS:455M\n"
+  },
+  "macos": {
+    "architecture": "arm64",
+    "cpu": "Apple M3 Max",
+    "debug_verifier": "Build Summary: 14/14 steps succeeded; 44/44 tests passed\nverify success\n+- compile exe zig-http Debug native cached 76ms MaxRSS:31M\n+- zig fmt --check success\n+- run python3 success 71ms\n+- run test 13 pass (13 total) 49ms MaxRSS:2M\n|  +- compile test Debug native cached 75ms MaxRSS:31M\n+- run test 2 pass (2 total) 9ms MaxRSS:2M\n|  +- compile test Debug native cached 77ms MaxRSS:31M\n+- run test 1 pass (1 total) 12ms MaxRSS:2M\n|  +- compile test Debug native cached 76ms MaxRSS:31M\n+- run test 6 pass (6 total) 35ms MaxRSS:2M\n|  +- compile test Debug native cached 78ms MaxRSS:31M\n+- run test 22 pass (22 total) 70ms MaxRSS:2M\n   +- compile test Debug native cached 71ms MaxRSS:31M\n\n",
+    "host": "maxross",
+    "integration": {
+      "ok": true,
+      "passed": 26,
+      "platform": "darwin",
+      "python": "3.9.6",
+      "schema_version": 1,
+      "seconds": 4.27831,
+      "server": "/Users/rs/code/github.com/technologylab.ai/zig-http/zig-out/bin/zig-http",
+      "sessions": [
+        {
+          "backend": "kqueue",
+          "phase": "wire",
+          "stats": {
+            "accepted": 32,
+            "allocation_calls_after_start": 0,
+            "bytes_received": 6820,
+            "bytes_sent": 8581,
+            "completed": 41,
+            "flushes": 8,
+            "framework_heap_limit_bytes": 534773760,
+            "framework_heap_peak_bytes": 217216,
+            "live_connections": 0,
+            "live_operations": 0,
+            "max_handler_ns": 1010027000,
+            "max_loop_ns": 73000,
+            "max_queue_ns": 13000,
+            "max_request_ns": 1011346000,
+            "peak_connections": 2,
+            "peak_operations": 2,
+            "pipeline_copy_bytes": 5697,
+            "rejected": 9,
+            "resumed": 8,
+            "timeouts": 0,
+            "workers": 2
+          }
+        },
+        {
+          "backend": "kqueue",
+          "phase": "capacity",
+          "stats": {
+            "accepted": 3,
+            "allocation_calls_after_start": 0,
+            "bytes_received": 104,
+            "bytes_sent": 157,
+            "completed": 1,
+            "flushes": 0,
+            "framework_heap_limit_bytes": 534773760,
+            "framework_heap_peak_bytes": 27712,
+            "live_connections": 0,
+            "live_operations": 0,
+            "max_handler_ns": 1000,
+            "max_loop_ns": 24000,
+            "max_queue_ns": 7000,
+            "max_request_ns": 79000,
+            "peak_connections": 2,
+            "peak_operations": 3,
+            "pipeline_copy_bytes": 0,
+            "rejected": 1,
+            "resumed": 0,
+            "timeouts": 0,
+            "workers": 2
+          }
+        },
+        {
+          "backend": "kqueue",
+          "phase": "combined_capacity",
+          "stats": {
+            "accepted": 5,
+            "allocation_calls_after_start": 0,
+            "bytes_received": 4388,
+            "bytes_sent": 4893,
+            "completed": 5,
+            "flushes": 4,
+            "framework_heap_limit_bytes": 534773760,
+            "framework_heap_peak_bytes": 54784,
+            "live_connections": 0,
+            "live_operations": 0,
+            "max_handler_ns": 1000,
+            "max_loop_ns": 110000,
+            "max_queue_ns": 50000,
+            "max_request_ns": 101848000,
+            "peak_connections": 4,
+            "peak_operations": 5,
+            "pipeline_copy_bytes": 0,
+            "rejected": 1,
+            "resumed": 4,
+            "timeouts": 0,
+            "workers": 2
+          }
+        },
+        {
+          "backend": "kqueue",
+          "phase": "deadlines",
+          "stats": {
+            "accepted": 4,
+            "allocation_calls_after_start": 0,
+            "bytes_received": 158,
+            "bytes_sent": 314,
+            "completed": 2,
+            "flushes": 0,
+            "framework_heap_limit_bytes": 535822336,
+            "framework_heap_peak_bytes": 54744,
+            "live_connections": 0,
+            "live_operations": 0,
+            "max_handler_ns": 607069000,
+            "max_loop_ns": 216000,
+            "max_queue_ns": 70000,
+            "max_request_ns": 686000,
+            "peak_connections": 1,
+            "peak_operations": 3,
+            "pipeline_copy_bytes": 0,
+            "rejected": 0,
+            "resumed": 0,
+            "timeouts": 2,
+            "workers": 1
+          }
+        },
+        {
+          "backend": "kqueue",
+          "phase": "slow_reader",
+          "stats": {
+            "accepted": 3,
+            "allocation_calls_after_start": 0,
+            "bytes_received": 2097305,
+            "bytes_sent": 524765,
+            "completed": 2,
+            "flushes": 1,
+            "framework_heap_limit_bytes": 534773760,
+            "framework_heap_peak_bytes": 16823808,
+            "live_connections": 0,
+            "live_operations": 0,
+            "max_handler_ns": 2000,
+            "max_loop_ns": 222000,
+            "max_queue_ns": 42000,
+            "max_request_ns": 390000,
+            "peak_connections": 2,
+            "peak_operations": 3,
+            "pipeline_copy_bytes": 0,
+            "rejected": 0,
+            "resumed": 0,
+            "timeouts": 1,
+            "workers": 2
+          }
+        },
+        {
+          "backend": "kqueue",
+          "phase": "shutdown",
+          "stats": {
+            "accepted": 2,
+            "allocation_calls_after_start": 0,
+            "bytes_received": 70,
+            "bytes_sent": 0,
+            "completed": 0,
+            "flushes": 0,
+            "framework_heap_limit_bytes": 534773760,
+            "framework_heap_peak_bytes": 54784,
+            "live_connections": 0,
+            "live_operations": 0,
+            "max_handler_ns": 301439000,
+            "max_loop_ns": 69000,
+            "max_queue_ns": 11000,
+            "max_request_ns": 0,
+            "peak_connections": 2,
+            "peak_operations": 4,
+            "pipeline_copy_bytes": 0,
+            "rejected": 0,
+            "resumed": 0,
+            "timeouts": 0,
+            "workers": 2
+          }
+        }
+      ],
+      "tests": [
+        {
+          "name": "plaintext",
+          "ok": true,
+          "seconds": 0.001939
+        },
+        {
+          "name": "head_then_keepalive",
+          "ok": true,
+          "seconds": 0.001132
+        },
+        {
+          "name": "startup_loaded_html",
+          "ok": true,
+          "seconds": 0.00124
+        },
+        {
+          "name": "unknown_route",
+          "ok": true,
+          "seconds": 0.000627
+        },
+        {
+          "name": "absolute_uri_case_insensitive_scheme_and_query",
+          "ok": true,
+          "seconds": 0.001842
+        },
+        {
+          "name": "fragmented_headers_and_binary_body",
+          "ok": true,
+          "seconds": 0.027085
+        },
+        {
+          "name": "exact_body_limit",
+          "ok": true,
+          "seconds": 0.003861
+        },
+        {
+          "name": "chunked_echo_and_pipeline_suffix",
+          "ok": true,
+          "seconds": 0.001569
+        },
+        {
+          "name": "expect_100_continue",
+          "ok": true,
+          "seconds": 0.000718
+        },
+        {
+          "name": "pipeline_16_and_connection_close",
+          "ok": true,
+          "seconds": 0.007606
+        },
+        {
+          "name": "multiple_flushes_partial_sends_and_resume",
+          "ok": true,
+          "seconds": 0.001121
+        },
+        {
+          "name": "oversize_content_length",
+          "ok": true,
+          "seconds": 0.000831
+        },
+        {
+          "name": "oversize_expect_without_100",
+          "ok": true,
+          "seconds": 0.000826
+        },
+        {
+          "name": "oversize_header_block",
+          "ok": true,
+          "seconds": 0.000919
+        },
+        {
+          "name": "conflicting_framing",
+          "ok": true,
+          "seconds": 0.001093
+        },
+        {
+          "name": "conflicting_lengths",
+          "ok": true,
+          "seconds": 0.000951
+        },
+        {
+          "name": "missing_host",
+          "ok": true,
+          "seconds": 0.000787
+        },
+        {
+          "name": "whitespace_before_field_colon",
+          "ok": true,
+          "seconds": 0.000837
+        },
+        {
+          "name": "unsupported_expectation",
+          "ok": true,
+          "seconds": 0.000772
+        },
+        {
+          "name": "cumulative_chunked_body_limit",
+          "ok": true,
+          "seconds": 0.000755
+        },
+        {
+          "name": "healthy_progress_while_other_worker_stalls",
+          "ok": true,
+          "seconds": 1.011474
+        },
+        {
+          "name": "connection_cap_and_recovery",
+          "ok": true,
+          "seconds": 0.247547
+        },
+        {
+          "name": "simultaneous_connection_and_body_limits_then_recovery",
+          "ok": true,
+          "seconds": 0.235152
+        },
+        {
+          "name": "incomplete_and_handler_deadlines_then_recovery",
+          "ok": true,
+          "seconds": 1.016597
+        },
+        {
+          "name": "slow_reader_bounded_output_and_deadline",
+          "ok": true,
+          "seconds": 1.2997
+        },
+        {
+          "name": "shutdown_with_live_receive_and_worker_borrows",
+          "ok": true,
+          "seconds": 0.367595
+        }
+      ],
+      "tool": "zig-http-integration"
+    },
+    "logical_cpus": 16,
+    "os": "macOS 26.6.2 (build25G83)",
+    "ram_bytes": 137438953472,
+    "releasesafe_verifier": "Build Summary: 14/14 steps succeeded; 44/44 tests passed\nverify success\n+- compile exe zig-http ReleaseSafe native cached 82ms MaxRSS:31M\n+- zig fmt --check success\n+- run python3 success 69ms\n+- run test 13 pass (13 total) 7ms MaxRSS:1M\n|  +- compile test ReleaseSafe native cached 77ms MaxRSS:31M\n+- run test 2 pass (2 total) 8ms MaxRSS:1M\n|  +- compile test ReleaseSafe native cached 82ms MaxRSS:31M\n+- run test 1 pass (1 total) 20ms MaxRSS:1M\n|  +- compile test ReleaseSafe native cached 83ms MaxRSS:31M\n+- run test 6 pass (6 total) 33ms MaxRSS:1M\n|  +- compile test ReleaseSafe native cached 84ms MaxRSS:31M\n+- run test 22 pass (22 total) 28ms MaxRSS:2M\n   +- compile test ReleaseSafe native cached 83ms MaxRSS:31M\n\n",
+    "smoke": {
+      "asset": {
+        "bytes": 210,
+        "path": "assets/index.html",
+        "sha256": "fd2af64d44b0ee710911fe473d4549934ab721800361b0ae09ff379946796130"
+      },
+      "build": {
+        "binary": "/Users/rs/code/github.com/technologylab.ai/zig-http/zig-out/bin/zig-http",
+        "binary_sha256": "84325f0d584ccfebd2ef7921768b52cab4320299ca4e4d56ef06e86d258d574c",
+        "optimize": "ReleaseSafe",
+        "repository_commit": "6d622009abee5807eb0829e558c3173635e077ea",
+        "repository_status": "",
+        "zig_target": "0.16.0"
+      },
+      "child_cpu": {
+        "scope": "All reaped children, including server, clients and metadata commands; not isolated server CPU",
+        "system_seconds": 1.144771,
+        "user_seconds": 0.61027
+      },
+      "classification": "Python/client-bound smoke; not TechEmpower ranking, server capacity or SLO evidence",
+      "environment": {
+        "cpu": {
+          "logical_count": 16,
+          "model": "Apple M3 Max",
+          "physical_count": 16
+        },
+        "hostname": "renerocksai-M3-Max-5.local",
+        "kernel_release": "25.6.0",
+        "kernel_version": "Darwin Kernel Version 25.6.0: Fri Jul 31 19:18:53 PDT 2026; root:xnu-12377.161.14~5/RELEASE_ARM64_T6031",
+        "machine": "arm64",
+        "network": "IPv4 TCP loopback; client and server share this host",
+        "physical_memory_bytes": 137438953472,
+        "platform": "macOS-26.6.2-arm64-arm-64bit",
+        "python": "3.9.6",
+        "python_executable": "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+        "system": "Darwin"
+      },
+      "ok": true,
+      "schema_version": 1,
+      "seconds": 0.759573,
+      "server": {
+        "backend": "kqueue",
+        "configuration": {
+          "connections": 128,
+          "duration_ms": 150000,
+          "max_body": 65536,
+          "max_header": 16384,
+          "port": 0,
+          "send_chunk": 65536,
+          "socket_send_buffer": 65536,
+          "stall_ms": 1000,
+          "timeout_ms": 5000,
+          "workers": 2
+        },
+        "port": 51427,
+        "ready": "READY port=51427 backend=kqueue connections=128 workers=2 optimize=ReleaseSafe",
+        "stats": {
+          "accepted": 24,
+          "allocation_calls_after_start": 0,
+          "bytes_received": 1510000,
+          "bytes_sent": 6830000,
+          "completed": 30000,
+          "flushes": 0,
+          "framework_heap_limit_bytes": 534773760,
+          "framework_heap_peak_bytes": 20083328,
+          "live_connections": 0,
+          "live_operations": 0,
+          "max_handler_ns": 17000,
+          "max_loop_ns": 79000,
+          "max_queue_ns": 73000,
+          "max_request_ns": 3419000,
+          "peak_connections": 8,
+          "peak_operations": 9,
+          "pipeline_copy_bytes": 7563688,
+          "rejected": 0,
+          "resumed": 0,
+          "timeouts": 0,
+          "workers": 2
+        }
+      },
+      "started_utc": "2026-09-05T14:51:01.135334+00:00",
+      "tool": "zig-http-smoke-suite",
+      "warning": "Short closed-loop loopback runs without warmup/repetitions; keep safety assertions enabled and compare only matching environments",
+      "workloads": [
+        {
+          "command": [
+            "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+            "/Users/rs/code/github.com/technologylab.ai/zig-http/tools/benchmark.py",
+            "http://127.0.0.1:51427/plaintext",
+            "--connections",
+            "8",
+            "--requests",
+            "10000",
+            "--pipeline",
+            "1",
+            "--timeout",
+            "5",
+            "--deadline",
+            "38"
+          ],
+          "exit_code": 0,
+          "name": "plaintext_p1",
+          "result": {
+            "body_bytes": 130000,
+            "body_sha256": [
+              "dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a362182986f"
+            ],
+            "body_validation": "exact expected bytes",
+            "classification": "Python/client-bound smoke; not TechEmpower ranking or server capacity",
+            "client_cpu_per_wall": 2.435,
+            "client_cpu_seconds": 0.802074,
+            "completed": 10000,
+            "connections": 8,
+            "errors": [],
+            "latency_model": "closed-loop; each pipelined response measured from its batch send",
+            "machine": "arm64",
+            "ok": true,
+            "p50_ms": 0.228291,
+            "p999_ms": 1.347625,
+            "p99_ms": 0.620291,
+            "pipeline": 1,
+            "platform": "macOS-26.6.2-arm64-arm-64bit",
+            "python": "3.9.6",
+            "requested": 10000,
+            "requests_per_second": 30360.328,
+            "schema_version": 1,
+            "seconds": 0.329377,
+            "tool": "zig-http-python-smoke",
+            "url": "http://127.0.0.1:51427/plaintext"
+          },
+          "stderr": ""
+        },
+        {
+          "command": [
+            "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+            "/Users/rs/code/github.com/technologylab.ai/zig-http/tools/benchmark.py",
+            "http://127.0.0.1:51427/plaintext",
+            "--connections",
+            "8",
+            "--requests",
+            "10000",
+            "--pipeline",
+            "16",
+            "--timeout",
+            "5",
+            "--deadline",
+            "38"
+          ],
+          "exit_code": 0,
+          "name": "plaintext_p16",
+          "result": {
+            "body_bytes": 130000,
+            "body_sha256": [
+              "dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a362182986f"
+            ],
+            "body_validation": "exact expected bytes",
+            "classification": "Python/client-bound smoke; not TechEmpower ranking or server capacity",
+            "client_cpu_per_wall": 1.358,
+            "client_cpu_seconds": 0.151406,
+            "completed": 10000,
+            "connections": 8,
+            "errors": [],
+            "latency_model": "closed-loop; each pipelined response measured from its batch send",
+            "machine": "arm64",
+            "ok": true,
+            "p50_ms": 1.009375,
+            "p999_ms": 2.967375,
+            "p99_ms": 2.33275,
+            "pipeline": 16,
+            "platform": "macOS-26.6.2-arm64-arm-64bit",
+            "python": "3.9.6",
+            "requested": 10000,
+            "requests_per_second": 89687.64,
+            "schema_version": 1,
+            "seconds": 0.111498,
+            "tool": "zig-http-python-smoke",
+            "url": "http://127.0.0.1:51427/plaintext"
+          },
+          "stderr": ""
+        },
+        {
+          "command": [
+            "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+            "/Users/rs/code/github.com/technologylab.ai/zig-http/tools/benchmark.py",
+            "http://127.0.0.1:51427/index.html",
+            "--connections",
+            "8",
+            "--requests",
+            "10000",
+            "--pipeline",
+            "16",
+            "--timeout",
+            "5",
+            "--deadline",
+            "38",
+            "--expect-file",
+            "/Users/rs/code/github.com/technologylab.ai/zig-http/assets/index.html"
+          ],
+          "exit_code": 0,
+          "name": "html_p16",
+          "result": {
+            "body_bytes": 2100000,
+            "body_sha256": [
+              "fd2af64d44b0ee710911fe473d4549934ab721800361b0ae09ff379946796130"
+            ],
+            "body_validation": "exact expected bytes",
+            "classification": "Python/client-bound smoke; not TechEmpower ranking or server capacity",
+            "client_cpu_per_wall": 1.365,
+            "client_cpu_seconds": 0.151005,
+            "completed": 10000,
+            "connections": 8,
+            "errors": [],
+            "latency_model": "closed-loop; each pipelined response measured from its batch send",
+            "machine": "arm64",
+            "ok": true,
+            "p50_ms": 1.0535,
+            "p999_ms": 3.417417,
+            "p99_ms": 2.366625,
+            "pipeline": 16,
+            "platform": "macOS-26.6.2-arm64-arm-64bit",
+            "python": "3.9.6",
+            "requested": 10000,
+            "requests_per_second": 90412.03,
+            "schema_version": 1,
+            "seconds": 0.110605,
+            "tool": "zig-http-python-smoke",
+            "url": "http://127.0.0.1:51427/index.html"
+          },
+          "stderr": ""
+        }
+      ]
+    }
+  },
+  "schema_version": 1,
+  "scope": "Linux/macOS experimental HTTP MVP; no Windows HTTP runtime or capacity qualification",
+  "source_commit": "6d622009abee5807eb0829e558c3173635e077ea",
+  "source_repository": "https://github.com/technologylab-ai/zig-http",
+  "source_sha256": {
+    ".gitattributes": "d60f352d0db1404c70afb4bb8b2ca3fd1c610572aa40720e8a0b7baa7885418c",
+    ".gitignore": "84b510e64a2855d869bd4314b4dc20dbcd952c0a57aac7bd20442286cb07055f",
+    ".zig-version": "aa037454b5e8320521a32b278a3f4aff05fc79009ab5503f5d4a1b9a33b38c47",
+    "AGENTS.md": "a887b1a9f20a9f7ad2c4db612c655a467f2e70952807ded01b1bdf21bf3b4e69",
+    "HANDOFF.md": "b712cb6b4a61501854335edd13729bcb9a81ed6ae732855524eaa28acaee2e1d",
+    "README.md": "ad936dbfeabb712b7e168dc4c18e27ebd1a6d371f08863a1d32bcf2736384434",
+    "ROADMAP.md": "7038c1001708e10976fc0105c0d84443d9403eb1e6dadd3037e84cf44f6100ac",
+    "assets/index.html": "fd2af64d44b0ee710911fe473d4549934ab721800361b0ae09ff379946796130",
+    "build.zig": "080216fd10b19eb31e25c93dc325da1d3d2ed0285ddf9079e1175308819cae26",
+    "build.zig.zon": "afd567a947dc05c31fc7db34c95361f228f805b894fa46c09fba471325b532a6",
+    "docs/EVIDENCE.md": "4fad89ff0daa663a3ba1a991849b53f66648c33f71f938ddafdd873249751539",
+    "docs/INTERFACES.md": "f7648c53f410c32eb50fa28b3bf993dd95d0942710ac23afcf0964989d0fb33a",
+    "docs/OWNERSHIP.md": "204b049a590281affcdaf4e8051dbb0f220196c65dd5ee14a274f41229f9467e",
+    "src/api.zig": "4b1b65b1b5fe5854e0e7253d42d2ada973d4e9ebf82cb4493d7b648577b93873",
+    "src/budget.zig": "1a1f2dc2ac3418289590ed8868e588df6039e9fe69ff52412bec368ebfb4dcc9",
+    "src/http.zig": "b560923434cad54c8f05a2f080959320ab916173bfeed361713450b1b6abba7a",
+    "src/main.zig": "a50758c31a39a07e3bcf187c713cb68daa7d911bef2bc978ba9d891ded4d2d16",
+    "src/server.zig": "dc6d60aff0a6471829f7dce1465b40ae9b1d6f21e3ed8bc256dd441e63341e8d",
+    "src/transport.zig": "dfa97a8d5f68028775218c1bf529ce40e10fecd477a7f7305068c1195ee2f8a7",
+    "src/transport_linux.zig": "ca09b2a8d61627926efe280ee79abb401bcff2004d30ef6f274d72358ffd747f",
+    "src/transport_macos.zig": "f48c7f4b1047331f95626aa0b3f097bb7efe60109c16695193a0ada74400ec6e",
+    "tests/integration.py": "90d3d6a335b92c667e482d8702da151c959fe5a16c0a272ee70719fb3bc555b7",
+    "tools/benchmark.py": "8346ceb1bea3bdd7d936587cb30d167e665aa7cb978fdffb8246c5fa6b625a27",
+    "tools/check_version.py": "e39b3fcff3d590210393cbfdaa49bff5238c437e5945c4d1304f94d6e9df0974",
+    "tools/smoke.py": "f6d921b1c0058170a272d6ca3b9a405a0349c6948951dd8376671c84541791da",
+    "tools/verify_linux_ssh.sh": "7e5d9a7028a2b2ebf841bcbc9e1aade34df910b7c1bcfe3ac4e4662e9fc07d4b"
+  },
+  "zig": "0.16.0"
+}
