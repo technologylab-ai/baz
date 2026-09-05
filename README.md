@@ -125,8 +125,8 @@ The default startup limits are explicit:
 | Request target | 8192 bytes | Fixed MVP parser setting, also subject to the header budget. |
 | Receive wire buffer per slot | `max_header + 2 * max_body + 4096` | Checked startup derivation; chunk framing consumes this independent bound. |
 | Writable output per response cell | 4 KiB | `--output-bytes`; 1 byte–64 KiB. |
-| Response cells per connection | 16 inline, 1 workers | `--response-batch-limit`; 1–16, effective limit 1 in worker mode. |
-| Inline callbacks per event-loop turn | 64 globally | Fixed fairness budget; each connection gets at most its response batch limit, with rotating scan start. |
+| Response cells per connection | 16 inline, 1 workers | `--response-batch-limit`; 1–64, effective limit 1 in worker mode. |
+| Inline callbacks per event-loop turn | 64 globally | `--inline-callback-budget`; 1–256; each connection gets at most its response batch limit, with rotating scan start. |
 | Logical response body | 16 MiB | `--max-response`; counted across flushes. |
 | Request cycle deadline | 5000 ms | `--timeout-ms`; includes receive, worker queue/execution and response sending. |
 | Shutdown drain deadline | 5000 ms | `Config.shutdown_ms`; positive. |
@@ -252,3 +252,11 @@ drain before reuse or close. Mac honors the same token contract but keeps its
 pooled scans. This changes the low-level transport token contract; see
 [INTERFACES.md](docs/INTERFACES.md). No measured throughput gain is claimed until
 the paired comparison report is complete.
+
+The batch/callback experiment exposes startup response-cell limits1–64 and a
+global callback budget1–256, retaining defaults16/64. Expanding the static
+gather maximum80→320 adds3840 bytes to each Slot and each Gather on the current
+64-bit hosts, including at batch16; Q alone adds no storage. Config.heapBytes
+accounts for actual types and startup counts. Native320-span and larger-budget
+evidence is pending in this source checkpoint. These are custom Linux/macOS
+sendmsg paths, not a portable std.Io vector-count guarantee.

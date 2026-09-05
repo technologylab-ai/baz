@@ -1,43 +1,34 @@
 # HTTP experiment handoff — 2026-09-05
 
-Active continuation: `perf/batch-quantum` in
+Resumable branch: `perf/batch-quantum`, worktree
 `/Users/rs/code/github.com/technologylab.ai/zig-http-batchq`, based on tested
-operation-cell candidate2b971e14f5fd8ed9769b5cdefbea3d86c71d83fc.
-Parent Codex /root owns this worktree; batch_quantum agent implements only
-startup response-batch16/64 and global-callback64/256 tuning plus meaningful
-ownership/fairness fixtures. No performance gain or runtime validation of that
-new tuning is established yet. The prior direct-cell ABBA comparison runs from
-immutable binaries in /tmp/zig-http-compare.PIwh35 under the Linux host lock;
-no builds may overlap it. The external architecture agent's worktree is separate.
-Use `git worktree list` and each branch's HANDOFF.md to resume; do not duplicate,
-discard or implicitly merge another worktree. Source edits only until parent
-coordinates native gates. Existing lower sections describe the prior checkpoint.
+operation-cell source2b971e14f5fd8ed9769b5cdefbea3d86c71d83fc.
+Parent Codex /root owns integration. The batch_quantum implementation agent
+finished and released its four source/test files. Current stage: source complete;
+native validation and the same-binary B16/B64 × Q64/Q256 comparison are pending.
+Do not label this new tuning runtime-verified or faster before those gates pass.
 
+Startup limits now accept response cells1–64 and global inline callbacks1–256;
+defaults remain16/64. Larger static gather metadata increases requested startup
+heap even at batch16. Q alone changes no allocation. New finite fixtures cover
+320 native send spans,64 retained cells at cancellation, partial/flush/close
+ordering and cold service among seven backpressured depth128 pipelines.
 
-Active experiment (2026-09-05): parent Codex /root owns branch
-`perf/direct-operation-cells` in
-`/Users/rs/code/github.com/technologylab.ai/zig-http-opcells`, based on pushed
-c0f87766efa310d517d262781a33ce189c4f9f0d. This named Git worktree is discoverable
-with `git worktree list`; it is separate from the other agent's
-`.claude/worktrees/perf-architecture` tree. Do not delete or merge the other
-agent's work. Current scope: replace Linux hot operation-table admission/CQE
-searches with explicit addressed cells, preserve socket/token/generation and
-separate target/cancel ownership, then perform a controlled ReleaseSafe A/B at
-configured capacities128/1024 with128 active clients. No improvement is measured
-yet. Mac baseline at the unchanged starting commit passed14/14 steps and52/52
-ReleaseSafe tests with exact Zig0.16.0 under the host lock; the lock is released.
-The prior full native publication gates remain in the wiki's durable receipt.
-Current stage: direct-addressing implementation and ABBA harness are complete.
-The source implementation agent finished; Linux preparation finished67/67
-commands at /tmp/zig-http-compare.PIwh35 and released its reservation. Parent
-owns Linux native validation and timing next. Mac development gates passed58/58
-test executions in both Debug/ReleaseSafe,69 wire cases,8 comparator tests and
-30,000 ReleaseSafe smoke bodies. An initial fixture switch-label comptime error
-was fixed before that successful native run; failed logs are retained.
-No Linux runtime or throughput gain is established for the new code yet.
-All heavy work must acquire `/tmp/zig-http-measurement.lock` on its execution
-host. This progress record exists so interruptions do not orphan work.
+The preceding direct-operation-cell comparison completed48/48 Linux trials at
+configured capacities128/1024 with128 active clients. Its exact results are being
+published from `perf/direct-operation-cells` in `zig-http-opcells`; the evidence
+agent owns that report only. No timed runner is active at this checkpoint.
+The remote `/tmp/zig-http-compare.PIwh35` contains pinned binaries used by both
+teams: preserve its wrk/libreactor tools until coordinated cleanup is possible.
+The external `.claude/worktrees/perf-architecture` remains separate and untouched.
 
+Use `git worktree list` and branch handoffs to resume after interruption. Before
+any heavy build/runtime/timed work acquire the execution host's atomic
+`/tmp/zig-http-measurement.lock`, inspect pre-existing measurement processes,
+and retain ownership through child cleanup. Windows HTTP gates are deferred
+by the user's current Mac/Linux tuning decision.
+
+## Historical evidence before this batch/quantum experiment
 
 Latest measurement: [recorded performance-profile depth sweep](reports/2026-09-05-power-profile.md)
 at exact bda54040bb0b809c82824b87a782e96826f05dff, Zig 0.16.0 ReleaseSafe.

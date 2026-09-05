@@ -17,6 +17,7 @@ pub const Config = struct {
     execution: Execution = .inline_event_loop,
     gather_send: bool = true,
     response_batch_limit: u8 = 16,
+    inline_callback_budget: u16 = 64,
     port: u16 = 8080,
     connections: u16 = 128,
     workers: u16 = 0,
@@ -74,7 +75,8 @@ pub const Config = struct {
             self.shutdown_ms == 0 or self.send_chunk == 0 or self.socket_send_buffer_bytes == 0 or
             self.socket_send_buffer_bytes > 16 * 1024 * 1024 or self.max_headers == 0 or
             self.max_headers > 1024 or self.worker_stack_bytes < 65536 or
-            self.response_batch_limit == 0 or self.response_batch_limit > 16)
+            self.response_batch_limit == 0 or self.response_batch_limit > 64 or
+            self.inline_callback_budget == 0 or self.inline_callback_budget > 256)
             return error.InvalidConfiguration;
         const stacks = try std.math.mul(usize, self.worker_stack_bytes, self.workers);
         if (try std.math.add(usize, try self.heapBytes(), stacks) > self.memory_budget_bytes)
@@ -86,6 +88,7 @@ pub const Stats = struct {
     execution: Execution = .inline_event_loop,
     gather_send: bool = true,
     response_batch_limit: usize = 16,
+    inline_callback_budget: usize = 64,
     response_batches: u64 = 0,
     batched_finished_responses: u64 = 0,
     max_batch_responses: usize = 0,
@@ -284,7 +287,7 @@ pub const Server = struct {
         const storage = try allocator.alloc(u8, per_slot * config.connections);
         errdefer allocator.free(storage);
         @memset(storage, 0);
-        self.* = .{ .allocator = allocator, .config = config, .handler = handler, .application = application, .backend = backend, .slots = slots, .workers = workers, .storage = storage, .response_cells = response_cells, .stats = .{ .workers = config.workers, .execution = config.execution, .gather_send = config.gather_send, .response_batch_limit = batch_limit } };
+        self.* = .{ .allocator = allocator, .config = config, .handler = handler, .application = application, .backend = backend, .slots = slots, .workers = workers, .storage = storage, .response_cells = response_cells, .stats = .{ .workers = config.workers, .execution = config.execution, .gather_send = config.gather_send, .response_batch_limit = batch_limit, .inline_callback_budget = config.inline_callback_budget } };
         for (slots, 0..) |*slot, index| {
             const base = storage[index * per_slot ..][0..per_slot];
             const cells = response_cells[index * batch_limit ..][0..batch_limit];
@@ -352,7 +355,7 @@ pub const Server = struct {
         assert(self.started);
         var completions: [128]transport.Completion = undefined;
         while (true) {
-            self.inline_budget = 64; // Global callback budget across every connection.
+            self.inline_budget = self.config.inline_callback_budget; // Global across every connection.
             const turn_start = nowNs();
             if (self.config.duration_ms != 0 and
                 turn_start - self.started_at >= @as(u64, self.config.duration_ms) * 1_000_000)
@@ -430,8 +433,8 @@ pub const Server = struct {
             const count = try self.backend.poll(&completions, if (local_result_ready) 0 else 10);
             const processing_start = nowNs();
             for (completions[0..count]) |completion| try self.onCompletion(completion);
-            assert(self.inline_budget <= 64);
-            self.stats.max_inline_callbacks_per_turn = @max(self.stats.max_inline_callbacks_per_turn, 64 - self.inline_budget);
+            assert(self.inline_budget <= self.config.inline_callback_budget);
+            self.stats.max_inline_callbacks_per_turn = @max(self.stats.max_inline_callbacks_per_turn, self.config.inline_callback_budget - self.inline_budget);
             self.stats.max_loop_ns = @max(self.stats.max_loop_ns, control_ns + nowNs() - processing_start);
         }
         self.stop_workers.store(true, .release);
@@ -1083,10 +1086,10 @@ test "positive gather completions advance before at and after part boundaries" {
 
 test "response cell limit validates and every startup requested byte is budgeted" {
     try std.testing.expectError(error.InvalidConfiguration, (Config{ .response_batch_limit = 0 }).validate());
-    try std.testing.expectError(error.InvalidConfiguration, (Config{ .response_batch_limit = 17 }).validate());
+    try std.testing.expectError(error.InvalidConfiguration, (Config{ .response_batch_limit = 65 }).validate());
     for ([_]bool{ false, true }) |gather| {
-        for ([_]u8{ 1, 16 }) |limit| {
-            var config: Config = .{ .connections = 2, .port = 0, .gather_send = gather, .response_batch_limit = limit };
+        for ([_]u8{ 1, 16, 64 }) |limit| {
+            var config: Config = .{ .connections = 2, .port = 0, .gather_send = gather, .response_batch_limit = limit, .inline_callback_budget = 256 };
             const heap = try config.heapBytes();
             config.memory_budget_bytes = heap;
             try config.validate();
@@ -1097,6 +1100,7 @@ test "response cell limit validates and every startup requested byte is budgeted
                 }
             }.handle, null);
             try std.testing.expectEqual(heap, budget.live_bytes);
+            try std.testing.expectEqual(@as(usize, 256), server.stats.inline_callback_budget);
             try std.testing.expectEqual(@as(usize, 2) * limit, server.response_cells.len);
             for (server.slots) |slot| {
                 try std.testing.expectEqual(@as(usize, limit), slot.cells.len);
@@ -1111,11 +1115,28 @@ test "response cell limit validates and every startup requested byte is budgeted
             try std.testing.expectError(error.MemoryBudgetExceeded, config.validate());
         }
     }
-    const workers: Config = .{ .execution = .workers, .workers = 2, .response_batch_limit = 16 };
+    const workers: Config = .{ .execution = .workers, .workers = 2, .response_batch_limit = 64, .inline_callback_budget = 256 };
     try std.testing.expectEqual(@as(usize, 1), workers.effectiveBatchLimit());
     var single = workers;
     single.response_batch_limit = 1;
     try std.testing.expectEqual(try single.heapBytes(), try workers.heapBytes());
+    const baseline: Config = .{ .connections = 2 };
+    const larger: Config = .{ .connections = 2, .response_batch_limit = 64 };
+    const expected_growth = @as(usize, 2 * (64 - 16)) * (baseline.output_bytes + @sizeOf(ResponseCell));
+    try std.testing.expectEqual(expected_growth, try larger.heapBytes() - try baseline.heapBytes());
+}
+
+test "inline callback budget accepts bounded startup values without extra storage" {
+    const defaults: Config = .{};
+    try std.testing.expectEqual(@as(u8, 16), defaults.response_batch_limit);
+    try std.testing.expectEqual(@as(u16, 64), defaults.inline_callback_budget);
+    try std.testing.expectError(error.InvalidConfiguration, (Config{ .inline_callback_budget = 0 }).validate());
+    try std.testing.expectError(error.InvalidConfiguration, (Config{ .inline_callback_budget = 257 }).validate());
+    for ([_]u16{ 1, 64, 256 }) |budget| {
+        const config: Config = .{ .inline_callback_budget = budget };
+        try config.validate();
+        try std.testing.expectEqual(try defaults.heapBytes(), try config.heapBytes());
+    }
 }
 
 test "batch gather progress crosses response cell boundaries without copying" {
@@ -1123,7 +1144,7 @@ test "batch gather progress crosses response cell boundaries without copying" {
     for (&parts, 0..) |*part, index| part.* = if (index % 2 == 0) "header" else "payload";
     const selected = selectSendParts(&parts, 0, 0, 65536);
     try std.testing.expectEqual(parts.len, selected.count);
-    try std.testing.expectEqual(@as(usize, 520), selected.bytes);
+    try std.testing.expectEqual(@as(usize, 2080), selected.bytes);
     var part: usize = 0;
     var offset: usize = 0;
     advanceSendParts(&parts, &part, &offset, 13 * 17 + 2);

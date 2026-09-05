@@ -80,7 +80,7 @@ must split any individual write larger than the total output buffer. Workers
 do not wait for clients to drain socket output.
 
 Each connection invokes one callback at a time, preserving response order.
-Inline mode may retain up to 16 finished response cells while parsing successive
+Inline mode may retain up to the configured 1–64 finished response cells while parsing successive
 already-buffered requests. Each cell has exclusive output/header/chunk storage;
 all borrowed input stays immutable. The input cursor advances without moving
 bytes. After the entire batch drains, the I/O owner compacts any pipelined
@@ -164,8 +164,8 @@ experiments to perform before making production or capacity claims.
 `Config.execution = .inline_event_loop` is the default and requires `workers = 0`. No application
 worker threads, worker pipes or worker-stack budget are provisioned. The same
 handler receives exclusive request/writer borrows on the I/O owner; it returns
-the same frozen flush/finish/close action. A global budget of 64 callbacks per
-turn, at most the effective batch limit per connection, and a rotating scan
+the same frozen flush/finish/close action. A startup global budget of 1–256 callbacks per
+turn (default64), at most the effective batch limit per connection, and a rotating scan
 start bound callback dispatch work. Local pending work uses a nonblocking
 backend poll. Neither this count nor deadline checks can preempt a callback.
 
@@ -179,7 +179,7 @@ are separate future API decisions. The inline test does not run the blocking
 ## Gathered output snapshot
 
 Gather-send is enabled by default. Each cell's at-most-five immutable framing
-and payload slices (at most 80 per batch) are described by startup-reserved iovecs and msghdr storage,
+and payload slices (at most 320 per batch) are described by startup-reserved iovecs and msghdr storage,
 retained through the terminal SENDMSG completion on Linux or the nonblocking
 sendmsg/completion adapter on Mac. A positive completion can cross several spans;
 advance the cursor by its aggregate count, capped by send_chunk and i32. No
@@ -189,7 +189,7 @@ exists for controlled comparison and retains the same completion/ownership rules
 
 ## Bounded response batches and flush barriers
 
-The configured response-cell limit is 1–16, default 16; worker mode's effective
+The configured response-cell limit is 1–64, default 16; worker mode's effective
 limit is always 1. Output bytes are reserved per cell at startup. Request/writer
 metadata is reused only after its finished response has been frozen into a
 separate cell; immutable payload and framing storage is retained until the

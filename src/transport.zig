@@ -7,7 +7,7 @@ const c = std.c;
 
 pub const Socket = i32;
 pub const Completion = struct { token: u64, result: i32 };
-pub const max_send_parts = 16 * 5;
+pub const max_send_parts = 64 * 5;
 
 /// Explicit single-owner operation identity shared by the server and adapters.
 /// Bits 0..7 select kind, 8..23 select connection slot, 24..31 are zero,

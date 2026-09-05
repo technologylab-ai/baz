@@ -7,6 +7,7 @@ witness batching; timing is only a watchdog, never a throughput measurement.
 import argparse
 import contextlib
 import json
+import os
 from pathlib import Path
 import signal
 import socket
@@ -22,6 +23,7 @@ import integration as wire
 class BatchServer(wire.Server):
     def __init__(self, binary, **options):
         options.setdefault("response_batch_limit", 16)
+        options.setdefault("inline_callback_budget", 64)
         options.setdefault("send_chunk", 65536)
         super().__init__(binary, execution="inline", workers=0, **options)
 
@@ -30,12 +32,169 @@ class BatchServer(wire.Server):
         if kind is None:
             wire.require(self.stats["worker_dispatches"] == 0, "unexpected worker dispatch")
             wire.require(self.stats["max_batch_responses"] <= self.options["response_batch_limit"], "response batch limit exceeded")
-            wire.require(self.stats["max_inline_callbacks_per_turn"] <= 64, "global callback turn limit exceeded")
+            budget = self.options["inline_callback_budget"]
+            wire.require(self.stats["inline_callback_budget"] == budget, "configured callback budget not reported")
+            wire.require(self.stats["max_inline_callbacks_per_turn"] <= budget, "global callback turn limit exceeded")
+            wire.require(any(" inline_callback_budget=%d " % budget in line for line in self.lines if line.startswith("READY ")),
+                         "READY omitted the configured callback budget")
         return result
 
 
 def get(target, method=b"GET", close=False):
     return method + b" " + target + b" HTTP/1.1\r\nHost: localhost\r\n" + (b"Connection: close\r\n" if close else b"") + b"\r\n"
+
+
+@contextlib.contextmanager
+def paused(server):
+    """Queue bounded loopback input before accept/recv without assuming packets.
+
+    Observe the child stop with a one-second watchdog and always resume it,
+    including when connect/send fails. Counter assertions remain the evidence
+    that a full batch was actually frozen/submitted after resumption.
+    """
+    server.process.send_signal(signal.SIGSTOP)
+    deadline = time.monotonic() + 1
+    try:
+        while time.monotonic() < deadline:
+            pid, status = os.waitpid(server.process.pid, os.WNOHANG | os.WUNTRACED)
+            if pid:
+                wire.require(os.WIFSTOPPED(status), "server exited while preparing queued input")
+                break
+            time.sleep(0.001)
+        else:
+            raise TimeoutError("server stop acknowledgement deadline")
+        yield
+    finally:
+        if server.process.poll() is None:
+            server.process.send_signal(signal.SIGCONT)
+
+
+def maximum_cells(binary, emit, sessions):
+    # A nonempty chunked finish owns header, chunk-size, body, CRLF and final
+    # chunk spans. Both output ownership forms must reach the native sendmsg
+    # path with 64 * 5 descriptors; sizeof/compilation alone is insufficient.
+    for kind in ("generated", "borrowed_body"):
+        for cap in (65536, 23):
+            with BatchServer(binary, response_batch_limit=64, inline_callback_budget=256,
+                             max_body=32768, send_chunk=cap) as server:
+                with contextlib.ExitStack() as stack:
+                    expected, requests = [], []
+                    for index in range(64):
+                        if kind == "generated":
+                            body = b"/buffered-chunked?cell=" + str(index).encode() + b"&value=" + b"x" * index
+                            requests.append(get(body))
+                        else:
+                            body = index.to_bytes(2, "big") + bytes([index]) * (index + 1)
+                            requests.append(b"POST /borrowed-body-chunked HTTP/1.1\r\nHost: localhost\r\nContent-Length: " +
+                                            str(len(body)).encode() + b"\r\n\r\n" + body)
+                        expected.append(body)
+                    encoded = b"".join(requests)
+                    wire.require(len(encoded) <= 16384, "maximum-cell input exceeded its finite queue bound")
+                    with paused(server):
+                        sock = stack.enter_context(server.connect())
+                        sock.sendall(encoded)
+                    reader = wire.ResponseReader(sock)
+                    for index, expected_body in enumerate(expected):
+                        status, headers, body = reader.response()
+                        wire.require(status == 200 and body == expected_body and
+                                     headers.get(b"transfer-encoding") == b"chunked" and b"content-length" not in headers,
+                                     "%s cell %d lost generated/borrowed bytes or framing" % (kind, index))
+                    # Partial-send progress must release every old cell before
+                    # a flush/resume barrier and an ordered closing suffix.
+                    sock.sendall(get(b"/buffered?prefix") + get(b"/chunks") +
+                                 get(b"/buffered?close", close=True) + wire.REQUEST)
+                    for expected_body in (b"/buffered?prefix", b"first second third", b"/buffered?close"):
+                        wire.require(reader.response()[2] == expected_body, "maximum-cell reuse/flush/close order corrupted")
+                    wire.require(not reader.buffer, "closing response emitted a pipelined suffix")
+                    wire.expect_closed(sock)
+            stats = server.stats
+            wire.require(stats["completed"] == 67 and stats["max_batch_responses"] == 64,
+                         "fixture failed to freeze all 64 distinct cells")
+            wire.require(stats["flushes"] == stats["resumed"] == 3, "flush barrier lost a continuation")
+            wire.require(stats["max_send_bytes"] <= cap, "maximum-cell aggregate send cap exceeded")
+            if cap == 65536:
+                wire.require(stats["max_send_parts"] == 320, "native gather did not submit all 320 response spans")
+            else:
+                wire.require(stats["gather_send_operations"] > 64, "partial-cap fixture did not split frozen responses")
+            sessions.append(dict(phase="maximum_cells", kind=kind, cap=cap, wire_bytes=len(encoded), stats=stats))
+            emit("maximum_64_%s_cells_quantum_256_cap_%d" % (kind, cap))
+
+
+def maximum_pressure(binary, emit, sessions):
+    asset_bytes = 65535  # Startup asset readFileAlloc's 65536 bound is exclusive.
+    with tempfile.TemporaryDirectory(prefix="zig-http-quantum-pressure-") as directory:
+        asset = Path(directory) / "index.html"
+        asset.write_bytes(b"q" * asset_bytes)
+        with BatchServer(binary, connections=2, index=asset, response_batch_limit=64,
+                         inline_callback_budget=256, timeout_ms=1000,
+                         socket_send_buffer=4096) as server:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as slow:
+                slow.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 1024)
+                slow.settimeout(3)
+                with paused(server):
+                    slow.connect(("127.0.0.1", server.port))
+                    slow.sendall(get(b"/index.html") * 64)
+                wire.require(slow.recv(1, socket.MSG_PEEK), "maximum frozen batch made no initial send progress")
+                wire.plaintext(server)
+                time.sleep(1.25)
+                wire.plaintext(server)
+        stats = server.stats
+        wire.require(stats["max_batch_responses"] == stats["max_canceled_batch_responses"] == 64,
+                     "deadline cancellation did not retain all 64 frozen response cells")
+        wire.require(stats["gather_cancel_requests"] >= 1 and stats["timeouts"] >= 1 and
+                     0 < stats["bytes_sent"] < asset_bytes * 64,
+                     "maximum-cell deadline failed to cancel a partially sent gather")
+        sessions.append(dict(phase="maximum_cell_cancel", asset_bytes=asset_bytes, pipeline_depth=64, stats=stats))
+        emit("maximum_64_frozen_cells_pending_cancel_and_recovery_quantum_256")
+
+        hot_count, depth, cold_timeout = 7, 128, 2.0
+        with BatchServer(binary, connections=hot_count + 1, index=asset, response_batch_limit=64,
+                         inline_callback_budget=256, timeout_ms=5000,
+                         socket_send_buffer=4096) as server:
+            with contextlib.ExitStack() as stack:
+                busy = []
+                # Warm each admitted slot with a response so all seven data
+                # owners can receive their deep pipelines during the same turn.
+                for _ in range(hot_count):
+                    sock = stack.enter_context(socket.socket(socket.AF_INET, socket.SOCK_STREAM))
+                    sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 1024)
+                    sock.settimeout(3)
+                    sock.connect(("127.0.0.1", server.port))
+                    sock.sendall(wire.REQUEST)
+                    wire.require(wire.ResponseReader(sock).response()[2] == wire.PLAINTEXT,
+                                 "hot connection warmup failed")
+                    busy.append(sock)
+                encoded = get(b"/index.html") * depth
+                wire.require(len(encoded) <= 8192, "saturated pipeline input exceeded its finite queue bound")
+                with paused(server):
+                    for sock in busy:
+                        sock.sendall(encoded)
+                # A peek witnesses initial service without releasing the small
+                # receive windows; pending deep output stays under backpressure.
+                for sock in busy:
+                    wire.require(sock.recv(1, socket.MSG_PEEK), "hot pipeline received no service")
+                started = time.monotonic()
+                with server.connect(timeout=cold_timeout) as cold:
+                    cold.sendall(get(b"/buffered?cold-after-saturation", close=True))
+                    wire.require(wire.ResponseReader(cold).response()[2] == b"/buffered?cold-after-saturation",
+                                 "cold connection lost service among saturated deep pipelines")
+                    wire.expect_closed(cold)
+                cold_seconds = time.monotonic() - started
+                wire.require(cold_seconds < cold_timeout, "cold service exceeded the explicit finite bound")
+                # Close the hot sockets with unread output; normal shutdown must
+                # retire all target/cancel owners and preserve allocator sealing.
+        stats = server.stats
+        wire.require(stats["accepted"] == hot_count + 1 and stats["max_batch_responses"] == 64,
+                     "cold witness did not admit eight connections and full hot batches")
+        wire.require(stats["bytes_sent"] < hot_count * depth * asset_bytes and
+                     stats["completed"] < hot_count * (depth + 1) + 1,
+                     "deep hot pipelines completed before the saturation witness")
+        wire.require(64 < stats["max_inline_callbacks_per_turn"] <= 256,
+                     "saturated fixture did not exercise the enlarged global quantum")
+        sessions.append(dict(phase="saturated_cold_service", hot_connections=hot_count,
+                             pipeline_depth=depth, asset_bytes=asset_bytes,
+                             cold_timeout_seconds=cold_timeout, cold_seconds=cold_seconds, stats=stats))
+        emit("cold_connection_served_among_saturated_deep_pipelines_quantum_256")
 
 
 def mixed(count):
@@ -67,10 +226,31 @@ def mixed(count):
 
 
 def run(binary, emit, sessions):
-    for invalid in (0, 17):
+    for invalid in (0, 65):
         result = subprocess.run([str(binary), "--response-batch-limit", str(invalid)], cwd=wire.ROOT, capture_output=True, timeout=5)
         wire.require(result.returncode != 0 and b"InvalidConfiguration" in result.stderr, "invalid batch limit admitted")
     emit("batch_limit_configuration_rejected")
+
+    for invalid in (0, 257):
+        result = subprocess.run([str(binary), "--inline-callback-budget", str(invalid)], cwd=wire.ROOT, capture_output=True, timeout=5)
+        wire.require(result.returncode != 0 and b"InvalidConfiguration" in result.stderr, "invalid callback budget admitted")
+    emit("inline_callback_budget_configuration_rejected")
+
+    for limit, budget in ((16, 64), (16, 256), (64, 64), (64, 256), (64, 1)):
+        with BatchServer(binary, response_batch_limit=limit, inline_callback_budget=budget) as server:
+            with server.connect() as sock:
+                sock.sendall(wire.REQUEST * 128 + get(b"/plaintext", close=True))
+                reader = wire.ResponseReader(sock)
+                for _ in range(129):
+                    wire.require(reader.response()[2] == wire.PLAINTEXT, "configured callback quantum lost pipeline progress")
+                wire.expect_closed(sock)
+        wire.require(server.stats["completed"] == 129 and server.stats["max_batch_responses"] <= min(limit, budget),
+                     "response accumulation exceeded the available per-turn callbacks")
+        sessions.append(dict(phase="batch_quantum_configuration", limit=limit, budget=budget, stats=server.stats))
+    emit("same_binary_batch_16_64_quantum_64_256_and_minimum_quantum")
+
+    maximum_cells(binary, emit, sessions)
+    maximum_pressure(binary, emit, sessions)
 
     for limit, cap in ((1, 65536), (2, 65536), (4, 65536), (16, 65536), (16, 1), (16, 17)):
         with BatchServer(binary, response_batch_limit=limit, send_chunk=cap) as server:
