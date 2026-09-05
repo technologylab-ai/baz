@@ -33,7 +33,7 @@ port, reported in `READY`. The HTML file is loaded before serving starts.
 | Route | Behavior |
 | --- | --- |
 | `/plaintext` | `Hello, World!`, exactly 13 bytes, `text/plain`. |
-| `/` and `/index.html` | The startup-loaded [assets/index.html](assets/index.html); `--index FILE` selects another file, limited to 64 KiB. |
+| `/` and `/index.html` | The startup-loaded [assets/index.html](assets/index.html); `--index FILE` selects another file, limited to 65,535 bytes (the current file-reader bound is exclusive). |
 | `/echo` | Echoes the complete bounded request body through borrowed spans; accepts Content-Length or chunked framing. |
 | `/chunks` | Three flush/resume turns followed by finish, producing `first second third` with chunked response framing. |
 | `/stall` | Worker-mode blocking fixture; inline returns 501. |

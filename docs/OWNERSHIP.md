@@ -201,3 +201,11 @@ metrics intentionally do not claim individual response completion timestamps.
 The batch integration suite checks 32 distinct generated/borrowed bodies,
 barriers, fairness and pending cancellation; these fixtures are finite witnesses,
 not starvation or production latency guarantees.
+
+A handler's explicit `.close`, invalid response or expiration aborts its
+connection and may discard earlier finished-but-unsent cells in that batch.
+This differs from a parser rejection or Connection: close response, which drains
+its valid prefix in wire order. No completed-send guarantee follows from the
+handler merely returning finish. The cancellation test separately witnesses
+multiple frozen cells at a pending gather cancel; a large incomplete request
+alone can drain its prefix first and is insufficient evidence for that case.

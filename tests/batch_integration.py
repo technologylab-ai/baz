@@ -12,6 +12,7 @@ import signal
 import socket
 import subprocess
 import sys
+import tempfile
 import time
 import traceback
 
@@ -200,6 +201,40 @@ def run(binary, emit, sessions):
     wire.require(server.stats["resumed"] == 128 and server.stats["completed"] == 26, "empty flush resume accounting differs")
     sessions.append(dict(phase="empty_flushes", stats=server.stats))
     emit("batch_flush_barrier_and_128_empty_resumes")
+
+    # An incomplete large request can drain its earlier finished prefix before
+    # its own send stalls. Instead, pipeline complete, small requests for a
+    # startup-loaded asset so multiple response cells remain frozen together.
+    # Zig 0.16 readFileAlloc's .limited(65536) bound is exclusive.
+    asset_bytes = 65535
+    pipeline_depth = 16
+    with tempfile.TemporaryDirectory(prefix="zig-http-batch-cancel-") as directory:
+        asset = Path(directory) / "index.html"
+        asset.write_bytes(b"a" * asset_bytes)
+        with BatchServer(binary, connections=2, index=asset, timeout_ms=1000,
+                         socket_send_buffer=4096) as server:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as slow:
+                # Set the receive window before connect rather than relying on
+                # reducing an already negotiated TCP window after the handshake.
+                slow.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 1024)
+                slow.settimeout(3)
+                slow.connect(("127.0.0.1", server.port))
+                slow.sendall(get(b"/index.html") * pipeline_depth)
+                wire.plaintext(server)
+                time.sleep(1.25)
+                wire.plaintext(server)
+        wire.require(server.stats["gather_cancel_requests"] >= 1,
+                     "asset slow reader did not retain a cancellable gather")
+        wire.require(1 < server.stats["max_canceled_batch_responses"] <= pipeline_depth,
+                     "canceled send did not retain multiple frozen response cells")
+        wire.require(server.stats["timeouts"] >= 1 and
+                     0 < server.stats["bytes_sent"] < asset_bytes * pipeline_depth,
+                     "asset pipeline did not reach its deadline with partial output")
+        # A cancel can race a normal terminal completion. Server.__exit__ checks
+        # both target/cancel drainage through zero live operations/connections.
+        sessions.append(dict(phase="multi_cell_cancel", asset_bytes=asset_bytes,
+                             pipeline_depth=pipeline_depth, stats=server.stats))
+    emit("multi_cell_frozen_batch_deadline_cancel_and_recovery")
 
     with BatchServer(binary, connections=8, max_body=2 * 1024 * 1024, timeout_ms=1000,
                      socket_send_buffer=4096) as server:

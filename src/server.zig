@@ -95,6 +95,9 @@ pub const Stats = struct {
     short_send_completions: u64 = 0,
     gather_cancel_requests: u64 = 0,
     gather_canceled_completions: u64 = 0,
+    /// Frozen response cells retained when cancellation of a pending gather is
+    /// successfully requested. The target may still complete normally in a race.
+    max_canceled_batch_responses: usize = 0,
     max_send_parts: usize = 0,
     max_send_bytes: usize = 0,
     max_inline_callbacks_per_turn: usize = 0,
@@ -881,8 +884,11 @@ pub const Server = struct {
         if (slot.op_pending and !slot.cancel_pending) {
             const token = (slot.op_token & ~@as(u64, 255)) | @intFromEnum(Kind.cancel);
             try self.backend.cancel(token, slot.op_token);
-            if (@as(u8, @truncate(slot.op_token)) == @intFromEnum(Kind.send) and slot.send_is_gather)
+            if (@as(u8, @truncate(slot.op_token)) == @intFromEnum(Kind.send) and slot.send_is_gather) {
                 self.stats.gather_cancel_requests += 1;
+                assert(slot.batch_count <= slot.cells.len);
+                self.stats.max_canceled_batch_responses = @max(self.stats.max_canceled_batch_responses, slot.batch_count);
+            }
             slot.cancel_pending = true;
             self.operationAdded();
         }

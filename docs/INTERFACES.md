@@ -1,7 +1,7 @@
-# Initial module contracts
+# Module contracts
 
-Exact Zig 0.16.0. Root integrates server, worker and writer. Separate contributors
-own `src/http.zig` and `src/transport*.zig`. Interface changes are coordinated.
+Exact Zig 0.16.0. The maintained parser, server, writer and platform adapters
+share the ownership contract in [OWNERSHIP.md](OWNERSHIP.md).
 
 ## HTTP parser
 
@@ -9,7 +9,9 @@ own `src/http.zig` and `src/transport*.zig`. Interface changes are coordinated.
 max_wire_bytes u32, max_target_bytes u16. Defaults may be declared by parser.
 `Parser.init(limits)`, `reset()` and `parse(bytes: []const u8) ParseError!?Request`.
 Input is one stable contiguous receive buffer; each call extends the prefix.
-The parser retains scan state to avoid rescanning all earlier bytes.
+The parser retains scan state to avoid rescanning all earlier bytes. Reset
+clears parser metadata; older response cells may still borrow immutable input.
+Only the server knows when every such borrow has ended and compaction is safe.
 Public `head_complete`, `expect_continue`, `headers_end` allow an interim 100
 after validated headers and before waiting for a body. No allocation.
 
@@ -30,6 +32,8 @@ Backend methods: `init(allocator, max_connections: u16, port: u16) !Backend`,
 `deinit()`, `accept(token: u64) !void`,
 `recv(token, socket, buffer: []u8) !void`,
 `send(token, socket, bytes: []const u8) !void`,
+`enableGatherSend() !void` during startup,
+`sendv(token, socket, parts: []const []const u8) !void`,
 `cancel(token: u64, target: u64) !void`,
 `poll(out: []Completion, timeout_ms: u32) !usize`,
 `close(socket) void`, `shutdown(socket) void`, `port() u16`.
@@ -45,3 +49,9 @@ Linux uses actual low-level io_uring accept/recv/send, runtime opcode probes,
 finite queues and explicit cancel drain. macOS uses nonblocking sockets/kqueue
 and the same completion interface. IPv4 loopback binding initially; CLI can
 expose other bind addresses later. No per-operation allocation.
+
+Gather metadata is separately reserved during startup when enabled. At most 80
+parts borrow payload storage through the terminal target completion. The server
+caps aggregate bytes and advances partial sends across part boundaries. Adapter
+`operation_bytes` allows Config.heapBytes to include exact requested operation
+storage; these counts exclude kernel ring/socket allocations.
