@@ -469,7 +469,9 @@ pub inline fn fixedEqual(bytes: []const u8, comptime expected: []const u8) bool 
 /// ASCII case-insensitive equality against a comptime lowercase name made of
 /// letters, digits and '-': setting bit 5 folds letters and leaves the other
 /// permitted octets unchanged, so one masked integer compare decides.
-pub inline fn fixedEqualCase(bytes: []const u8, comptime expected: []const u8) bool {
+/// Private to the parser: callers must first validate token/value octets;
+/// unvalidated control bytes could alias punctuation under this mask.
+inline fn fixedEqualCase(bytes: []const u8, comptime expected: []const u8) bool {
     comptime for (expected) |c| {
         std.debug.assert(std.ascii.isLower(c) or std.ascii.isDigit(c) or c == '-');
     };

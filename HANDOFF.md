@@ -1,5 +1,21 @@
 # HTTP experiment handoff — 2026-09-05
 
+Current adoption work is on `integrate/arena-shards` in the sibling
+`zig-http-arena-integration` worktree. The user selected the external agent's
+merged arena/shard implementation as the new main base. Original references
+`perf/arena-shards` (122e903) and `perf/arena-shards-plus-main` (d5b6d9b) remain
+unchanged; their `.claude` worktrees are preserved. The imported baseline
+passed the Mac gates. Integration adds worker cache snapshots, EOF/interim
+ordering fixes, exact clock groups, bounded shard startup/failure propagation
+and exact coordinator/stack budget accounting. New deterministic and native
+fixtures cover those failures. See reports/2026-09-05-arena-adoption.md.
+
+Checkpoint: hardened Mac gates passed; Linux native validation is being
+coordinated separately. Qualified three-repetition one-/three-core comparisons
+and main/wiki publication remain pending at this checkpoint. Do not attribute
+older branch measurements to the integrated source. The earlier handoff below
+is historical; its defaults and queued-sharding statements have been superseded.
+
 Completed performance work is consolidated on `perf/batch-quantum` in
 `/Users/rs/code/github.com/technologylab.ai/zig-http-batchq` before main publication.
 Direct operation cells are preserved at adf24f380ac56b2ae142e514a1491be1e08d4a20

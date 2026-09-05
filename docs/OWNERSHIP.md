@@ -7,7 +7,7 @@ experimental execution contract, informed by the [evidence inputs](EVIDENCE.md).
 The [module contracts](INTERFACES.md) describe the low-level interfaces.
 
 Every connection has one startup-reserved slot: receive storage, parser state,
-request view, a bounded array of response output/framing cells, eight application state
+request view, one output arena and a bounded array of response descriptors, eight application state
 words, deadline and operation identity. The I/O owner is the thread calling
 `Server.run`. Inline mode uses this same thread with zero workers. In explicit worker mode a slot is assigned to worker `slot_index % workers`.
 There is no unbounded task queue; each slot holds at most one ready/running
@@ -46,16 +46,16 @@ place. One outstanding reservation or one borrowed payload is permitted, and
 borrowed and buffered payloads cannot be mixed in one flush snapshot.
 
 `borrow(bytes)` permits only immutable server-lifetime storage or bytes owned
-by the current request. `content_type` has the same lifetime rule. Both are
-slices rather than copies. A callback's stack locals are invalid after return;
+by the current request. `content_type` has the same lifetime rule. Small borrowed payloads may be copied into the bounded arena as described
+below; callers must still honor this uniform lifetime contract. A callback's stack locals are invalid after return;
 external pool buffers cannot be reused merely because a callback returned.
 There is no application release notification after finish or cancellation, so
 those dynamic borrows are not supported even if a successful flush could have
 reported their release.
 
 `return writer.flush()` freezes **all currently committed payload bytes**.
-The I/O owner generates framing in separate reserved buffers, sends partial
-prefixes until that snapshot is exhausted, resets the writer and dispatches
+The writer and I/O owner finish framing in the reserved arena, send partial
+prefixes until that snapshot is exhausted, reset the writer and dispatch
 `.flushed`. The callback cannot append while the snapshot is frozen. Returning
 from `flush()` itself only creates the action; the handler must immediately
 return that action to yield execution. A successful resumed event establishes
@@ -80,8 +80,9 @@ must split any individual write larger than the total output buffer. Workers
 do not wait for clients to drain socket output.
 
 Each connection invokes one callback at a time, preserving response order.
-Inline mode may retain up to 16 finished response cells while parsing successive
-already-buffered requests. Each cell has exclusive output/header/chunk storage;
+Inline mode may retain up to its configured response batch limit (default 128,
+range 1–511) while parsing successive already-buffered requests. Each cell
+identifies a frozen arena range and optional borrowed span;
 all borrowed input stays immutable. The input cursor advances without moving
 bytes. After the entire batch drains, the I/O owner compacts any pipelined
 suffix once, then resets the parser. This is a measured payload copy
@@ -100,7 +101,8 @@ or real-time latency guarantee.
 
 At admission exhaustion, an accepted overflow descriptor is closed without
 allocating a slot. Kernel backlog membership is separate from admitted work.
-Each slot has a single data operation and reserved cancellation capacity. Tokens
+Each slot has independent receive/send operations and one reserved cancellation
+cell for each. Tokens
 combine slot index, generation and operation kind. Generation increments are
 checked rather than wrapped silently. A cancellation acknowledgement is distinct
 from the target operation's terminal completion; neither alone permits releasing
@@ -124,8 +126,11 @@ demo uses process exit 70 instead of unwinding/freeing live storage. An embeddin
 application must preserve that boundary or deliberately retain the entire
 server until all outstanding owners are otherwise proven finished.
 
-Startup computes exact requested framework heap bytes, including response cells and gather metadata, and separately reserves requested worker stack bytes. The demo then
-sets `Budget.limit_bytes` to `memory_budget_bytes - workers * worker_stack_bytes`;
+Startup computes exact requested framework heap bytes, including the cluster
+coordinator, shard arrays, per-shard slot/arena/cell/gather storage, and separately
+reserves startup stacks. `Cluster.stackBytes(config)` includes each worker and
+each secondary shard; shard 0 uses the caller's existing stack. The demo sets
+`Budget.limit_bytes` to `memory_budget_bytes - Cluster.stackBytes(config)`;
 `live_bytes` and `peak_bytes` count requested bytes through this allocator, and
 allocation/resize/remap growth is refused before exceeding the cap. The requested
 stack sizes are reserved separately in that calculation. Pthread/libc resources,
@@ -135,7 +140,8 @@ Zig 0.16's pthread implementation uses its C allocator for thread bookkeeping
 instead of the supplied spawn allocator. These counters do not measure whole
 process RSS.
 
-The demo seals the framework allocator after all workers have started; later
+The demo seals the framework allocator after all workers and shard threads
+have prepared, before `Cluster.run` releases request I/O; later
 allocation attempts through it are refused and counted. Embedding applications
 that want these checks must use the same budget/sealing lifecycle; passing an
 arbitrary allocator to `Server.init` does not establish a heap cap. This wrapper
@@ -158,16 +164,18 @@ handler receives exclusive request/writer borrows on the I/O owner; it returns
 the same frozen flush/finish/close action. Slots with a published callback or
 result wait in a FIFO ready ring; one turn services the ring entries present at
 its start, at most the effective batch limit per connection and at most
-`callbacks_per_turn` in total (default connections × batch limit, capped at
+`callbacks_per_turn` per shard (default connections × batch limit, capped at
 8192, reported in STATS). Local pending work uses a nonblocking backend poll.
 Neither this count nor deadline checks can preempt a callback.
 
 The turn clock is sampled at turn start, after polling and after every 16
-callbacks; deadlines, request starts and completion stamps use it, so a deadline
-can be observed late by at most 16 callbacks' work. Slots the loop touches are
+callbacks; deadlines, request starts and completion stamps use it, so callback groups add at most 16 completed callbacks' work to the
+clock-sampling delay. Polling, OS scheduling and a violating callback can add
+unbounded wall-clock delay. Slots the loop touches are
 checked against their deadline; every slot is swept every `deadline_sweep_ms`
-(default 100), so an idle connection's deadline overshoots by at most one sweep
-interval plus one turn. Exact per-callback queue/handler timing needs
+(default 100), so under progressing callbacks the sweep adds up to one interval plus a turn
+of scheduling delay. This is not a wall-clock bound under arbitrary application
+code or OS scheduling. Exact per-callback queue/handler timing needs
 `callback_timing`, which costs two clock reads per callback; otherwise those
 maxima stay zero. Worker mode keeps a full slot scan per turn for results.
 
@@ -176,9 +184,9 @@ own cancel cell. With `prearm_receive`, a drain first arms the next receive
 into the free input tail, compacting the consumed prefix beforehand when no
 frozen cell borrows request input, and then submits the send; with
 `submit_batch` the transport submits after that many drains so responses leave
-before the turn ends. Both are off by default: on omarx1 neither changed
-throughput at depths 1, 16 or 128, and on kqueue the early receive costs two
-syscalls that find no data yet (6-16% slower). Bytes that arrive
+before the turn ends. Both are off by default: the preliminary interleaved experiment on omarx1 found no gain at depths
+1, 16 or 128; its sequential Mac samples reported 6–16% lower throughput
+with early receive. Those observations do not establish a kernel-wide cause. Bytes that arrive
 while that batch is still being sent, or while a flushed request waits to
 resume, are held and parsed after the batch completes. Closing cancels both
 operations and releases the slot only after every target and cancel
@@ -188,8 +196,8 @@ show how often the overlap happened and how often the loop had to wait.
 The application promises a bounded, nonblocking callback. The framework cannot
 preempt it, isolate a crash or enforce wall-clock deadlines during it. Worker
 mode still separates finite blocking callbacks from the I/O owner but does not
-isolate arbitrary application code. Per-request optional offload and I/O sharding
-are separate future API decisions. The inline test does not run the blocking
+isolate arbitrary application code. Per-request optional offload remains a future API decision. Inline sharding
+is implemented below. The inline test does not run the blocking
 /stall fixture; that demo endpoint explicitly returns501 in this mode.
 
 ## Output arena, cells and gathered sends
@@ -257,7 +265,8 @@ alone can drain its prefix first and is insufficient evidence for that case.
 
 `Config.shards` runs that many complete, independent servers on one port, each
 with its own listener (`SO_REUSEPORT`), transport, slots, arenas, operation
-cells, clock and counters. They share only the stop flags; shard 0 runs on the
+cells, clock and counters. They share admission, stop/start coordination, the startup allocator and the
+application pointer; shard 0 runs on the
 calling thread and the others on threads created at start with fixed stacks.
 Every shard reserves the full `connections` slot capacity, because the kernel's
 hash can place more than an even share on one listener; the process-wide
@@ -265,8 +274,32 @@ ceiling is enforced by one shared admission counter touched on accept and
 release, so `connections` stays the exact limit and `peak_connections` reports
 the shared peak. Zero selects one shard per CPU the process may run on (Linux,
 at most 16 because each shard reserves full storage) and one elsewhere. Optional `shard_affinity` pins shard i to the i-th allowed CPU.
-Only inline execution supports several shards. The Linux kernel hashes
-connections across the listeners; XNU delivers every connection to the last
-bound listener, so macOS rejects more than one shard. Merged STATS sum counters
+Only inline execution supports several shards. Linux reuse-port distributes connections across listeners in the tested
+configuration. The preliminary M3 Max fixture observed all connections at the
+last-bound listener; macOS currently rejects more than one shard. This fixture
+is not a universal claim about every XNU version or socket configuration. Merged STATS sum counters
 and take maxima; per-shard admission is printed separately. A shard that cannot
 reconcile ownership by the shutdown deadline still ends the whole process.
+
+
+`Cluster.start()` prepares every owner behind a gate; no accepts or callbacks
+run before `Cluster.run()` releases it. A partial spawn failure aborts and joins
+prepared owners, then drains started-but-unrun servers. Coordinator/array bytes
+are included in the exact startup budget. Failure of a secondary shard requests
+stop across the cluster, including when duration is unlimited. Exit acknowledgements
+precede joins and have a finite watchdog; unreconciled owners cause process exit
+70. The framework cannot preempt an inline callback on the calling thread; an
+external watchdog remains necessary for an application that violates that contract.
+
+Multiple inline shards can call the same application's handler concurrently on
+different connections. The application must synchronize mutable shared state;
+request/writer ownership is exclusive per slot, not process-wide. In worker mode,
+dispatch snapshots the owner's Date/header prefix into slot-exclusive storage
+before release publication, so a worker never races the owner's cache refresh.
+
+A received write-half EOF ends input, not pending responses. Complete buffered
+requests and output drain in order; an incomplete suffix receives 400 after the
+valid prefix. A prearmed body arriving before an interim 100 SEND completion
+waits for that send, then parsing resumes from the bytes already buffered.
+Deterministic Zig tests force both completion orders; the finite
+`tests/arena_lifecycle_integration.py` suite also exercises these wire paths.

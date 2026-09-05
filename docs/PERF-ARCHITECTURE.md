@@ -1,6 +1,14 @@
 # Closing the plaintext gap: sharded owners and a contiguous output arena
 
-Status: design proposal, 2026-09-05. Nothing below is measured unless it cites
+Status: historical design proposal, 2026-09-05.
+The implemented contract is [OWNERSHIP.md](OWNERSHIP.md), and current adoption
+evidence is [the integration report](../reports/2026-09-05-arena-adoption.md).
+The proposal below preserves its original hypotheses and models; it is not the
+current resource/API specification. In particular, current shards each reserve
+full slot capacity with shared admission; defaults and operation modes evolved.
+Causal parser/client-bottleneck claims require profiling or controlled ablation.
+
+Original proposal: Nothing below is measured unless it cites
 a report. Model numbers are labeled as such. This document proposes changes to
 the maintained MVP so the pinned Linux comparison against libreactor/mrhttp
 moves from a 2–6× deficit to parity or better, while keeping every startup

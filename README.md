@@ -71,7 +71,7 @@ To use the framework, import the `bounded_http` module exported by
 [build.zig](build.zig), provide an [api.Handler](src/api.zig), and follow the
 startup/run/stop lifecycle in [src/main.zig](src/main.zig). Its actual demo
 callback is the maintained example. [src/server.zig](src/server.zig) exposes
-`Config`, `Server`, `api` and `Budget`; builds link libc. Treat this API as
+`Config`, `Cluster`, `Server`, `api` and `Budget`; builds link libc. Treat this API as
 experimental and read the [ownership contract](docs/OWNERSHIP.md) before
 retaining slices or adding asynchronous application work.
 
@@ -85,7 +85,9 @@ preempt a violating callback or enforce deadlines while that callback runs.
 The demo `/stall` route therefore returns501 in inline mode. Explicit
 `--execution inline --workers 2` is rejected. Worker mode is selectable
 with `--execution workers --workers 2`; this is an execution-policy experiment,
-not yet a per-request offload API or multiple I/O shards.
+not yet a per-request offload API. Worker execution currently requires one shard.
+With several inline shards, callbacks on different connections can run
+concurrently; shared application state must be immutable or synchronized.
 
 Run `python3 tests/inline_integration.py` for inline framing, partial sends,
 empty flush/resume, bounds and shutdown gates. Execution mode and separate
@@ -147,15 +149,19 @@ connection count bounds admitted slots, not the kernel TCP backlog. The server
 may accept one extra descriptor and immediately close it when all slots are
 occupied; it creates no extra request state and does not promise an HTTP 503.
 Each connection has one receive and one send operation cell plus a cancel
-cell for each, `4 * connections + 2` operation records in all; the next
-receive is armed while the previous batch is still being sent. Admission resumes
+cell for each, `4 * connections + 2` operation records in all; the optional `--prearm-receive 1` path can arm the next
+receive while the previous batch is still being sent. Admission resumes
 when the old application and transport owners have actually released a slot.
 
 The demo caps requested live bytes through its framework allocator at
-`memory_budget_bytes - workers * worker_stack_bytes`, reserving the requested
-worker stack budget separately. `Budget` tracks live/peak requested bytes and
+`memory_budget_bytes - Cluster.stackBytes(config)`, reserving the requested
+worker and secondary I/O-owner stack budget separately. `Budget` tracks live/peak requested bytes and
 refuses allocation, resize or remap growth beyond that heap cap. Startup also
-checks exact requested framework heap bytes plus requested worker stacks before allocation, including every response cell and gather descriptor. This is not an RSS limit: allocator
+checks exact requested framework heap bytes plus requested startup stacks before allocation, including the cluster coordinator, shard arrays, every response cell and gather descriptor.
+Each secondary shard and each application worker reserves `worker_stack_bytes`;
+shard 0 uses the caller's existing stack. Each shard reserves the full slot
+capacity, so heap usage multiplies with shard count even though admission is
+a shared process-wide ceiling. This is not an RSS limit: allocator
 metadata, libc/pthread metadata and actual stack mappings, mapped kernel rings,
 socket queues, loaded assets and arbitrary application allocations require
 separate accounting. Zig 0.16's pthread implementation uses its C allocator for
@@ -228,7 +234,9 @@ The current transport addresses every operation by cell and the arena replaces
 fixed cells, so those knobs map onto `--response-batch-limit` (1–511) and
 `--callbacks-per-turn`; `--inline-callback-budget` is accepted as an alias.
 The [arena/shard report](reports/2026-09-05-arena-shards.md) records the
-current implementation's Mac ladder and interleaved Linux pairs.
+original implementation's preliminary Mac ladder and interleaved Linux pairs.
+The [adoption report](reports/2026-09-05-arena-adoption.md) tracks integration
+fixes, qualified comparisons and current verification.
 
 Reproduce all three finite smoke workloads with `python3 tools/smoke.py`. It
 checks the running binary reports ReleaseSafe. For isolated Linux verification
@@ -248,7 +256,8 @@ STATS reports `shards`, `callbacks_per_turn`, `single_span_send_operations`
 and `borrow_copies`; with several shards a `SHARDS` line lists per-shard
 admission and completion counts.
 
-Run `python3 tests/batch_integration.py` for distinct generated and borrowed
+Run `python3 tests/arena_lifecycle_integration.py` for EOF/interim ordering and
+worker/inline half-close cases. Run `python3 tests/batch_integration.py` for distinct generated and borrowed
 bodies, mixed routes, small send caps, flush/order barriers, fairness and
 cancellation; `tests/gather_integration.py` tests transport operations separately.
 The server counts completed requests and cycle maxima when their containing

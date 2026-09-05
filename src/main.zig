@@ -89,7 +89,7 @@ pub fn main(init: std.process.Init) !void {
     const html = try std.Io.Dir.cwd().readFileAlloc(init.io, index_path, init.gpa, .limited(65536));
     defer init.gpa.free(html);
     var demo: Demo = .{ .html = html, .stall_ms = stall_ms, .execution = config.execution };
-    var budget: framework.Budget = .{ .upstream = init.gpa, .limit_bytes = config.memory_budget_bytes - (config.workers + shards - 1) * config.worker_stack_bytes };
+    var budget: framework.Budget = .{ .upstream = init.gpa, .limit_bytes = config.memory_budget_bytes - try framework.Cluster.stackBytes(config) };
     defer std.debug.assert(budget.live_bytes == 0);
     const cluster = try framework.Cluster.init(budget.allocator(), config, handler, &demo);
     defer cluster.deinit();

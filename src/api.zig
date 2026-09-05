@@ -25,8 +25,9 @@ pub const chunk_size_field_bytes: usize = 10;
 const chunk_slack_bytes: usize = 7;
 pub const max_content_type_bytes: usize = 128;
 
-/// Date/status prefix shared by every response of one I/O owner and rebuilt
-/// once per second. begin() copies it instead of formatting.
+/// Date/status prefix rebuilt by one I/O owner once per second. Inline begin()
+/// reads that owner's cache; worker begin() reads an exclusive slot snapshot
+/// published before dispatch. begin() copies the prefix instead of formatting.
 pub const HeaderCache = struct {
     date: [29]u8 = undefined,
     ok_prefix: [80]u8 = undefined,

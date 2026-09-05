@@ -235,12 +235,17 @@ const Slot = struct {
     parser: http.Parser,
     request: http.Request = undefined,
     writer: api.Writer,
+    /// Worker callbacks read this exclusive snapshot, never the owner's mutable
+    /// once-per-second cache. Inline callbacks use the owner cache directly.
+    worker_header_cache: api.HeaderCache = .{},
     state: [8]usize = @splat(0),
     action: api.Action = .close,
     event: api.Event = .request,
     /// A receive into the free input tail and a send of the frozen batch may
     /// be in flight together; each has its own cell and cancel cell.
     recv_pending: bool = false,
+    /// Peer write-half closure ends input, not pending response output.
+    recv_eof: bool = false,
     recv_token: u64 = 0,
     recv_cancel_pending: bool = false,
     send_pending: bool = false,
@@ -738,6 +743,7 @@ pub const Server = struct {
             slot.closing = false;
             slot.cancelled.store(false, .release);
             slot.received = 0;
+            slot.recv_eof = false;
             slot.input_cursor = 0;
             slot.request_active = false;
             slot.batch_count = 0;
@@ -791,6 +797,15 @@ pub const Server = struct {
                 self.stats.gather_canceled_completions += 1;
             }
         }
+        if (!slot.closing and kind == .recv and completion.result == 0) {
+            slot.recv_eof = true;
+            // A prearmed receive can observe EOF while output or a callback
+            // still owns the request. Those owners finish before input closure
+            // is handled; complete buffered requests remain eligible to run.
+            if (!slot.send_pending and slot.batch_count == 0 and !slot.request_active)
+                try self.parseRequest(index);
+            return;
+        }
         if (slot.closing or completion.result <= 0) {
             try self.beginClose(slot);
             self.maybeFree(slot);
@@ -804,7 +819,8 @@ pub const Server = struct {
                 self.stats.bytes_received += transferred;
                 // Bytes that arrive while a batch is still being sent, or while
                 // a flushed request waits to resume, are parsed after that batch.
-                if (slot.batch_count == 0 and !slot.request_active) try self.parseRequest(index);
+                if (!slot.send_pending and slot.batch_count == 0 and !slot.request_active)
+                    try self.parseRequest(index);
             },
             .send => {
                 assert(transferred <= slot.send_submitted_bytes);
@@ -827,7 +843,7 @@ pub const Server = struct {
 
     fn armReceive(self: *Server, index: usize) anyerror!void {
         const slot = &self.slots[index];
-        assert(!slot.recv_pending and !slot.closing and slot.received < slot.input.len);
+        assert(!slot.recv_pending and !slot.recv_eof and !slot.closing and slot.received < slot.input.len);
         const token = tokenFor(slot, index, .recv);
         try self.backend.recv(self.recvCell(index), token, slot.fd, slot.input[slot.received..]);
         slot.recv_pending = true;
@@ -840,7 +856,7 @@ pub const Server = struct {
     /// The consumed prefix is compacted first when no frozen cell borrows it.
     fn prearmReceive(self: *Server, index: usize) anyerror!void {
         const slot = &self.slots[index];
-        if (slot.recv_pending or slot.closing or slot.request_active or slot.batch_borrows_input) return;
+        if (slot.recv_pending or slot.recv_eof or slot.closing or slot.request_active or slot.batch_borrows_input) return;
         if (slot.input_cursor != 0) {
             const remaining = slot.received - slot.input_cursor;
             if (remaining != 0) {
@@ -904,6 +920,12 @@ pub const Server = struct {
         const slot = &self.slots[index];
         if (slot.recv_pending) return;
         assert(slot.batch_count == 0 and !slot.request_active and !slot.send_pending);
+        if (slot.recv_eof) {
+            // parseRequest already consumed every complete request. A remaining
+            // incomplete prefix cannot become complete after EOF.
+            if (slot.input_cursor < slot.received) return self.reject(index, 400);
+            return self.beginClose(slot);
+        }
         if (slot.input_cursor != 0) {
             const remaining = slot.received - slot.input_cursor;
             if (remaining != 0) {
@@ -927,6 +949,7 @@ pub const Server = struct {
         switch (self.config.execution) {
             .workers => {
                 assert(self.workers.len > 0);
+                self.snapshotWorkerHeader(slot);
                 self.stats.worker_dispatches += 1;
                 slot.phase.store(.ready, .release);
                 self.workers[index % self.workers.len].wake();
@@ -939,6 +962,18 @@ pub const Server = struct {
         }
     }
 
+    fn snapshotWorkerHeader(self: *Server, slot: *Slot) void {
+        assert(self.config.execution == .workers and slot.phase.load(.acquire) == .io);
+        slot.worker_header_cache = self.header_cache;
+        slot.writer.header_cache = &slot.worker_header_cache;
+    }
+
+    fn callbackClockDue(budget: *u32) bool {
+        assert(budget.* > 0);
+        budget.* -= 1;
+        return budget.* == 0;
+    }
+
     fn invokeInline(self: *Server, slot: *Slot) void {
         assert(self.config.execution == .inline_event_loop and self.inline_budget > 0);
         assert(slot.phase.load(.acquire) == .ready);
@@ -946,7 +981,7 @@ pub const Server = struct {
         self.stats.inline_dispatches += 1;
         slot.phase.store(.running, .release);
         self.invokeHandler(slot);
-        if (self.clock_budget == 0) self.sampleClock() else self.clock_budget -= 1;
+        if (callbackClockDue(&self.clock_budget)) self.sampleClock();
     }
 
     /// Caller exclusively owns the running phase. Publishing result ends every
@@ -1174,7 +1209,10 @@ pub const Server = struct {
                 slot.part_count = 0;
                 slot.part = 0;
                 slot.part_offset = 0;
-                try self.receiveMore(index);
+                // A prearmed receive may have already completed while this
+                // interim send was pending. Consume those buffered bytes before
+                // asking the backend for another receive.
+                try self.parseRequest(index);
             },
             .reject => try self.beginClose(slot),
             .response => try self.completeBatch(index),
@@ -1293,6 +1331,130 @@ pub const Server = struct {
         self.free_count += 1;
     }
 
+    test "worker response headers retain their exclusive dispatch snapshot" {
+        const server = try Server.init(std.testing.allocator, .{
+            .execution = .workers,
+            .workers = 1,
+            .connections = 1,
+            .port = 0,
+        }, struct {
+            fn handler(_: *api.Context) api.Action {
+                return .close;
+            }
+        }.handler, null);
+        defer server.deinit();
+        const slot = &server.slots[0];
+        const before = "Sat, 05 Sep 2026 12:34:56 GMT";
+        const after = "Sat, 05 Sep 2026 12:34:57 GMT";
+        server.header_cache.refresh(before);
+        slot.writer.open(0, true, false);
+        server.snapshotWorkerHeader(slot);
+        // Deterministic ownership witness: refresh after publication, before
+        // the callback reads the snapshot. No racing threads or sleeps needed.
+        server.header_cache.refresh(after);
+        try std.testing.expect(slot.writer.header_cache == &slot.worker_header_cache);
+        try slot.writer.begin(200, "text/plain", 0);
+        try std.testing.expect(std.mem.indexOf(u8, slot.arena[0..slot.writer.buffered], before) != null);
+        try std.testing.expect(std.mem.indexOf(u8, slot.arena[0..slot.writer.buffered], after) == null);
+        // The non-200 path reads the cached date separately from the 200 prefix.
+        slot.writer.open(0, true, false);
+        try slot.writer.begin(404, "text/plain", 0);
+        try std.testing.expect(std.mem.indexOf(u8, slot.arena[0..slot.writer.buffered], before) != null);
+    }
+
+    test "callback clock becomes due on exactly every sixteenth callback" {
+        var budget = clock_refresh_callbacks;
+        var refreshes: usize = 0;
+        for (1..2 * clock_refresh_callbacks + 1) |completed| {
+            const due = callbackClockDue(&budget);
+            try std.testing.expectEqual(completed % clock_refresh_callbacks == 0, due);
+            if (due) {
+                refreshes += 1;
+                budget = clock_refresh_callbacks;
+            }
+        }
+        try std.testing.expectEqual(@as(usize, 2), refreshes);
+    }
+
+    test "prearmed body completion waits for interim send then parses buffered body" {
+        const server = try Server.init(std.testing.allocator, .{ .connections = 1, .port = 0 }, struct {
+            fn handler(_: *api.Context) api.Action {
+                return .close;
+            }
+        }.handler, null);
+        const slot = &server.slots[0];
+        defer {
+            // The test injects completion state without submitting kernel work.
+            slot.in_use = false;
+            slot.in_ready = false;
+            slot.phase.store(.io, .release);
+            server.ready_count = 0;
+            server.deinit();
+        }
+        const head = "POST /echo HTTP/1.1\r\nHost: localhost\r\nExpect: 100-continue\r\nContent-Length: 4\r\n\r\n";
+        const body = "body";
+        @memcpy(slot.input[0 .. head.len + body.len], head ++ body);
+        slot.received = head.len;
+        try std.testing.expect(!try slot.parser.parseInto(slot.input[0..slot.received], &slot.request));
+        try std.testing.expect(slot.parser.head_complete and slot.parser.expect_continue);
+        slot.in_use = true;
+        slot.generation = 1;
+        slot.interim_sent = true;
+        slot.send_mode = .interim;
+        slot.send_pending = true;
+        slot.recv_pending = true;
+        slot.recv_token = tokenFor(slot, 0, .recv);
+        server.stats.live_operations = 2;
+        // Force the formerly failing completion order: body first, interim last.
+        try server.onCompletion(.{ .token = slot.recv_token, .result = body.len });
+        try std.testing.expect(slot.send_pending and !slot.request_active);
+        try std.testing.expectEqual(Phase.io, slot.phase.load(.acquire));
+        try std.testing.expectEqual(head.len + body.len, slot.received);
+        slot.send_pending = false;
+        server.stats.live_operations -= 1;
+        slot.part_count = 1;
+        slot.part = 1;
+        try server.sendNext(0);
+        try std.testing.expect(slot.request_active and !slot.recv_pending);
+        try std.testing.expectEqual(Phase.ready, slot.phase.load(.acquire));
+        try std.testing.expectEqualStrings(body, slot.request.body_wire);
+        try std.testing.expectEqual(@as(usize, 0), server.stats.live_operations);
+    }
+
+    test "prearmed EOF retains pending output and closes only after its drain" {
+        const server = try Server.init(std.testing.allocator, .{ .connections = 1, .port = 0 }, struct {
+            fn handler(_: *api.Context) api.Action {
+                return .close;
+            }
+        }.handler, null);
+        defer server.deinit();
+        const slot = &server.slots[0];
+        // Synthetic terminal-order witness: no kernel operation is submitted.
+        slot.in_use = true;
+        slot.generation = 1;
+        slot.recv_pending = true;
+        slot.recv_token = tokenFor(slot, 0, .recv);
+        slot.send_pending = true;
+        slot.batch_count = 1;
+        server.free_count = 0;
+        server.stats.live_connections = 1;
+        server.stats.live_operations = 2;
+        try server.onCompletion(.{ .token = slot.recv_token, .result = 0 });
+        try std.testing.expect(slot.recv_eof and !slot.recv_pending);
+        try std.testing.expect(slot.send_pending and !slot.closing);
+        try std.testing.expectEqual(@as(usize, 1), slot.batch_count);
+        try std.testing.expectEqual(@as(usize, 1), server.stats.live_connections);
+        // Once output is drained, an empty EOF input closes instead of rearming.
+        slot.send_pending = false;
+        server.stats.live_operations -= 1;
+        slot.batch_count = 0;
+        try server.receiveMore(0);
+        try std.testing.expect(!slot.in_use and !slot.recv_pending);
+        try std.testing.expectEqual(@as(usize, 0), server.stats.live_connections);
+        try std.testing.expectEqual(@as(usize, 0), server.stats.live_operations);
+        try std.testing.expectEqual(@as(usize, 1), server.free_count);
+    }
+
     fn refreshDate(self: *Server) void {
         var ts: c.timespec = undefined;
         assert(c.clock_gettime(.REALTIME, &ts) == 0);
@@ -1342,8 +1504,9 @@ pub const Admission = struct {
 
 /// Several independent I/O owners on one port. Each shard is a complete
 /// Server with its own listener (SO_REUSEPORT), transport, slots, arenas and
-/// counters; they share only the stop flags. Shard 0 runs on the calling
-/// thread, the others on startup-spawned threads with fixed stacks. Linux
+/// counters; they share admission, stop coordination and the application
+/// pointer. Shard 0 runs on the calling thread, the others on startup-spawned
+/// threads with fixed stacks. Linux
 /// distributes connections across the listeners; macOS keeps one shard.
 pub const Cluster = struct {
     allocator: std.mem.Allocator,
@@ -1353,6 +1516,19 @@ pub const Cluster = struct {
     failures: []?anyerror,
     admission: Admission,
     port_number: u16,
+    start_attempted: bool = false,
+    started: bool = false,
+    gate: std.atomic.Value(Gate) = .init(.waiting),
+    prepared: std.atomic.Value(u32) = .init(0),
+    exited: std.atomic.Value(u32) = .init(0),
+
+    const Gate = enum(u8) { waiting, run, abort };
+    const NativeLifecycle = struct {
+        fn beforeSpawn(_: *Cluster, _: usize) !void {}
+        fn runShard(cluster: *Cluster, index: usize) !void {
+            try cluster.shards[index].run();
+        }
+    };
 
     pub const max_auto_shards: u8 = 16;
 
@@ -1396,18 +1572,26 @@ pub const Cluster = struct {
         // listener (observed 2026-09-05), so extra macOS shards only shrink
         // admission. Distribution needs an acceptor mailbox there; not built.
         if (shards > 1 and @import("builtin").os.tag != .linux) return error.InvalidConfiguration;
-        var heap: usize = 0;
-        for (0..shards) |index| heap = try std.math.add(usize, heap, try shardConfig(config, shards, @intCast(index), config.port).heapBytes());
-        const stacks = try std.math.mul(usize, config.worker_stack_bytes, config.workers + shards - 1);
-        if (try std.math.add(usize, heap, stacks) > config.memory_budget_bytes) return error.MemoryBudgetExceeded;
+        if (try std.math.add(usize, try heapBytes(config), try stackBytes(config)) > config.memory_budget_bytes)
+            return error.MemoryBudgetExceeded;
     }
 
-    /// Requested framework heap across all shards; stacks are separate.
+    /// Exact requested framework heap, including coordinator arrays. Pthread
+    /// bookkeeping and kernel mappings are excluded; stacks are separate.
     pub fn heapBytes(config: Config) !usize {
         const shards = resolveShards(config);
-        var heap: usize = 0;
+        var heap: usize = @sizeOf(Cluster);
+        const coordinator_per_shard = @sizeOf(*Server) + @sizeOf(?std.Thread) + @sizeOf(?anyerror);
+        heap = try std.math.add(usize, heap, try std.math.mul(usize, shards, coordinator_per_shard));
         for (0..shards) |index| heap = try std.math.add(usize, heap, try shardConfig(config, shards, @intCast(index), config.port).heapBytes());
         return heap;
+    }
+
+    /// Requested startup stacks: application workers plus secondary owners.
+    /// Shard 0 runs on the caller's existing stack.
+    pub fn stackBytes(config: Config) !usize {
+        const count = try std.math.add(usize, config.workers, resolveShards(config) - 1);
+        return std.math.mul(usize, config.worker_stack_bytes, count);
     }
 
     pub fn init(allocator: std.mem.Allocator, config: Config, handler: api.Handler, application: ?*anyopaque) !*Cluster {
@@ -1444,11 +1628,23 @@ pub const Cluster = struct {
         return self.port_number;
     }
 
-    fn shardMain(self: *Cluster, index: usize) void {
+    fn shardMain(self: *Cluster, index: usize, comptime Lifecycle: type) void {
+        // Entry and exit acknowledgements are published even when startup
+        // aborts. No request operation or callback precedes the release gate.
+        defer _ = self.exited.fetchAdd(1, .release);
         if (self.config.shard_affinity) pinToAllowedCpu(index);
-        self.shards[index].run() catch |err| {
+        _ = self.prepared.fetchAdd(1, .release);
+        while (true) switch (self.gate.load(.acquire)) {
+            .waiting => std.Thread.yield() catch {},
+            .abort => return,
+            .run => break,
+        };
+        Lifecycle.runShard(self, index) catch |err| {
             self.failures[index] = err;
         };
+        // A secondary owner's error or ordinary stop must reach shard 0 even
+        // when duration_ms is zero. Error ownership remains retained.
+        self.requestStop();
     }
 
     /// Pin the calling thread to the index-th CPU of the process's allowed set
@@ -1475,18 +1671,69 @@ pub const Cluster = struct {
     }
 
     pub fn start(self: *Cluster) !void {
-        for (self.shards) |server| try server.start();
+        return self.startWith(NativeLifecycle);
+    }
+
+    /// The comptime lifecycle seam supports deterministic startup/run faults
+    /// in tests without runtime hooks on the production request path.
+    fn startWith(self: *Cluster, comptime Lifecycle: type) !void {
+        assert(!self.start_attempted);
+        self.start_attempted = true;
+        var started: usize = 0;
         var spawned: usize = 0;
-        errdefer {
-            for (self.shards) |server| server.requestStop();
-            for (self.threads[1 .. 1 + spawned]) |*thread| if (thread.*) |t| {
-                t.join();
-                thread.* = null;
-            };
+        errdefer self.abortStartup(started, spawned);
+        for (self.shards) |server| {
+            try server.start();
+            started += 1;
         }
+        const Entry = struct {
+            fn main(cluster: *Cluster, index: usize) void {
+                cluster.shardMain(index, Lifecycle);
+            }
+        };
         for (self.threads[1..], 1..) |*thread, index| {
-            thread.* = try std.Thread.spawn(.{ .stack_size = self.config.worker_stack_bytes, .allocator = self.allocator }, shardMain, .{ self, index });
+            try Lifecycle.beforeSpawn(self, index);
+            thread.* = try std.Thread.spawn(.{ .stack_size = self.config.worker_stack_bytes, .allocator = self.allocator }, Entry.main, .{ self, index });
             spawned += 1;
+        }
+        const deadline = self.shutdownDeadline();
+        while (self.prepared.load(.acquire) != spawned) {
+            if (nowNs() >= deadline) std.c._exit(70);
+            std.Thread.yield() catch {};
+        }
+        self.started = true;
+        // The calling application can now seal its allocator and announce
+        // readiness. Only run() releases the prepared request-I/O owners.
+    }
+
+    fn shutdownDeadline(self: *const Cluster) u64 {
+        return nowNs() + @as(u64, self.config.shutdown_ms) * 1_000_000;
+    }
+
+    fn joinExited(self: *Cluster, count: usize, deadline: u64) void {
+        // Never join a shard still inside an application callback or waiting
+        // for startup release. Its deadline cannot preempt arbitrary code.
+        while (self.exited.load(.acquire) != count) {
+            if (nowNs() >= deadline) std.c._exit(70);
+            std.Thread.yield() catch {};
+        }
+        for (self.threads[1 .. 1 + count]) |*thread| {
+            thread.*.?.join();
+            thread.* = null;
+        }
+    }
+
+    fn abortStartup(self: *Cluster, started: usize, spawned: usize) void {
+        assert(!self.started and started <= self.shards.len);
+        self.gate.store(.abort, .release);
+        self.joinExited(spawned, self.shutdownDeadline());
+        for (self.shards[0..started]) |server| {
+            // The gate proves no request I/O ran. A stopped run starts no
+            // accepts and safely joins any startup workers before destruction.
+            assert(server.stats.live_connections == 0 and server.stats.live_operations == 0);
+            server.requestStop();
+            server.run() catch std.c._exit(70);
+            assert(server.safe_to_destroy);
         }
     }
 
@@ -1498,13 +1745,16 @@ pub const Cluster = struct {
     /// shard. Any shard's failure is the cluster's failure; the caller must
     /// then terminate the process because loans may remain outstanding.
     pub fn run(self: *Cluster) !void {
+        return self.runWith(NativeLifecycle);
+    }
+
+    fn runWith(self: *Cluster, comptime Lifecycle: type) !void {
+        assert(self.started and self.gate.load(.acquire) == .waiting);
         if (self.config.shard_affinity) pinToAllowedCpu(0);
-        const first = self.shards[0].run();
+        self.gate.store(.run, .release);
+        const first = Lifecycle.runShard(self, 0);
         self.requestStop();
-        for (self.threads[1..]) |*thread| if (thread.*) |t| {
-            t.join();
-            thread.* = null;
-        };
+        self.joinExited(self.shards.len - 1, self.shutdownDeadline());
         try first;
         for (self.failures) |failure| if (failure) |err| return err;
     }
@@ -1727,7 +1977,7 @@ test "batch gather progress crosses part boundaries without copying" {
     try std.testing.expectEqual(parts[34].base + 2, out[0].base);
 }
 
-test "cluster splits connections across shards and rejects unsupported topologies" {
+test "cluster reserves full shard capacity and rejects unsupported topologies" {
     const config: Config = .{ .connections = 128, .shards = 3 };
     const first = Cluster.shardConfig(config, 3, 0, 9000);
     const last = Cluster.shardConfig(config, 3, 2, 9000);
@@ -1762,6 +2012,163 @@ test "cluster splits connections across shards and rejects unsupported topologie
     single.requestStop();
     try single.run();
     try std.testing.expectEqual(@as(u16, 1), single.stats().shards);
+}
+
+/// A regression in stop propagation must fail finitely even when the fixture
+/// deliberately leaves duration_ms at zero. This is outside server resources.
+const ClusterTestWatchdog = struct {
+    done: std.atomic.Value(bool) = .init(false),
+
+    fn run(self: *ClusterTestWatchdog) void {
+        const deadline = nowNs() + 5_000_000_000;
+        while (!self.done.load(.acquire)) {
+            if (nowNs() >= deadline) std.c._exit(71);
+            const delay: c.timespec = .{ .sec = 0, .nsec = 1_000_000 };
+            _ = c.nanosleep(&delay, null);
+        }
+    }
+};
+
+test "cluster exact heap and stack budget includes coordinator and shard arrays" {
+    const configs = [_]Config{
+        .{ .connections = 2, .port = 0, .shards = 1, .response_batch_limit = 2 },
+        .{ .connections = 2, .port = 0, .shards = 1, .execution = .workers, .workers = 1 },
+        .{ .connections = 2, .port = 0, .shards = 3, .response_batch_limit = 2 },
+    };
+    for (configs) |initial| {
+        if (initial.shards > 1 and @import("builtin").os.tag != .linux) continue;
+        var config = initial;
+        const heap = try Cluster.heapBytes(config);
+        const stacks = try Cluster.stackBytes(config);
+        try std.testing.expectEqual(config.worker_stack_bytes * (config.workers + config.shards - 1), stacks);
+        config.memory_budget_bytes = try std.math.add(usize, heap, stacks);
+        try Cluster.validate(config);
+        var budget: Budget = .{ .upstream = std.testing.allocator, .limit_bytes = heap };
+        const cluster = try Cluster.init(budget.allocator(), config, struct {
+            fn handle(_: *api.Context) api.Action {
+                unreachable;
+            }
+        }.handle, null);
+        try std.testing.expectEqual(heap, budget.live_bytes);
+        try std.testing.expectEqual(config.shards, cluster.shards.len);
+        // No request I/O is released by start(), including on secondary owners.
+        try cluster.start();
+        try std.testing.expectEqual(heap, budget.live_bytes);
+        for (cluster.shards) |server| {
+            try std.testing.expectEqual(@as(usize, 0), server.stats.live_operations);
+            try std.testing.expectEqual(@as(u64, 0), server.stats.turns);
+        }
+        budget.sealed.store(true, .release);
+        cluster.requestStop();
+        try cluster.run();
+        cluster.deinit();
+        try std.testing.expectEqual(@as(usize, 0), budget.live_bytes);
+        try std.testing.expectEqual(@as(usize, 0), budget.late_calls.load(.acquire));
+        config.memory_budget_bytes -= 1;
+        try std.testing.expectError(error.MemoryBudgetExceeded, Cluster.validate(config));
+    }
+}
+
+test "cluster partial spawn failure aborts prepared owners before request I/O" {
+    if (@import("builtin").os.tag != .linux) return error.SkipZigTest;
+    const Lifecycle = struct {
+        fn beforeSpawn(cluster: *Cluster, index: usize) !void {
+            if (index != 2) return;
+            // Ensure the first spawned thread has entered the barrier before
+            // failing the next spawn. No timing-dependent sleeps or requests.
+            const deadline = cluster.shutdownDeadline();
+            while (cluster.prepared.load(.acquire) != 1) {
+                if (nowNs() >= deadline) std.c._exit(71);
+                std.Thread.yield() catch {};
+            }
+            return error.InjectedSpawnFailure;
+        }
+        fn runShard(_: *Cluster, _: usize) !void {
+            @panic("aborted startup must not release a request owner");
+        }
+    };
+    var watchdog: ClusterTestWatchdog = .{};
+    const watcher = try std.Thread.spawn(.{}, ClusterTestWatchdog.run, .{&watchdog});
+    defer {
+        watchdog.done.store(true, .release);
+        watcher.join();
+    }
+    const cluster = try Cluster.init(std.testing.allocator, .{
+        .connections = 2,
+        .port = 0,
+        .shards = 3,
+        .response_batch_limit = 2,
+        .shutdown_ms = 1000,
+    }, struct {
+        fn handle(_: *api.Context) api.Action {
+            @panic("aborted startup must not dispatch a callback");
+        }
+    }.handle, null);
+    defer cluster.deinit();
+    try std.testing.expectError(error.InjectedSpawnFailure, cluster.startWith(Lifecycle));
+    try std.testing.expectEqual(@as(u32, 1), cluster.prepared.load(.acquire));
+    try std.testing.expectEqual(@as(u32, 1), cluster.exited.load(.acquire));
+    for (cluster.threads) |thread| try std.testing.expect(thread == null);
+    for (cluster.shards) |server| {
+        try std.testing.expect(server.safe_to_destroy);
+        try std.testing.expectEqual(@as(u64, 0), server.stats.turns);
+        try std.testing.expectEqual(@as(usize, 0), server.stats.live_connections);
+        try std.testing.expectEqual(@as(usize, 0), server.stats.live_operations);
+    }
+}
+
+test "secondary shard error stops the primary without a duration escape" {
+    if (@import("builtin").os.tag != .linux) return error.SkipZigTest;
+    const Lifecycle = struct {
+        var primary_entered: std.atomic.Value(bool) = .init(false);
+        fn beforeSpawn(_: *Cluster, _: usize) !void {}
+        fn runShard(cluster: *Cluster, index: usize) !void {
+            if (index == 0) {
+                primary_entered.store(true, .release);
+                return cluster.shards[0].run();
+            }
+            const deadline = cluster.shutdownDeadline();
+            while (!primary_entered.load(.acquire)) {
+                if (nowNs() >= deadline) std.c._exit(71);
+                std.Thread.yield() catch {};
+            }
+            // Reconcile this fixture's owners before injecting the error, so
+            // the test can destroy its cluster. Real failed runs retain loans.
+            cluster.shards[index].requestStop();
+            try cluster.shards[index].run();
+            return error.InjectedShardFailure;
+        }
+    };
+    Lifecycle.primary_entered.store(false, .release);
+    var watchdog: ClusterTestWatchdog = .{};
+    const watcher = try std.Thread.spawn(.{}, ClusterTestWatchdog.run, .{&watchdog});
+    defer {
+        watchdog.done.store(true, .release);
+        watcher.join();
+    }
+    const cluster = try Cluster.init(std.testing.allocator, .{
+        .connections = 2,
+        .port = 0,
+        .shards = 2,
+        .response_batch_limit = 2,
+        .shutdown_ms = 1000,
+    }, struct {
+        fn handle(_: *api.Context) api.Action {
+            unreachable;
+        }
+    }.handle, null);
+    defer cluster.deinit();
+    try std.testing.expectEqual(@as(u32, 0), cluster.config.duration_ms);
+    try cluster.startWith(Lifecycle);
+    try std.testing.expectError(error.InjectedShardFailure, cluster.runWith(Lifecycle));
+    try std.testing.expect(cluster.shards[0].stop_requested.load(.acquire));
+    try std.testing.expectEqual(@as(u32, 1), cluster.exited.load(.acquire));
+    for (cluster.threads) |thread| try std.testing.expect(thread == null);
+    for (cluster.shards) |server| {
+        try std.testing.expect(server.safe_to_destroy);
+        try std.testing.expectEqual(@as(usize, 0), server.stats.live_connections);
+        try std.testing.expectEqual(@as(usize, 0), server.stats.live_operations);
+    }
 }
 
 test "stats merge sums counters, keeps maxima and leaves configuration alone" {
