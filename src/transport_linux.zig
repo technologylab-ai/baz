@@ -1,4 +1,6 @@
 //! Linux single-shot io_uring adapter. No std.Io.Threaded or application workers.
+//! Every SQE carries its operation cell as user_data, so a CQE addresses its
+//! record directly; the caller's token is returned from that record.
 const std = @import("std");
 const c = std.c;
 const linux = std.os.linux;
@@ -9,14 +11,21 @@ const assert = std.debug.assert;
 
 pub const Backend = struct {
     const Kind = enum { free, accept, data, cancel };
-    const Operation = struct { kind: Kind = .free, token: u64 = 0, socket: Socket = -1 };
+    const Operation = struct {
+        kind: Kind = .free,
+        token: u64 = 0,
+        socket: Socket = -1,
+        /// SENDMSG reads this header until completion; it points at the
+        /// caller's stable vectors and never copies payload.
+        message: linux.msghdr_const = undefined,
+    };
 
     pub const operation_bytes = @sizeOf(Operation);
 
     allocator: std.mem.Allocator,
     ring: linux.IoUring,
     operations: []Operation,
-    gather_metadata: ?[]common.Gather = null,
+    gather_enabled: bool = false,
     gather_supported: bool,
     outstanding: usize = 0,
     listener: Socket,
@@ -25,9 +34,9 @@ pub const Backend = struct {
     /// Saturating diagnostic; a transient never releases an operation or buffer.
     transient_retries: u64 = 0,
 
-    pub fn init(allocator: std.mem.Allocator, max_connections: u16, port_number: u16) !Backend {
+    pub fn init(allocator: std.mem.Allocator, max_connections: u16, port_number: u16, reuse_port: bool) !Backend {
         if (max_connections == 0 or max_connections > 16383) return error.InvalidConnectionLimit;
-        const capacity = (@as(usize, max_connections) + 1) * 2;
+        const capacity = common.cellCount(max_connections);
         const entries = try std.math.ceilPowerOfTwo(u16, @intCast(capacity));
         var ring = try linux.IoUring.init(entries, 0);
         errdefer ring.deinit();
@@ -38,7 +47,7 @@ pub const Backend = struct {
         const operations = try allocator.alloc(Operation, capacity);
         errdefer allocator.free(operations);
         @memset(operations, .{});
-        const listener = try common.listen(port_number, max_connections, false);
+        const listener = try common.listen(port_number, max_connections, false, reuse_port);
         errdefer common.closeFd(listener.socket);
         const result = linux.eventfd(0, linux.EFD.CLOEXEC | linux.EFD.NONBLOCK);
         if (linux.errno(result) != .SUCCESS) return error.WakeDescriptorFailed;
@@ -55,9 +64,9 @@ pub const Backend = struct {
 
     /// Startup-only optional capability: scalar SEND does not require SENDMSG.
     pub fn enableGather(self: *Backend) !void {
-        assert(self.outstanding == 0 and self.gather_metadata == null);
+        assert(self.outstanding == 0 and !self.gather_enabled);
         if (!self.gather_supported) return error.GatherSendUnsupported;
-        self.gather_metadata = try self.allocator.alloc(common.Gather, self.operations.len);
+        self.gather_enabled = true;
     }
 
     /// Caller must stop admission, cancel, and drain every target AND cancel CQE.
@@ -68,72 +77,67 @@ pub const Backend = struct {
         common.closeFd(self.listener);
         common.closeFd(self.wake_fd);
         self.ring.deinit();
-        if (self.gather_metadata) |metadata| self.allocator.free(metadata);
         self.allocator.free(self.operations);
         self.* = undefined;
     }
 
-    fn vacant(self: *Backend, token: u64, socket: Socket, kind: Kind) !*Operation {
-        var free: ?*Operation = null;
-        var data_count: usize = 0;
-        var cancel_count: usize = 0;
-        for (self.operations) |*op| {
-            if (op.kind == .free) {
-                if (free == null) free = op;
-            } else {
-                assert(op.token != token);
-                if (kind == .accept) assert(op.kind != .accept);
-                if (kind == .data and op.kind == .data) assert(op.socket != socket);
-                if (op.kind == .data) data_count += 1;
-                if (op.kind == .cancel) cancel_count += 1;
-            }
-        }
-        if (kind == .data and data_count >= self.operations.len / 2 - 1) return error.OperationCapacityExceeded;
-        if (kind == .cancel and cancel_count >= self.operations.len / 2) return error.OperationCapacityExceeded;
-        return free orelse error.OperationCapacityExceeded;
+    fn claim(self: *Backend, cell: u32, token: u64, socket: Socket, kind: Kind) !*Operation {
+        if (cell >= self.operations.len) return error.OperationCellInvalid;
+        const op = &self.operations[cell];
+        if (op.kind != .free) return error.OperationCellBusy;
+        op.* = .{ .kind = kind, .token = token, .socket = socket };
+        return op;
     }
 
-    pub fn accept(self: *Backend, token: u64) !void {
-        const op = try self.vacant(token, self.listener, .accept);
-        _ = try self.ring.accept(token, self.listener, null, null, linux.SOCK.CLOEXEC);
-        op.* = .{ .kind = .accept, .token = token, .socket = self.listener };
+    fn submitted(self: *Backend, op: *Operation, result: anyerror!*linux.io_uring_sqe) !void {
+        _ = result catch |err| {
+            op.* = .{};
+            return err;
+        };
         self.outstanding += 1;
     }
 
-    pub fn recv(self: *Backend, token: u64, socket: Socket, buffer: []u8) !void {
+    pub fn accept(self: *Backend, cell: u32, token: u64) !void {
+        const op = try self.claim(cell, token, self.listener, .accept);
+        try self.submitted(op, self.ring.accept(cell, self.listener, null, null, linux.SOCK.CLOEXEC));
+    }
+
+    pub fn recv(self: *Backend, cell: u32, token: u64, socket: Socket, buffer: []u8) !void {
         assert(buffer.len > 0 and buffer.len <= std.math.maxInt(i32));
-        const op = try self.vacant(token, socket, .data);
-        _ = try self.ring.recv(token, socket, .{ .buffer = buffer }, 0);
-        op.* = .{ .kind = .data, .token = token, .socket = socket };
-        self.outstanding += 1;
+        const op = try self.claim(cell, token, socket, .data);
+        try self.submitted(op, self.ring.recv(cell, socket, .{ .buffer = buffer }, 0));
     }
 
-    pub fn send(self: *Backend, token: u64, socket: Socket, bytes: []const u8) !void {
+    pub fn send(self: *Backend, cell: u32, token: u64, socket: Socket, bytes: []const u8) !void {
         assert(bytes.len > 0 and bytes.len <= std.math.maxInt(i32));
-        const op = try self.vacant(token, socket, .data);
-        _ = try self.ring.send(token, socket, bytes, linux.MSG.NOSIGNAL);
-        op.* = .{ .kind = .data, .token = token, .socket = socket };
-        self.outstanding += 1;
+        const op = try self.claim(cell, token, socket, .data);
+        try self.submitted(op, self.ring.send(cell, socket, bytes, linux.MSG.NOSIGNAL));
     }
 
-    pub fn sendv(self: *Backend, token: u64, socket: Socket, parts: []const []const u8) !void {
-        const metadata = self.gather_metadata orelse return error.GatherSendNotEnabled;
-        const op = try self.vacant(token, socket, .data);
-        const index = (@intFromPtr(op) - @intFromPtr(self.operations.ptr)) / @sizeOf(Operation);
-        assert(index < metadata.len);
-        const gather = &metadata[index];
-        gather.prepare(parts);
-        _ = try self.ring.sendmsg(token, socket, &gather.message, linux.MSG.NOSIGNAL);
-        op.* = .{ .kind = .data, .token = token, .socket = socket };
-        self.outstanding += 1;
+    /// `vectors` must stay valid and unmodified until this operation's terminal
+    /// completion, including a canceled one.
+    pub fn sendv(self: *Backend, cell: u32, token: u64, socket: Socket, vectors: []const c.iovec_const) !void {
+        if (!self.gather_enabled) return error.GatherSendNotEnabled;
+        assert(vectors.len > 0 and vectors.len <= common.max_vectors);
+        const op = try self.claim(cell, token, socket, .data);
+        op.message = .{
+            .name = null,
+            .namelen = 0,
+            .iov = vectors.ptr,
+            .iovlen = @intCast(vectors.len),
+            .control = null,
+            .controllen = 0,
+            .flags = 0,
+        };
+        try self.submitted(op, self.ring.sendmsg(cell, socket, &op.message, linux.MSG.NOSIGNAL));
     }
 
-    pub fn cancel(self: *Backend, token: u64, target: u64) !void {
-        assert(token != target);
-        const op = try self.vacant(token, -1, .cancel);
-        _ = try self.ring.cancel(token, target, 0);
-        op.* = .{ .kind = .cancel, .token = token };
-        self.outstanding += 1;
+    /// Cancels whatever operation currently occupies `target_cell`; an idle
+    /// target completes the cancellation with ENOENT.
+    pub fn cancel(self: *Backend, cell: u32, token: u64, target_cell: u32) !void {
+        assert(cell != target_cell and target_cell < self.operations.len);
+        const op = try self.claim(cell, token, -1, .cancel);
+        try self.submitted(op, self.ring.cancel(cell, target_cell, 0));
     }
 
     pub fn poll(self: *Backend, out: []Completion, timeout_ms: u32) !usize {
@@ -149,9 +153,9 @@ pub const Backend = struct {
             },
             else => return err,
         };
-        var cqes: [64]linux.io_uring_cqe = undefined;
+        var cqes: [256]linux.io_uring_cqe = undefined;
         var count = try self.copyReady(cqes[0..@min(out.len, cqes.len)]);
-        if (count == 0) {
+        if (count == 0 and timeout_ms != 0) {
             var fds = [_]c.pollfd{
                 .{ .fd = self.ring.fd, .events = c.POLL.IN, .revents = 0 },
                 .{ .fd = self.wake_fd, .events = c.POLL.IN, .revents = 0 },
@@ -169,24 +173,19 @@ pub const Backend = struct {
             // Socket readiness hints do not extend ownership. Only single-shot,
             // caller-buffer operations are admitted: no provided buffer or ZC.
             assert(cqe.flags & (linux.IORING_CQE_F_MORE | linux.IORING_CQE_F_NOTIF | linux.IORING_CQE_F_BUFFER) == 0);
-            var matched = false;
-            for (self.operations) |*op| {
-                if (op.kind == .free or op.token != cqe.user_data) continue;
-                assert(!matched and self.outstanding > 0);
-                matched = true;
-                var result = cqe.res;
-                if (op.kind == .accept and result >= 0) {
-                    common.configureAccepted(result, false) catch {
-                        common.closeFd(result);
-                        result = -@as(i32, @intFromEnum(c.E.IO));
-                    };
-                }
-                completion.* = .{ .token = op.token, .result = result };
-                op.* = .{};
-                self.outstanding -= 1;
-                break;
+            assert(cqe.user_data < self.operations.len and self.outstanding > 0);
+            const op = &self.operations[@intCast(cqe.user_data)];
+            assert(op.kind != .free);
+            var result = cqe.res;
+            if (op.kind == .accept and result >= 0) {
+                common.configureAccepted(result, false) catch {
+                    common.closeFd(result);
+                    result = -@as(i32, @intFromEnum(c.E.IO));
+                };
             }
-            assert(matched);
+            completion.* = .{ .token = op.token, .result = result };
+            op.* = .{};
+            self.outstanding -= 1;
         }
         assert(self.ring.cq.overflow.* == 0 and self.ring.sq.dropped.* == 0);
         return count;
@@ -220,8 +219,10 @@ pub const Backend = struct {
         // Interrupted wake is backed by the engine's finite deadline poll.
     }
 
-    pub fn close(self: *Backend, socket: Socket) void {
-        for (self.operations) |op| assert(op.kind != .data or op.socket != socket);
+    /// The caller names the socket's data cell so the adapter can assert that no
+    /// operation still borrows the descriptor.
+    pub fn close(self: *Backend, cell: u32, socket: Socket) void {
+        assert(cell < self.operations.len and self.operations[cell].kind == .free);
         common.closeFd(socket);
     }
 

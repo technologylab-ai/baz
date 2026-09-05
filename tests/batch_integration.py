@@ -30,7 +30,7 @@ class BatchServer(wire.Server):
         if kind is None:
             wire.require(self.stats["worker_dispatches"] == 0, "unexpected worker dispatch")
             wire.require(self.stats["max_batch_responses"] <= self.options["response_batch_limit"], "response batch limit exceeded")
-            wire.require(self.stats["max_inline_callbacks_per_turn"] <= 64, "global callback turn limit exceeded")
+            wire.require(self.stats["max_inline_callbacks_per_turn"] <= self.stats["callbacks_per_turn"], "global callback turn limit exceeded")
         return result
 
 
@@ -67,7 +67,7 @@ def mixed(count):
 
 
 def run(binary, emit, sessions):
-    for invalid in (0, 17):
+    for invalid in (0, 512):
         result = subprocess.run([str(binary), "--response-batch-limit", str(invalid)], cwd=wire.ROOT, capture_output=True, timeout=5)
         wire.require(result.returncode != 0 and b"InvalidConfiguration" in result.stderr, "invalid batch limit admitted")
     emit("batch_limit_configuration_rejected")
@@ -150,7 +150,7 @@ def run(binary, emit, sessions):
                          "deep pipeline did not complete on one reused connection")
             wire.require(stats["response_batch_limit"] == 16 and 1 < stats["max_batch_responses"] <= 16,
                          "deep client pipeline changed or failed to exercise the server batch bound")
-            wire.require(stats["max_inline_callbacks_per_turn"] <= 64,
+            wire.require(stats["max_inline_callbacks_per_turn"] <= stats["callbacks_per_turn"],
                          "deep pipeline exceeded the global callback turn budget")
             wire.require(stats["allocation_calls_after_start"] == 0 and
                          stats["live_connections"] == stats["live_operations"] == 0,
@@ -210,9 +210,9 @@ def run(binary, emit, sessions):
     sessions.append(dict(phase="borrowed_finished_cells", stats=server.stats))
     emit("distinct_finished_request_bodies_and_headers_survive_partial_sends")
 
-    with BatchServer(binary, output_bytes=32) as server:
+    with BatchServer(binary, output_bytes=1024) as server:
         with server.connect() as sock:
-            sock.sendall(wire.REQUEST * 3 + get(b"/buffered?" + b"x" * 32) + wire.REQUEST)
+            sock.sendall(wire.REQUEST * 3 + get(b"/buffered?" + b"x" * 1024) + wire.REQUEST)
             reader = wire.ResponseReader(sock)
             for _ in range(3):
                 wire.require(reader.response()[2] == wire.PLAINTEXT, "buffer boundary overtook prefix")
@@ -234,7 +234,7 @@ def run(binary, emit, sessions):
                 reader = wire.ResponseReader(sock)
                 for _ in range(512):
                     wire.require(reader.response()[2] == wire.PLAINTEXT, "busy connection lost progress")
-    wire.require(server.stats["completed"] == 3585 and server.stats["max_inline_callbacks_per_turn"] <= 64, "global callback budget/progress accounting differs")
+    wire.require(server.stats["completed"] == 3585 and server.stats["max_inline_callbacks_per_turn"] <= server.stats["callbacks_per_turn"], "global callback budget/progress accounting differs")
     sessions.append(dict(phase="fairness", stats=server.stats))
     emit("global_callback_budget_rotates_busy_connections")
 

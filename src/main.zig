@@ -25,7 +25,8 @@ pub fn main(init: std.process.Init) !void {
             std.debug.print("zig-http: bounded experimental Linux io_uring / macOS kqueue HTTP/1.1\n" ++
                 "--port N --connections N --execution workers|inline --workers N --max-body N --max-header N\n" ++
                 "--timeout-ms N --duration-ms N --send-chunk N --gather-send 0|1 --stall-ms N\n" ++
-                "--response-batch-limit N --socket-send-buffer N --output-bytes N --max-response N --memory-budget N --index FILE\n", .{});
+                "--response-batch-limit N --socket-send-buffer N --output-bytes N --max-response N --memory-budget N --index FILE\n" ++
+                "--borrow-copy-threshold N --callbacks-per-turn N --callback-timing 0|1 --deadline-sweep-ms N --shards N\n", .{});
             return;
         }
         const value = args.next() orelse return error.MissingArgument;
@@ -51,7 +52,17 @@ pub fn main(init: std.process.Init) !void {
         } else if (std.mem.eql(u8, flag, "--gather-send")) {
             config.gather_send = if (std.mem.eql(u8, value, "1")) true else if (std.mem.eql(u8, value, "0")) false else return error.InvalidGatherSend;
         } else if (std.mem.eql(u8, flag, "--response-batch-limit")) {
-            config.response_batch_limit = try std.fmt.parseInt(u8, value, 10);
+            config.response_batch_limit = try std.fmt.parseInt(u16, value, 10);
+        } else if (std.mem.eql(u8, flag, "--borrow-copy-threshold")) {
+            config.borrow_copy_threshold = try std.fmt.parseInt(u32, value, 10);
+        } else if (std.mem.eql(u8, flag, "--callbacks-per-turn")) {
+            config.callbacks_per_turn = try std.fmt.parseInt(u32, value, 10);
+        } else if (std.mem.eql(u8, flag, "--callback-timing")) {
+            config.callback_timing = if (std.mem.eql(u8, value, "1")) true else if (std.mem.eql(u8, value, "0")) false else return error.InvalidCallbackTiming;
+        } else if (std.mem.eql(u8, flag, "--deadline-sweep-ms")) {
+            config.deadline_sweep_ms = try std.fmt.parseInt(u32, value, 10);
+        } else if (std.mem.eql(u8, flag, "--shards")) {
+            config.shards = try std.fmt.parseInt(u8, value, 10);
         } else if (std.mem.eql(u8, flag, "--socket-send-buffer")) {
             config.socket_send_buffer_bytes = try std.fmt.parseInt(u32, value, 10);
         } else if (std.mem.eql(u8, flag, "--stall-ms")) {
@@ -92,7 +103,8 @@ pub fn main(init: std.process.Init) !void {
     server.run() catch |err| {
         // A stuck callback or uncertain kernel submission still owns memory.
         // Terminate the process; never unwind live loans or kill a worker alone.
-        std.debug.print("FATAL {s}; retained loans require process termination\n", .{@errorName(err)});
+        // The counters name the retained owners for the shutdown diagnosis.
+        std.debug.print("FATAL {s}; retained loans require process termination; live_connections={d} live_operations={d}\n", .{ @errorName(err), server.stats.live_connections, server.stats.live_operations });
         std.c._exit(70);
     };
     server.stats.allocation_calls_after_start = budget.late_calls.load(.acquire);
@@ -175,14 +187,24 @@ fn handle(context: *api.Context) !api.Action {
         try writer.begin(200, "text/plain", 13);
         try writer.borrow("Hello, World!");
     } else if (std.mem.eql(u8, path, "/buffered")) {
-        // A generated response exercises the ordinary output buffer ownership.
+        // A generated response exercises the ordinary output arena ownership.
         // Distinct targets make accidental reuse across a pipeline observable.
-        if (context.request.target.len > writer.buffer.len) {
-            try writer.begin(413, "text/plain", 0);
-            return writer.finish();
+        // The arena is shared with earlier unsent responses: a reservation that
+        // does not fit now flushes the head and retries in an empty arena.
+        const target = context.request.target;
+        if (context.event == .request) {
+            if (target.len > writer.capacity()) {
+                try writer.begin(413, "text/plain", 0);
+                return writer.finish();
+            }
+            try writer.begin(200, "text/plain", target.len);
         }
-        try writer.begin(200, "text/plain", context.request.target.len);
-        try writer.write(context.request.target);
+        const destination = writer.reserve(target.len) catch |err| switch (err) {
+            error.WouldBlock => return writer.flush(),
+            else => return err,
+        };
+        @memcpy(destination, target);
+        writer.commit(target.len);
     } else if (std.mem.eql(u8, path, "/index.html") or std.mem.eql(u8, path, "/")) {
         try writer.begin(200, "text/html; charset=utf-8", demo.html.len);
         try writer.borrow(demo.html);

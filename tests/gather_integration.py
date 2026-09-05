@@ -23,7 +23,8 @@ def run(binary, emit, sessions):
     for mode, workers in (("inline", 0), ("workers", 2)):
         for gathered in (0, 1):
             with wire.Server(binary, execution=mode, workers=workers,
-                             response_batch_limit=1, gather_send=gathered, send_chunk=65536) as server:
+                             response_batch_limit=1, gather_send=gathered, send_chunk=65536,
+                             borrow_copy_threshold=0) as server:
                 wire.plaintext(server)
             expected = 1 if gathered else 2
             wire.require(server.stats["completed"] == 1 and
@@ -57,7 +58,7 @@ def run(binary, emit, sessions):
                 response += chunk
             wire.require(response[header_bytes:] == wire.PLAINTEXT, "header boundary fixture body")
     for cap in (1, 7, header_bytes - 1, header_bytes, header_bytes + 1, 65536):
-        with wire.Server(binary, execution="inline", workers=0, response_batch_limit=1, gather_send=1,
+        with wire.Server(binary, execution="inline", workers=0, response_batch_limit=1, gather_send=1, borrow_copy_threshold=0,
                          send_chunk=cap) as server:
             with server.connect() as sock:
                 reader = wire.ResponseReader(sock)
