@@ -293,14 +293,14 @@ pub const Parser = struct {
         if (target.len > self.limits.max_target_bytes) return error.TargetTooLong;
         try validateTarget(method, target);
         const version = line[target_end + 1 ..];
-        if (!equal(u8, version, "HTTP/1.1")) {
+        if (!fixedEqual(version, "HTTP/1.1")) {
             if (version.len == 8 and equal(u8, version[0..5], "HTTP/") and std.ascii.isDigit(version[5]) and version[6] == '.' and std.ascii.isDigit(version[7])) return error.UnsupportedVersion;
             return error.BadRequest;
         }
         self.method_end = method_end;
         self.target_start = target_start;
         self.target_end = target_end;
-        self.head_only = equal(u8, method, "HEAD");
+        self.head_only = fixedEqual(method, "HEAD");
     }
 
     fn field(self: *Parser, line: []const u8, trailer: bool) ParseError!void {
@@ -319,39 +319,48 @@ pub const Parser = struct {
             }
             return;
         }
-        if (equalCase(name, "host")) {
-            if (self.host_seen) return error.BadRequest;
-            try validateAuthority(value, false);
-            self.host_seen = true;
-        } else if (equalCase(name, "content-length")) {
-            if (self.content_length != null or self.chunked) return error.BadRequest;
-            const length = try decimalLength(value, self.limits.max_body_bytes);
-            self.content_length = length;
-        } else if (equalCase(name, "transfer-encoding")) {
-            if (self.chunked or self.content_length != null) return error.BadRequest;
-            try transferEncoding(value);
-            self.chunked = true;
-        } else if (equalCase(name, "connection")) {
-            var values = std.mem.splitScalar(u8, value, ',');
-            while (values.next()) |raw| {
-                const option = trim(raw);
-                // RFC 9110 list recipients ignore a reasonable number of empty
-                // elements; total elements/work are bounded by the header budget.
-                if (option.len == 0) continue;
-                if (!isToken(option)) return error.BadRequest;
-                if (equalCase(option, "close")) self.keep_alive = false;
-            }
-        } else if (equalCase(name, "expect")) {
-            var values = std.mem.splitScalar(u8, value, ',');
-            var found = false;
-            while (values.next()) |raw| {
-                const expectation = trim(raw);
-                if (expectation.len == 0) continue;
-                if (!equalCase(expectation, "100-continue")) return error.ExpectationFailed;
-                found = true;
-            }
-            if (!found) return error.ExpectationFailed;
-            self.expect_continue = true;
+        // The interpreted field names have distinct lengths, so one length
+        // switch selects the single case-insensitive comparison to perform.
+        switch (name.len) {
+            "host".len => if (equalCase(name, "host")) {
+                if (self.host_seen) return error.BadRequest;
+                try validateAuthority(value, false);
+                self.host_seen = true;
+            },
+            "content-length".len => if (equalCase(name, "content-length")) {
+                if (self.content_length != null or self.chunked) return error.BadRequest;
+                const length = try decimalLength(value, self.limits.max_body_bytes);
+                self.content_length = length;
+            },
+            "transfer-encoding".len => if (equalCase(name, "transfer-encoding")) {
+                if (self.chunked or self.content_length != null) return error.BadRequest;
+                try transferEncoding(value);
+                self.chunked = true;
+            },
+            "connection".len => if (equalCase(name, "connection")) {
+                var values = std.mem.splitScalar(u8, value, ',');
+                while (values.next()) |raw| {
+                    const option = trim(raw);
+                    // RFC 9110 list recipients ignore a reasonable number of empty
+                    // elements; total elements/work are bounded by the header budget.
+                    if (option.len == 0) continue;
+                    if (!isToken(option)) return error.BadRequest;
+                    if (equalCase(option, "close")) self.keep_alive = false;
+                }
+            },
+            "expect".len => if (equalCase(name, "expect")) {
+                var values = std.mem.splitScalar(u8, value, ',');
+                var found = false;
+                while (values.next()) |raw| {
+                    const expectation = trim(raw);
+                    if (expectation.len == 0) continue;
+                    if (!equalCase(expectation, "100-continue")) return error.ExpectationFailed;
+                    found = true;
+                }
+                if (!found) return error.ExpectationFailed;
+                self.expect_continue = true;
+            },
+            else => {},
         }
     }
 
@@ -435,6 +444,16 @@ const ByteClass = struct {
 const byte_class = ByteClass.init();
 
 const Lane = @Vector(16, u8);
+
+/// Equality against a comptime string as one or two integer compares, which
+/// is cheaper than the generic slice comparison for these tiny fixed names.
+pub inline fn fixedEqual(bytes: []const u8, comptime expected: []const u8) bool {
+    if (bytes.len != expected.len) return false;
+    const Int = std.meta.Int(.unsigned, 8 * expected.len);
+    const actual: Int = @bitCast(bytes[0..expected.len].*);
+    const wanted: Int = @bitCast(expected[0..expected.len].*);
+    return actual == wanted;
+}
 
 /// Index of the first CR or LF at or after `start`; one 16-byte lane per step.
 fn findLineControl(bytes: []const u8, start: usize) ?usize {

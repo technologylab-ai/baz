@@ -135,7 +135,7 @@ fn handle(context: *api.Context) !api.Action {
     const writer = context.writer;
     // Exact-target fast path for the measured route; every other form takes
     // the general route resolution below.
-    if (context.request.target.len == 10 and std.mem.eql(u8, context.request.target, "/plaintext")) {
+    if (api.http.fixedEqual(context.request.target, "/plaintext")) {
         try writer.begin(200, "text/plain", 13);
         try writer.borrow("Hello, World!");
         return writer.finish();

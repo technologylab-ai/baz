@@ -69,18 +69,29 @@ pub fn reason(status: u16) []const u8 {
 
 /// Writes the shortest decimal representation; returns the byte count.
 pub fn putDecimal(out: []u8, value: usize) usize {
-    var digits: [20]u8 = undefined;
+    var count: usize = 1;
+    var probe = value;
+    while (probe >= 10) : (probe /= 10) count += 1;
     var remaining = value;
-    var at: usize = digits.len;
-    while (true) {
+    var at = count;
+    while (at > 0) {
         at -= 1;
-        digits[at] = @intCast('0' + remaining % 10);
+        out[at] = @intCast('0' + remaining % 10);
         remaining /= 10;
-        if (remaining == 0) break;
     }
-    const count = digits.len - at;
-    @memcpy(out[0..count], digits[at..]);
     return count;
+}
+
+/// Copy a short span with word stores instead of a libc call; the destination
+/// must hold `src.len` bytes.
+pub inline fn copyShort(dst: []u8, src: []const u8) void {
+    if (src.len > 32) {
+        @memcpy(dst[0..src.len], src);
+        return;
+    }
+    var at: usize = 0;
+    while (at + 8 <= src.len) : (at += 8) dst[at..][0..8].* = src[at..][0..8].*;
+    while (at < src.len) : (at += 1) dst[at] = src[at];
 }
 
 /// Writes exactly eight lowercase hex digits and CRLF: a valid chunk-size line
@@ -201,8 +212,10 @@ pub const Writer = struct {
         var n = self.buffered;
         const out = self.arena;
         if (status == 200) {
+            // Fixed-size copy of the cached prefix; the reserve guarantees room
+            // and the logical end advances by the prefix's real length.
             const cache = self.header_cache;
-            @memcpy(out[n..][0..cache.ok_prefix_len], cache.ok_prefix[0..cache.ok_prefix_len]);
+            out[n..][0..cache.ok_prefix.len].* = cache.ok_prefix;
             n += cache.ok_prefix_len;
         } else {
             @memcpy(out[n..][0..9], "HTTP/1.1 ");
@@ -225,7 +238,7 @@ pub const Writer = struct {
         }
         @memcpy(out[n..][0..14], "Content-Type: ");
         n += 14;
-        @memcpy(out[n..][0..content_type.len], content_type);
+        copyShort(out[n..], content_type);
         n += content_type.len;
         @memcpy(out[n..][0..2], "\r\n");
         n += 2;
@@ -288,7 +301,7 @@ pub const Writer = struct {
         if (self.frozen or self.generatedBytes() != 0 or self.reserved != 0 or self.borrowed != null)
             return error.InvalidState;
         if (bytes.len <= self.copy_threshold and bytes.len <= self.arena.len - self.buffered - self.slack()) {
-            @memcpy(self.arena[self.buffered..][0..bytes.len], bytes);
+            copyShort(self.arena[self.buffered..], bytes);
             self.buffered += bytes.len;
             self.copied_borrow = true;
             return;
