@@ -131,6 +131,7 @@ The default startup limits are explicit:
 | Inline callbacks per event-loop turn | connections × batch limit, at most 8192 | `--callbacks-per-turn`; each connection gets at most its batch limit per turn from a FIFO ready ring. |
 | Deadline sweep | 100 ms | `--deadline-sweep-ms`; 1–1000; touched slots are checked sooner. |
 | Submit batch | 1 drain | `--submit-batch`; submit queued sends after this many drains within a turn; 0 submits only when the turn polls. |
+| Pre-armed receive | on with io_uring, off with kqueue | `--prearm-receive 0|1`; arm the next receive while the batch is still being sent. |
 | Per-callback timing | off | `--callback-timing 1` records exact queue/handler maxima at two clock reads per callback. |
 | I/O shards | one per allowed CPU (Linux, at most 16), 1 (macOS) | `--shards`; 1–64, inline execution only; each shard reserves full slot storage and a shared counter keeps `--connections` the process-wide ceiling; `--shard-affinity 1` pins shard i to allowed CPU i. |
 | Logical response body | 16 MiB | `--max-response`; counted across flushes. |

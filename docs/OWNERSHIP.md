@@ -174,7 +174,9 @@ maxima stay zero. Worker mode keeps a full slot scan per turn for results.
 Each connection has separate receive and send operation cells, each with its
 own cancel cell. When a batch of finished responses drains, the loop first
 arms the next receive into the free input tail, compacting the consumed prefix
-beforehand when no frozen cell borrows request input, and then submits the
+beforehand when no frozen cell borrows request input (`prearm_receive`,
+on for io_uring where the receive rides the same submission and off for kqueue
+where it would cost two syscalls that find no data), and then submits the
 send; by default the transport submits after every drain (`submit_batch`) so
 responses leave before the turn ends instead of at its poll. Bytes that arrive
 while that batch is still being sent, or while a flushed request waits to
