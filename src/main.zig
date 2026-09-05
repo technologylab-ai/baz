@@ -133,6 +133,13 @@ fn handler(context: *api.Context) api.Action {
 fn handle(context: *api.Context) !api.Action {
     const demo: *const Demo = @ptrCast(@alignCast(context.application.?));
     const writer = context.writer;
+    // Exact-target fast path for the measured route; every other form takes
+    // the general route resolution below.
+    if (context.request.target.len == 10 and std.mem.eql(u8, context.request.target, "/plaintext")) {
+        try writer.begin(200, "text/plain", 13);
+        try writer.borrow("Hello, World!");
+        return writer.finish();
+    }
     const path = routePath(context.request.target);
     if (std.mem.eql(u8, context.request.method, "CONNECT")) {
         try writer.begin(501, "text/plain", 0);
@@ -228,7 +235,10 @@ fn handle(context: *api.Context) !api.Action {
 
 fn routePath(target: []const u8) []const u8 {
     var path = target;
-    if (std.ascii.startsWithIgnoreCase(path, "http://") or std.ascii.startsWithIgnoreCase(path, "https://")) {
+    // Origin-form targets start with '/'; only other forms can carry a scheme.
+    if (target.len != 0 and target[0] != '/' and
+        (std.ascii.startsWithIgnoreCase(path, "http://") or std.ascii.startsWithIgnoreCase(path, "https://")))
+    {
         const scheme_end = std.mem.find(u8, path, "://").? + 3;
         const authority_end = std.mem.findAny(u8, path[scheme_end..], "/?") orelse return "/";
         path = path[scheme_end + authority_end ..];

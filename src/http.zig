@@ -255,34 +255,39 @@ pub const Parser = struct {
             if (self.scan >= limit) return limit_error;
             return null;
         }
-        // Vectorised search for the line end. A CR is legal only immediately
-        // before that LF; a CR anywhere else, or an LF without CR, is malformed.
-        // Bytes before `from` were classified by an earlier call except for the
-        // byte at scan - 1, whose CR-ness is decided by its successor.
-        const from = if (self.scan > self.line_start) self.scan - 1 else self.scan;
-        if (std.mem.findScalarPos(u8, bytes[0..end], self.scan, '\n')) |lf| {
-            if (lf == self.line_start) return error.BadRequest;
-            const cr = std.mem.findScalarPos(u8, bytes[0..lf], from, '\r') orelse return error.BadRequest;
-            if (cr != lf - 1) return error.BadRequest;
-            const line = bytes[self.line_start..cr];
-            self.scan = lf + 1;
+        // A CR that ended the previous fragment is decided by this byte.
+        if (self.scan > self.line_start and bytes[self.scan - 1] == '\r') {
+            if (bytes[self.scan] != '\n') return error.BadRequest;
+            const line = bytes[self.line_start .. self.scan - 1];
+            self.scan += 1;
             self.line_start = self.scan;
             return line;
         }
-        if (std.mem.findScalarPos(u8, bytes[0..end], from, '\r')) |cr| {
-            // Only a CR as the final examined byte may still be followed by LF.
-            if (cr + 1 < end) return error.BadRequest;
+        // One vector pass finds the first CR or LF. A CR is legal only when
+        // immediately followed by LF; a bare LF or bare CR is malformed.
+        const hit = findLineControl(bytes[0..end], self.scan) orelse {
+            self.scan = end;
+            if (self.scan >= limit) return limit_error;
+            return null;
+        };
+        if (bytes[hit] == '\n') return error.BadRequest;
+        if (hit + 1 >= end) {
+            self.scan = hit + 1;
+            if (self.scan >= limit) return limit_error;
+            return null;
         }
-        self.scan = end;
-        if (self.scan >= limit) return limit_error;
-        return null;
+        if (bytes[hit + 1] != '\n') return error.BadRequest;
+        const line = bytes[self.line_start..hit];
+        self.scan = hit + 2;
+        self.line_start = self.scan;
+        return line;
     }
 
     fn requestLine(self: *Parser, line: []const u8) ParseError!void {
-        const method_end = std.mem.findScalar(u8, line, ' ') orelse return error.BadRequest;
+        const method_end = findByte(line, ' ') orelse return error.BadRequest;
         if (!isToken(line[0..method_end])) return error.BadRequest;
         const target_start = method_end + 1;
-        const target_end = std.mem.findScalarPos(u8, line, target_start, ' ') orelse return error.BadRequest;
+        const target_end = (findByte(line[target_start..], ' ') orelse return error.BadRequest) + target_start;
         const method = line[0..method_end];
         const target = line[target_start..target_end];
         if (target.len > self.limits.max_target_bytes) return error.TargetTooLong;
@@ -301,11 +306,11 @@ pub const Parser = struct {
     fn field(self: *Parser, line: []const u8, trailer: bool) ParseError!void {
         if (self.field_count == self.limits.max_header_count) return error.HeadersTooLarge;
         self.field_count += 1;
-        const colon = std.mem.findScalar(u8, line, ':') orelse return error.BadRequest;
+        const colon = findByte(line, ':') orelse return error.BadRequest;
         const name = line[0..colon];
         if (!isToken(name)) return error.BadRequest;
         const value = trim(line[colon + 1 ..]);
-        for (value) |c| if ((c < 0x20 and c != '\t') or c == 0x7f) return error.BadRequest;
+        for (value) |c| if (!byte_class.value[c]) return error.BadRequest;
         if (trailer) {
             // Trailers are never merged into header lookup or acted upon. Reject
             // common forbidden fields explicitly; unknown valid fields are ignored.
@@ -390,7 +395,11 @@ pub const Parser = struct {
 };
 
 fn trim(bytes: []const u8) []const u8 {
-    return std.mem.trim(u8, bytes, " \t");
+    var start: usize = 0;
+    var end = bytes.len;
+    while (start < end and (bytes[start] == ' ' or bytes[start] == '\t')) start += 1;
+    while (end > start and (bytes[end - 1] == ' ' or bytes[end - 1] == '\t')) end -= 1;
+    return bytes[start..end];
 }
 
 fn tokenByteSlow(c: u8) bool {
@@ -406,18 +415,58 @@ const ByteClass = struct {
     token: [256]bool,
     /// RFC 3986 pchar/query octets except '%', which needs two hex digits.
     path: [256]bool,
+    /// reg-name octets except '%': unreserved and sub-delims.
+    host: [256]bool,
+    /// Field value octets: visible ASCII, HTAB, SP and obs-text.
+    value: [256]bool,
     fn init() ByteClass {
         @setEvalBranchQuota(20_000);
-        var class: ByteClass = .{ .token = undefined, .path = undefined };
+        var class: ByteClass = .{ .token = undefined, .path = undefined, .host = undefined, .value = undefined };
         for (0..256) |index| {
             const c: u8 = @intCast(index);
             class.token[index] = tokenByteSlow(c);
             class.path[index] = unreserved(c) or subDelimiter(c) or c == ':' or c == '@' or c == '/' or c == '?';
+            class.host[index] = unreserved(c) or subDelimiter(c);
+            class.value[index] = !((c < 0x20 and c != '\t') or c == 0x7f);
         }
         return class;
     }
 };
 const byte_class = ByteClass.init();
+
+const Lane = @Vector(16, u8);
+
+/// Index of the first CR or LF at or after `start`; one 16-byte lane per step.
+fn findLineControl(bytes: []const u8, start: usize) ?usize {
+    assert(start <= bytes.len);
+    var at = start;
+    const cr: Lane = @splat('\r');
+    const lf: Lane = @splat('\n');
+    while (at + 16 <= bytes.len) : (at += 16) {
+        const lane: Lane = bytes[at..][0..16].*;
+        const hits: u16 = @bitCast((lane == cr) | (lane == lf));
+        if (hits != 0) return at + @ctz(hits);
+    }
+    while (at < bytes.len) : (at += 1) {
+        if (bytes[at] == '\r' or bytes[at] == '\n') return at;
+    }
+    return null;
+}
+
+/// Index of the first `needle` in `bytes`; short header lines fit a few lanes.
+fn findByte(bytes: []const u8, needle: u8) ?usize {
+    var at: usize = 0;
+    const wanted: Lane = @splat(needle);
+    while (at + 16 <= bytes.len) : (at += 16) {
+        const lane: Lane = bytes[at..][0..16].*;
+        const hits: u16 = @bitCast(lane == wanted);
+        if (hits != 0) return at + @ctz(hits);
+    }
+    while (at < bytes.len) : (at += 1) {
+        if (bytes[at] == needle) return at;
+    }
+    return null;
+}
 
 fn tokenByte(c: u8) bool {
     return byte_class.token[c];
@@ -633,7 +682,7 @@ fn validateAuthority(bytes: []const u8, require_port: bool) ParseError!void {
     } else {
         while (host_end < bytes.len and bytes[host_end] != ':') : (host_end += 1) {
             const c = bytes[host_end];
-            if (unreserved(c) or subDelimiter(c)) continue;
+            if (byte_class.host[c]) continue;
             if (c == '%' and bytes.len - host_end >= 3 and hexDigit(bytes[host_end + 1]) != null and hexDigit(bytes[host_end + 2]) != null) {
                 host_end += 2;
                 continue;
