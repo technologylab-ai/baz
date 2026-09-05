@@ -28,30 +28,37 @@ UnsupportedTransferEncoding, ExpectationFailed, UnsupportedVersion.
 
 `src/transport.zig` exports selected `Backend`, `Socket` (i32 for POSIX MVP),
 `Completion { token: u64, result: i32 }` and `name`.
-Backend methods: `init(allocator, max_connections: u16, port: u16) !Backend`,
-`deinit()`, `accept(token: u64) !void`,
-`recv(token, socket, buffer: []u8) !void`,
-`send(token, socket, bytes: []const u8) !void`,
-`enableGatherSend() !void` during startup,
-`sendv(token, socket, parts: []const []const u8) !void`,
-`cancel(token: u64, target: u64) !void`,
+Operations are addressed by caller-chosen cells: `cellCount(max_connections)`
+= `2 × (max_connections + 1)` fixed records. The server numbers them data
+cell = slot index, cancel cell = slots + index, then accept and cancel-accept.
+One cell never holds two live operations, so admission and completion matching
+are constant-time and the token is returned from the record.
+Backend methods: `init(allocator, max_connections: u16, port: u16, reuse_port: bool) !Backend`,
+`deinit()`, `accept(cell: u32, token: u64) !void`,
+`recv(cell, token, socket, buffer: []u8) !void`,
+`send(cell, token, socket, bytes: []const u8) !void`,
+`enableGather() !void` during startup,
+`sendv(cell, token, socket, vectors: []const iovec_const) !void`,
+`cancel(cell, token, target_cell: u32) !void`,
 `poll(out: []Completion, timeout_ms: u32) !usize`,
-`close(socket) void`, `shutdown(socket) void`, `port() u16`.
+`close(cell, socket) void`, `shutdown(socket) void`, `port() u16`.
 Accepted sockets are returned as nonnegative completion results; zero recv is EOF;
 negative results are terminal OS failures. Cancellation reports target and
-cancel-request completions separately. One data operation per connection and
-one pending accept suffice for the first engine. Buffers remain borrowed until
-the target completion, and close is only after outstanding operations return.
-`wake()` is thread-safe for worker completions if available; agree a documented
-short bounded poll interval if implementing that hook would block progress.
+cancel-request completions separately; cancelling an idle cell reports ENOENT.
+Buffers and gather vectors remain borrowed until the target completion, and
+close is only after outstanding operations return. A busy cell yields
+`error.OperationCellBusy`. `wake()` is thread-safe for worker completions.
 
 Linux uses actual low-level io_uring accept/recv/send, runtime opcode probes,
 finite queues and explicit cancel drain. macOS uses nonblocking sockets/kqueue
 and the same completion interface. IPv4 loopback binding initially; CLI can
 expose other bind addresses later. No per-operation allocation.
 
-Gather metadata is separately reserved during startup when enabled. At most 80
-parts borrow payload storage through the terminal target completion. The server
-caps aggregate bytes and advances partial sends across part boundaries. Adapter
-`operation_bytes` allows Config.heapBytes to include exact requested operation
-storage; these counts exclude kernel ring/socket allocations.
+Gather vectors live in the caller's per-connection startup storage; the adapter
+points its msghdr at them and copies nothing. Up to `max_vectors` (1024) may be
+submitted; the server bounds a batch at `2 × response_batch_limit + 1`. The
+server caps aggregate bytes and advances partial sends across vector
+boundaries. Adapter `operation_bytes` allows Config.heapBytes to include exact
+requested operation storage; these counts exclude kernel ring/socket allocations.
+With `reuse_port`, several backends bind one port and Linux distributes
+connections across them; XNU does not.

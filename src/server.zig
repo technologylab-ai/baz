@@ -339,6 +339,8 @@ pub const Server = struct {
     header_cache: api.HeaderCache = .{},
     date: [29]u8 = undefined,
     date_second: u64 = std.math.maxInt(u64),
+    /// Shared process-wide ceiling when running as a shard; null standalone.
+    admission: ?*Admission = null,
 
     const clock_refresh_callbacks: u32 = 16;
 
@@ -677,6 +679,13 @@ pub const Server = struct {
                 transport.closeFd(completion.result);
                 return;
             }
+            if (self.admission) |admission| {
+                if (!admission.admit()) {
+                    self.stats.rejected += 1;
+                    transport.closeFd(completion.result);
+                    return;
+                }
+            }
             const index = self.free_slots[self.free_count - 1];
             const slot = &self.slots[index];
             assert(!slot.in_use and slot.phase.load(.acquire) == .io);
@@ -687,6 +696,7 @@ pub const Server = struct {
                 transport.closeFd(slot.fd);
                 slot.fd = -1;
                 self.stats.rejected += 1;
+                if (self.admission) |admission| admission.release();
                 return;
             }
             self.free_count -= 1;
@@ -1149,6 +1159,7 @@ pub const Server = struct {
         }
         assert(slot.in_use and self.stats.live_connections > 0);
         self.stats.live_connections -= 1;
+        if (self.admission) |admission| admission.release();
         slot.in_use = false;
         slot.closing = false;
         slot.received = 0;
@@ -1179,6 +1190,35 @@ pub const Server = struct {
     }
 };
 
+/// Process-wide connection ceiling shared by every shard. Touched once per
+/// accept and once per release; a shard that finds the ceiling reached closes
+/// the accepted descriptor exactly as a full single owner does.
+pub const Admission = struct {
+    limit: u32,
+    live: std.atomic.Value(u32) = .init(0),
+    peak: std.atomic.Value(u32) = .init(0),
+
+    /// Reserve one connection; false when the ceiling is already reached.
+    pub fn admit(self: *Admission) bool {
+        const before = self.live.fetchAdd(1, .acq_rel);
+        if (before >= self.limit) {
+            _ = self.live.fetchSub(1, .acq_rel);
+            return false;
+        }
+        const now_live = before + 1;
+        var peak = self.peak.load(.monotonic);
+        while (peak < now_live) {
+            peak = self.peak.cmpxchgWeak(peak, now_live, .monotonic, .monotonic) orelse break;
+        }
+        return true;
+    }
+
+    pub fn release(self: *Admission) void {
+        const before = self.live.fetchSub(1, .acq_rel);
+        assert(before > 0);
+    }
+};
+
 /// Several independent I/O owners on one port. Each shard is a complete
 /// Server with its own listener (SO_REUSEPORT), transport, slots, arenas and
 /// counters; they share only the stop flags. Shard 0 runs on the calling
@@ -1190,28 +1230,35 @@ pub const Cluster = struct {
     shards: []*Server,
     threads: []?std.Thread,
     failures: []?anyerror,
+    admission: Admission,
     port_number: u16,
 
-    /// 0 selects one shard per CPU the process may run on (Linux), else 1.
+    pub const max_auto_shards: u8 = 16;
+
+    /// 0 selects one shard per CPU the process may run on (Linux, at most
+    /// max_auto_shards because every shard reserves full slot storage), else 1.
     pub fn resolveShards(config: Config) u8 {
         if (config.shards != 0) return config.shards;
+        // Worker execution keeps one owner; only an explicit request is an error.
+        if (config.execution != .inline_event_loop) return 1;
         if (@import("builtin").os.tag == .linux) {
             var set: std.os.linux.cpu_set_t = undefined;
             if (std.os.linux.sched_getaffinity(0, @sizeOf(std.os.linux.cpu_set_t), &set) == 0) {
                 const count = std.os.linux.CPU_COUNT(set);
-                return @intCast(@min(@max(count, 1), 64));
+                return @intCast(@min(@max(count, 1), max_auto_shards));
             }
         }
         return 1;
     }
 
+    /// Every shard keeps the full slot capacity: the kernel's hash may place
+    /// more than an even share on one listener, and refusing those would make
+    /// the process-wide limit depend on luck. The cluster enforces the limit
+    /// with one shared counter instead.
     pub fn shardConfig(config: Config, shards: u8, index: u8, port_number: u16) Config {
         assert(shards > 0 and index < shards);
         var shard = config;
         shard.shards = shards;
-        const base: u16 = config.connections / shards;
-        const extra: u16 = if (index < config.connections % shards) 1 else 0;
-        shard.connections = base + extra;
         shard.port = port_number;
         shard.reuse_port = shards > 1;
         // Stacks for the other shards are reserved by the cluster, not per shard.
@@ -1222,7 +1269,7 @@ pub const Cluster = struct {
     pub fn validate(config: Config) !void {
         try config.validate();
         const shards = resolveShards(config);
-        if (shards == 0 or shards > 64 or shards > config.connections) return error.InvalidConfiguration;
+        if (shards == 0 or shards > 64) return error.InvalidConfiguration;
         if (shards > 1 and config.execution != .inline_event_loop) return error.InvalidConfiguration;
         // XNU delivers every connection to the most recently bound reuse-port
         // listener (observed 2026-09-05), so extra macOS shards only shrink
@@ -1264,7 +1311,11 @@ pub const Cluster = struct {
             // A port chosen by the OS for the first shard binds every other one.
             if (index == 0) port_number = server.*.backend.port();
         }
-        self.* = .{ .allocator = allocator, .config = config, .shards = servers, .threads = threads, .failures = failures, .port_number = port_number };
+        self.* = .{ .allocator = allocator, .config = config, .shards = servers, .threads = threads, .failures = failures, .admission = .{ .limit = config.connections }, .port_number = port_number };
+        // Standalone servers admit by their own slots; shards share one ceiling.
+        if (shards > 1) for (servers) |server| {
+            server.admission = &self.admission;
+        };
         return self;
     }
 
@@ -1341,6 +1392,11 @@ pub const Cluster = struct {
         var total = self.shards[0].stats;
         total.shards = @intCast(self.shards.len);
         for (self.shards[1..]) |server| total.merge(server.stats);
+        if (self.shards.len > 1) {
+            // The shared ceiling is the process-wide observation, not a sum.
+            total.live_connections = self.admission.live.load(.acquire);
+            total.peak_connections = self.admission.peak.load(.acquire);
+        }
         return total;
     }
 
@@ -1554,12 +1610,18 @@ test "cluster splits connections across shards and rejects unsupported topologie
     const config: Config = .{ .connections = 128, .shards = 3 };
     const first = Cluster.shardConfig(config, 3, 0, 9000);
     const last = Cluster.shardConfig(config, 3, 2, 9000);
-    try std.testing.expectEqual(@as(u16, 43), first.connections);
-    try std.testing.expectEqual(@as(u16, 42), last.connections);
+    // Every shard keeps full capacity; the shared Admission enforces the total.
+    try std.testing.expectEqual(@as(u16, 128), first.connections);
+    try std.testing.expectEqual(@as(u16, 128), last.connections);
     try std.testing.expect(first.reuse_port and last.reuse_port);
     try std.testing.expectEqual(@as(u16, 9000), last.port);
     try std.testing.expect(!Cluster.shardConfig(config, 1, 0, 1).reuse_port);
-    try std.testing.expectError(error.InvalidConfiguration, Cluster.validate(.{ .connections = 2, .shards = 3 }));
+    var admission: Admission = .{ .limit = 2 };
+    try std.testing.expect(admission.admit() and admission.admit() and !admission.admit());
+    admission.release();
+    try std.testing.expect(admission.admit());
+    try std.testing.expectEqual(@as(u32, 2), admission.peak.load(.acquire));
+    try std.testing.expectError(error.InvalidConfiguration, Cluster.validate(.{ .shards = 65 }));
     try std.testing.expectError(error.InvalidConfiguration, Cluster.validate(.{ .execution = .workers, .workers = 2, .shards = 2 }));
     if (@import("builtin").os.tag != .linux) {
         try std.testing.expectEqual(@as(u8, 1), Cluster.resolveShards(.{}));

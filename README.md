@@ -37,7 +37,7 @@ port, reported in `READY`. The HTML file is loaded before serving starts.
 | `/echo` | Echoes the complete bounded request body through borrowed spans; accepts Content-Length or chunked framing. |
 | `/chunks` | Three flush/resume turns followed by finish, producing `first second third` with chunked response framing. |
 | `/stall` | Worker-mode blocking fixture; inline returns 501. |
-| `/buffered` | Writes its distinct raw request target into reserved output; 413 if it exceeds output capacity. |
+| `/buffered` | Writes its distinct raw request target into the output arena; 413 if it exceeds `Writer.capacity()`, and a flush/retry when the shared arena is momentarily full. |
 | `/borrowed-body` | Borrows a fixed-length request body through finish; chunked input receives 501. |
 | Other paths | 404. CONNECT receives 501; no tunnel is opened. |
 
@@ -75,7 +75,8 @@ callback is the maintained example. [src/server.zig](src/server.zig) exposes
 experimental and read the [ownership contract](docs/OWNERSHIP.md) before
 retaining slices or adding asynchronous application work.
 
-The default `./zig-out/bin/zig-http` uses inline execution, gather sends and up to 16 responses per batch.
+The default `./zig-out/bin/zig-http` uses inline execution, gather sends, up to 128 responses per batch
+and, on Linux, one I/O shard per CPU the process may run on (`--shards N` sets it; macOS runs one).
 `--execution inline` selects it explicitly.
 It provisions **zero application workers** and runs the same handler/writer path
 on the I/O owner. Callbacks and flush resumptions must be short and nonblocking;
@@ -124,9 +125,13 @@ The default startup limits are explicit:
 | Header/trailer count | 64 combined | `Config.max_headers`; 1–1024. |
 | Request target | 8192 bytes | Fixed MVP parser setting, also subject to the header budget. |
 | Receive wire buffer per slot | `max_header + 2 * max_body + 4096` | Checked startup derivation; chunk framing consumes this independent bound. |
-| Writable output per response cell | 4 KiB | `--output-bytes`; 1 byte–64 KiB. |
-| Response cells per connection | 16 inline, 1 workers | `--response-batch-limit`; 1–16, effective limit 1 in worker mode. |
-| Inline callbacks per event-loop turn | 64 globally | Fixed fairness budget; each connection gets at most its response batch limit, with rotating scan start. |
+| Output arena per connection | 64 KiB | `--output-bytes`; 1 KiB–1 MiB; holds heads, generated bodies, framing and copied small borrows of one batch. |
+| Response cells per connection | 128 inline, 1 workers | `--response-batch-limit`; 1–511, effective limit 1 in worker mode. |
+| Borrow copy threshold | 256 bytes | `--borrow-copy-threshold`; borrowed spans up to this size are copied into the arena; 0 keeps every borrow a separate vector. |
+| Inline callbacks per event-loop turn | connections × batch limit, at most 8192 | `--callbacks-per-turn`; each connection gets at most its batch limit per turn from a FIFO ready ring. |
+| Deadline sweep | 100 ms | `--deadline-sweep-ms`; 1–1000; touched slots are checked sooner. |
+| Per-callback timing | off | `--callback-timing 1` records exact queue/handler maxima at two clock reads per callback. |
+| I/O shards | one per allowed CPU (Linux, at most 16), 1 (macOS) | `--shards`; 1–64, inline execution only; each shard reserves full slot storage and a shared counter keeps `--connections` the process-wide ceiling; `--shard-affinity 1` pins shard i to allowed CPU i. |
 | Logical response body | 16 MiB | `--max-response`; counted across flushes. |
 | Request cycle deadline | 5000 ms | `--timeout-ms`; includes receive, worker queue/execution and response sending. |
 | Shutdown drain deadline | 5000 ms | `Config.shutdown_ms`; positive. |
@@ -188,8 +193,11 @@ allocation attempts. It does not yet provide latency histograms,
 per-reason rejection metrics or a live metrics endpoint.
 
 Zero-copy here describes borrowed parsing and worker/transport payload handoff.
-Gather sends submit buffered framing and payload spans together using stable
-startup metadata; the body remains borrowed through terminal completion.
+Response heads are written straight into the connection's output arena at
+`begin()`, generated bodies follow them, and borrowed spans up to the copy
+threshold are copied there too (counted as `borrow_copies`), so a batch of small
+responses is one contiguous span and one SEND. Larger borrows stay separate
+vectors of a SENDMSG and remain borrowed through terminal completion.
 `--gather-send 0` retains the scalar path for controlled comparison.
 Ordinary socket I/O still copies across the kernel boundary; this MVP does not
 use `SEND_ZC`, zero-copy receive or file `sendfile`. Pipelined suffix compaction
@@ -204,14 +212,17 @@ from the Mac, run `tools/verify_linux_ssh.sh omarx1`; use a clean pushed checkou
 for publication evidence.
 
 Response batching uses the ordinary handler and writer for every request; there
-is no cached plaintext response path. Each finished response keeps separate
-header/output/chunk storage until terminal sends release the whole batch. A
-batch drains at its configured limit, when the available pipeline ends, on
-flush/close, or when the callback budget is exhausted. It never waits for a
-batch to fill. `--response-batch-limit 1` gives a controlled unbatched comparison.
-At most 80 spans (five per cell) are described by the gather metadata; the
-aggregate `--send-chunk` limit still applies. Request input stays immutable
-while any response borrows it.
+is no cached plaintext response path. Each finished response is a range of the
+connection's arena plus an optional borrowed span, frozen until terminal sends
+release the whole batch. A batch drains at its configured limit, when the
+available pipeline ends, when the arena is nearly full, on flush/close, or when
+the callback budget is exhausted. It never waits for a batch to fill.
+`--response-batch-limit 1` gives a controlled unbatched comparison. At most
+`2 × limit + 1` vectors describe a batch; the aggregate `--send-chunk` limit
+still applies. Request input stays immutable while any response borrows it.
+STATS reports `shards`, `callbacks_per_turn`, `single_span_send_operations`
+and `borrow_copies`; with several shards a `SHARDS` line lists per-shard
+admission and completion counts.
 
 Run `python3 tests/batch_integration.py` for distinct generated and borrowed
 bodies, mixed routes, small send caps, flush/order barriers, fairness and

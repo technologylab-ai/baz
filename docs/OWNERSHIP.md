@@ -155,10 +155,21 @@ experiments to perform before making production or capacity claims.
 `Config.execution = .inline_event_loop` is the default and requires `workers = 0`. No application
 worker threads, worker pipes or worker-stack budget are provisioned. The same
 handler receives exclusive request/writer borrows on the I/O owner; it returns
-the same frozen flush/finish/close action. A global budget of 64 callbacks per
-turn, at most the effective batch limit per connection, and a rotating scan
-start bound callback dispatch work. Local pending work uses a nonblocking
-backend poll. Neither this count nor deadline checks can preempt a callback.
+the same frozen flush/finish/close action. Slots with a published callback or
+result wait in a FIFO ready ring; one turn services the ring entries present at
+its start, at most the effective batch limit per connection and at most
+`callbacks_per_turn` in total (default connections × batch limit, capped at
+8192, reported in STATS). Local pending work uses a nonblocking backend poll.
+Neither this count nor deadline checks can preempt a callback.
+
+The turn clock is sampled at turn start, after polling and after every 16
+callbacks; deadlines, request starts and completion stamps use it, so a deadline
+can be observed late by at most 16 callbacks' work. Slots the loop touches are
+checked against their deadline; every slot is swept every `deadline_sweep_ms`
+(default 100), so an idle connection's deadline overshoots by at most one sweep
+interval plus one turn. Exact per-callback queue/handler timing needs
+`callback_timing`, which costs two clock reads per callback; otherwise those
+maxima stay zero. Worker mode keeps a full slot scan per turn for results.
 
 The application promises a bounded, nonblocking callback. The framework cannot
 preempt it, isolate a crash or enforce wall-clock deadlines during it. Worker
@@ -167,40 +178,58 @@ isolate arbitrary application code. Per-request optional offload and I/O shardin
 are separate future API decisions. The inline test does not run the blocking
 /stall fixture; that demo endpoint explicitly returns501 in this mode.
 
-## Gathered output snapshot
+## Output arena, cells and gathered sends
 
-Gather-send is enabled by default. Each cell's at-most-five immutable framing
-and payload slices (at most 80 per batch) are described by startup-reserved iovecs and msghdr storage,
-retained through the terminal SENDMSG completion on Linux or the nonblocking
-sendmsg/completion adapter on Mac. A positive completion can cross several spans;
-advance the cursor by its aggregate count, capped by send_chunk and i32. No
-borrowed body is copied into a contiguous transport buffer. A cancellation
-acknowledgement alone still cannot release target storage. The scalar switch
-exists for controlled comparison and retains the same completion/ownership rules.
+Each connection owns one contiguous output arena, `output_bytes` long (default
+64 KiB). `begin()` writes the response head into the arena immediately, from a
+per-owner status/Server/Date prefix refreshed once per second, so the head,
+generated body bytes, chunk framing and any copied small borrow of one response
+are adjacent, and consecutive responses of one batch form one span. A cell
+records a response snapshot as an arena range plus an optional borrowed span
+and its insertion offset. The arena prefix up to the last frozen cell and every
+borrowed span stay frozen until the batch's terminal send completion, canceled
+or not; request input stays immutable while any cell borrows it. The whole
+arena and all cells are released together when the batch completes.
+
+`borrow()` copies spans of at most `borrow_copy_threshold` bytes (default 256,
+0 disables) into the arena when they fit and counts each copy in
+`borrow_copies`; longer spans remain borrowed and become their own vector.
+This is the one deliberate copy in the borrowed path: it keeps small responses
+in one span and one SEND instead of two vectors. Chunked snapshots reserve a
+fixed ten-digit chunk-size field before the data and fill it when frozen.
+
+A drain describes the batch as at most `2 × response_batch_limit + 1` vectors in
+per-connection startup storage: adjacent arena runs merge, each borrow is
+inserted where its cell recorded it. A one-vector selection uses SEND, several
+use SENDMSG; both count as gather-mode operations. The transport references the
+caller's vectors without copying them and keeps that reference until the
+terminal completion. A positive completion can cross several vectors; the
+cursor advances by the aggregate count, capped by send_chunk and i32. A
+cancellation acknowledgement alone still cannot release target storage. The
+scalar switch exists for controlled comparison with the same ownership rules.
 
 ## Bounded response batches and flush barriers
 
-The configured response-cell limit is 1–16, default 16; worker mode's effective
-limit is always 1. Output bytes are reserved per cell at startup. Request/writer
-metadata is reused only after its finished response has been frozen into a
-separate cell; immutable payload and framing storage is retained until the
-batch's terminal sends finish. Ordinary generated output and request-owned
-borrowed bodies use this same path, with no route-specific response cache.
+The configured response-cell limit is 1–511, default 128; worker mode's
+effective limit is always 1. The scheduler dispatches the next buffered request
+into the same batch only while the arena keeps `header_reserve_bytes` free, so
+`begin()` never lacks head space. A reservation larger than the remaining arena
+returns WouldBlock; the handler flushes and retries in an emptied arena, and
+`Writer.capacity()` names the body size that always fits after a flush.
 
 Drain when the next request needs input, the cell/global callback limit is
-reached, or a handler flushes/closes. Never delay output waiting to fill a batch.
-A flush drains preceding finished responses and the current snapshot, releases
-all cells, then resumes the same active request/state with an empty first-cell
-writer. Later malformed input or an Expect handshake waits behind prior output
-in wire order. A send completion may cross response boundaries; aggregate caps,
-short completion cursors and separate cancellation/target ownership still apply.
+reached, the arena is nearly full, or a handler flushes/closes. Never delay
+output waiting to fill a batch. A flush drains preceding finished responses and
+the current snapshot, releases the arena and cells, then resumes the same active
+request/state at the arena start with the head already sent. Later malformed
+input or an Expect handshake waits behind prior output in wire order.
 
 Completed-request counts and request-cycle maxima are recorded at whole-batch
 drain. A sent prefix of a subsequently canceled batch may be omitted. These
 metrics intentionally do not claim individual response completion timestamps.
-The batch integration suite checks 32 distinct generated/borrowed bodies,
-barriers, fairness and pending cancellation; these fixtures are finite witnesses,
-not starvation or production latency guarantees.
+The batch integration suite checks distinct generated/borrowed bodies at client
+depths up to 128, barriers, fairness and pending cancellation; these fixtures
+are finite witnesses, not starvation or production latency guarantees.
 
 A handler's explicit `.close`, invalid response or expiration aborts its
 connection and may discard earlier finished-but-unsent cells in that batch.
@@ -209,3 +238,21 @@ its valid prefix in wire order. No completed-send guarantee follows from the
 handler merely returning finish. The cancellation test separately witnesses
 multiple frozen cells at a pending gather cancel; a large incomplete request
 alone can drain its prefix first and is insufficient evidence for that case.
+
+## Shards: several I/O owners
+
+`Config.shards` runs that many complete, independent servers on one port, each
+with its own listener (`SO_REUSEPORT`), transport, slots, arenas, operation
+cells, clock and counters. They share only the stop flags; shard 0 runs on the
+calling thread and the others on threads created at start with fixed stacks.
+Every shard reserves the full `connections` slot capacity, because the kernel's
+hash can place more than an even share on one listener; the process-wide
+ceiling is enforced by one shared admission counter touched on accept and
+release, so `connections` stays the exact limit and `peak_connections` reports
+the shared peak. Zero selects one shard per CPU the process may run on (Linux,
+at most 16 because each shard reserves full storage) and one elsewhere. Optional `shard_affinity` pins shard i to the i-th allowed CPU.
+Only inline execution supports several shards. The Linux kernel hashes
+connections across the listeners; XNU delivers every connection to the last
+bound listener, so macOS rejects more than one shard. Merged STATS sum counters
+and take maxima; per-shard admission is printed separately. A shard that cannot
+reconcile ownership by the shutdown deadline still ends the whole process.
