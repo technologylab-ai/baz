@@ -19,6 +19,8 @@ pub const Backend = struct {
         registered: bool = false,
     };
 
+    pub const operation_bytes = @sizeOf(Operation);
+
     allocator: std.mem.Allocator,
     operations: []Operation,
     gather_metadata: ?[]common.Gather = null,

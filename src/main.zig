@@ -25,7 +25,7 @@ pub fn main(init: std.process.Init) !void {
             std.debug.print("zig-http: bounded experimental Linux io_uring / macOS kqueue HTTP/1.1\n" ++
                 "--port N --connections N --execution workers|inline --workers N --max-body N --max-header N\n" ++
                 "--timeout-ms N --duration-ms N --send-chunk N --gather-send 0|1 --stall-ms N\n" ++
-                "--socket-send-buffer N --output-bytes N --max-response N --memory-budget N --index FILE\n", .{});
+                "--response-batch-limit N --socket-send-buffer N --output-bytes N --max-response N --memory-budget N --index FILE\n", .{});
             return;
         }
         const value = args.next() orelse return error.MissingArgument;
@@ -50,6 +50,8 @@ pub fn main(init: std.process.Init) !void {
             config.send_chunk = try std.fmt.parseInt(u32, value, 10);
         } else if (std.mem.eql(u8, flag, "--gather-send")) {
             config.gather_send = if (std.mem.eql(u8, value, "1")) true else if (std.mem.eql(u8, value, "0")) false else return error.InvalidGatherSend;
+        } else if (std.mem.eql(u8, flag, "--response-batch-limit")) {
+            config.response_batch_limit = try std.fmt.parseInt(u8, value, 10);
         } else if (std.mem.eql(u8, flag, "--socket-send-buffer")) {
             config.socket_send_buffer_bytes = try std.fmt.parseInt(u32, value, 10);
         } else if (std.mem.eql(u8, flag, "--stall-ms")) {
@@ -84,8 +86,8 @@ pub fn main(init: std.process.Init) !void {
     std.posix.sigaction(.TERM, &action, null);
     try server.start();
     budget.sealed.store(true, .release);
-    std.debug.print("READY port={d} backend={s} connections={d} workers={d} execution={s} gather_send={d} optimize={s}\n", .{
-        server.backend.port(), framework.backend_name, config.connections, config.workers, @tagName(config.execution), @intFromBool(config.gather_send), @tagName(@import("builtin").mode),
+    std.debug.print("READY port={d} backend={s} connections={d} workers={d} execution={s} gather_send={d} response_batch_limit={d} optimize={s}\n", .{
+        server.backend.port(), framework.backend_name, config.connections, config.workers, @tagName(config.execution), @intFromBool(config.gather_send), config.effectiveBatchLimit(), @tagName(@import("builtin").mode),
     });
     server.run() catch |err| {
         // A stuck callback or uncertain kernel submission still owns memory.
@@ -111,6 +113,18 @@ fn handle(context: *api.Context) !api.Action {
     const path = routePath(context.request.target);
     if (std.mem.eql(u8, context.request.method, "CONNECT")) {
         try writer.begin(501, "text/plain", 0);
+        return writer.finish();
+    }
+    if (std.mem.eql(u8, path, "/borrowed-body")) {
+        // Fixed-length bodies form one request-owned span. This route finishes
+        // without a flush, allowing multiple distinct borrowed bodies in a
+        // batch; /echo demonstrates chunked iteration and flush/resume instead.
+        if (context.request.chunked) {
+            try writer.begin(501, "text/plain", 0);
+            return writer.finish();
+        }
+        try writer.begin(200, "application/octet-stream", context.request.body_bytes);
+        try writer.borrow(context.request.body_wire);
         return writer.finish();
     }
     if (std.mem.eql(u8, path, "/echo")) {
@@ -160,6 +174,15 @@ fn handle(context: *api.Context) !api.Action {
     if (std.mem.eql(u8, path, "/plaintext")) {
         try writer.begin(200, "text/plain", 13);
         try writer.borrow("Hello, World!");
+    } else if (std.mem.eql(u8, path, "/buffered")) {
+        // A generated response exercises the ordinary output buffer ownership.
+        // Distinct targets make accidental reuse across a pipeline observable.
+        if (context.request.target.len > writer.buffer.len) {
+            try writer.begin(413, "text/plain", 0);
+            return writer.finish();
+        }
+        try writer.begin(200, "text/plain", context.request.target.len);
+        try writer.write(context.request.target);
     } else if (std.mem.eql(u8, path, "/index.html") or std.mem.eql(u8, path, "/")) {
         try writer.begin(200, "text/html; charset=utf-8", demo.html.len);
         try writer.borrow(demo.html);

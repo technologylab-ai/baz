@@ -1,4 +1,26 @@
-# MVP handoff — 2026-09-05
+# HTTP experiment handoff — 2026-09-05
+
+Current performance checkpoints:
+
+- `b8a3afe1bcfd7dd933060e1064cab55c4f7a41c3`: unchanged MVP versus pinned
+  Round23 leaders, 113k/s versus mrhttp3.20M/libreactor4.04M at128connections,
+  pipeline16. All54+18 trials passed; raw wrk latency percentiles rejected.
+- `a164d42badb05e3d5cb11d3ea3789f06ffcd196d`: optional inline execution,
+  24-trial same-sweep gain from117k to134k/s; zero application workers.
+- `ca2eccf262632eda943615b119573c23e0f6e4fc`: inline and gather become defaults.
+  A12-trial same-sweep comparison measured125k scalar-inline versus344k gather.
+  Mac/Linux native wire/cancellation evidence is in reports/2026-09-05-gather.md.
+- Generic bounded response batching is implemented with default 16 inline
+  cells, a global 64-callback turn budget, delayed compaction and flush barriers.
+  Mac Debug/ReleaseSafe: 52 unit tests and 26 generic + 10 inline + 11 gather +
+  15 batch cases passed per mode. Linux throughput evidence is pending.
+  Preserve all earlier checkpoints; do not relabel their data as the new code.
+
+Inline application callbacks must be bounded and nonblocking. Worker mode is
+explicit; per-request optional offload and multiple I/O owners remain future
+work. Gather metadata and all borrowed payloads survive target completion,
+independently of cancellation acknowledgements. See current code/docs and the
+next batching packet before changing ownership. Read ROADMAP.md for scope.
 
 This is the first working Zig 0.16.0 HTTP/1.1 experiment. Start with README.md,
 AGENTS.md, docs/OWNERSHIP.md, docs/EVIDENCE.md and ROADMAP.md. The current code is
@@ -12,7 +34,7 @@ without linker overrides. build.zig selects LLVM/LLD only for Linux Debug to
 retain both correctness gates. Do not upgrade Zig to work around this.
 
 Core model: one I/O owner, raw io_uring on Linux/nonblocking kqueue on macOS,
-fixed startup application workers with slot affinity. Callback state survives
+inline callbacks by default, optional fixed startup workers with slot affinity. Callback state survives
 `return writer.flush()`, which sends all committed bytes before `.flushed`.
 `finish()` ends framing. Borrow only request-owned input or immutable
 server-lifetime assets; dynamic completion/release notifications are pending.

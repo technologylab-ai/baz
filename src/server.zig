@@ -16,6 +16,7 @@ pub const Execution = enum { workers, inline_event_loop };
 pub const Config = struct {
     execution: Execution = .inline_event_loop,
     gather_send: bool = true,
+    response_batch_limit: u8 = 16,
     port: u16 = 8080,
     connections: u16 = 128,
     workers: u16 = 0,
@@ -36,6 +37,31 @@ pub const Config = struct {
         const body = try std.math.mul(usize, self.max_body, 2);
         return std.math.add(usize, try std.math.add(usize, body, self.max_header), 4096);
     }
+    pub fn effectiveBatchLimit(self: Config) usize {
+        return if (self.execution == .inline_event_loop) self.response_batch_limit else 1;
+    }
+
+    /// Exact requested bytes for the framework allocator's startup allocations.
+    /// Kernel mappings, allocator metadata, application allocations and pthread
+    /// bookkeeping remain outside this metric; requested stacks are separate.
+    pub fn heapBytes(self: Config) !usize {
+        const count: usize = self.connections;
+        const cells = try std.math.mul(usize, count, self.effectiveBatchLimit());
+        const storage = try std.math.add(usize, try std.math.mul(usize, count, try self.wireBytes()), try std.math.mul(usize, cells, self.output_bytes));
+        const operation_count = try std.math.mul(usize, count + 1, 2);
+        const operation_bytes = transport.Backend.operation_bytes +
+            if (self.gather_send) @sizeOf(transport.Gather) else @as(usize, 0);
+        var total: usize = @sizeOf(Server);
+        for ([_]usize{
+            storage,
+            try std.math.mul(usize, count, @sizeOf(Slot)),
+            try std.math.mul(usize, cells, @sizeOf(ResponseCell)),
+            try std.math.mul(usize, self.workers, @sizeOf(Worker)),
+            try std.math.mul(usize, operation_count, operation_bytes),
+        }) |bytes| total = try std.math.add(usize, total, bytes);
+        return total;
+    }
+
     pub fn validate(self: Config) !void {
         const invalid_workers = switch (self.execution) {
             .workers => self.workers == 0,
@@ -47,12 +73,11 @@ pub const Config = struct {
             self.output_bytes == 0 or self.output_bytes > 65536 or self.timeout_ms == 0 or
             self.shutdown_ms == 0 or self.send_chunk == 0 or self.socket_send_buffer_bytes == 0 or
             self.socket_send_buffer_bytes > 16 * 1024 * 1024 or self.max_headers == 0 or
-            self.max_headers > 1024 or self.worker_stack_bytes < 65536)
+            self.max_headers > 1024 or self.worker_stack_bytes < 65536 or
+            self.response_batch_limit == 0 or self.response_batch_limit > 16)
             return error.InvalidConfiguration;
-        const per_connection = try std.math.add(usize, try self.wireBytes(), try std.math.add(usize, self.output_bytes, @sizeOf(Slot) + 4096));
-        const pools = try std.math.mul(usize, per_connection, self.connections);
         const stacks = try std.math.mul(usize, self.worker_stack_bytes, self.workers);
-        if (try std.math.add(usize, pools, stacks) > self.memory_budget_bytes)
+        if (try std.math.add(usize, try self.heapBytes(), stacks) > self.memory_budget_bytes)
             return error.MemoryBudgetExceeded;
     }
 };
@@ -60,6 +85,10 @@ pub const Config = struct {
 pub const Stats = struct {
     execution: Execution = .inline_event_loop,
     gather_send: bool = true,
+    response_batch_limit: usize = 16,
+    response_batches: u64 = 0,
+    batched_finished_responses: u64 = 0,
+    max_batch_responses: usize = 0,
     scalar_send_operations: u64 = 0,
     gather_send_operations: u64 = 0,
     send_completions: u64 = 0,
@@ -68,6 +97,7 @@ pub const Stats = struct {
     gather_canceled_completions: u64 = 0,
     max_send_parts: usize = 0,
     max_send_bytes: usize = 0,
+    max_inline_callbacks_per_turn: usize = 0,
     inline_dispatches: u64 = 0,
     worker_dispatches: u64 = 0,
     accepted: u64 = 0,
@@ -99,6 +129,19 @@ const Kind = enum(u8) { accept = 1, recv, send, cancel, cancel_accept };
 const accept_token: u64 = @intFromEnum(Kind.accept);
 const cancel_accept_token: u64 = @intFromEnum(Kind.cancel_accept);
 
+const BatchNext = enum { parse, resume_flush, close };
+
+/// A frozen cell owns its framing/output bytes and borrowed payload spans until
+/// the batch's final target completion. The Request/Writer metadata may move on
+/// to another cell, but these buffers and the receive allocation stay immutable.
+const ResponseCell = struct {
+    output: []u8,
+    header: [512]u8 = undefined,
+    chunk: [32]u8 = undefined,
+    finished: bool = false,
+    request_started: u64 = 0,
+};
+
 const Slot = struct {
     phase: std.atomic.Value(Phase) = .init(.io),
     cancelled: std.atomic.Value(bool) = .init(false),
@@ -107,6 +150,11 @@ const Slot = struct {
     fd: transport.Socket = -1,
     input: []u8,
     received: usize = 0,
+    input_cursor: usize = 0,
+    request_active: bool = false,
+    cells: []ResponseCell,
+    batch_count: usize = 0,
+    batch_next: BatchNext = .parse,
     parser: http.Parser,
     request: http.Request = undefined,
     writer: api.Writer,
@@ -126,7 +174,6 @@ const Slot = struct {
     response_started: bool = false,
     logical_written: usize = 0,
     header_buffer: [512]u8 = undefined,
-    chunk_buffer: [32]u8 = undefined,
     parts: [transport.max_send_parts][]const u8 = @splat(""),
     part_count: usize = 0,
     part: usize = 0,
@@ -196,6 +243,7 @@ pub const Server = struct {
     slots: []Slot,
     workers: []Worker,
     storage: []u8,
+    response_cells: []ResponseCell,
     stop_requested: std.atomic.Value(bool) = .init(false),
     stop_workers: std.atomic.Value(bool) = .init(false),
     ready_workers: std.atomic.Value(u32) = .init(0),
@@ -209,6 +257,8 @@ pub const Server = struct {
     started: bool = false,
     safe_to_destroy: bool = true,
     stats: Stats = .{},
+    inline_budget: usize = 0,
+    scan_start: usize = 0,
     date: [29]u8 = undefined,
     date_second: u64 = std.math.maxInt(u64),
 
@@ -224,14 +274,22 @@ pub const Server = struct {
         const workers = try allocator.alloc(Worker, config.workers);
         errdefer allocator.free(workers);
         const wire = try config.wireBytes();
-        const per_slot = wire + config.output_bytes;
+        const batch_limit = config.effectiveBatchLimit();
+        const response_cells = try allocator.alloc(ResponseCell, config.connections * batch_limit);
+        errdefer allocator.free(response_cells);
+        const per_slot = wire + config.output_bytes * batch_limit;
         const storage = try allocator.alloc(u8, per_slot * config.connections);
         errdefer allocator.free(storage);
         @memset(storage, 0);
-        self.* = .{ .allocator = allocator, .config = config, .handler = handler, .application = application, .backend = backend, .slots = slots, .workers = workers, .storage = storage, .stats = .{ .workers = config.workers, .execution = config.execution, .gather_send = config.gather_send } };
+        self.* = .{ .allocator = allocator, .config = config, .handler = handler, .application = application, .backend = backend, .slots = slots, .workers = workers, .storage = storage, .response_cells = response_cells, .stats = .{ .workers = config.workers, .execution = config.execution, .gather_send = config.gather_send, .response_batch_limit = batch_limit } };
         for (slots, 0..) |*slot, index| {
             const base = storage[index * per_slot ..][0..per_slot];
+            const cells = response_cells[index * batch_limit ..][0..batch_limit];
+            for (cells, 0..) |*cell, cell_index| cell.* = .{
+                .output = base[wire + cell_index * config.output_bytes ..][0..config.output_bytes],
+            };
             slot.* = .{
+                .cells = cells,
                 .input = base[0..wire],
                 .parser = http.Parser.init(.{
                     .max_header_bytes = config.max_header,
@@ -240,7 +298,7 @@ pub const Server = struct {
                     .max_wire_bytes = @intCast(wire),
                     .max_target_bytes = 8192,
                 }),
-                .writer = api.Writer.init(base[wire..]),
+                .writer = api.Writer.init(cells[0].output),
             };
         }
         var initialized: usize = 0;
@@ -291,6 +349,7 @@ pub const Server = struct {
         assert(self.started);
         var completions: [128]transport.Completion = undefined;
         while (true) {
+            self.inline_budget = 64; // Global callback budget across every connection.
             const turn_start = nowNs();
             if (self.config.duration_ms != 0 and
                 turn_start - self.started_at >= @as(u64, self.config.duration_ms) * 1_000_000)
@@ -312,20 +371,45 @@ pub const Server = struct {
             }
             self.refreshDate();
             var local_result_ready = false;
-            for (self.slots, 0..) |*slot, index| {
+            // Rotate the first serviced slot so a global callback budget cannot
+            // permanently favor low-index busy connections.
+            assert(self.scan_start < self.slots.len);
+            const scan_start = self.scan_start;
+            self.scan_start = (scan_start + 1) % self.slots.len;
+            for (0..self.slots.len) |offset| {
+                const index = (scan_start + offset) % self.slots.len;
+                const slot = &self.slots[index];
                 if (!slot.in_use) continue;
                 if (!slot.closing and (self.stopping or turn_start >= slot.deadline)) {
                     if (!self.stopping) self.stats.timeouts += 1;
                     try self.beginClose(slot);
                 }
-                if (slot.phase.load(.acquire) == .result) {
+                // At most one configured batch worth of callbacks per slot and
+                // turn. Empty flushes also consume this finite progress budget.
+                for (0..self.config.effectiveBatchLimit()) |iteration| {
+                    if (self.config.execution == .inline_event_loop and
+                        slot.phase.load(.acquire) == .ready and self.inline_budget > 0)
+                    {
+                        // A preceding callback may have consumed substantial
+                        // time since turn_start. Check again before borrowing
+                        // another request into application code.
+                        if (!slot.closing and (self.stop_requested.load(.acquire) or nowNs() >= slot.deadline)) {
+                            if (!self.stop_requested.load(.acquire)) self.stats.timeouts += 1;
+                            try self.beginClose(slot);
+                        }
+                        self.invokeInline(slot);
+                    }
+                    if (slot.phase.load(.acquire) != .result) break;
                     self.stats.max_handler_ns = @max(self.stats.max_handler_ns, slot.handler_ns);
                     self.stats.max_queue_ns = @max(self.stats.max_queue_ns, slot.queue_ns);
                     slot.phase.store(.io, .release);
                     if (slot.closing or slot.action == .close) {
                         try self.beginClose(slot);
+                    } else if (self.stop_requested.load(.acquire) or nowNs() >= slot.deadline) {
+                        if (!self.stop_requested.load(.acquire)) self.stats.timeouts += 1;
+                        try self.beginClose(slot);
                     } else {
-                        try self.prepareResponse(index);
+                        try self.prepareResponse(index, iteration + 1 < self.config.effectiveBatchLimit());
                     }
                 }
                 if (slot.closing) self.maybeFree(slot);
@@ -333,7 +417,7 @@ pub const Server = struct {
                 // publish another result while consuming this one. Process it
                 // on the next turn: no recursive callbacks or idle poll delay.
                 if (self.config.execution == .inline_event_loop and
-                    slot.phase.load(.acquire) == .result) local_result_ready = true;
+                    (slot.phase.load(.acquire) == .result or slot.phase.load(.acquire) == .ready)) local_result_ready = true;
             }
             const control_ns = nowNs() - turn_start;
             self.stats.max_loop_ns = @max(self.stats.max_loop_ns, control_ns);
@@ -343,6 +427,8 @@ pub const Server = struct {
             const count = try self.backend.poll(&completions, if (local_result_ready) 0 else 10);
             const processing_start = nowNs();
             for (completions[0..count]) |completion| try self.onCompletion(completion);
+            assert(self.inline_budget <= 64);
+            self.stats.max_inline_callbacks_per_turn = @max(self.stats.max_inline_callbacks_per_turn, 64 - self.inline_budget);
             self.stats.max_loop_ns = @max(self.stats.max_loop_ns, control_ns + nowNs() - processing_start);
         }
         self.stop_workers.store(true, .release);
@@ -369,6 +455,7 @@ pub const Server = struct {
         }
         self.backend.deinit();
         self.allocator.free(self.storage);
+        self.allocator.free(self.response_cells);
         self.allocator.free(self.slots);
         self.allocator.free(self.workers);
         const allocator = self.allocator;
@@ -419,6 +506,13 @@ pub const Server = struct {
                 slot.closing = false;
                 slot.cancelled.store(false, .release);
                 slot.received = 0;
+                slot.input_cursor = 0;
+                slot.request_active = false;
+                slot.batch_count = 0;
+                slot.part_count = 0;
+                slot.part = 0;
+                slot.part_offset = 0;
+                slot.writer = api.Writer.init(slot.cells[0].output);
                 slot.parser.reset();
                 slot.interim_sent = false;
                 slot.response_started = false;
@@ -484,6 +578,7 @@ pub const Server = struct {
     fn receive(self: *Server, index: usize) anyerror!void {
         const slot = &self.slots[index];
         assert(!slot.op_pending and !slot.closing and slot.phase.load(.acquire) == .io);
+        assert(slot.batch_count == 0 and !slot.request_active and slot.input_cursor == 0);
         if (slot.received == slot.input.len) return self.reject(index, 413);
         const token = tokenFor(slot, index, .recv);
         try self.backend.recv(token, slot.fd, slot.input[slot.received..]);
@@ -494,7 +589,12 @@ pub const Server = struct {
 
     fn parseRequest(self: *Server, index: usize) !void {
         const slot = &self.slots[index];
-        const parsed = slot.parser.parse(slot.input[0..slot.received]) catch |err| {
+        assert(!slot.request_active and !slot.op_pending and slot.input_cursor <= slot.received);
+        assert(slot.batch_count < slot.cells.len);
+        const parsed = slot.parser.parse(slot.input[slot.input_cursor..slot.received]) catch |err| {
+            // Earlier successful responses retain wire order before this error.
+            // Drain them, compact safely, then parse/reject the unchanged suffix.
+            if (slot.batch_count != 0) return self.drainBatch(index, .parse);
             return self.reject(index, switch (err) {
                 error.HeadersTooLarge => 431,
                 error.BodyTooLarge => 413,
@@ -507,12 +607,17 @@ pub const Server = struct {
         };
         if (parsed) |request| {
             slot.request = request;
-            slot.writer = api.Writer.init(slot.writer.buffer);
+            slot.request_active = true;
+            slot.writer = api.Writer.init(slot.cells[slot.batch_count].output);
             slot.state = @splat(0);
             slot.event = .request;
             slot.response_started = false;
             slot.logical_written = 0;
             self.dispatch(index);
+        } else if (slot.batch_count != 0) {
+            // Do not wait for another byte, including an Expect body, to send
+            // responses that are already complete.
+            return self.drainBatch(index, .parse);
         } else if (slot.parser.head_complete and slot.parser.expect_continue and !slot.interim_sent) {
             slot.interim_sent = true;
             slot.send_mode = .interim;
@@ -537,11 +642,18 @@ pub const Server = struct {
             },
             .inline_event_loop => {
                 assert(self.workers.len == 0);
-                self.stats.inline_dispatches += 1;
-                slot.phase.store(.running, .release);
-                self.invokeHandler(slot);
+                slot.phase.store(.ready, .release);
             },
         }
+    }
+
+    fn invokeInline(self: *Server, slot: *Slot) void {
+        assert(self.config.execution == .inline_event_loop and self.inline_budget > 0);
+        assert(slot.phase.load(.acquire) == .ready);
+        self.inline_budget -= 1;
+        self.stats.inline_dispatches += 1;
+        slot.phase.store(.running, .release);
+        self.invokeHandler(slot);
     }
 
     /// Caller exclusively owns the running phase. Publishing result ends every
@@ -580,10 +692,12 @@ pub const Server = struct {
         try self.sendNext(index);
     }
 
-    fn prepareResponse(self: *Server, index: usize) !void {
+    fn prepareResponse(self: *Server, index: usize, continue_turn: bool) !void {
         const slot = &self.slots[index];
         const writer = &slot.writer;
-        assert(writer.frozen);
+        assert(writer.frozen and slot.request_active and slot.batch_count < slot.cells.len);
+        const cell = &slot.cells[slot.batch_count];
+        assert(writer.buffer.ptr == cell.output.ptr);
         const bytes = writer.committed();
         const total = std.math.add(usize, slot.logical_written, bytes.len) catch {
             return self.beginClose(slot);
@@ -597,16 +711,13 @@ pub const Server = struct {
             return self.beginClose(slot);
         slot.logical_written = total;
         slot.send_mode = .response;
-        slot.part_count = 0;
-        slot.part = 0;
-        slot.part_offset = 0;
         if (!slot.response_started) {
             var length_buffer: [64]u8 = undefined;
             const framing = if (writer.status == 204 or writer.status == 304) "" else if (writer.content_length) |length|
                 try std.fmt.bufPrint(&length_buffer, "Content-Length: {d}\r\n", .{length})
             else
                 "Transfer-Encoding: chunked\r\n";
-            const header = try std.fmt.bufPrint(&slot.header_buffer, "HTTP/1.1 {d} {s}\r\nServer: zig-http\r\nDate: {s}\r\n" ++
+            const header = try std.fmt.bufPrint(&cell.header, "HTTP/1.1 {d} {s}\r\nServer: zig-http\r\nDate: {s}\r\n" ++
                 "Content-Type: {s}\r\n{s}Connection: {s}\r\n\r\n", .{ writer.status, reason(writer.status), self.date, writer.content_type, framing, if (slot.request.keep_alive) "keep-alive" else "close" });
             self.addPart(slot, header);
             slot.response_started = true;
@@ -614,7 +725,7 @@ pub const Server = struct {
         }
         if (!slot.request.head_only and writer.status != 204 and writer.status != 304) {
             if (writer.content_length == null and bytes.len != 0) {
-                self.addPart(slot, try std.fmt.bufPrint(&slot.chunk_buffer, "{x}\r\n", .{bytes.len}));
+                self.addPart(slot, try std.fmt.bufPrint(&cell.chunk, "{x}\r\n", .{bytes.len}));
             }
             if (bytes.len != 0) self.addPart(slot, bytes);
             if (writer.content_length == null) {
@@ -622,7 +733,36 @@ pub const Server = struct {
                 if (slot.action == .finish) self.addPart(slot, "0\r\n\r\n");
             }
         }
-        if (slot.action == .flush) self.stats.flushes += 1;
+        cell.finished = slot.action == .finish;
+        cell.request_started = slot.request_started;
+        slot.batch_count += 1;
+        assert(slot.batch_count <= slot.cells.len);
+        if (slot.action == .flush) {
+            self.stats.flushes += 1;
+            return self.drainBatch(index, .resume_flush);
+        }
+        assert(slot.action == .finish);
+        slot.request_active = false;
+        assert(slot.request.consumed <= slot.received - slot.input_cursor);
+        slot.input_cursor += slot.request.consumed;
+        if (!slot.request.keep_alive) return self.drainBatch(index, .close);
+        slot.parser.reset();
+        slot.interim_sent = false;
+        slot.request_started = nowNs();
+        // Keep the oldest unsent response's deadline. A later callback must not
+        // extend ownership of bytes that are already waiting for the transport.
+        if (self.config.execution == .inline_event_loop and continue_turn and
+            self.inline_budget > 0 and slot.batch_count < slot.cells.len and slot.input_cursor < slot.received)
+            return self.parseRequest(index);
+        return self.drainBatch(index, .parse);
+    }
+
+    fn drainBatch(self: *Server, index: usize, next: BatchNext) anyerror!void {
+        const slot = &self.slots[index];
+        assert(slot.batch_count > 0 and !slot.op_pending);
+        slot.batch_next = next;
+        self.stats.response_batches += 1;
+        self.stats.max_batch_responses = @max(self.stats.max_batch_responses, slot.batch_count);
         try self.sendNext(index);
     }
 
@@ -669,32 +809,67 @@ pub const Server = struct {
             return;
         }
         switch (slot.send_mode) {
-            .interim => try self.receive(index),
+            .interim => {
+                slot.part_count = 0;
+                slot.part = 0;
+                slot.part_offset = 0;
+                try self.receive(index);
+            },
             .reject => try self.beginClose(slot),
-            .response => {
-                slot.writer.release();
-                if (slot.action == .flush) {
-                    slot.event = .flushed;
-                    self.stats.resumed += 1;
-                    self.dispatch(index);
-                } else {
-                    assert(slot.action == .finish);
-                    self.stats.completed += 1;
-                    self.stats.max_request_ns = @max(self.stats.max_request_ns, nowNs() - slot.request_started);
-                    if (!slot.request.keep_alive) return self.beginClose(slot);
-                    assert(slot.request.consumed <= slot.received);
-                    const remaining = slot.received - slot.request.consumed;
+            .response => try self.completeBatch(index),
+        }
+    }
+
+    fn completeBatch(self: *Server, index: usize) anyerror!void {
+        const slot = &self.slots[index];
+        assert(!slot.op_pending and !slot.cancel_pending and slot.batch_count > 0);
+        assert(slot.part == slot.part_count and slot.part_offset == 0);
+        const completed_at = nowNs();
+        var finished: usize = 0;
+        for (slot.cells[0..slot.batch_count]) |cell| {
+            if (!cell.finished) continue;
+            finished += 1;
+            self.stats.completed += 1;
+            self.stats.max_request_ns = @max(self.stats.max_request_ns, completed_at - cell.request_started);
+        }
+        if (slot.batch_count > 1) self.stats.batched_finished_responses += finished;
+        slot.batch_count = 0;
+        slot.part_count = 0;
+        slot.part = 0;
+        slot.part_offset = 0;
+        // Every batch cell is now released. The latest Writer is the only
+        // metadata object still present; earlier finish snapshots owned distinct
+        // output/framing cells even after their Writer metadata was replaced.
+        slot.writer.release();
+        slot.writer.buffer = slot.cells[0].output;
+        // A fresh idle cycle starts after the preceding send finishes. Already
+        // buffered partial/current requests retain their earlier deadline.
+        if (slot.batch_next == .parse and !slot.request_active and slot.input_cursor == slot.received)
+            slot.request_started = completed_at;
+        slot.deadline = slot.request_started + @as(u64, self.config.timeout_ms) * 1_000_000;
+        switch (slot.batch_next) {
+            .resume_flush => {
+                assert(slot.request_active);
+                slot.event = .flushed;
+                self.stats.resumed += 1;
+                self.dispatch(index);
+            },
+            .close => try self.beginClose(slot),
+            .parse => {
+                assert(!slot.request_active and slot.input_cursor <= slot.received);
+                // No callback or transport retains the consumed prefix now.
+                // Move the suffix once per batch, never once per response.
+                if (slot.input_cursor != 0) {
+                    const remaining = slot.received - slot.input_cursor;
                     if (remaining != 0) {
-                        std.mem.copyForwards(u8, slot.input[0..remaining], slot.input[slot.request.consumed..slot.received]);
+                        std.mem.copyForwards(u8, slot.input[0..remaining], slot.input[slot.input_cursor..slot.received]);
                         self.stats.pipeline_copy_bytes += remaining;
                     }
                     slot.received = remaining;
+                    slot.input_cursor = 0;
                     slot.parser.reset();
-                    slot.interim_sent = false;
-                    slot.request_started = nowNs();
-                    slot.deadline = slot.request_started + @as(u64, self.config.timeout_ms) * 1_000_000;
-                    if (remaining == 0) try self.receive(index) else try self.parseRequest(index);
                 }
+                if (slot.received == 0) try self.receive(index) else try self.parseRequest(index);
             },
         }
     }
@@ -729,6 +904,9 @@ pub const Server = struct {
         slot.in_use = false;
         slot.closing = false;
         slot.received = 0;
+        slot.input_cursor = 0;
+        slot.request_active = false;
+        slot.batch_count = 0;
     }
 
     fn refreshDate(self: *Server) void {
@@ -892,4 +1070,58 @@ test "positive gather completions advance before at and after part boundaries" {
     advanceSendParts(&parts, &part, &offset, 3);
     try std.testing.expectEqual(parts.len, part);
     try std.testing.expectEqual(@as(usize, 0), offset);
+}
+
+test "response cell limit validates and every startup requested byte is budgeted" {
+    try std.testing.expectError(error.InvalidConfiguration, (Config{ .response_batch_limit = 0 }).validate());
+    try std.testing.expectError(error.InvalidConfiguration, (Config{ .response_batch_limit = 17 }).validate());
+    for ([_]bool{ false, true }) |gather| {
+        for ([_]u8{ 1, 16 }) |limit| {
+            var config: Config = .{ .connections = 2, .port = 0, .gather_send = gather, .response_batch_limit = limit };
+            const heap = try config.heapBytes();
+            config.memory_budget_bytes = heap;
+            try config.validate();
+            var budget: Budget = .{ .upstream = std.testing.allocator, .limit_bytes = heap };
+            const server = try Server.init(budget.allocator(), config, struct {
+                fn handle(_: *api.Context) api.Action {
+                    unreachable;
+                }
+            }.handle, null);
+            try std.testing.expectEqual(heap, budget.live_bytes);
+            try std.testing.expectEqual(@as(usize, 2) * limit, server.response_cells.len);
+            for (server.slots) |slot| {
+                try std.testing.expectEqual(@as(usize, limit), slot.cells.len);
+                for (slot.cells, 0..) |cell, index| {
+                    try std.testing.expectEqual(config.output_bytes, cell.output.len);
+                    if (index > 0) try std.testing.expect(@intFromPtr(slot.cells[index - 1].output.ptr) + config.output_bytes <= @intFromPtr(cell.output.ptr));
+                }
+            }
+            server.deinit();
+            try std.testing.expectEqual(@as(usize, 0), budget.live_bytes);
+            config.memory_budget_bytes = heap - 1;
+            try std.testing.expectError(error.MemoryBudgetExceeded, config.validate());
+        }
+    }
+    const workers: Config = .{ .execution = .workers, .workers = 2, .response_batch_limit = 16 };
+    try std.testing.expectEqual(@as(usize, 1), workers.effectiveBatchLimit());
+    var single = workers;
+    single.response_batch_limit = 1;
+    try std.testing.expectEqual(try single.heapBytes(), try workers.heapBytes());
+}
+
+test "batch gather progress crosses response cell boundaries without copying" {
+    var parts: [transport.max_send_parts][]const u8 = undefined;
+    for (&parts, 0..) |*part, index| part.* = if (index % 2 == 0) "header" else "payload";
+    const selected = selectSendParts(&parts, 0, 0, 65536);
+    try std.testing.expectEqual(parts.len, selected.count);
+    try std.testing.expectEqual(@as(usize, 520), selected.bytes);
+    var part: usize = 0;
+    var offset: usize = 0;
+    advanceSendParts(&parts, &part, &offset, 13 * 17 + 2);
+    try std.testing.expectEqual(@as(usize, 34), part);
+    try std.testing.expectEqual(@as(usize, 2), offset);
+    const suffix = selectSendParts(&parts, part, offset, 9);
+    try std.testing.expectEqualStrings("ader", suffix.parts[0]);
+    try std.testing.expectEqualStrings("paylo", suffix.parts[1]);
+    try std.testing.expectEqual(parts[34].ptr + 2, suffix.parts[0].ptr);
 }

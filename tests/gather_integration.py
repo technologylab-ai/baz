@@ -23,7 +23,7 @@ def run(binary, emit, sessions):
     for mode, workers in (("inline", 0), ("workers", 2)):
         for gathered in (0, 1):
             with wire.Server(binary, execution=mode, workers=workers,
-                             gather_send=gathered, send_chunk=65536) as server:
+                             response_batch_limit=1, gather_send=gathered, send_chunk=65536) as server:
                 wire.plaintext(server)
             expected = 1 if gathered else 2
             wire.require(server.stats["completed"] == 1 and
@@ -40,7 +40,7 @@ def run(binary, emit, sessions):
                                  gather_send=gathered, stats=server.stats))
             emit("%s_plaintext_%s_operation_count" % (mode, "gather" if gathered else "scalar"))
 
-    with wire.Server(binary, execution="inline", workers=0, gather_send=1,
+    with wire.Server(binary, execution="inline", workers=0, response_batch_limit=1, gather_send=1,
                      send_chunk=65536) as server:
         with server.connect() as sock:
             sock.sendall(wire.REQUEST)
@@ -57,7 +57,7 @@ def run(binary, emit, sessions):
                 response += chunk
             wire.require(response[header_bytes:] == wire.PLAINTEXT, "header boundary fixture body")
     for cap in (1, 7, header_bytes - 1, header_bytes, header_bytes + 1, 65536):
-        with wire.Server(binary, execution="inline", workers=0, gather_send=1,
+        with wire.Server(binary, execution="inline", workers=0, response_batch_limit=1, gather_send=1,
                          send_chunk=cap) as server:
             with server.connect() as sock:
                 reader = wire.ResponseReader(sock)
@@ -86,7 +86,7 @@ def run(binary, emit, sessions):
                              plaintext_header_bytes=header_bytes, stats=server.stats))
         emit("gather_wire_aggregate_cap_%d" % cap)
 
-    with wire.Server(binary, execution="inline", workers=0, gather_send=1,
+    with wire.Server(binary, execution="inline", workers=0, response_batch_limit=1, gather_send=1,
                      connections=4, max_body=2 * 1024 * 1024, timeout_ms=1000,
                      send_chunk=65536, socket_send_buffer=4096) as server:
         with server.connect(timeout=3) as slow:

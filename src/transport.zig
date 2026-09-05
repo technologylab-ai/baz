@@ -7,7 +7,7 @@ const c = std.c;
 
 pub const Socket = i32;
 pub const Completion = struct { token: u64, result: i32 };
-pub const max_send_parts = 5;
+pub const max_send_parts = 16 * 5;
 
 /// Stable metadata for an ordinary gather send. prepare() copies descriptors,
 /// never payloads. The owner retains this object and all payload spans until the

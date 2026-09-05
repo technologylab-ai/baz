@@ -11,6 +11,8 @@ pub const Backend = struct {
     const Kind = enum { free, accept, data, cancel };
     const Operation = struct { kind: Kind = .free, token: u64 = 0, socket: Socket = -1 };
 
+    pub const operation_bytes = @sizeOf(Operation);
+
     allocator: std.mem.Allocator,
     ring: linux.IoUring,
     operations: []Operation,

@@ -7,9 +7,9 @@ experimental execution contract, informed by the [evidence inputs](EVIDENCE.md).
 The [module contracts](INTERFACES.md) describe the low-level interfaces.
 
 Every connection has one startup-reserved slot: receive storage, parser state,
-request view, output storage, response framing storage, eight application state
+request view, a bounded array of response output/framing cells, eight application state
 words, deadline and operation identity. The I/O owner is the thread calling
-`Server.run`. A slot is assigned to application worker `slot_index % workers`.
+`Server.run`. Inline mode uses this same thread with zero workers. In explicit worker mode a slot is assigned to worker `slot_index % workers`.
 There is no unbounded task queue; each slot holds at most one ready/running
 callback. The I/O owner and a worker communicate by publishing atomic phases
 with release/acquire ordering. Wake signals are hints; the phase is authoritative.
@@ -79,11 +79,13 @@ is exhausted, so the callback must flush committed bytes and resume later. It
 must split any individual write larger than the total output buffer. Workers
 do not wait for clients to drain socket output.
 
-Each connection processes one request at a time, preserving response order.
-After finish, the I/O owner may compact an already-received pipelined suffix to
-buffer offset zero, then reset the parser. This is a measured payload copy
-(`pipeline_copy_bytes`). It happens only after the preceding request's worker
-and send borrows have ended. Kernel/userspace socket copies also remain; worker
+Each connection invokes one callback at a time, preserving response order.
+Inline mode may retain up to 16 finished response cells while parsing successive
+already-buffered requests. Each cell has exclusive output/header/chunk storage;
+all borrowed input stays immutable. The input cursor advances without moving
+bytes. After the entire batch drains, the I/O owner compacts any pipelined
+suffix once, then resets the parser. This is a measured payload copy
+(`pipeline_copy_bytes`), performed only after every prior send borrow ends. Kernel/userspace socket copies also remain; worker
 handoff itself publishes descriptors and state rather than copying payloads.
 
 Configured limits are enforced independently: decoded body size, total wire
@@ -91,7 +93,7 @@ bytes, header/trailer bytes and count, target bytes, output capacity, cumulative
 response bytes, admitted slots, workers and operation records. A maximum body
 size does not imply arbitrary chunk framing fits the wire/header budgets.
 The current request deadline is absolute, begins at connection admission or the
-previous response's completion, and is not extended by trickled bytes or flushes.
+previous batch's completion when entering a fresh idle cycle. Already buffered requests retain their earlier cycle start; trickled bytes and flushes do not extend it. An accumulating batch retains its oldest unsent deadline.
 It includes waiting for the next header, application queue/execution and output.
 A bounded 10 ms idle poll interval backs up wake signals; it is not a scheduler
 or real-time latency guarantee.
@@ -122,7 +124,7 @@ demo uses process exit 70 instead of unwinding/freeing live storage. An embeddin
 application must preserve that boundary or deliberately retain the entire
 server until all outstanding owners are otherwise proven finished.
 
-Startup checks a conservative pool/stack reservation estimate. The demo then
+Startup computes exact requested framework heap bytes, including response cells and gather metadata, and separately reserves requested worker stack bytes. The demo then
 sets `Budget.limit_bytes` to `memory_budget_bytes - workers * worker_stack_bytes`;
 `live_bytes` and `peak_bytes` count requested bytes through this allocator, and
 allocation/resize/remap growth is refused before exceeding the cap. The requested
@@ -153,9 +155,10 @@ experiments to perform before making production or capacity claims.
 `Config.execution = .inline_event_loop` is the default and requires `workers = 0`. No application
 worker threads, worker pipes or worker-stack budget are provisioned. The same
 handler receives exclusive request/writer borrows on the I/O owner; it returns
-the same frozen flush/finish/close action. One callback result per slot per loop
-turn prevents recursive pipeline/empty-flush continuation; local pending work
-uses a nonblocking backend poll so it does not wait for a nonexistent worker.
+the same frozen flush/finish/close action. A global budget of 64 callbacks per
+turn, at most the effective batch limit per connection, and a rotating scan
+start bound callback dispatch work. Local pending work uses a nonblocking
+backend poll. Neither this count nor deadline checks can preempt a callback.
 
 The application promises a bounded, nonblocking callback. The framework cannot
 preempt it, isolate a crash or enforce wall-clock deadlines during it. Worker
@@ -166,11 +169,35 @@ are separate future API decisions. The inline test does not run the blocking
 
 ## Gathered output snapshot
 
-Gather-send is enabled by default. The response's at-most-five immutable framing
-and payload slices are described by startup-reserved iovecs and msghdr storage,
+Gather-send is enabled by default. Each cell's at-most-five immutable framing
+and payload slices (at most 80 per batch) are described by startup-reserved iovecs and msghdr storage,
 retained through the terminal SENDMSG completion on Linux or the nonblocking
 sendmsg/completion adapter on Mac. A positive completion can cross several spans;
 advance the cursor by its aggregate count, capped by send_chunk and i32. No
 borrowed body is copied into a contiguous transport buffer. A cancellation
 acknowledgement alone still cannot release target storage. The scalar switch
 exists for controlled comparison and retains the same completion/ownership rules.
+
+## Bounded response batches and flush barriers
+
+The configured response-cell limit is 1–16, default 16; worker mode's effective
+limit is always 1. Output bytes are reserved per cell at startup. Request/writer
+metadata is reused only after its finished response has been frozen into a
+separate cell; immutable payload and framing storage is retained until the
+batch's terminal sends finish. Ordinary generated output and request-owned
+borrowed bodies use this same path, with no route-specific response cache.
+
+Drain when the next request needs input, the cell/global callback limit is
+reached, or a handler flushes/closes. Never delay output waiting to fill a batch.
+A flush drains preceding finished responses and the current snapshot, releases
+all cells, then resumes the same active request/state with an empty first-cell
+writer. Later malformed input or an Expect handshake waits behind prior output
+in wire order. A send completion may cross response boundaries; aggregate caps,
+short completion cursors and separate cancellation/target ownership still apply.
+
+Completed-request counts and request-cycle maxima are recorded at whole-batch
+drain. A sent prefix of a subsequently canceled batch may be omitted. These
+metrics intentionally do not claim individual response completion timestamps.
+The batch integration suite checks 32 distinct generated/borrowed bodies,
+barriers, fairness and pending cancellation; these fixtures are finite witnesses,
+not starvation or production latency guarantees.

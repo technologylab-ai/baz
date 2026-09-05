@@ -137,8 +137,10 @@ pub const Parser = struct {
         return .{ .limits = limits };
     }
 
-    /// Call only after all borrows of the preceding request have returned.
-    /// The caller may then move an unconsumed pipelined suffix to buffer offset 0.
+    /// Reset parser metadata for a new independent input view. Existing Request
+    /// slices may remain borrowed if their underlying bytes stay unchanged.
+    /// Moving an input suffix requires every affected callback/transport borrow
+    /// to have returned; resetting parser metadata does not release those borrows.
     pub fn reset(self: *Parser) void {
         self.* = init(self.limits);
     }

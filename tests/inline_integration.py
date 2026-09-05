@@ -22,6 +22,7 @@ from integration import (PLAINTEXT, REQUEST, ROOT, ResponseReader, Server,
 
 class InlineServer(Server):
     def __init__(self, binary, **options):
+        options.setdefault("response_batch_limit", 1)
         super().__init__(binary, execution="inline", workers=0, **options)
 
     def __exit__(self, kind, value, tb):

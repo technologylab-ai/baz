@@ -36,11 +36,13 @@ port, reported in `READY`. The HTML file is loaded before serving starts.
 | `/` and `/index.html` | The startup-loaded [assets/index.html](assets/index.html); `--index FILE` selects another file, limited to 64 KiB. |
 | `/echo` | Echoes the complete bounded request body through borrowed spans; accepts Content-Length or chunked framing. |
 | `/chunks` | Three flush/resume turns followed by finish, producing `first second third` with chunked response framing. |
-| `/stall` | Deliberately sleeps on its application worker; `--stall-ms` controls this experimental fixture. |
+| `/stall` | Worker-mode blocking fixture; inline returns 501. |
+| `/buffered` | Writes its distinct raw request target into reserved output; 413 if it exceeds output capacity. |
+| `/borrowed-body` | Borrows a fixed-length request body through finish; chunked input receives 501. |
 | Other paths | 404. CONNECT receives 501; no tunnel is opened. |
 
 HEAD follows the handler path but suppresses response body bytes. Keep-alive
-and ordered pipelining are supported, with one active request per connection.
+and ordered pipelining are supported, with one active callback per connection and a bounded batch of frozen finished responses.
 The parser validates all framing/header syntax and interprets only the fields
 needed for framing and connection control. `request.header(name)` performs a
 lazy, case-insensitive lookup; its first matching value is borrowed, not copied
@@ -73,7 +75,7 @@ callback is the maintained example. [src/server.zig](src/server.zig) exposes
 experimental and read the [ownership contract](docs/OWNERSHIP.md) before
 retaining slices or adding asynchronous application work.
 
-The default `./zig-out/bin/zig-http` uses inline execution and gather sends.
+The default `./zig-out/bin/zig-http` uses inline execution, gather sends and up to 16 responses per batch.
 `--execution inline` selects it explicitly.
 It provisions **zero application workers** and runs the same handler/writer path
 on the I/O owner. Callbacks and flush resumptions must be short and nonblocking;
@@ -96,8 +98,8 @@ to produce bytes directly in output storage, or `borrow` for eligible existing
 bytes. `write` is the explicit convenience-copying path.
 
 **`return writer.flush()` means send everything currently committed.** It
-freezes that output snapshot and yields the worker. Partial sends continue on
-the I/O owner. Once all snapshot bytes have been handed to the transport, the
+freezes that output snapshot and yields the callback. Partial sends continue on
+the I/O owner. Once all earlier batched responses and this snapshot have been accepted by the local socket, the
 handler resumes with `event = .flushed` and an empty writable buffer. Success
 means the local socket accepted the bytes; it does not prove peer receipt.
 `return writer.finish()` sends the remaining bytes and completes HTTP framing,
@@ -122,7 +124,9 @@ The default startup limits are explicit:
 | Header/trailer count | 64 combined | `Config.max_headers`; 1–1024. |
 | Request target | 8192 bytes | Fixed MVP parser setting, also subject to the header budget. |
 | Receive wire buffer per slot | `max_header + 2 * max_body + 4096` | Checked startup derivation; chunk framing consumes this independent bound. |
-| Writable output per slot | 4 KiB | `--output-bytes`; 1 byte–64 KiB. |
+| Writable output per response cell | 4 KiB | `--output-bytes`; 1 byte–64 KiB. |
+| Response cells per connection | 16 inline, 1 workers | `--response-batch-limit`; 1–16, effective limit 1 in worker mode. |
+| Inline callbacks per event-loop turn | 64 globally | Fixed fairness budget; each connection gets at most its response batch limit, with rotating scan start. |
 | Logical response body | 16 MiB | `--max-response`; counted across flushes. |
 | Request cycle deadline | 5000 ms | `--timeout-ms`; includes receive, worker queue/execution and response sending. |
 | Shutdown drain deadline | 5000 ms | `Config.shutdown_ms`; positive. |
@@ -143,7 +147,7 @@ The demo caps requested live bytes through its framework allocator at
 `memory_budget_bytes - workers * worker_stack_bytes`, reserving the requested
 worker stack budget separately. `Budget` tracks live/peak requested bytes and
 refuses allocation, resize or remap growth beyond that heap cap. Startup also
-checks a conservative pool/stack estimate. This is not an RSS limit: allocator
+checks exact requested framework heap bytes plus requested worker stacks before allocation, including every response cell and gather descriptor. This is not an RSS limit: allocator
 metadata, libc/pthread metadata and actual stack mappings, mapped kernel rings,
 socket queues, loaded assets and arbitrary application allocations require
 separate accounting. Zig 0.16's pthread implementation uses its C allocator for
@@ -171,7 +175,7 @@ latencies; it may be the bottleneck. It is a smoke experiment, not server
 capacity or an open-loop service-level measurement. The separate
 [Linux contender comparison](reports/2026-09-05-comparison.md) measures pinned
 Round23 mrhttp/libreactor with wrk: our unchanged MVP is substantially slower,
-especially under pipelining. Its CPU budget, different callback/resource
+especially under pipelining. Subsequent inline/gather and batching experiments preserve that baseline. Its CPU budget, different callback/resource
 contracts and rejected tail-latency evidence are explicit.
 The demo emits `STATS` JSON on clean shutdown: connection/operation peaks,
 refusals, timeouts, flush/resume counts, byte counters, maximum queue/handler/
@@ -186,7 +190,7 @@ startup metadata; the body remains borrowed through terminal completion.
 `--gather-send 0` retains the scalar path for controlled comparison.
 Ordinary socket I/O still copies across the kernel boundary; this MVP does not
 use `SEND_ZC`, zero-copy receive or file `sendfile`. Pipelined suffix compaction
-currently copies bytes within the receive buffer and is counted explicitly.
+copies the remaining suffix once after a whole batch drains and is counted explicitly.
 The Linux adapter uses raw `std.os.linux.IoUring`, not `std.Io.Evented` or
 `std.Io.Threaded`; the kernel's own resources are outside the fixed application
 worker count.
@@ -195,3 +199,21 @@ Reproduce all three finite smoke workloads with `python3 tools/smoke.py`. It
 checks the running binary reports ReleaseSafe. For isolated Linux verification
 from the Mac, run `tools/verify_linux_ssh.sh omarx1`; use a clean pushed checkout
 for publication evidence.
+
+Response batching uses the ordinary handler and writer for every request; there
+is no cached plaintext response path. Each finished response keeps separate
+header/output/chunk storage until terminal sends release the whole batch. A
+batch drains at its configured limit, when the available pipeline ends, on
+flush/close, or when the callback budget is exhausted. It never waits for a
+batch to fill. `--response-batch-limit 1` gives a controlled unbatched comparison.
+At most 80 spans (five per cell) are described by the gather metadata; the
+aggregate `--send-chunk` limit still applies. Request input stays immutable
+while any response borrows it.
+
+Run `python3 tests/batch_integration.py` for distinct generated and borrowed
+bodies, mixed routes, small send caps, flush/order barriers, fairness and
+cancellation; `tests/gather_integration.py` tests transport operations separately.
+The server counts completed requests and cycle maxima when their containing
+batch fully drains. A successfully sent prefix of a later canceled batch may
+therefore be omitted; these are conservative batch completion observations,
+not exact per-request latency measurements.
