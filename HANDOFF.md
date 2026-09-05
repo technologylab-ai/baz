@@ -154,8 +154,13 @@ the sibling wiki's hosted Windows checks cover its lifecycle proofs only.
 
 ## Arena/shard architecture branch (Claude, worktree `perf-architecture`)
 
-Branch `worktree-perf-architecture` at `.claude/worktrees/perf-architecture`,
-measured commit `ad424c7`, report
+Reference branch `perf/arena-shards` (measured commit `ad424c7`, handoff at
+`122e903`) is kept untouched for comparison against experiments on the old
+main. `perf/arena-shards-plus-main` merges main's operation-cell, batch/quantum
+and ABBA-harness work on top of it (source resolved to the arena/shard side,
+main's reports, comparator tests, chunked demo routes and a maximum-64-cell
+fixture ported); both native gates pass on the merge. Worktree
+`.claude/worktrees/perf-architecture` is checked out on the merge branch. Report
 [reports/2026-09-05-arena-shards.md](reports/2026-09-05-arena-shards.md),
 design [docs/PERF-ARCHITECTURE.md](docs/PERF-ARCHITECTURE.md). It replaces the
 fixed response cells with a per-connection output arena (head written at
