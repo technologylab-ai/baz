@@ -227,3 +227,9 @@ raise the server's configured response-cell limit. Preflight validates two
 complete pipelines at each measured depth (at least16), followed by timed wrk
 framing/status/error checks. The independent batch wire suite checks distinct
 bodies and ordering through repeated bounded drains.
+
+Comparison receipts record the power profile, CPU driver/governor/EPP, frequency
+bounds, instantaneous endpoint frequency and Intel pstate limits before and after
+each timed trial. An optional `expected_power_profile` configuration field rejects
+an absent or changed endpoint profile. Those snapshots are outside the timed
+region; they do not measure average frequency, residency, or continuous policy.

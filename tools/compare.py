@@ -18,6 +18,7 @@ from pathlib import Path
 import random
 import resource
 import signal
+import shutil
 import socket
 import subprocess
 import sys
@@ -40,6 +41,38 @@ def digest(path):
 
 def capture(command):
     return subprocess.check_output(command, text=True, timeout=10).strip()
+
+
+
+def power_state():
+    """Untimed endpoint observations, not average frequency or residency."""
+    result = dict(profile=None, profile_error=None, cpus={}, intel_pstate={})
+    command = shutil.which('powerprofilesctl')
+    if command:
+        try:
+            result['profile'] = capture([command, 'get'])
+        except (OSError, subprocess.SubprocessError) as error:
+            result['profile_error'] = str(error)
+    else:
+        result['profile_error'] = 'powerprofilesctl unavailable'
+    fields = ('scaling_driver', 'scaling_governor', 'energy_performance_preference',
+              'scaling_min_freq', 'scaling_max_freq', 'scaling_cur_freq')
+    for directory in sorted(Path('/sys/devices/system/cpu').glob('cpu[0-9]*/cpufreq')):
+        values = {}
+        for name in fields:
+            with contextlib.suppress(OSError):
+                values[name] = (directory / name).read_text().strip()
+        result['cpus'][directory.parent.name] = values
+    for name in ('no_turbo', 'min_perf_pct', 'max_perf_pct', 'status'):
+        with contextlib.suppress(OSError):
+            result['intel_pstate'][name] = (Path('/sys/devices/system/cpu/intel_pstate') / name).read_text().strip()
+    result['frequency_units'] = 'kHz; scaling_cur_freq is an untimed instantaneous observation'
+    return result
+
+
+def check_power_state(state, expected):
+    if expected is not None:
+        require(state.get('profile') == expected, 'required power profile was not observed: ' + str(state))
 
 
 def ticks():
@@ -193,7 +226,7 @@ def main():
                    validation='two exact-body/header preflight pipelines at max(16, trial depth); wrk framing/status during load',
                    duration_seconds=args.seconds, repeats=args.repeats, threads=args.threads,
                    seed=args.seed, connections=args.connections, pipeline_depths=args.pipelines,
-                   environment=dict(uname=capture(['uname', '-a']), os_release=Path('/etc/os-release').read_text(),
+                   environment=dict(power_state=power_state(), uname=capture(['uname', '-a']), os_release=Path('/etc/os-release').read_text(),
                        cpuinfo=Path('/proc/cpuinfo').read_text(), meminfo=Path('/proc/meminfo').read_text(),
                        io_uring_disabled=Path('/proc/sys/kernel/io_uring_disabled').read_text().strip(),
                        lscpu=capture(['lscpu']), python=sys.version,
@@ -252,6 +285,8 @@ def main():
                     require(warm.returncode == 0 and trial['warmup']['ok'], 'warmup errors')
                     command = base[:4] + ['-d', f'{args.seconds}s'] + base[4:]
                     trial['client_command'] = command
+                    trial['power_before'] = power_state()
+                    check_power_state(trial['power_before'], config.get('expected_power_profile'))
                     before = descendants(ticks(), root_pid)
                     sys_before = system_ticks()
                     child_before = resource.getrusage(resource.RUSAGE_CHILDREN)
@@ -278,6 +313,8 @@ def main():
                     (args.output / (prefix + '-wrk.log')).write_text(measured.stdout + measured.stderr)
                     require(measured.returncode == 0 and trial['result']['ok'], 'measured client errors')
                     require(process.poll() is None, 'server exited during load')
+                    trial['power_after'] = power_state()
+                    check_power_state(trial['power_after'], config.get('expected_power_profile'))
             finally:
                 if process is not None:
                     pending_error = sys.exc_info()[1]

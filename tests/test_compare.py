@@ -32,6 +32,13 @@ class WrkReceiptTests(unittest.TestCase):
         self.assertTrue(result['ok'])
         self.assertEqual(result['responses_per_second'], 800)
 
+    def test_required_power_profile_cannot_silently_change_or_disappear(self):
+        compare.check_power_state({'profile': 'performance'}, 'performance')
+        compare.check_power_state({'profile': None}, None)
+        for actual in ('balanced', 'power-saver', None):
+            with self.assertRaises(RuntimeError):
+                compare.check_power_state({'profile': actual}, 'performance')
+
     def test_incomplete_or_ambiguous_receipt_rejected(self):
         for text in ['', self.receipt() * 2, self.receipt(requests=0), self.receipt(duration_us=0)]:
             with self.assertRaises(RuntimeError):

@@ -53,6 +53,12 @@ Preparation produces `preparation.log`, `preparation.json`, and
 and the mrhttp virtual environment entirely under that root. Builds run
 sequentially, each capped at two make jobs; the mrhttp build container gets two
 CPUs. The native server build uses Zig `ReleaseSafe` with assertions enabled.
+The generated Zig launch explicitly selects `--execution inline --workers 0`,
+matching the current default. Its `expected_execution` receipt check requires
+`inline_event_loop`; it does not silently select the earlier worker model.
+The generated configuration retains a three-CPU server affinity budget for all
+contenders. A separate one-CPU comparison must explicitly change that budget and
+the mrhttp worker count together before measurement.
 Each subprocess has a finite timeout (normally 300 seconds, 600 for the image
 pull), and the whole preparation has a one-hour watchdog. Interrupted native
 commands terminate their owned process groups. The install container has a unique

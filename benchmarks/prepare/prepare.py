@@ -282,7 +282,8 @@ cat /etc/os-release > /work/os-release.txt
                       wrk=str(self.root / 'bin/wrk'), implementation_commit=self.args.commit,
                       servers=[
             dict(name='zig-http', cwd=str(source), command=[str(binary), '--port', '8080', '--connections', '128',
-                 '--workers', '2', '--duration-ms', '120000'], body='Hello, World!'),
+                 '--execution', 'inline', '--workers', '0', '--duration-ms', '120000'],
+                 body='Hello, World!', expected_execution='inline_event_loop'),
             dict(name='libreactor', cwd=str(self.root), command=[str(self.root / 'bin/libreactor')], body='Hello, World!'),
             dict(name='mrhttp', cwd=str(self.root), command=['sh', str(self.root / 'mrhttp-build/launch.sh')],
                  body='Hello, world!', pid_command=['docker', 'inspect', '-f', '{{.State.Pid}}', container],
