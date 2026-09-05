@@ -90,15 +90,17 @@ def system_delta(before, after):
     return output
 
 
-def preflight(port, expected):
+def preflight(port, expected, pipeline):
+    depth = max(16, pipeline)
+    require(depth in (16, 32, 64, 128), "bounded preflight pipeline")
     dates = []
     header_sample = None
     for phase in range(2):
         with socket.create_connection(('127.0.0.1', port), 2) as sock:
             sock.settimeout(3)
             reader = WIRE.ResponseReader(sock)
-            sock.sendall(WIRE.REQUEST * 16)
-            for _ in range(16):
+            sock.sendall(WIRE.REQUEST * depth)
+            for _ in range(depth):
                 status, headers, body = reader.response()
                 require(status == 200 and body == expected, 'wrong plaintext status/body')
                 require(headers.get(b'content-type', b'').lower().startswith(b'text/plain'), 'content type')
@@ -111,7 +113,7 @@ def preflight(port, expected):
         if phase == 0:
             time.sleep(1.2)
     require(dates[0] != dates[-1], 'Date did not advance')
-    return dict(validated_responses=32, exact_body=expected.decode(), headers=header_sample,
+    return dict(validated_responses=2 * depth, pipeline_depth=depth, exact_body=expected.decode(), headers=header_sample,
                 first_date=dates[0], last_date=dates[-1])
 
 
@@ -168,7 +170,7 @@ def main():
     parser.add_argument('--seconds', type=int, default=5)
     parser.add_argument('--repeats', type=int, default=3)
     parser.add_argument('--connections', type=int, nargs='+', default=[8, 32, 128])
-    parser.add_argument('--pipelines', type=int, nargs='+', choices=[1, 16], default=[1, 16])
+    parser.add_argument('--pipelines', type=int, nargs='+', choices=[1, 16, 32, 64, 128], default=[1, 16])
     parser.add_argument('--threads', type=int, default=4)
     parser.add_argument('--seed', type=int, default=20260905)
     args = parser.parse_args()
@@ -177,7 +179,7 @@ def main():
     require(1 <= args.threads <= 8 and all(args.threads <= c <= 128 and c % args.threads == 0
                                           for c in args.connections), 'connection/thread bounds')
     require(len(set(args.connections)) == len(args.connections) <= 3, 'at most three distinct connection counts')
-    require(len(set(args.pipelines)) == len(args.pipelines) <= 2, 'distinct pipeline depths')
+    require(len(set(args.pipelines)) == len(args.pipelines) <= 5, 'distinct pipeline depths')
     config = json.loads(args.configuration.read_text())
     require(1 <= len(config['servers']) <= 4, 'bounded contender count')
     require(not set(config['server_cpus']) & set(config['client_cpus']), 'overlapping CPU budgets')
@@ -187,8 +189,8 @@ def main():
                    started_utc=datetime.now(timezone.utc).isoformat(), configuration=config,
                    harness_sha256=digest(__file__), lua_sha256=digest(ROOT / 'benchmarks/pipeline.lua'),
                    configuration_sha256=digest(args.configuration), wrk_sha256=digest(config['wrk']),
-                   latency_model='wrk corrected batch histogram; batch depth1 or16; closed loop',
-                   validation='32 exact-body/header responses per trial before timed load; wrk framing/status during load',
+                   latency_model='wrk corrected batch histogram; configured pipeline depth; closed loop',
+                   validation='two exact-body/header preflight pipelines at max(16, trial depth); wrk framing/status during load',
                    duration_seconds=args.seconds, repeats=args.repeats, threads=args.threads,
                    seed=args.seed, connections=args.connections, pipeline_depths=args.pipelines,
                    environment=dict(uname=capture(['uname', '-a']), os_release=Path('/etc/os-release').read_text(),
@@ -237,7 +239,7 @@ def main():
                             require(process.poll() is None and time.monotonic() < deadline, 'READY watchdog')
                             time.sleep(.02)
                         require('optimize=ReleaseSafe' in logpath.read_text(), 'benchmark requires ReleaseSafe')
-                    trial['preflight'] = preflight(server.get('port', 8080), server['body'].encode())
+                    trial['preflight'] = preflight(server.get('port', 8080), server['body'].encode(), pipeline)
                     root_pid = int(capture(server['pid_command'])) if server.get('pid_command') else process.pid
                     trial['root_pid'] = root_pid
                     base = ['taskset', '-c', ','.join(map(str, config['client_cpus'])), config['wrk'],

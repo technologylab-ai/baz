@@ -2,7 +2,7 @@
 -- Pattern follows wg/wrk a211dd5a7050b1f9e8a9870b95513060e72ac4a0/scripts/pipeline.lua.
 init = function(args)
   local depth = tonumber(args[1])
-  assert(depth == 1 or depth == 16)
+  assert(depth == 1 or depth == 16 or depth == 32 or depth == 64 or depth == 128)
   local requests = {}
   for i = 1, depth do requests[i] = wrk.format() end
   request_bytes = table.concat(requests)

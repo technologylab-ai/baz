@@ -217,3 +217,10 @@ The server counts completed requests and cycle maxima when their containing
 batch fully drains. A successfully sent prefix of a later canceled batch may
 therefore be omitted; these are conservative batch completion observations,
 not exact per-request latency measurements.
+
+The Linux wrk harness accepts pipeline depths 1,16,32,64,128; its default remains
+1/16 for the original TechEmpower comparison. Deeper client pipelines do not
+raise the server's configured response-cell limit. Preflight validates two
+complete pipelines at each measured depth (at least16), followed by timed wrk
+framing/status/error checks. The independent batch wire suite checks distinct
+bodies and ordering through repeated bounded drains.

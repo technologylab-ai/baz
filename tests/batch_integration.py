@@ -108,6 +108,57 @@ def run(binary, emit, sessions):
             wire.require(server.stats["gather_send_operations"] < 32, "batching failed to reduce sends")
         emit("distinct_generated_output_cells_limit_%d" % limit)
 
+    # Client pipeline depth and server batch capacity are independent limits.
+    # Deep pipelines must cross repeated cell reuse and receive compaction while
+    # the server retains at most sixteen frozen response cells at any time.
+    for depth in (32, 64, 128):
+        for kind in ("generated", "borrowed_body"):
+            with BatchServer(binary, response_batch_limit=16) as server:
+                with server.connect() as sock:
+                    expected, requests = [], []
+                    for index in range(depth):
+                        if kind == "generated":
+                            body = (b"/buffered?depth=" + str(depth).encode() +
+                                    b"&index=" + str(index).encode() + b"&value=" + b"x" * index)
+                            requests.append(get(body))
+                        else:
+                            body = depth.to_bytes(2, "big") + index.to_bytes(2, "big") + bytes([index]) * (index + 1)
+                            requests.append(b"POST /borrowed-body HTTP/1.1\r\nHost: localhost\r\nContent-Length: " +
+                                            str(len(body)).encode() + b"\r\n\r\n" + body)
+                        expected.append(body)
+                    encoded = b"".join(requests)
+                    wire.require(len(encoded) <= 65536, "deep pipeline fixture exceeded its write bound")
+                    sock.sendall(encoded)
+                    reader = wire.ResponseReader(sock)
+                    for index, expected_body in enumerate(expected):
+                        status, headers, body = reader.response()
+                        wire.require(status == 200 and body == expected_body and
+                                     headers.get(b"content-length") == str(len(expected_body)).encode(),
+                                     "%s depth %d response %d lost order or retained bytes" % (kind, depth, index))
+                    # Reuse this exact connection after all deep responses have
+                    # arrived; another request must not see stale parser/cell state.
+                    reused = (b"/buffered?reused=" + kind.encode() + b"-" + str(depth).encode())
+                    sock.sendall(get(reused) + get(b"/plaintext", close=True))
+                    status, headers, body = reader.response()
+                    wire.require(status == 200 and body == reused and
+                                 headers.get(b"content-length") == str(len(reused)).encode(),
+                                 "deep pipeline left stale state on its reused connection")
+                    wire.require(reader.response()[2] == wire.PLAINTEXT, "reused connection lost final response")
+                    wire.expect_closed(sock)
+            stats = server.stats
+            wire.require(stats["accepted"] == 1 and stats["completed"] == depth + 2,
+                         "deep pipeline did not complete on one reused connection")
+            wire.require(stats["response_batch_limit"] == 16 and 1 < stats["max_batch_responses"] <= 16,
+                         "deep client pipeline changed or failed to exercise the server batch bound")
+            wire.require(stats["max_inline_callbacks_per_turn"] <= 64,
+                         "deep pipeline exceeded the global callback turn budget")
+            wire.require(stats["allocation_calls_after_start"] == 0 and
+                         stats["live_connections"] == stats["live_operations"] == 0,
+                         "deep pipeline leaked ownership or allocated after startup")
+            sessions.append(dict(phase="deep_pipeline", kind=kind, pipeline_depth=depth,
+                                 response_batch_limit=16, wire_bytes=len(encoded), stats=stats))
+            emit("deep_%s_pipeline_%d_batch_limit_16_and_reuse" % (kind, depth))
+
     with BatchServer(binary) as server:
         with server.connect() as sock:
             sock.sendall(wire.REQUEST * 7 + b"POST /echo HTTP/1.1\r\nHost: localhost\r\nContent-Length: 5\r\n\r\nhe")
