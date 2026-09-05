@@ -7,6 +7,7 @@ witness batching; timing is only a watchdog, never a throughput measurement.
 import argparse
 import contextlib
 import json
+import os
 from pathlib import Path
 import signal
 import socket
@@ -64,6 +65,85 @@ def mixed(count):
             requests.append(get(b"/chunks"))
             expected.append((False, b"first second third"))
     return b"".join(requests), expected
+
+
+@contextlib.contextmanager
+def paused(server):
+    """Queue bounded loopback input before accept/recv without assuming packets.
+
+    Observe the child stop with a one-second watchdog and always resume it,
+    including when connect/send fails. Counter assertions remain the evidence
+    that a full batch was actually frozen/submitted after resumption.
+    """
+    server.process.send_signal(signal.SIGSTOP)
+    deadline = time.monotonic() + 1
+    try:
+        while time.monotonic() < deadline:
+            pid, status = os.waitpid(server.process.pid, os.WNOHANG | os.WUNTRACED)
+            if pid:
+                wire.require(os.WIFSTOPPED(status), "server exited while preparing queued input")
+                break
+            time.sleep(0.001)
+        else:
+            raise TimeoutError("server stop acknowledgement deadline")
+        yield
+    finally:
+        if server.process.poll() is None:
+            server.process.send_signal(signal.SIGCONT)
+
+
+def maximum_cells(binary, emit, sessions):
+    # Sixty-four distinct chunked responses frozen at once in both ownership
+    # forms. Generated chunked bodies stay contiguous in the arena (one span);
+    # borrowed chunked bodies keep their input borrow between arena runs, so
+    # the batch describes 2 * 64 + 1 spans. Partial caps split the same batch.
+    for kind in ("generated", "borrowed_body"):
+        for cap in (65536, 23):
+            with BatchServer(binary, response_batch_limit=64, callbacks_per_turn=256, max_body=32768,
+                             send_chunk=cap, borrow_copy_threshold=0) as server:
+                with contextlib.ExitStack() as stack:
+                    expected, requests = [], []
+                    for index in range(64):
+                        if kind == "generated":
+                            body = b"/buffered-chunked?cell=" + str(index).encode() + b"&value=" + b"x" * index
+                            requests.append(get(body))
+                        else:
+                            body = index.to_bytes(2, "big") + bytes([index]) * (index + 1)
+                            requests.append(b"POST /borrowed-body-chunked HTTP/1.1\r\nHost: localhost\r\nContent-Length: " +
+                                            str(len(body)).encode() + b"\r\n\r\n" + body)
+                        expected.append(body)
+                    encoded = b"".join(requests)
+                    wire.require(len(encoded) <= 16384, "maximum-cell input exceeded its finite queue bound")
+                    with paused(server):
+                        sock = stack.enter_context(server.connect())
+                        sock.sendall(encoded)
+                    reader = wire.ResponseReader(sock)
+                    for index, expected_body in enumerate(expected):
+                        status, headers, body = reader.response()
+                        wire.require(status == 200 and body == expected_body and
+                                     headers.get(b"transfer-encoding") == b"chunked" and b"content-length" not in headers,
+                                     "%s cell %d lost generated/borrowed bytes or framing" % (kind, index))
+                    # Partial-send progress must release every old cell before
+                    # a flush/resume barrier and an ordered closing suffix.
+                    sock.sendall(get(b"/buffered?prefix") + get(b"/chunks") +
+                                 get(b"/buffered?close", close=True) + wire.REQUEST)
+                    for expected_body in (b"/buffered?prefix", b"first second third", b"/buffered?close"):
+                        wire.require(reader.response()[2] == expected_body, "maximum-cell reuse/flush/close order corrupted")
+                    wire.require(not reader.buffer, "closing response emitted a pipelined suffix")
+                    wire.expect_closed(sock)
+            stats = server.stats
+            wire.require(stats["completed"] == 67 and stats["max_batch_responses"] == 64,
+                         "fixture failed to freeze all 64 distinct cells")
+            wire.require(stats["flushes"] == stats["resumed"] == 3, "flush barrier lost a continuation")
+            wire.require(stats["max_send_bytes"] <= cap, "maximum-cell aggregate send cap exceeded")
+            if cap == 65536:
+                expected_parts = 1 if kind == "generated" else 2 * 64 + 1
+                wire.require(stats["max_send_parts"] == expected_parts,
+                             "%s batch did not form %d span(s)" % (kind, expected_parts))
+            else:
+                wire.require(stats["gather_send_operations"] > 64, "partial-cap fixture did not split frozen responses")
+            sessions.append(dict(phase="maximum_cells", kind=kind, send_chunk=cap, stats=stats))
+            emit("maximum_64_%s_chunked_cells_cap_%d" % (kind, cap))
 
 
 def run(binary, emit, sessions):
@@ -226,6 +306,8 @@ def run(binary, emit, sessions):
             wire.require(reader.response()[2] == wire.PLAINTEXT, "buffer rejection lost next request")
     sessions.append(dict(phase="output_boundary", stats=server.stats))
     emit("buffered_demo_output_limit_returns_ordered_413")
+
+    maximum_cells(binary, emit, sessions)
 
     with BatchServer(binary, connections=8) as server:
         with contextlib.ExitStack() as stack:

@@ -55,7 +55,7 @@ pub fn main(init: std.process.Init) !void {
             config.response_batch_limit = try std.fmt.parseInt(u16, value, 10);
         } else if (std.mem.eql(u8, flag, "--borrow-copy-threshold")) {
             config.borrow_copy_threshold = try std.fmt.parseInt(u32, value, 10);
-        } else if (std.mem.eql(u8, flag, "--callbacks-per-turn")) {
+        } else if (std.mem.eql(u8, flag, "--callbacks-per-turn") or std.mem.eql(u8, flag, "--inline-callback-budget")) {
             config.callbacks_per_turn = try std.fmt.parseInt(u32, value, 10);
         } else if (std.mem.eql(u8, flag, "--callback-timing")) {
             config.callback_timing = if (std.mem.eql(u8, value, "1")) true else if (std.mem.eql(u8, value, "0")) false else return error.InvalidCallbackTiming;
@@ -149,15 +149,18 @@ fn handle(context: *api.Context) !api.Action {
         try writer.begin(501, "text/plain", 0);
         return writer.finish();
     }
-    if (std.mem.eql(u8, path, "/borrowed-body")) {
+    if (std.mem.eql(u8, path, "/borrowed-body") or std.mem.eql(u8, path, "/borrowed-body-chunked")) {
         // Fixed-length bodies form one request-owned span. This route finishes
         // without a flush, allowing multiple distinct borrowed bodies in a
         // batch; /echo demonstrates chunked iteration and flush/resume instead.
+        // The chunked variant frames the same borrow with chunk framing, so a
+        // cell carries arena bytes around one borrowed span.
         if (context.request.chunked) {
             try writer.begin(501, "text/plain", 0);
             return writer.finish();
         }
-        try writer.begin(200, "application/octet-stream", context.request.body_bytes);
+        const chunked_output = std.mem.eql(u8, path, "/borrowed-body-chunked");
+        try writer.begin(200, "application/octet-stream", if (chunked_output) null else context.request.body_bytes);
         try writer.borrow(context.request.body_wire);
         return writer.finish();
     }
@@ -208,7 +211,7 @@ fn handle(context: *api.Context) !api.Action {
     if (std.mem.eql(u8, path, "/plaintext")) {
         try writer.begin(200, "text/plain", 13);
         try writer.borrow("Hello, World!");
-    } else if (std.mem.eql(u8, path, "/buffered")) {
+    } else if (std.mem.eql(u8, path, "/buffered") or std.mem.eql(u8, path, "/buffered-chunked")) {
         // A generated response exercises the ordinary output arena ownership.
         // Distinct targets make accidental reuse across a pipeline observable.
         // The arena is shared with earlier unsent responses: a reservation that
@@ -219,7 +222,7 @@ fn handle(context: *api.Context) !api.Action {
                 try writer.begin(413, "text/plain", 0);
                 return writer.finish();
             }
-            try writer.begin(200, "text/plain", target.len);
+            try writer.begin(200, "text/plain", if (std.mem.eql(u8, path, "/buffered-chunked")) null else target.len);
         }
         const destination = writer.reserve(target.len) catch |err| switch (err) {
             error.WouldBlock => return writer.flush(),

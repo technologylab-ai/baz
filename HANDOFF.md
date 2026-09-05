@@ -1,5 +1,63 @@
 # HTTP experiment handoff — 2026-09-05
 
+Completed performance work is consolidated on `perf/batch-quantum` in
+`/Users/rs/code/github.com/technologylab.ai/zig-http-batchq` before main publication.
+Direct operation cells are preserved at adf24f380ac56b2ae142e514a1491be1e08d4a20
+on `perf/direct-operation-cells` / `zig-http-opcells`. Batch/quantum measured
+source is dbb639859e4c8503310933a2e53f0aaf45e2fca0. Both named worktrees and
+pushed branches are durable; `git worktree list` locates them after interruption.
+
+[Operation-cell evidence](reports/2026-09-05-operation-cells.md): both native
+gates passed 58 tests/mode,69 wire cases,8 comparator tests and30,000 smoke bodies.
+All 48 Linux paired trials passed. At 128 active clients,1024 reserved connections
+improved median throughput76%/29%/17% at depths1/16/128;128 reserved connections
+improved14%/4%/5%. Cold binding/close scans remain; startup heap is unchanged.
+
+[Batch/callback evidence](reports/2026-09-05-batch-quantum.md): both native gates
+passed 59 tests/mode,77 wire cases,8 comparator tests and30,000 smoke bodies.
+All 24 same-binary matrix trials passed. At client depth128, B16/Q64 measured
+1.951M/s and B64/Q256 2.780M/s; full ranges remain in the packet. Requested heap
+is 31,100,880/59,805,648 bytes at B16/B64; Q alone adds no heap. Defaults16/64
+remain. Tests exercised320 native spans,64 retained cells during cancellation,
+partial/flush/close order, and bounded cold service amid seven hot pipelines.
+
+Implementation/platform agents and both timed runners finished; all owned
+measurement locks were released. The evidence agent finished and verified both complete packets. Parent owns
+final publication gates; measured/native source is unchanged by the doc merge. No queued roadmap
+item implies a running agent. API release/offload, fault/combined-limit
+qualification, output representation/sharding, Mac/HTML/NIC/tail comparisons
+and Windows HTTP remain queued; this does not complete M4.
+
+The external `.claude/worktrees/perf-architecture` remains independent and
+untouched. Preserve shared `/tmp/zig-http-compare.PIwh35` tools: that agent also
+borrows wrk/libreactor. Acquire the host-local `/tmp/zig-http-measurement.lock`
+atomically before future builds/runtime/timing, check pre-existing processes,
+and hold through child cleanup. Windows tuning gates are deferred by the user.
+
+## Historical evidence before this batch/quantum experiment
+
+Latest measurement: [recorded performance-profile depth sweep](reports/2026-09-05-power-profile.md)
+at exact bda54040bb0b809c82824b87a782e96826f05dff, Zig 0.16.0 ReleaseSafe.
+All 24 trials/warmups passed: 643,222,112 timed responses, 2,880 exact preflights.
+One-core Zig medians at depths 16/32/64/128 were 1.746/1.742/1.919/1.923M/s;
+libreactor 4.298/7.263/10.938/13.627M/s. Server batch/callback limits remain 16/64;
+zero final owners/late allocations/timeouts/refusals. Both are faster than the
+preceding unqualified profile sweep, but no controlled profile A/B is established.
+All power-profile and EPP endpoints read performance; governor remained powersave.
+Current-frequency observations are untimed endpoints, not average active clocks.
+
+The preparation agent and Linux timed sweep finished. No timed runner remains
+active. Mac/Windows timings were not run. Windows gates are deferred while tuning
+this Linux/macOS-only HTTP implementation, per the user's explicit decision.
+Another agent takes Mac measurements: use the host-local atomic directory
+`/tmp/zig-http-measurement.lock` on both hosts before load/build/runtime suites.
+If it exists or an earlier benchmark process is active, hold off. Record
+owner.json metadata, keep your lock through child cleanup, then remove only your
+own reservation. The sweep's initial trials predated this new protocol; the
+Linux lock was acquired during the sweep and released after zero owned processes.
+Full protocol: sibling wiki docs/platform-testing.md. Do not assume the hosts
+remain free after an earlier check.
+
 Current performance checkpoints:
 
 - `b8a3afe1bcfd7dd933060e1064cab55c4f7a41c3`: unchanged MVP versus pinned
@@ -13,7 +71,7 @@ Current performance checkpoints:
 - `b7ac35558dea3e418e7dab5e41b1d3bb9054ca73`: generic response batching,
   default16 cells, global64-callback budget, deferred compaction and flush
   barriers. Same-binary pipeline16: batch1 234k/s, batch16 1.22M/s. Separate
-  one-core experiment: Zig1.83M/s versus libreactor2.62M/s. All24+12 trials passed.
+  one-core experiment: Zig1.83M/s versus libreactor2.62M/s. All 24+12 trials passed.
 - `5620905193e496af1c4b297a576c4fe7edd6c4a9`: separate multi-cell pending-cancel
   witness; both Mac and Linux retained16 cells and drained every owner. Both
   hosts pass52 tests in Debug/ReleaseSafe,26+10+11+16 wire cases,30k smoke bodies.

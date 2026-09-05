@@ -209,6 +209,27 @@ The Linux adapter uses raw `std.os.linux.IoUring`, not `std.Io.Evented` or
 `std.Io.Threaded`; the kernel's own resources are outside the fixed application
 worker count.
 
+For two-binary experiments, `tools/compare.py --order abba` runs adjacent
+A/B/B/A trials at identical connections and pipeline depth; the configuration's
+first server is A. It shuffles whole blocks only. `--repeats 2` means two blocks
+and therefore four samples per server/workload. Receipts identify each block,
+position and sample count. This reduces linear time-order bias; it does not
+isolate the host or remove thermal/client variation. The default shuffled
+ordering retains its original one-sample-per-repeat behavior. Use host-local
+`/tmp/zig-http-measurement.lock` reservations for preparation and timed runs,
+and finish all builds before measuring.
+
+Two earlier experiments on the pre-arena implementation are preserved:
+[direct operation cells](reports/2026-09-05-operation-cells.md) (48 paired
+Linux trials and native identity/cancellation gates) and the
+[batch/callback matrix](reports/2026-09-05-batch-quantum.md) (24 same-binary
+trials; at client depth 128, B16/Q64 median 1.951M/s versus B64/Q256 2.780M/s).
+The current transport addresses every operation by cell and the arena replaces
+fixed cells, so those knobs map onto `--response-batch-limit` (1–511) and
+`--callbacks-per-turn`; `--inline-callback-budget` is accepted as an alias.
+The [arena/shard report](reports/2026-09-05-arena-shards.md) records the
+current implementation's Mac ladder and interleaved Linux pairs.
+
 Reproduce all three finite smoke workloads with `python3 tools/smoke.py`. It
 checks the running binary reports ReleaseSafe. For isolated Linux verification
 from the Mac, run `tools/verify_linux_ssh.sh omarx1`; use a clean pushed checkout
