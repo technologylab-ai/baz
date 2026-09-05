@@ -146,10 +146,12 @@ The default startup limits are explicit:
 
 Startup rejects inconsistent or over-budget configurations. The configured
 connection count bounds admitted slots, not the kernel TCP backlog. The server
-may accept one extra descriptor and immediately close it when all slots are
+may transiently accept one extra descriptor per shard/listener and immediately
+close it when all admitted slots are
 occupied; it creates no extra request state and does not promise an HTTP 503.
 Each connection has one receive and one send operation cell plus a cancel
-cell for each, `4 * connections + 2` operation records in all; the optional `--prearm-receive 1` path can arm the next
+cell for each, `4 * connections + 2` operation records per shard
+(`shards * (4 * connections + 2)` across the cluster); the optional `--prearm-receive 1` path can arm the next
 receive while the previous batch is still being sent. Admission resumes
 when the old application and transport owners have actually released a slot.
 

@@ -7,7 +7,7 @@ publication_commit=$(git -C "$repository_root" rev-parse HEAD 2>/dev/null || pri
 printf 'checkout_commit=%s (streamed tree; require clean status for publication)\n' "$publication_commit"
 
 COPYFILE_DISABLE=1 tar --no-xattrs --exclude=.git --exclude=.zig-cache \
-    --exclude=zig-out --exclude='__pycache__' -C "$repository_root" -czf - . |
+    --exclude=zig-out --exclude=.claude/worktrees --exclude='__pycache__' -C "$repository_root" -czf - . |
     ssh -o BatchMode=yes -o ConnectTimeout=5 "$linux_host" 'set -eu
         run_directory=$(mktemp -d /tmp/zig-http.XXXXXX)
         cleanup() {

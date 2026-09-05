@@ -301,5 +301,6 @@ A received write-half EOF ends input, not pending responses. Complete buffered
 requests and output drain in order; an incomplete suffix receives 400 after the
 valid prefix. A prearmed body arriving before an interim 100 SEND completion
 waits for that send, then parsing resumes from the bytes already buffered.
-Deterministic Zig tests force both completion orders; the finite
+Deterministic Zig tests force body-before-interim and EOF-before-output-drain
+interleavings; the finite
 `tests/arena_lifecycle_integration.py` suite also exercises these wire paths.

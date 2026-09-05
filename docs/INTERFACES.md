@@ -63,4 +63,22 @@ server caps aggregate bytes and advances partial sends across vector
 boundaries. Adapter `operation_bytes` allows Config.heapBytes to include exact
 requested operation storage; these counts exclude kernel ring/socket allocations.
 With `reuse_port`, several backends bind one port and Linux distributes
-connections across them; XNU does not.
+connections across them in the tested configuration. The M3 Max branch fixture
+observed every connection at the last-bound listener, so the current macOS
+configuration rejects multiple shards. That observation is not a universal
+XNU API guarantee.
+
+
+## Cluster startup and application ownership
+
+`Cluster.init` validates the process-wide admitted-connection ceiling and exact
+requested heap plus startup stacks. Each shard reserves full connection storage.
+`Cluster.start` prepares workers and secondary owners behind a release gate;
+the caller seals its allocator before `Cluster.run` releases request I/O.
+Partial startup aborts without dispatching callbacks. Secondary-owner failure
+requests cluster stop; finite exit acknowledgements precede joins, with process
+exit70 when ownership cannot be reconciled. See OWNERSHIP.md for embedding and
+external-watchdog requirements. The same application pointer is shared between
+shards: simultaneous handlers on different connections require immutable or
+synchronized application state. Worker dispatch uses a slot-owned header cache
+snapshot; inline dispatch reads its owner's cache directly.

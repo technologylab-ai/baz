@@ -1,20 +1,41 @@
 # HTTP experiment handoff — 2026-09-05
 
-Current adoption work is on `integrate/arena-shards` in the sibling
-`zig-http-arena-integration` worktree. The user selected the external agent's
-merged arena/shard implementation as the new main base. Original references
-`perf/arena-shards` (122e903) and `perf/arena-shards-plus-main` (d5b6d9b) remain
-unchanged; their `.claude` worktrees are preserved. The imported baseline
-passed the Mac gates. Integration adds worker cache snapshots, EOF/interim
-ordering fixes, exact clock groups, bounded shard startup/failure propagation
-and exact coordinator/stack budget accounting. New deterministic and native
-fixtures cover those failures. See reports/2026-09-05-arena-adoption.md.
+Arena/shard adoption is the current base on `integrate/arena-shards` in
+`zig-http-arena-integration`. Measured/hardened source is pushed
+**bbcec8aa9516efc470238b9edeea4f01b1f4a6d7**, descended from the external
+`perf/arena-shards-plus-main` at d5b6d9b. Original reference branches and external
+worktrees remain unchanged and are pushed. The separate wiki proposal is
+merged into its integration branch with navigation restored and claims audited.
 
-Checkpoint: hardened Mac gates passed; Linux native validation is being
-coordinated separately. Qualified three-repetition one-/three-core comparisons
-and main/wiki publication remain pending at this checkpoint. Do not attribute
-older branch measurements to the integrated source. The earlier handoff below
-is historical; its defaults and queued-sharding statements have been superseded.
+[Adoption evidence](reports/2026-09-05-arena-adoption.md) preserves all36 qualified
+Linux trials:1,053,649,993 timed responses and3,840 exact preflights. With three
+server CPUs, Zig/libreactor ratios of medians are0.957/0.909/0.860 at depths
+1/16/128. One CPU gives1.106/0.778/0.596; depth128 remains a substantial
+efficiency gap, whose cause requires profiling. No client-bottleneck or
+parser-only causal conclusion is established. Desktop/power endpoints and
+full ranges remain in the packet; no wrk tail/SLO claim is valid.
+
+Clean pushed bbcec8a passed both native gates: Mac67/69tests per mode with
+2Linux-only skips, Linux69/69,84wire cases,8comparator tests and30k exact smoke
+bodies on each. New witnesses cover worker header-cache ownership, EOF/interim
+completion ordering, exact16callback clock groups, partial shard startup,
+secondary-shard failure and exact coordinator/stack budgets. Framework
+requested heap is29,635,986bytes/88,907,590bytes at1/3shards; admission remains
+process-wide128 while each shard reserves full slot capacity. Inline handlers
+can run concurrently across shards and must synchronize shared application state.
+
+Both timed blocks finished and the Linux reservation was released after child
+cleanup. The extraction compatibility failure was recovered from the original
+raw download without rerunning load. Final publication repeats native gates
+on the clean pushed main commit; its durable receipt belongs in the wiki.
+No queued follow-up implies an active runner. Preserve shared
+`/tmp/zig-http-compare.PIwh35` and all named worktrees. Future load must reacquire
+the host-local measurement lock. Windows tuning stays deferred; M3-006 postponed.
+
+Remaining work: profiled one-core efficiency, lease release/optional offload,
+broader fault and combined-limit qualification, HTML/Mac/NIC/tail comparisons
+and Windows HTTP. This adoption does not complete M4. The older handoff below
+is historical; its defaults and queued-sharding statements are superseded.
 
 Completed performance work is consolidated on `perf/batch-quantum` in
 `/Users/rs/code/github.com/technologylab.ai/zig-http-batchq` before main publication.
