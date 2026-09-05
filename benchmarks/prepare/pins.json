@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "tfb_commit": "523534bb61450e3522d775a749ad060753e26e3a",
+  "zig_version": "0.16.0",
+  "python_image": "python@sha256:53cb5152064a7e7b485ad42704ea63c5155b264c82e7f17de99d3aa28e4f8956",
+  "repositories": {
+    "libdynamic": {
+      "repository": "https://github.com/fredrikwidlund/libdynamic",
+      "commit": "5aacfb1bc8aee9468041313a38a15b086c9d0ee2",
+      "git_archive_sha256": "b3d9d76857e2d1a0ab5210dda686c4420ff9c7810a6c7daf06af4169bb2647d6"
+    },
+    "libclo": {
+      "repository": "https://github.com/fredrikwidlund/libclo",
+      "commit": "cc815bded704919246685093d0574bcf8cafd561",
+      "git_archive_sha256": "fe3dae0658fda0ed203b59b943855ec3c1bc506ba4ac95495e14aaa8dd6e3ff7"
+    },
+    "libreactor": {
+      "repository": "https://github.com/fredrikwidlund/libreactor",
+      "commit": "63fa717a8047b1b5c38bc1d69ad193050e4f0ef7",
+      "git_archive_sha256": "ad779c34125b3ed7f2d1cd6829a48d0ffdbd3b5ac12a9f80b8c6e93f5b589e82"
+    },
+    "wrk": {
+      "repository": "https://github.com/wg/wrk",
+      "commit": "a211dd5a7050b1f9e8a9870b95513060e72ac4a0",
+      "git_archive_sha256": "b20a12b40716e4c1e750ba308da815634ab57a2c52831a03288d1a6ad3df6a14"
+    }
+  },
+  "tfb_files": {
+    "frameworks/C/libreactor/Makefile": "a1d9e6d8f67a5c2749d0b76c24240a0583b13c11490131debd59cc08c33e74b3",
+    "frameworks/C/libreactor/libreactor.dockerfile": "1192e01eba2ad47fb12b7385de01dac4672b873d33911ee6dfeda2db60bd623f",
+    "frameworks/C/libreactor/src/libreactor.c": "4ff49890dd0d356e0518a82acc6805bc7edf95753ec40c798d694191857861a7",
+    "frameworks/C/libreactor/src/libreactor-server.c": "e8161f9b776cf8b6c775a770877a56caca8132318e689458d471c8714101b7ca",
+    "frameworks/C/libreactor/src/helpers.c": "77b51ad2bcfcac9cd02f68d53af3c8c0a2156c4ecf1b3b9a40e31ccc1acb1304",
+    "frameworks/C/libreactor/src/helpers.h": "880d93e8b4974ce9ed6056f450d54b4d87624c47be8c08d0bd833f2bc47fe6d7",
+    "frameworks/Python/mrhttp/app.py": "6735cbeedcc71e5b2d4bf0306dab548526e6ef6d4a2f7fc46f8de84f2d64c6d6",
+    "frameworks/Python/mrhttp/mrhttp.dockerfile": "bb17d3cd2b053555374ebdeb3aacdb7e26342433b66e8205449ea0f50b6e1292",
+    "frameworks/Python/mrhttp/requirements.txt": "ef3e108ac005de172c4966ea6a3a2bf7a344f6e06c5bdf5cb9d587670172bfd5"
+  },
+  "mrhttp_packages": [
+    {
+      "project": "asyncpg",
+      "version": "0.25.0",
+      "filename": "asyncpg-0.25.0-cp38-cp38-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl",
+      "sha256": "4327f691b1bdb222df27841938b3e04c14068166b3a97491bec2cb982f49f03e",
+      "url": "https://files.pythonhosted.org/packages/92/02/a776123f8a88e1e9f493d1026029e657be99a775693e708c7e3973e2e2b7/asyncpg-0.25.0-cp38-cp38-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl",
+      "upload_time": "2021-11-16T22:58:26.750304Z"
+    },
+    {
+      "project": "mrhttp",
+      "version": "0.12",
+      "filename": "mrhttp-0.12-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+      "sha256": "bb20d12155b1d470c108b8ae72e30a5a1a604747a48c02464c1419faf6020aaf",
+      "url": "https://files.pythonhosted.org/packages/38/f7/ea4bb7ab085a9cf131c2e91c4c593cf4c7a8db7a909c01996f259dc8f817/mrhttp-0.12-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+      "upload_time": "2024-03-22T21:25:28.763122Z"
+    },
+    {
+      "project": "mrjson",
+      "version": "1.4",
+      "filename": "mrjson-1.4-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+      "sha256": "9a788d7d9c97177dd4397c0d3fae8ceac9d14a3a5c9514f78580d5fa4c71000b",
+      "url": "https://files.pythonhosted.org/packages/8e/12/a8467d83c01b23ed69ebdad27199e57a8d9e41a829d266cc4ef12d17110f/mrjson-1.4-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+      "upload_time": "2023-12-12T22:29:38.297652Z"
+    },
+    {
+      "project": "mrpacker",
+      "version": "1.5",
+      "filename": "mrpacker-1.5.tar.gz",
+      "sha256": "13b3c47317cff697d8af4fc8d76205bb19d75f301222d33e26018a7860653573",
+      "url": "https://files.pythonhosted.org/packages/a9/4c/fad73adaff6108ebf42e93c09a550687eb749b16c30a754ba5004e810b4d/mrpacker-1.5.tar.gz",
+      "upload_time": "2021-09-17T13:05:14.589588Z"
+    },
+    {
+      "project": "ujson",
+      "version": "5.4.0",
+      "filename": "ujson-5.4.0-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+      "sha256": "0551c1ba0bc9e05b69d9c18266dbc93252b5fa3cd9940051bc88a0dd33607b19",
+      "url": "https://files.pythonhosted.org/packages/5f/f1/b9aadba666b7b3eddae7ca4ab960b225e1a9715801f69201eeb38f01e223/ujson-5.4.0-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+      "upload_time": "2022-07-02T05:33:28.463166Z"
+    },
+    {
+      "project": "uvloop",
+      "version": "0.19.0",
+      "filename": "uvloop-0.19.0-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+      "sha256": "271718e26b3e17906b28b67314c45d19106112067205119dddbd834c2b7ce797",
+      "url": "https://files.pythonhosted.org/packages/13/b6/a5cb14acb1417c1660d722c554757e134462f09eb917e6c49907d990d63a/uvloop-0.19.0-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+      "upload_time": "2023-10-22T22:03:38.108822Z"
+    }
+  ],
+  "wrk_luajit_archive_sha256": "334d23596bdfc0a2e2e1fe815b436f5e1bca552466c8c1a5fe2c0996be9f43b8"
+}

@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "purpose": "Native dependency builds only; no benchmark or runtime server claims",
+  "host": "omarx1",
+  "date_utc": "2026-09-05T16:00:03Z",
+  "uname": "Linux omarx1 7.1.9-arch1-2 #1 SMP PREEMPT_DYNAMIC Fri, 21 Aug 2026 22:18:59 +0000 x86_64 GNU/Linux",
+  "packages": [
+    "gcc 16.2.1+r23+gd564253eb6c8-1",
+    "glibc 2.44+r24+g16be1518495f-1",
+    "openssl 3.6.3-1",
+    "autoconf 2.73-1",
+    "automake 1.18.1-1",
+    "libtool 2.6.2-5",
+    "make 4.4.1-3"
+  ],
+  "build_parallelism": 2,
+  "techempower": {
+    "repository": "https://github.com/TechEmpower/FrameworkBenchmarks",
+    "commit": "523534bb61450e3522d775a749ad060753e26e3a",
+    "subdirectory": "frameworks/C/libreactor",
+    "upstream_files_sha256": {
+      "Makefile": "a1d9e6d8f67a5c2749d0b76c24240a0583b13c11490131debd59cc08c33e74b3",
+      "libreactor.dockerfile": "1192e01eba2ad47fb12b7385de01dac4672b873d33911ee6dfeda2db60bd623f",
+      "src/libreactor.c.upstream": "4ff49890dd0d356e0518a82acc6805bc7edf95753ec40c798d694191857861a7",
+      "src/libreactor-server.c": "e8161f9b776cf8b6c775a770877a56caca8132318e689458d471c8714101b7ca",
+      "src/helpers.c": "77b51ad2bcfcac9cd02f68d53af3c8c0a2156c4ecf1b3b9a40e31ccc1acb1304",
+      "src/helpers.h": "880d93e8b4974ce9ed6056f450d54b4d87624c47be8c08d0bd833f2bc47fe6d7"
+    },
+    "adapted_libreactor_c_sha256": "1b651d1910c349875e9d2f80fdce51868728f543c92327611c88e21d8ca9ed3b"
+  },
+  "libdynamic": {
+    "repository": "https://github.com/fredrikwidlund/libdynamic",
+    "commit": "5aacfb1bc8aee9468041313a38a15b086c9d0ee2",
+    "git_archive_sha256": "b3d9d76857e2d1a0ab5210dda686c4420ff9c7810a6c7daf06af4169bb2647d6"
+  },
+  "libclo": {
+    "repository": "https://github.com/fredrikwidlund/libclo",
+    "commit": "cc815bded704919246685093d0574bcf8cafd561",
+    "git_archive_sha256": "fe3dae0658fda0ed203b59b943855ec3c1bc506ba4ac95495e14aaa8dd6e3ff7"
+  },
+  "libreactor": {
+    "repository": "https://github.com/fredrikwidlund/libreactor",
+    "commit": "63fa717a8047b1b5c38bc1d69ad193050e4f0ef7",
+    "git_archive_sha256": "ad779c34125b3ed7f2d1cd6829a48d0ffdbd3b5ac12a9f80b8c6e93f5b589e82"
+  },
+  "wrk": {
+    "repository": "https://github.com/wg/wrk",
+    "commit": "a211dd5a7050b1f9e8a9870b95513060e72ac4a0",
+    "git_archive_sha256": "b20a12b40716e4c1e750ba308da815634ab57a2c52831a03288d1a6ad3df6a14"
+  },
+  "adaptations": [
+    "Native Arch Linux build with GCC 16.2.1 rather than the recipe Ubuntu 20.04 GCC 10 container.",
+    "Libraries installed only into the owned temporary prefix. Source Makefile optimization flags preserved.",
+    "libdynamic and libclo built from the pinned release-tag commit via autogen.sh, rather than the release tarball configure script.",
+    "Removed the unused #include <dynamic.h> from libclo src/clo.c, exactly as required by the TFB Dockerfile.",
+    "Changed only app server_open(&s, 0, 8080) to server_open(&s, 0x7f000001, 8080) for loopback binding.",
+    "Original application response construction, pipeline response batching, worker forks, affinity and CBPF preserved.",
+    "wrk uses its commit-bundled LuaJIT archive and host OpenSSL 3.6.3-1 via make -j2 WITH_OPENSSL=/usr."
+  ],
+  "launch": {
+    "server_argv": [
+      "taskset",
+      "-c",
+      "0-2",
+      "/tmp/zig-http-compare.qHiBFl/bin/libreactor"
+    ],
+    "bind": "127.0.0.1:8080",
+    "required_environment": {},
+    "workers": "Three forked workers selected by initial affinity; parent waits for child exits.",
+    "cleanup": "Create a dedicated process group; terminate and reap the parent and all forked workers.",
+    "cbpf_caveat": "Original filter returns the current CPU as reuseport socket index. CPUs outside worker indices 0-2 can fall back to normal reuseport selection; loopback delivery and client affinity can affect distribution."
+  },
+  "binary_sha256": {
+    "bin/libreactor": "ca86ed71b47c0b464ea4169f1af2d355253693981a5c31e11173ca4b0c5f38f7",
+    "bin/wrk": "d74f87d0d3fa3056b4fddb7e9c86e427c6013258c3387409f231c9d1bb5f8fb1"
+  },
+  "prefix_libraries_sha256": {
+    "libreactor-build/prefix/lib/libclo.a": "bb8e581b2669aa286ea3ae404a7c27c9911f7fdd297d6e4302e364c635aff041",
+    "libreactor-build/prefix/lib/libdynamic.a": "2f51e2d29dd4e50a2d9f358837905bfeb748bcc77e36fe6c727fa645bf78016b",
+    "libreactor-build/prefix/lib/libreactor.a": "6901e984f9413f66068e864c062e625ed5f298cb2f806438f8795d376468812b"
+  },
+  "wrk_bundled_luajit": {
+    "archive": "deps/LuaJIT-2.1.zip",
+    "sha256": "334d23596bdfc0a2e2e1fe815b436f5e1bca552466c8c1a5fe2c0996be9f43b8",
+    "archive_comment_commit": "ec6edc5c39c25e4eb3fca51b753f9995e97215da"
+  },
+  "host_openssl_libraries_sha256": {
+    "/usr/lib/libssl.so.3": "ed5cef78fd8cdbec3aa37572dfd9a8ecca9a015d60adfc76be64eb9af8d0f40c",
+    "/usr/lib/libcrypto.so.3": "7784f1a9dc82516691a81a1191b651545a4d949c42ebe5268dcc3c5a9cdb7af2"
+  },
+  "ldd": {
+    "libreactor": [
+      "linux-vdso.so.1 (0x00007f109b5d9000)",
+      "\tlibc.so.6 => /usr/lib/libc.so.6 (0x00007f109b200000)",
+      "\t/lib64/ld-linux-x86-64.so.2 => /usr/lib64/ld-linux-x86-64.so.2 (0x00007f109b5db000)"
+    ],
+    "wrk": [
+      "linux-vdso.so.1 (0x00007fe974b8e000)",
+      "\tlibm.so.6 => /usr/lib/libm.so.6 (0x00007fe97498d000)",
+      "\tlibssl.so.3 => /usr/lib/libssl.so.3 (0x00007fe974896000)",
+      "\tlibcrypto.so.3 => /usr/lib/libcrypto.so.3 (0x00007fe974200000)",
+      "\tlibgcc_s.so.1 => /usr/lib/libgcc_s.so.1 (0x00007fe974869000)",
+      "\tlibc.so.6 => /usr/lib/libc.so.6 (0x00007fe973e00000)",
+      "\t/lib64/ld-linux-x86-64.so.2 => /usr/lib64/ld-linux-x86-64.so.2 (0x00007fe974b90000)",
+      "\tlibz.so.1 => /usr/lib/libz.so.1 (0x00007fe97484c000)",
+      "\tlibbrotlienc.so.1 => /usr/lib/libbrotlienc.so.1 (0x00007fe974140000)",
+      "\tlibbrotlidec.so.1 => /usr/lib/libbrotlidec.so.1 (0x00007fe97483d000)",
+      "\tlibzstd.so.1 => /usr/lib/libzstd.so.1 (0x00007fe97405a000)",
+      "\tlibbrotlicommon.so.1 => /usr/lib/libbrotlicommon.so.1 (0x00007fe974818000)"
+    ]
+  },
+  "version_probe": {
+    "wrk": "wrk 4.2.0 [epoll]; --version prints usage and returns 1 by upstream behavior"
+  },
+  "runtime_or_load_test_performed": false
+}

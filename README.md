@@ -151,8 +151,11 @@ python3 tools/benchmark.py http://127.0.0.1:8080/index.html --connections 8 --re
 
 This Python client checks bodies and records throughput and closed-loop pipeline
 latencies; it may be the bottleneck. It is a smoke experiment, not server
-capacity or an open-loop service-level measurement. Comparing pinned external
-frameworks under the same hardware, workload and limits remains future work.
+capacity or an open-loop service-level measurement. The separate
+[Linux contender comparison](reports/2026-09-05-comparison.md) measures pinned
+Round23 mrhttp/libreactor with wrk: our unchanged MVP is substantially slower,
+especially under pipelining. Its CPU budget, different callback/resource
+contracts and rejected tail-latency evidence are explicit.
 The demo emits `STATS` JSON on clean shutdown: connection/operation peaks,
 refusals, timeouts, flush/resume counts, byte counters, maximum queue/handler/
 request-cycle durations, loop processing time, pipeline bytes copied,
