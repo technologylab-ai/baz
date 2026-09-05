@@ -1,5 +1,19 @@
 # HTTP experiment handoff — 2026-09-05
 
+Active continuation: `perf/batch-quantum` in
+`/Users/rs/code/github.com/technologylab.ai/zig-http-batchq`, based on tested
+operation-cell candidate2b971e14f5fd8ed9769b5cdefbea3d86c71d83fc.
+Parent Codex /root owns this worktree; batch_quantum agent implements only
+startup response-batch16/64 and global-callback64/256 tuning plus meaningful
+ownership/fairness fixtures. No performance gain or runtime validation of that
+new tuning is established yet. The prior direct-cell ABBA comparison runs from
+immutable binaries in /tmp/zig-http-compare.PIwh35 under the Linux host lock;
+no builds may overlap it. The external architecture agent's worktree is separate.
+Use `git worktree list` and each branch's HANDOFF.md to resume; do not duplicate,
+discard or implicitly merge another worktree. Source edits only until parent
+coordinates native gates. Existing lower sections describe the prior checkpoint.
+
+
 Active experiment (2026-09-05): parent Codex /root owns branch
 `perf/direct-operation-cells` in
 `/Users/rs/code/github.com/technologylab.ai/zig-http-opcells`, based on pushed
