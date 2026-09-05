@@ -1,0 +1,75 @@
+{
+  "commit": "bda54040bb0b809c82824b87a782e96826f05dff",
+  "started_utc": "2026-09-05T18:27:07.897771+00:00",
+  "ok": true,
+  "commands": [
+    {
+      "argv": [
+        "zig",
+        "build",
+        "verify",
+        "-Doptimize=ReleaseSafe",
+        "-j2",
+        "--summary",
+        "all"
+      ],
+      "log": "release-verify.log",
+      "exit": 0,
+      "timeout_seconds": 300
+    },
+    {
+      "argv": [
+        "zig",
+        "build",
+        "-Doptimize=ReleaseSafe",
+        "-j2",
+        "--summary",
+        "all"
+      ],
+      "log": "release-install.log",
+      "exit": 0,
+      "timeout_seconds": 300
+    },
+    {
+      "argv": [
+        "python3",
+        "tests/batch_integration.py",
+        "--server",
+        "/tmp/zig-http-compare.1FQK18/zig-http/zig-out/bin/zig-http",
+        "--json",
+        "/tmp/zig-http-compare.1FQK18/batch-wire.json"
+      ],
+      "log": "batch-wire.log",
+      "exit": 0,
+      "timeout_seconds": 150
+    },
+    {
+      "argv": [
+        "python3",
+        "tests/test_compare.py",
+        "-v"
+      ],
+      "log": "comparator-tests.log",
+      "exit": 0,
+      "timeout_seconds": 30
+    }
+  ],
+  "batch_wire_passed": 22,
+  "binary_sha256": {
+    "zig-http/zig-out/bin/zig-http": "8352eb4e11a272bdf95438bcf0d4b9214d8c2bf95a9ebb0cda22208f8842d73f",
+    "bin/libreactor": "28a29517c5864a16e62a50b05121a7b8bceaea779cdc861712677e4fc2e67624",
+    "bin/wrk": "ec4ba590234163a893cb99b2c0874219e9672408d3e52b2851b1f4868ac78658"
+  },
+  "power_profile": "performance",
+  "epp": {
+    "/sys/devices/system/cpu/cpufreq/policy0/energy_performance_preference": "performance",
+    "/sys/devices/system/cpu/cpufreq/policy1/energy_performance_preference": "performance",
+    "/sys/devices/system/cpu/cpufreq/policy2/energy_performance_preference": "performance",
+    "/sys/devices/system/cpu/cpufreq/policy3/energy_performance_preference": "performance",
+    "/sys/devices/system/cpu/cpufreq/policy4/energy_performance_preference": "performance",
+    "/sys/devices/system/cpu/cpufreq/policy5/energy_performance_preference": "performance",
+    "/sys/devices/system/cpu/cpufreq/policy6/energy_performance_preference": "performance",
+    "/sys/devices/system/cpu/cpufreq/policy7/energy_performance_preference": "performance"
+  },
+  "finished_utc": "2026-09-05T18:27:48.417907+00:00"
+}

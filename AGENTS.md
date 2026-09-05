@@ -19,3 +19,13 @@ until the named gate passes; do not claim arbitrary application isolation.
 
 Use subagents for independent parser, transport and lifecycle work. Keep file
 ownership explicit. The parent owns integration, README, docs and build setup.
+
+Before benchmarks, heavy builds or runtime suites on maxross or omarx1, acquire
+`/tmp/zig-http-measurement.lock` with atomic mkdir on the execution host. If it
+exists, hold off; owner.json records who and why. Also inspect pre-existing
+measurement processes that may not honor the new protocol. Retain your lock
+through child cleanup and remove only your own metadata/directory. Never steal
+an old lock by age alone. The full cooperative protocol is in the sibling wiki's
+`docs/platform-testing.md`. Mac measurements by another agent take precedence
+while that agent holds its reservation. Windows performance/publication gates
+are deferred during the current Linux/macOS HTTP tuning loop by user decision.

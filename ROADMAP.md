@@ -12,8 +12,14 @@ pending/resume. This is a separate project from the evidence wiki.
 | Scheduling/copy improvements | queued | Inline, gather and bounded response cells/deferred compaction are implemented, measured and runtime-checked on Mac/Linux. Next: token-addressed operation cells and deep-pipeline scheduling/batch tuning. Constant-time lookup and I/O sharding remain separate experiments; preserve assertions and ownership gates. |
 | Reliability qualification | queued | More deterministic fault/schedule injection, long mixed maximum-load runs, syscall failure catalog, full process/kernel resource accounting and shutdown diagnostics. |
 | Windows HTTP adapter | queued | Implement IOCP and use hosted Windows runtime gates; no Windows server implementation or runtime is claimed today. |
-| Comparative performance | partial | Pinned Linux mrhttp/libreactor comparison: 54 main + 18 client-sensitivity trials; inline and gather A/B sweeps preserved separately. Batch1/16 and one-core comparisons are complete; client depths32/64/128 are measured separately. Remaining: HTML/Mac comparisons, dedicated-host/NIC saturation and qualified request tails; wrk corrected percentiles were rejected. |
+| Comparative performance | partial | Pinned Linux mrhttp/libreactor comparison: 54 main + 18 client-sensitivity trials; inline and gather A/B sweeps preserved separately. Batch1/16 and one-core comparisons are complete; client depths32/64/128 and a separate recorded-performance-profile sweep are complete. Preserve the unresolved fixed-batch gap and prior unknown-profile observations. Remaining: HTML/Mac comparisons, dedicated-host/NIC saturation and qualified request tails; wrk corrected percentiles were rejected. |
 | Higher-level features | queued | TLS boundary, routing/middleware, upload protocol and application state APIs after the core experiment. |
 
 The wiki's M3-006 Windows deployment qualification stays postponed by user
 decision. It is distinct from this project's future Windows HTTP adapter.
+
+Current cadence: macOS correctness and Linux runtime/performance, with Windows
+publication runs deferred by user decision during HTTP tuning. Coordinate host
+load via `/tmp/zig-http-measurement.lock`; another agent also measures on the Mac.
+The performance-profile sweep is complete; no queued architecture experiment is
+an active agent or runner.

@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "token": "02364f7b09bd4712b9a2f3744a563fcb",
+  "host": "omarx1",
+  "owner": "Codex zig-http Linux comparison /root",
+  "purpose": "ReleaseSafe CPU0 depth 16/32/64/128 sweep; keep builds and competing benchmarks off this host",
+  "created_utc": "2026-09-05T18:37:33.403287+00:00",
+  "owner_pid": 980464,
+  "owner_start_ticks": "47733099",
+  "work_root": "/tmp/zig-http-compare.1FQK18",
+  "release_policy": "Owner removes only after comparison and all owned server/client processes finish. No time-based stealing."
+}
