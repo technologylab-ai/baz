@@ -1,5 +1,23 @@
 # HTTP experiment handoff — 2026-09-05
 
+Active experiment (2026-09-05): parent Codex /root owns branch
+`perf/direct-operation-cells` in
+`/Users/rs/code/github.com/technologylab.ai/zig-http-opcells`, based on pushed
+c0f87766efa310d517d262781a33ce189c4f9f0d. This named Git worktree is discoverable
+with `git worktree list`; it is separate from the other agent's
+`.claude/worktrees/perf-architecture` tree. Do not delete or merge the other
+agent's work. Current scope: replace Linux hot operation-table admission/CQE
+searches with explicit addressed cells, preserve socket/token/generation and
+separate target/cancel ownership, then perform a controlled ReleaseSafe A/B at
+configured capacities128/1024 with128 active clients. No improvement is measured
+yet. Mac baseline at the unchanged starting commit passed14/14 steps and52/52
+ReleaseSafe tests with exact Zig0.16.0 under the host lock; the lock is released.
+The prior full native publication gates remain in the wiki's durable receipt.
+Stage at this checkpoint: baseline/inspection complete; implementation and A/B
+are next. All heavy work must acquire `/tmp/zig-http-measurement.lock` on its
+execution host. This progress record exists so interruptions do not orphan work.
+
+
 Latest measurement: [recorded performance-profile depth sweep](reports/2026-09-05-power-profile.md)
 at exact bda54040bb0b809c82824b87a782e96826f05dff, Zig 0.16.0 ReleaseSafe.
 All 24 trials/warmups passed: 643,222,112 timed responses, 2,880 exact preflights.
