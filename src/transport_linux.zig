@@ -38,7 +38,13 @@ pub const Backend = struct {
         if (max_connections == 0 or max_connections > 16383) return error.InvalidConnectionLimit;
         const capacity = common.cellCount(max_connections);
         const entries = try std.math.ceilPowerOfTwo(u16, @intCast(capacity));
-        var ring = try linux.IoUring.init(entries, 0);
+        // Cooperative task running skips the per-completion interrupt while
+        // the owner is executing and still wakes it from an interruptible
+        // wait; kernels without it fall back to the plain ring.
+        var ring = linux.IoUring.init(entries, linux.IORING_SETUP_COOP_TASKRUN) catch |err| switch (err) {
+            error.ArgumentsInvalid => try linux.IoUring.init(entries, 0),
+            else => return err,
+        };
         errdefer ring.deinit();
         const probe = try ring.get_probe();
         inline for (.{ linux.IORING_OP.ACCEPT, linux.IORING_OP.RECV, linux.IORING_OP.SEND, linux.IORING_OP.ASYNC_CANCEL }) |opcode| {

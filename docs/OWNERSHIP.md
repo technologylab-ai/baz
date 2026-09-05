@@ -172,13 +172,13 @@ interval plus one turn. Exact per-callback queue/handler timing needs
 maxima stay zero. Worker mode keeps a full slot scan per turn for results.
 
 Each connection has separate receive and send operation cells, each with its
-own cancel cell. When a batch of finished responses drains, the loop first
-arms the next receive into the free input tail, compacting the consumed prefix
-beforehand when no frozen cell borrows request input (`prearm_receive`,
-on for io_uring where the receive rides the same submission and off for kqueue
-where it would cost two syscalls that find no data), and then submits the
-send; by default the transport submits after every drain (`submit_batch`) so
-responses leave before the turn ends instead of at its poll. Bytes that arrive
+own cancel cell. With `prearm_receive`, a drain first arms the next receive
+into the free input tail, compacting the consumed prefix beforehand when no
+frozen cell borrows request input, and then submits the send; with
+`submit_batch` the transport submits after that many drains so responses leave
+before the turn ends. Both are off by default: on omarx1 neither changed
+throughput at depths 1, 16 or 128, and on kqueue the early receive costs two
+syscalls that find no data yet (6-16% slower). Bytes that arrive
 while that batch is still being sent, or while a flushed request waits to
 resume, are held and parsed after the batch completes. Closing cancels both
 operations and releases the slot only after every target and cancel

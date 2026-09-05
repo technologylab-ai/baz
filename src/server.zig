@@ -38,13 +38,13 @@ pub const Config = struct {
     /// Interval of the full deadline sweep; touched slots are checked sooner.
     deadline_sweep_ms: u32 = 100,
     /// Submit queued sends after this many drains within a turn so responses
-    /// leave before the turn ends; 0 submits only when the turn polls.
-    submit_batch: u16 = 1,
-    /// Arm the next receive while a batch is still being sent. Null selects
-    /// the transport default: on for io_uring, where the receive rides the
-    /// same submission; off for kqueue, where an early receive costs two
-    /// syscalls that find no data yet.
-    prearm_receive: ?bool = null,
+    /// leave before the turn ends; 0 submits only when the turn polls. Measured
+    /// on omarx1 (2026-09-05): no throughput change at any depth, more CPU.
+    submit_batch: u16 = 0,
+    /// Arm the next receive while a batch is still being sent. Measured
+    /// 2026-09-05: no change on io_uring, 6-16% slower on kqueue where the
+    /// early receive costs two syscalls that find no data yet. Off by default.
+    prearm_receive: bool = false,
     /// I/O owners. 0 selects one per allowed CPU on Linux and 1 elsewhere.
     shards: u8 = 0,
     /// Pin shard i to the i-th CPU the process may use (Linux only).
@@ -68,9 +68,6 @@ pub const Config = struct {
     }
     pub fn effectiveBatchLimit(self: Config) usize {
         return if (self.execution == .inline_event_loop) self.response_batch_limit else 1;
-    }
-    pub fn effectivePrearmReceive(self: Config) bool {
-        return self.prearm_receive orelse (@import("builtin").os.tag == .linux);
     }
     pub fn effectiveCallbacksPerTurn(self: Config) usize {
         if (self.callbacks_per_turn != 0) return self.callbacks_per_turn;
@@ -1117,7 +1114,7 @@ pub const Server = struct {
         slot.part_count = count;
         slot.part = 0;
         slot.part_offset = 0;
-        if (next == .parse and count > 0 and self.config.effectivePrearmReceive()) try self.prearmReceive(index);
+        if (next == .parse and count > 0 and self.config.prearm_receive) try self.prearmReceive(index);
         try self.sendNext(index);
         if (count > 0 and self.config.submit_batch != 0) {
             self.drains_since_flush += 1;

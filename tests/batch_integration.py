@@ -111,9 +111,12 @@ def run(binary, emit, sessions):
     # Client pipeline depth and server batch capacity are independent limits.
     # Deep pipelines must cross repeated cell reuse and receive compaction while
     # the server retains at most sixteen frozen response cells at any time.
-    for depth in (32, 64, 128):
+    # The overlap experiment (receive armed while the batch sends, eager
+    # submission) is off by default; the depth-128 cases also run with it on
+    # so its two-operation cancellation and compaction rules stay exercised.
+    for depth, overlap in ((32, 0), (64, 0), (128, 0), (128, 1)):
         for kind in ("generated", "borrowed_body"):
-            with BatchServer(binary, response_batch_limit=16) as server:
+            with BatchServer(binary, response_batch_limit=16, prearm_receive=overlap, submit_batch=overlap) as server:
                 with server.connect() as sock:
                     expected, requests = [], []
                     for index in range(depth):
@@ -155,9 +158,11 @@ def run(binary, emit, sessions):
             wire.require(stats["allocation_calls_after_start"] == 0 and
                          stats["live_connections"] == stats["live_operations"] == 0,
                          "deep pipeline leaked ownership or allocated after startup")
-            sessions.append(dict(phase="deep_pipeline", kind=kind, pipeline_depth=depth,
+            if overlap:
+                wire.require(stats["prearmed_receives"] >= 1, "overlap variant did not pre-arm a receive")
+            sessions.append(dict(phase="deep_pipeline", kind=kind, pipeline_depth=depth, overlap=overlap,
                                  response_batch_limit=16, wire_bytes=len(encoded), stats=stats))
-            emit("deep_%s_pipeline_%d_batch_limit_16_and_reuse" % (kind, depth))
+            emit("deep_%s_pipeline_%d_batch_limit_16_and_reuse%s" % (kind, depth, "_overlap" if overlap else ""))
 
     with BatchServer(binary) as server:
         with server.connect() as sock:
@@ -287,25 +292,28 @@ def run(binary, emit, sessions):
                              pipeline_depth=pipeline_depth, stats=server.stats))
     emit("multi_cell_frozen_batch_deadline_cancel_and_recovery")
 
-    with BatchServer(binary, connections=8, max_body=2 * 1024 * 1024, timeout_ms=1000,
-                     socket_send_buffer=4096) as server:
-        with contextlib.ExitStack() as stack:
-            slow = stack.enter_context(server.connect())
-            slow.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 1024)
-            payload = b"z" * (2 * 1024 * 1024)
-            slow.sendall(wire.REQUEST * 7 + b"POST /echo HTTP/1.1\r\nHost: localhost\r\nContent-Length: 2097152\r\n\r\n" + payload)
-            wire.plaintext(server)
-            time.sleep(1.25)
-            wire.plaintext(server)
-            incomplete = stack.enter_context(server.connect())
-            incomplete.sendall(wire.REQUEST * 3 + b"GET /plaintext HTTP/1.1\r\nHost:")
-            server.process.send_signal(signal.SIGINT)
-            server.process.wait(timeout=5)
-    wire.require(server.stats["gather_cancel_requests"] >= 1, "slow reader did not retain a cancellable gather")
-    wire.require(server.stats["bytes_received"] >= len(payload) and server.stats["timeouts"] >= 1, "borrowed payload deadline was not reached")
-    wire.require(server.stats["bytes_sent"] < len(payload), "slow reader fixture did not retain a partial payload")
-    sessions.append(dict(phase="cancel_shutdown", stats=server.stats))
-    emit("borrowed_batch_slow_reader_deadline_recovery_shutdown")
+    # With the overlap experiment on, a pre-armed receive and a frozen batch
+    # send can both be pending at the deadline; both must be canceled and drained.
+    for overlap in (0, 1):
+        with BatchServer(binary, connections=8, max_body=2 * 1024 * 1024, timeout_ms=1000,
+                         socket_send_buffer=4096, prearm_receive=overlap, submit_batch=overlap) as server:
+            with contextlib.ExitStack() as stack:
+                slow = stack.enter_context(server.connect())
+                slow.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 1024)
+                payload = b"z" * (2 * 1024 * 1024)
+                slow.sendall(wire.REQUEST * 7 + b"POST /echo HTTP/1.1\r\nHost: localhost\r\nContent-Length: 2097152\r\n\r\n" + payload)
+                wire.plaintext(server)
+                time.sleep(1.25)
+                wire.plaintext(server)
+                incomplete = stack.enter_context(server.connect())
+                incomplete.sendall(wire.REQUEST * 3 + b"GET /plaintext HTTP/1.1\r\nHost:")
+                server.process.send_signal(signal.SIGINT)
+                server.process.wait(timeout=5)
+        wire.require(server.stats["gather_cancel_requests"] >= 1, "slow reader did not retain a cancellable gather")
+        wire.require(server.stats["bytes_received"] >= len(payload) and server.stats["timeouts"] >= 1, "borrowed payload deadline was not reached")
+        wire.require(server.stats["bytes_sent"] < len(payload), "slow reader fixture did not retain a partial payload")
+        sessions.append(dict(phase="cancel_shutdown", overlap=overlap, stats=server.stats))
+        emit("borrowed_batch_slow_reader_deadline_recovery_shutdown%s" % ("_overlap" if overlap else ""))
 
 
 def main():

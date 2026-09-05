@@ -130,8 +130,8 @@ The default startup limits are explicit:
 | Borrow copy threshold | 256 bytes | `--borrow-copy-threshold`; borrowed spans up to this size are copied into the arena; 0 keeps every borrow a separate vector. |
 | Inline callbacks per event-loop turn | connections × batch limit, at most 8192 | `--callbacks-per-turn`; each connection gets at most its batch limit per turn from a FIFO ready ring. |
 | Deadline sweep | 100 ms | `--deadline-sweep-ms`; 1–1000; touched slots are checked sooner. |
-| Submit batch | 1 drain | `--submit-batch`; submit queued sends after this many drains within a turn; 0 submits only when the turn polls. |
-| Pre-armed receive | on with io_uring, off with kqueue | `--prearm-receive 0|1`; arm the next receive while the batch is still being sent. |
+| Submit batch | 0 (at poll) | `--submit-batch`; submit queued sends after this many drains within a turn; measured no gain on omarx1, kept as an experiment. |
+| Pre-armed receive | off | `--prearm-receive 0|1`; arm the next receive while the batch is still being sent; measured no gain on io_uring and slower on kqueue. |
 | Per-callback timing | off | `--callback-timing 1` records exact queue/handler maxima at two clock reads per callback. |
 | I/O shards | one per allowed CPU (Linux, at most 16), 1 (macOS) | `--shards`; 1–64, inline execution only; each shard reserves full slot storage and a shared counter keeps `--connections` the process-wide ceiling; `--shard-affinity 1` pins shard i to allowed CPU i. |
 | Logical response body | 16 MiB | `--max-response`; counted across flushes. |
