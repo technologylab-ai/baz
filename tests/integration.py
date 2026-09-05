@@ -113,7 +113,7 @@ class ResponseReader:
 class Server:
     def __init__(self, binary, **options):
         self.binary = binary
-        self.options = dict(port=0, connections=16, workers=2, max_body=1024,
+        self.options = dict(execution="workers", port=0, connections=16, workers=2, max_body=1024,
                             max_header=2048, timeout_ms=3000, stall_ms=1000,
                             send_chunk=7)
         self.options.update(options)

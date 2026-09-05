@@ -38,7 +38,7 @@ def run_suite(binary, emit, sessions):
                               "--duration-ms", "10"], cwd=ROOT, capture_output=True, timeout=8)
     require(process.returncode == 0 and b"workers=0 execution=inline_event_loop" in process.stderr,
             "--execution inline must provision zero application workers")
-    for options in (("--execution", "inline", "--workers", "2"), ("--workers", "0")):
+    for options in (("--execution", "inline", "--workers", "2"), ("--execution", "workers", "--workers", "0")):
         process = subprocess.run([str(binary), *options], cwd=ROOT, capture_output=True, timeout=8)
         require(process.returncode != 0 and b"InvalidConfiguration" in process.stderr,
                 "contradictory execution/worker configuration accepted")

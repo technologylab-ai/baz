@@ -14,6 +14,8 @@ pub const Backend = struct {
     allocator: std.mem.Allocator,
     ring: linux.IoUring,
     operations: []Operation,
+    gather_metadata: ?[]common.Gather = null,
+    gather_supported: bool,
     outstanding: usize = 0,
     listener: Socket,
     wake_fd: Socket,
@@ -42,10 +44,18 @@ pub const Backend = struct {
             .allocator = allocator,
             .ring = ring,
             .operations = operations,
+            .gather_supported = probe.is_supported(.SENDMSG),
             .listener = listener.socket,
             .wake_fd = @intCast(result),
             .bound_port = listener.port,
         };
+    }
+
+    /// Startup-only optional capability: scalar SEND does not require SENDMSG.
+    pub fn enableGather(self: *Backend) !void {
+        assert(self.outstanding == 0 and self.gather_metadata == null);
+        if (!self.gather_supported) return error.GatherSendUnsupported;
+        self.gather_metadata = try self.allocator.alloc(common.Gather, self.operations.len);
     }
 
     /// Caller must stop admission, cancel, and drain every target AND cancel CQE.
@@ -56,6 +66,7 @@ pub const Backend = struct {
         common.closeFd(self.listener);
         common.closeFd(self.wake_fd);
         self.ring.deinit();
+        if (self.gather_metadata) |metadata| self.allocator.free(metadata);
         self.allocator.free(self.operations);
         self.* = undefined;
     }
@@ -99,6 +110,18 @@ pub const Backend = struct {
         assert(bytes.len > 0 and bytes.len <= std.math.maxInt(i32));
         const op = try self.vacant(token, socket, .data);
         _ = try self.ring.send(token, socket, bytes, linux.MSG.NOSIGNAL);
+        op.* = .{ .kind = .data, .token = token, .socket = socket };
+        self.outstanding += 1;
+    }
+
+    pub fn sendv(self: *Backend, token: u64, socket: Socket, parts: []const []const u8) !void {
+        const metadata = self.gather_metadata orelse return error.GatherSendNotEnabled;
+        const op = try self.vacant(token, socket, .data);
+        const index = (@intFromPtr(op) - @intFromPtr(self.operations.ptr)) / @sizeOf(Operation);
+        assert(index < metadata.len);
+        const gather = &metadata[index];
+        gather.prepare(parts);
+        _ = try self.ring.sendmsg(token, socket, &gather.message, linux.MSG.NOSIGNAL);
         op.* = .{ .kind = .data, .token = token, .socket = socket };
         self.outstanding += 1;
     }

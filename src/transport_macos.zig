@@ -8,7 +8,7 @@ const Completion = common.Completion;
 const assert = std.debug.assert;
 
 pub const Backend = struct {
-    const Kind = enum { free, accept, recv, send, cancel };
+    const Kind = enum { free, accept, recv, send, sendv, cancel };
     const Operation = struct {
         kind: Kind = .free,
         token: u64 = 0,
@@ -21,6 +21,7 @@ pub const Backend = struct {
 
     allocator: std.mem.Allocator,
     operations: []Operation,
+    gather_metadata: ?[]common.Gather = null,
     outstanding: usize = 0,
     listener: Socket,
     queue_fd: Socket,
@@ -43,11 +44,18 @@ pub const Backend = struct {
         return .{ .allocator = allocator, .operations = operations, .listener = listener.socket, .queue_fd = queue, .bound_port = listener.port };
     }
 
+    /// Startup-only storage; nonblocking sendmsg uses the established socket ABI.
+    pub fn enableGather(self: *Backend) !void {
+        assert(self.outstanding == 0 and self.gather_metadata == null);
+        self.gather_metadata = try self.allocator.alloc(common.Gather, self.operations.len);
+    }
+
     pub fn deinit(self: *Backend) void {
         assert(self.outstanding == 0);
         for (self.operations) |op| assert(op.kind == .free);
         common.closeFd(self.listener);
         common.closeFd(self.queue_fd);
+        if (self.gather_metadata) |metadata| self.allocator.free(metadata);
         self.allocator.free(self.operations);
         self.* = undefined;
     }
@@ -77,16 +85,31 @@ pub const Backend = struct {
             } else {
                 assert(op.token != token);
                 if (kind == .accept) assert(op.kind != .accept);
-                if (kind == .recv or kind == .send) {
-                    if (op.kind == .recv or op.kind == .send) assert(op.socket != socket);
+                if (isData(kind)) {
+                    if (isData(op.kind)) assert(op.socket != socket);
                 }
-                if (op.kind == .recv or op.kind == .send) data_count += 1;
+                if (isData(op.kind)) data_count += 1;
                 if (op.kind == .cancel) cancel_count += 1;
             }
         }
-        if ((kind == .recv or kind == .send) and data_count >= self.operations.len / 2 - 1) return error.OperationCapacityExceeded;
+        if (isData(kind) and data_count >= self.operations.len / 2 - 1) return error.OperationCapacityExceeded;
         if (kind == .cancel and cancel_count >= self.operations.len / 2) return error.OperationCapacityExceeded;
         return free orelse error.OperationCapacityExceeded;
+    }
+
+    fn isData(kind: Kind) bool {
+        return kind == .recv or kind == .send or kind == .sendv;
+    }
+
+    fn isSend(kind: Kind) bool {
+        return kind == .send or kind == .sendv;
+    }
+
+    fn gatherFor(self: *Backend, op: *Operation) *common.Gather {
+        const index = (@intFromPtr(op) - @intFromPtr(self.operations.ptr)) / @sizeOf(Operation);
+        const metadata = self.gather_metadata.?;
+        assert(index < metadata.len);
+        return &metadata[index];
     }
 
     fn arm(self: *Backend, op: *Operation) !void {
@@ -95,7 +118,7 @@ pub const Backend = struct {
         assert(index < self.operations.len);
         const event: c.Kevent = .{
             .ident = @intCast(op.socket),
-            .filter = if (op.kind == .send) c.EVFILT.WRITE else c.EVFILT.READ,
+            .filter = if (isSend(op.kind)) c.EVFILT.WRITE else c.EVFILT.READ,
             .flags = c.EV.ADD | c.EV.ONESHOT,
             .fflags = 0,
             .data = 0,
@@ -118,6 +141,7 @@ pub const Backend = struct {
             .accept => c.accept(self.listener, null, null),
             .recv => c.recv(op.socket, op.read_buffer.ptr, op.read_buffer.len, 0),
             .send => c.send(op.socket, op.write_buffer.ptr, op.write_buffer.len, 0),
+            .sendv => c.sendmsg(op.socket, &self.gatherFor(op).message, 0),
             else => unreachable,
         };
         if (result >= 0) {
@@ -160,6 +184,13 @@ pub const Backend = struct {
         try self.begin(op, .{ .kind = .send, .token = token, .socket = socket, .write_buffer = bytes });
     }
 
+    pub fn sendv(self: *Backend, token: u64, socket: Socket, parts: []const []const u8) !void {
+        if (self.gather_metadata == null) return error.GatherSendNotEnabled;
+        const op = try self.vacant(token, socket, .sendv);
+        self.gatherFor(op).prepare(parts);
+        try self.begin(op, .{ .kind = .sendv, .token = token, .socket = socket });
+    }
+
     pub fn cancel(self: *Backend, token: u64, target: u64) !void {
         assert(token != target);
         const cancellation = try self.vacant(token, -1, .cancel);
@@ -169,7 +200,7 @@ pub const Backend = struct {
             assert(op.kind != .cancel and op.registered);
             try change(self.queue_fd, .{
                 .ident = @intCast(op.socket),
-                .filter = if (op.kind == .send) c.EVFILT.WRITE else c.EVFILT.READ,
+                .filter = if (isSend(op.kind)) c.EVFILT.WRITE else c.EVFILT.READ,
                 .flags = c.EV.DELETE,
                 .fflags = 0,
                 .data = 0,

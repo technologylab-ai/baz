@@ -9,14 +9,16 @@ pub const backend_name = transport.name;
 
 /// Inline handlers execute on the sole I/O owner and must be bounded and
 /// nonblocking. The framework cannot preempt or isolate a violating callback.
-/// Workers remain the default; inline mode reserves no application threads.
+/// Inline mode is the default and reserves no application threads. Applications
+/// with blocking callbacks explicitly select the fixed worker execution mode.
 pub const Execution = enum { workers, inline_event_loop };
 
 pub const Config = struct {
-    execution: Execution = .workers,
+    execution: Execution = .inline_event_loop,
+    gather_send: bool = true,
     port: u16 = 8080,
     connections: u16 = 128,
-    workers: u16 = 2,
+    workers: u16 = 0,
     max_body: u32 = 65536,
     max_header: u32 = 16384,
     max_headers: u16 = 64,
@@ -56,7 +58,16 @@ pub const Config = struct {
 };
 
 pub const Stats = struct {
-    execution: Execution = .workers,
+    execution: Execution = .inline_event_loop,
+    gather_send: bool = true,
+    scalar_send_operations: u64 = 0,
+    gather_send_operations: u64 = 0,
+    send_completions: u64 = 0,
+    short_send_completions: u64 = 0,
+    gather_cancel_requests: u64 = 0,
+    gather_canceled_completions: u64 = 0,
+    max_send_parts: usize = 0,
+    max_send_bytes: usize = 0,
     inline_dispatches: u64 = 0,
     worker_dispatches: u64 = 0,
     accepted: u64 = 0,
@@ -116,10 +127,12 @@ const Slot = struct {
     logical_written: usize = 0,
     header_buffer: [512]u8 = undefined,
     chunk_buffer: [32]u8 = undefined,
-    parts: [5][]const u8 = @splat(""),
+    parts: [transport.max_send_parts][]const u8 = @splat(""),
     part_count: usize = 0,
     part: usize = 0,
     part_offset: usize = 0,
+    send_submitted_bytes: usize = 0,
+    send_is_gather: bool = false,
     send_mode: SendMode = .response,
 };
 
@@ -205,6 +218,7 @@ pub const Server = struct {
         errdefer allocator.destroy(self);
         var backend = try transport.Backend.init(allocator, config.connections, config.port);
         errdefer backend.deinit();
+        if (config.gather_send) try backend.enableGather();
         const slots = try allocator.alloc(Slot, config.connections);
         errdefer allocator.free(slots);
         const workers = try allocator.alloc(Worker, config.workers);
@@ -214,7 +228,7 @@ pub const Server = struct {
         const storage = try allocator.alloc(u8, per_slot * config.connections);
         errdefer allocator.free(storage);
         @memset(storage, 0);
-        self.* = .{ .allocator = allocator, .config = config, .handler = handler, .application = application, .backend = backend, .slots = slots, .workers = workers, .storage = storage, .stats = .{ .workers = config.workers, .execution = config.execution } };
+        self.* = .{ .allocator = allocator, .config = config, .handler = handler, .application = application, .backend = backend, .slots = slots, .workers = workers, .storage = storage, .stats = .{ .workers = config.workers, .execution = config.execution, .gather_send = config.gather_send } };
         for (slots, 0..) |*slot, index| {
             const base = storage[index * per_slot ..][0..per_slot];
             slot.* = .{
@@ -434,6 +448,16 @@ pub const Server = struct {
         }
         assert(slot.op_pending and slot.op_token == completion.token);
         slot.op_pending = false;
+        if (kind == .send) {
+            self.stats.send_completions += 1;
+            if (completion.result > 0) {
+                assert(@as(usize, @intCast(completion.result)) <= slot.send_submitted_bytes);
+                if (@as(usize, @intCast(completion.result)) < slot.send_submitted_bytes)
+                    self.stats.short_send_completions += 1;
+            } else if (slot.send_is_gather and completion.result == -@as(i32, @intFromEnum(c.E.CANCELED))) {
+                self.stats.gather_canceled_completions += 1;
+            }
+        }
         if (slot.closing or completion.result <= 0) {
             try self.beginClose(slot);
             self.maybeFree(slot);
@@ -448,8 +472,8 @@ pub const Server = struct {
                 try self.parseRequest(index);
             },
             .send => {
-                assert(transferred <= slot.parts[slot.part].len - slot.part_offset);
-                slot.part_offset += transferred;
+                assert(transferred <= slot.send_submitted_bytes);
+                advanceSendParts(slot.parts[0..slot.part_count], &slot.part, &slot.part_offset, transferred);
                 self.stats.bytes_sent += transferred;
                 try self.sendNext(index);
             },
@@ -619,7 +643,26 @@ pub const Server = struct {
                 continue;
             }
             const token = tokenFor(slot, index, .send);
-            try self.backend.send(token, slot.fd, bytes[0..@min(bytes.len, self.config.send_chunk)]);
+            const cap = @min(self.config.send_chunk, std.math.maxInt(i32));
+            if (self.config.gather_send) {
+                const selection = selectSendParts(slot.parts[0..slot.part_count], slot.part, slot.part_offset, cap);
+                assert(selection.count > 0 and selection.bytes <= cap);
+                // The adapter copies these descriptors into startup-reserved,
+                // stable metadata. Payload and framing storage stay borrowed.
+                try self.backend.sendv(token, slot.fd, selection.parts[0..selection.count]);
+                slot.send_submitted_bytes = selection.bytes;
+                slot.send_is_gather = true;
+                self.stats.gather_send_operations += 1;
+                self.stats.max_send_parts = @max(self.stats.max_send_parts, selection.count);
+            } else {
+                const submitted = bytes[0..@min(bytes.len, cap)];
+                try self.backend.send(token, slot.fd, submitted);
+                slot.send_submitted_bytes = submitted.len;
+                slot.send_is_gather = false;
+                self.stats.scalar_send_operations += 1;
+                self.stats.max_send_parts = @max(self.stats.max_send_parts, 1);
+            }
+            self.stats.max_send_bytes = @max(self.stats.max_send_bytes, slot.send_submitted_bytes);
             slot.op_pending = true;
             slot.op_token = token;
             self.operationAdded();
@@ -663,6 +706,8 @@ pub const Server = struct {
         if (slot.op_pending and !slot.cancel_pending) {
             const token = (slot.op_token & ~@as(u64, 255)) | @intFromEnum(Kind.cancel);
             try self.backend.cancel(token, slot.op_token);
+            if (@as(u8, @truncate(slot.op_token)) == @intFromEnum(Kind.send) and slot.send_is_gather)
+                self.stats.gather_cancel_requests += 1;
             slot.cancel_pending = true;
             self.operationAdded();
         }
@@ -703,6 +748,53 @@ pub const Server = struct {
     }
 };
 
+const SendSelection = struct {
+    parts: [transport.max_send_parts][]const u8 = @splat(""),
+    count: usize = 0,
+    bytes: usize = 0,
+};
+
+/// Select one bounded write across framing and payload without coalescing bytes.
+fn selectSendParts(parts: []const []const u8, part: usize, offset: usize, cap: usize) SendSelection {
+    assert(parts.len > 0 and parts.len <= transport.max_send_parts and part < parts.len);
+    assert(offset <= parts[part].len and cap > 0 and cap <= std.math.maxInt(i32));
+    var selected: SendSelection = .{};
+    for (parts[part..], 0..) |span, index| {
+        const available = span[if (index == 0) offset else 0..];
+        if (available.len == 0) continue;
+        const count = @min(available.len, cap - selected.bytes);
+        if (count == 0) break;
+        assert(selected.count < selected.parts.len);
+        selected.parts[selected.count] = available[0..count];
+        selected.count += 1;
+        selected.bytes += count;
+        if (selected.bytes == cap) break;
+    }
+    assert(selected.bytes > 0 and selected.bytes <= cap);
+    return selected;
+}
+
+/// One positive completion acknowledges a prefix of the submitted aggregate,
+/// which may stop before, exactly at, or after a framing/payload boundary.
+fn advanceSendParts(parts: []const []const u8, part: *usize, offset: *usize, amount: usize) void {
+    assert(parts.len > 0 and parts.len <= transport.max_send_parts and part.* < parts.len);
+    assert(offset.* <= parts[part.*].len and amount > 0);
+    var remaining = amount;
+    for (0..parts.len) |_| {
+        assert(part.* < parts.len and offset.* <= parts[part.*].len);
+        const available = parts[part.*].len - offset.*;
+        if (remaining < available) {
+            offset.* += remaining;
+            return;
+        }
+        remaining -= available;
+        part.* += 1;
+        offset.* = 0;
+        if (remaining == 0) return;
+    }
+    unreachable; // Caller proved completion bytes <= the submitted selection.
+}
+
 pub fn nowNs() u64 {
     var time: c.timespec = undefined;
     assert(c.clock_gettime(.MONOTONIC, &time) == 0);
@@ -731,14 +823,14 @@ fn reason(status: u16) []const u8 {
 
 test "configuration rejects combined resource overcommit and impossible worker limits" {
     try (Config{}).validate();
-    try std.testing.expectError(error.InvalidConfiguration, (Config{ .workers = 0 }).validate());
+    try std.testing.expectError(error.InvalidConfiguration, (Config{ .execution = .workers, .workers = 0 }).validate());
     try std.testing.expectError(error.InvalidConfiguration, (Config{ .connections = 1, .workers = 2 }).validate());
     try std.testing.expectError(error.MemoryBudgetExceeded, (Config{ .connections = 4096, .max_body = 1024 * 1024 }).validate());
 }
 
 test "inline execution explicitly requires no application worker resources" {
     try (Config{ .execution = .inline_event_loop, .workers = 0 }).validate();
-    try std.testing.expectError(error.InvalidConfiguration, (Config{ .execution = .inline_event_loop }).validate());
+    try std.testing.expectError(error.InvalidConfiguration, (Config{ .execution = .inline_event_loop, .workers = 2 }).validate());
     const config: Config = .{ .execution = .inline_event_loop, .workers = 0, .connections = 1, .port = 0 };
     const server = try Server.init(std.testing.allocator, config, struct {
         fn handle(_: *api.Context) api.Action {
@@ -754,4 +846,50 @@ test "inline execution explicitly requires no application worker resources" {
     try std.testing.expectEqual(@as(u32, 0), server.exited_workers.load(.acquire));
     try std.testing.expectEqual(@as(u64, 0), server.stats.worker_dispatches);
     try std.testing.expect(server.safe_to_destroy);
+}
+
+test "gather selection bounds aggregate bytes and borrows original spans" {
+    const parts = [_][]const u8{ "abc", "", "defg", "hi" };
+    const selected = selectSendParts(&parts, 0, 1, 5);
+    try std.testing.expectEqual(@as(usize, 2), selected.count);
+    try std.testing.expectEqual(@as(usize, 5), selected.bytes);
+    try std.testing.expectEqualStrings("bc", selected.parts[0]);
+    try std.testing.expectEqualStrings("def", selected.parts[1]);
+    try std.testing.expectEqual(parts[0].ptr + 1, selected.parts[0].ptr);
+    try std.testing.expectEqual(parts[2].ptr, selected.parts[1].ptr);
+    const complete = selectSendParts(&parts, 0, 0, 64);
+    try std.testing.expectEqual(@as(usize, 3), complete.count);
+    try std.testing.expectEqual(@as(usize, 9), complete.bytes);
+    const at_end = selectSendParts(&parts, 2, 4, 1);
+    try std.testing.expectEqualStrings("h", at_end.parts[0]);
+}
+
+test "positive gather completions advance before at and after part boundaries" {
+    const parts = [_][]const u8{ "abc", "defg", "hi" };
+    const Case = struct { bytes: usize, part: usize, offset: usize };
+    const cases = [_]Case{
+        .{ .bytes = 1, .part = 0, .offset = 1 },
+        .{ .bytes = 3, .part = 1, .offset = 0 },
+        .{ .bytes = 4, .part = 1, .offset = 1 },
+        .{ .bytes = 7, .part = 2, .offset = 0 },
+        .{ .bytes = 8, .part = 2, .offset = 1 },
+        .{ .bytes = 9, .part = 3, .offset = 0 },
+    };
+    for (cases) |case| {
+        var part: usize = 0;
+        var offset: usize = 0;
+        advanceSendParts(&parts, &part, &offset, case.bytes);
+        try std.testing.expectEqual(case.part, part);
+        try std.testing.expectEqual(case.offset, offset);
+    }
+    var part: usize = 0;
+    var offset: usize = 0;
+    advanceSendParts(&parts, &part, &offset, 4);
+    const resumed = selectSendParts(&parts, part, offset, 5);
+    try std.testing.expectEqualStrings("efg", resumed.parts[0]);
+    try std.testing.expectEqualStrings("hi", resumed.parts[1]);
+    advanceSendParts(&parts, &part, &offset, 2);
+    advanceSendParts(&parts, &part, &offset, 3);
+    try std.testing.expectEqual(parts.len, part);
+    try std.testing.expectEqual(@as(usize, 0), offset);
 }

@@ -3,8 +3,8 @@
 An experimental HTTP/1.1 framework and reference server for **Zig 0.16.0**.
 Linux uses a custom single-shot `io_uring` adapter; macOS uses nonblocking
 sockets with `kqueue`. Application callbacks can run on the I/O owner or on fixed startup workers.
-The default worker mode retains the original experiment; opt into inline mode
-for trusted bounded, nonblocking handlers. Windows support is pending and currently produces
+Inline execution is the default for trusted bounded, nonblocking handlers;
+blocking callbacks must explicitly select fixed startup workers. Windows support is pending and currently produces
 a compile error. This is the M4 implementation informed by the adjacent
 [Zig LLM Wiki](https://github.com/technologylab-ai/zigllmwiki/blob/main/wiki/bounded-http-server-design.md).
 
@@ -22,7 +22,7 @@ ReleaseSafe is the preferred experiment mode; assertions remain enabled.
 zig version
 zig build verify -Doptimize=ReleaseSafe
 zig build -Doptimize=ReleaseSafe
-./zig-out/bin/zig-http --port 8080 --connections 128 --workers 2
+./zig-out/bin/zig-http --port 8080 --connections 128
 ```
 
 The version must print `0.16.0`. The server prints `READY` to stderr after
@@ -73,13 +73,14 @@ callback is the maintained example. [src/server.zig](src/server.zig) exposes
 experimental and read the [ownership contract](docs/OWNERSHIP.md) before
 retaining slices or adding asynchronous application work.
 
-For the no-handoff experiment, run `./zig-out/bin/zig-http --execution inline`.
+The default `./zig-out/bin/zig-http` uses inline execution and gather sends.
+`--execution inline` selects it explicitly.
 It provisions **zero application workers** and runs the same handler/writer path
 on the I/O owner. Callbacks and flush resumptions must be short and nonblocking;
 they must not sleep, perform blocking I/O or wait for work. The server cannot
 preempt a violating callback or enforce deadlines while that callback runs.
 The demo `/stall` route therefore returns501 in inline mode. Explicit
-`--execution inline --workers 2` is rejected. Worker mode remains selectable
+`--execution inline --workers 2` is rejected. Worker mode is selectable
 with `--execution workers --workers 2`; this is an execution-policy experiment,
 not yet a per-request offload API or multiple I/O shards.
 
@@ -115,7 +116,7 @@ The default startup limits are explicit:
 | Resource | Default | Configuration |
 | --- | --- | --- |
 | Admitted connections/request slots | 128 | `--connections`; 1–4096. |
-| Application workers | 2 | `--workers`; 1–64, at most the connection count. |
+| Application workers | 0 | Inline default; `--execution workers` selects 2 unless `--workers` sets 1–64, at most the connection count. |
 | Request body | 64 KiB | `--max-body`; at most 16 MiB, cumulative after chunk decoding. |
 | Header bytes | 16 KiB | `--max-header`; 128 bytes–64 KiB, including request line and shared trailer budget. |
 | Header/trailer count | 64 combined | `Config.max_headers`; 1–1024. |
@@ -180,6 +181,9 @@ allocation attempts. It does not yet provide latency histograms,
 per-reason rejection metrics or a live metrics endpoint.
 
 Zero-copy here describes borrowed parsing and worker/transport payload handoff.
+Gather sends submit buffered framing and payload spans together using stable
+startup metadata; the body remains borrowed through terminal completion.
+`--gather-send 0` retains the scalar path for controlled comparison.
 Ordinary socket I/O still copies across the kernel boundary; this MVP does not
 use `SEND_ZC`, zero-copy receive or file `sendfile`. Pipelined suffix compaction
 currently copies bytes within the receive buffer and is counted explicitly.

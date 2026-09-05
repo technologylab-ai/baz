@@ -91,7 +91,7 @@ def main():
         parser.error("requests must be 8..1000000 and timeout 10..3600 seconds")
     binary = args.server.resolve()
     asset = ROOT / "assets/index.html"
-    configuration = dict(port=0, connections=128, workers=2, max_body=65536,
+    configuration = dict(port=0, connections=128, execution="inline", workers=0, max_body=65536,
                          max_header=16384, timeout_ms=5000, stall_ms=1000,
                          send_chunk=65536, socket_send_buffer=65536,
                          duration_ms=args.timeout * 1000)

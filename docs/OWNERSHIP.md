@@ -148,9 +148,9 @@ complete latency histograms, dynamic borrow release, alternative continuation
 styles, worker scheduling and controlled external framework comparisons remain
 experiments to perform before making production or capacity claims.
 
-## Optional inline execution experiment
+## Default inline execution and explicit workers
 
-`Config.execution = .inline_event_loop` requires `workers = 0`. No application
+`Config.execution = .inline_event_loop` is the default and requires `workers = 0`. No application
 worker threads, worker pipes or worker-stack budget are provisioned. The same
 handler receives exclusive request/writer borrows on the I/O owner; it returns
 the same frozen flush/finish/close action. One callback result per slot per loop
@@ -163,3 +163,14 @@ mode still separates finite blocking callbacks from the I/O owner but does not
 isolate arbitrary application code. Per-request optional offload and I/O sharding
 are separate future API decisions. The inline test does not run the blocking
 /stall fixture; that demo endpoint explicitly returns501 in this mode.
+
+## Gathered output snapshot
+
+Gather-send is enabled by default. The response's at-most-five immutable framing
+and payload slices are described by startup-reserved iovecs and msghdr storage,
+retained through the terminal SENDMSG completion on Linux or the nonblocking
+sendmsg/completion adapter on Mac. A positive completion can cross several spans;
+advance the cursor by its aggregate count, capped by send_chunk and i32. No
+borrowed body is copied into a contiguous transport buffer. A cancellation
+acknowledgement alone still cannot release target storage. The scalar switch
+exists for controlled comparison and retains the same completion/ownership rules.

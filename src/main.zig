@@ -24,7 +24,7 @@ pub fn main(init: std.process.Init) !void {
         if (std.mem.eql(u8, flag, "--help")) {
             std.debug.print("zig-http: bounded experimental Linux io_uring / macOS kqueue HTTP/1.1\n" ++
                 "--port N --connections N --execution workers|inline --workers N --max-body N --max-header N\n" ++
-                "--timeout-ms N --duration-ms N --send-chunk N --stall-ms N\n" ++
+                "--timeout-ms N --duration-ms N --send-chunk N --gather-send 0|1 --stall-ms N\n" ++
                 "--socket-send-buffer N --output-bytes N --max-response N --memory-budget N --index FILE\n", .{});
             return;
         }
@@ -48,6 +48,8 @@ pub fn main(init: std.process.Init) !void {
             config.duration_ms = try std.fmt.parseInt(u32, value, 10);
         } else if (std.mem.eql(u8, flag, "--send-chunk")) {
             config.send_chunk = try std.fmt.parseInt(u32, value, 10);
+        } else if (std.mem.eql(u8, flag, "--gather-send")) {
+            config.gather_send = if (std.mem.eql(u8, value, "1")) true else if (std.mem.eql(u8, value, "0")) false else return error.InvalidGatherSend;
         } else if (std.mem.eql(u8, flag, "--socket-send-buffer")) {
             config.socket_send_buffer_bytes = try std.fmt.parseInt(u32, value, 10);
         } else if (std.mem.eql(u8, flag, "--stall-ms")) {
@@ -62,7 +64,7 @@ pub fn main(init: std.process.Init) !void {
             index_path = value;
         } else return error.UnknownArgument;
     }
-    if (config.execution == .inline_event_loop and !workers_explicit) config.workers = 0;
+    if (!workers_explicit) config.workers = if (config.execution == .workers) 2 else 0;
     try config.validate();
     const html = try std.Io.Dir.cwd().readFileAlloc(init.io, index_path, init.gpa, .limited(65536));
     defer init.gpa.free(html);
@@ -82,8 +84,8 @@ pub fn main(init: std.process.Init) !void {
     std.posix.sigaction(.TERM, &action, null);
     try server.start();
     budget.sealed.store(true, .release);
-    std.debug.print("READY port={d} backend={s} connections={d} workers={d} execution={s} optimize={s}\n", .{
-        server.backend.port(), framework.backend_name, config.connections, config.workers, @tagName(config.execution), @tagName(@import("builtin").mode),
+    std.debug.print("READY port={d} backend={s} connections={d} workers={d} execution={s} gather_send={d} optimize={s}\n", .{
+        server.backend.port(), framework.backend_name, config.connections, config.workers, @tagName(config.execution), @intFromBool(config.gather_send), @tagName(@import("builtin").mode),
     });
     server.run() catch |err| {
         // A stuck callback or uncertain kernel submission still owns memory.
