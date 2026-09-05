@@ -93,3 +93,24 @@ baseline/client trials and the separate inline/gather checkpoints remain intact.
 All agents and timed runners finished. Use the final clean pushed documentation
 revision for local and Linux publication gates. Windows HTTP remains unimplemented;
 the sibling wiki's hosted Windows checks cover its lifecycle proofs only.
+
+## Arena/shard architecture branch (Claude, worktree `perf-architecture`)
+
+Branch `worktree-perf-architecture` at `.claude/worktrees/perf-architecture`,
+measured commit `ad424c7`, report
+[reports/2026-09-05-arena-shards.md](reports/2026-09-05-arena-shards.md),
+design [docs/PERF-ARCHITECTURE.md](docs/PERF-ARCHITECTURE.md). It replaces the
+fixed response cells with a per-connection output arena (head written at
+`begin()`, small borrows copied, one span per batch), a FIFO ready ring and
+turn clock, a lane-scanning parser, cell-addressed transport operations with
+caller-owned vectors, and a shard cluster (one owner per allowed CPU on Linux,
+SO_REUSEPORT, shared admission ceiling). Interleaved Linux pairs at `ad424c7`:
+three CPUs depth 16 7.0–7.2M/s versus libreactor 7.6–7.7M/s; one core depth 128
+6.6–6.9M/s versus 10.0M/s; three CPUs depth 1 549–588k/s versus 558–568k/s.
+Both native gates pass (Linux with eight auto shards). It overlaps main's
+direct-operation-cell and batch/quantum work in `src/transport*.zig`,
+`src/server.zig`, `src/main.zig` and `tests/batch_integration.py`; resolve by
+taking this branch's source and keeping main's reports, tools and comparator
+tests. `--inline-callback-budget` corresponds to `--callbacks-per-turn`.
+Pre-armed receives and eager submission are implemented, measured without
+gain, off by default and covered by the batch suite's overlap variants.
