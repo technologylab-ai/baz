@@ -1,34 +1,34 @@
 # HTTP experiment handoff — 2026-09-05
 
-Active experiment (2026-09-05): parent Codex /root owns branch
-`perf/direct-operation-cells` in
-`/Users/rs/code/github.com/technologylab.ai/zig-http-opcells`, based on pushed
-c0f87766efa310d517d262781a33ce189c4f9f0d. This named Git worktree is discoverable
-with `git worktree list`; it is separate from the other agent's
-`.claude/worktrees/perf-architecture` tree. Do not delete or merge the other
-agent's work. Current scope: replace Linux hot operation-table admission/CQE
-searches with explicit addressed cells, preserve socket/token/generation and
-separate target/cancel ownership, then perform a controlled ReleaseSafe A/B at
-configured capacities128/1024 with128 active clients. No improvement is measured
-yet. Mac baseline at the unchanged starting commit passed14/14 steps and52/52
-ReleaseSafe tests with exact Zig0.16.0 under the host lock; the lock is released.
-The prior full native publication gates remain in the wiki's durable receipt.
-Current stage: implementation checkpoint2b971e14f5fd8ed9769b5cdefbea3d86c71d83fc
-is pushed. Both Mac and Linux passed58/58 Debug and58/58 ReleaseSafe test
-executions,69 wire cases,8 comparator tests and30,000 ReleaseSafe smoke bodies.
-Independent source review found no further issues. All our subagents finished.
-The initial test switch-label comptime compile failure was fixed and retained.
-Baseline and candidate binaries are ready under /tmp/zig-http-compare.PIwh35;
-exact hashes and native receipts are in .zig-cache/tfb/opcells-candidate-*.
-Our ABBA launch stopped at lock acquisition before any timed trial: the external
-architecture agent holds Linux for its own sweep and also uses this prepared
-root's wrk/libreactor. Preserve those shared artifacts; do not remove the root
-merely because our own jobs have finished. Parent comparison is queued behind
-that host reservation, with capacities128/1024 and depths1/16/128, two ABBA
-blocks per configuration (48 total trials). No speedup has been measured yet.
-All heavy work must acquire `/tmp/zig-http-measurement.lock` on its execution
-host. This progress record exists so interruptions do not orphan work.
+Completed direct-operation-cell experiment: branch `perf/direct-operation-cells`,
+worktree `/Users/rs/code/github.com/technologylab.ai/zig-http-opcells`. Tested
+source2b971e14f5fd8ed9769b5cdefbea3d86c71d83fc; baselinec0f8776. Read
+[the complete report](reports/2026-09-05-operation-cells.md) and its immutable
+packets for all samples, commands, ownership gates and environment boundaries.
 
+Both Mac/Linux passed58 unit executions in Debug and ReleaseSafe,69 wire cases,
+8 comparator tests and30,000 ReleaseSafe smoke bodies. All48 Linux A/B/B/A
+trials passed with301,290,349 timed responses and5,120 exact preflights.
+At128 configured/active connections median gains were14%/4%/5% for client
+depths1/16/128; at1024 configured but128 active they were76%/29%/17%.
+Both paired blocks favored the candidate in every workload. Startup heap was
+unchanged. This removes an established-operation scan; cold fd binding/close,
+whole-slot scheduling and other fixed-batch costs remain. It does not close the
+previous libreactor gap or establish valid tails or production capacity.
+
+The implementation, independent review and Linux preparation agents finished;
+no operation-cell timed runner remains active. Parent owns publication. The next
+batch/callback experiment is source-complete and checkpointed atdbb6398 on
+`perf/batch-quantum` in `zig-http-batchq`; its own handoff owns validation status.
+Do not duplicate or discard that worktree after interruption. The external
+`.claude/worktrees/perf-architecture` is separate and remains untouched.
+
+Preserve `/tmp/zig-http-compare.PIwh35`: the external agent also borrows its
+pinned wrk/libreactor tools. Our measurement lock was released after child cleanup;
+future host work must reacquire `/tmp/zig-http-measurement.lock` atomically and
+check existing workloads. Windows HTTP gates remain deferred by user decision.
+
+## Historical evidence preceding direct operation cells
 
 Latest measurement: [recorded performance-profile depth sweep](reports/2026-09-05-power-profile.md)
 at exact bda54040bb0b809c82824b87a782e96826f05dff, Zig 0.16.0 ReleaseSafe.

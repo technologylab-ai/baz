@@ -1,0 +1,976 @@
+{
+  "analysis": "Rates = raw requests * 1e6 / raw duration_us. Each group contains four trials; median uses the arithmetic mean of its two middle rates. Block ratio = arithmetic mean of the two B rates divided by arithmetic mean of the two A rates; the table ratio is the ratio of four-sample medians. No outliers were excluded.",
+  "archive_encoding": "Sorted USTAR entries, uid/gid/mtime zero, mode0644, empty owner/group names; gzip filename empty and mtime zero.",
+  "archive_member_sha256": {
+    "control/opcells-abba-console.log": "0e8dc244fbff0dc912869700bfbb5e7b4515966d9aa6753ce8dc460ceb7a733f",
+    "control/opcells-abba-controller.json": "d27483f44a490d04a3033bab98bb6a1ce53ec78196787ee84383a4c325eea576",
+    "control/opcells-abba-lock-busy.log": "43c3c170c5d3c5b9aa76dc01a9232a4ecaaa2de4b925d8ec32909b9c382506f4",
+    "control/opcells-abba-lock.json": "acf109257e2a2953329350aee871fa5f8d7a7619b98cf5b450ac204d1141ab19",
+    "control/opcells-candidate-build.log": "31d1308bac0290816e53cd4af9c83bae5281d184f5e9e8019acad9bfe3e3a243",
+    "control/opcells-candidate-controller-receipt.json": "77275c214c39ac6caab228858f16cdef14d42fe5f7624e1b7639cb5819547b35",
+    "control/opcells-candidate-environment.json": "90ae1a07618780beec250ba0e884fadb33564f3869134337efbd136260fb57d3",
+    "control/run-opcells-abba.py": "5f019fbf7fd15bc8b1dd9b11fbdb955d71be2b8bb046549a433d7bc8c9327fee",
+    "opcells-abba-1024/000-baseline-c128-p1-server.log": "778dbcae11a5ce8a5935695df5dc402ab0af73047e879ba96534512a85ea4707",
+    "opcells-abba-1024/000-baseline-c128-p1-warmup.log": "d80b7f8059e608d637ed96221b12093d0de503cb0a68cea60c9d6e03adc06d68",
+    "opcells-abba-1024/000-baseline-c128-p1-wrk.log": "737282efc75d5bc026e8c2f578ef37ce82d5e5a957f320df4e6dd360d9f9cba8",
+    "opcells-abba-1024/001-direct-cells-c128-p1-server.log": "60422e7b5cd30526144d78aa6cedc9a4c06e377bb18eafa5c2ed61c4911bc15b",
+    "opcells-abba-1024/001-direct-cells-c128-p1-warmup.log": "cbe8a952688a123603de8f4f2862538406a56def40431cd5dea5857740053cf4",
+    "opcells-abba-1024/001-direct-cells-c128-p1-wrk.log": "9c3add9bbfcfc7203fac3d30e97642cd4ac5f92724ec335048ec7db484f0a796",
+    "opcells-abba-1024/002-direct-cells-c128-p1-server.log": "8c387bc19365c172685f80c31dea48cd57d6b208b51ef3e090b374675a50e300",
+    "opcells-abba-1024/002-direct-cells-c128-p1-warmup.log": "63574222d8ba2ba00d5d2216991e735ac3fd3950f2b5020d56ceb337c8f9b52f",
+    "opcells-abba-1024/002-direct-cells-c128-p1-wrk.log": "040dc98a0d8db4cfe9574adbec939a6b8d985e39dcc9751adba6cbe86636d66b",
+    "opcells-abba-1024/003-baseline-c128-p1-server.log": "95cb1cdd451faae7b675d7c84e5ec51fea8635c8c2759e6e74a5a198d23fe6b6",
+    "opcells-abba-1024/003-baseline-c128-p1-warmup.log": "0d67e7079e51532b92e621f5d6fa1846f088429cc4b3d06c77114fb03fbf7901",
+    "opcells-abba-1024/003-baseline-c128-p1-wrk.log": "cbaea45d020072d568987064e56d5eeae0326fe828dbf6a1e069b154b90a3b1d",
+    "opcells-abba-1024/004-baseline-c128-p16-server.log": "6c286248a650ace5c8b52ced47ebd5bb11966d8d708a99285882907e4698cd63",
+    "opcells-abba-1024/004-baseline-c128-p16-warmup.log": "4335f7353109f5686350bd16607add098dbc9d2decde1d8d45fd18dd16ccf495",
+    "opcells-abba-1024/004-baseline-c128-p16-wrk.log": "70cbd34fad50841abe0bdfd35637c889869bbd50cc1f3194637f561c72ea6cfd",
+    "opcells-abba-1024/005-direct-cells-c128-p16-server.log": "a1bde15b3866a265669b8a2794a76921a8fbb8d66c2a5f9e9d491f35d21e35d9",
+    "opcells-abba-1024/005-direct-cells-c128-p16-warmup.log": "1921a5cba3b8d5d9fb829166ae492a524f87f7b7a5aa9cbf95ea1a899c17a249",
+    "opcells-abba-1024/005-direct-cells-c128-p16-wrk.log": "11756b63b1a13fa35afa48a941fcc6e7790a6764c1960eaf115289131c02e2ae",
+    "opcells-abba-1024/006-direct-cells-c128-p16-server.log": "0ee00744c532ba23221dafff6e104e4a78fa31f0b34ac1ead7e3db041fe066c9",
+    "opcells-abba-1024/006-direct-cells-c128-p16-warmup.log": "9c4521a74eb9edbc36d9cc786d804addb7ac1be3e0faf1d81e774939be7d6fca",
+    "opcells-abba-1024/006-direct-cells-c128-p16-wrk.log": "965d6dca3e28ca63b5517391a19165014f5de44d89f7aa662dd75dd773046f2f",
+    "opcells-abba-1024/007-baseline-c128-p16-server.log": "910e434ecf389fc10e30df81960503db0a9584cd99d1235824a04aeece395636",
+    "opcells-abba-1024/007-baseline-c128-p16-warmup.log": "f0c0b7cce15f3cda55ad22ad0d15d9fc0fd2202bc0b6a25c3d61a73c16fabe84",
+    "opcells-abba-1024/007-baseline-c128-p16-wrk.log": "8332ac06ada7e459b81a6194298504319627d5e3f1cbf3a7a9d092733f4306ab",
+    "opcells-abba-1024/008-baseline-c128-p128-server.log": "6349abc79dc691aab1af2e334788ebc0ccd29b55096af87ec21ce80710ff4044",
+    "opcells-abba-1024/008-baseline-c128-p128-warmup.log": "b096bd06c10bac073dd8d2415c4d92cdfc634537c5d21ec311193131582dcaf7",
+    "opcells-abba-1024/008-baseline-c128-p128-wrk.log": "c823a4b9702c1db6941144bfb40235ee1c3db8c1c6c54921d06f64ae0e88487f",
+    "opcells-abba-1024/009-direct-cells-c128-p128-server.log": "21ba11778941db18d363d5d84c50119ea57991c97fef72211ab6b8ef38eeee0c",
+    "opcells-abba-1024/009-direct-cells-c128-p128-warmup.log": "7e916619ff0082bcdce3201c8686a6fc6ab3e5848bcae90cb3a6c880383e2ff9",
+    "opcells-abba-1024/009-direct-cells-c128-p128-wrk.log": "7d9f4f927a1e6f65df8b3b3fd738fa8281e44af35aa8c875516036e479b5186d",
+    "opcells-abba-1024/010-direct-cells-c128-p128-server.log": "1713ba03cf985c50efe544b5778756111eaa0a6b0a73be77e4449b7732068092",
+    "opcells-abba-1024/010-direct-cells-c128-p128-warmup.log": "a756b36fc8b9ed0c98e7de7eeb4d324d89544aa32190afdd7eed0b715a7e94bb",
+    "opcells-abba-1024/010-direct-cells-c128-p128-wrk.log": "00a664f8871f360cc75f2daa6ed336a984224c05b2ae358c6ad88bf5e08e14ef",
+    "opcells-abba-1024/011-baseline-c128-p128-server.log": "b003eee38daf211b918d3eb2b68fcdbde1d85df4b3d5ff74778041a02f2facaa",
+    "opcells-abba-1024/011-baseline-c128-p128-warmup.log": "ecf9ee8eaab9ddecf8260efdfa7aa3f665909ca21972d6aa27e0bab3790263d6",
+    "opcells-abba-1024/011-baseline-c128-p128-wrk.log": "e4d20b1b006f96e512a97337ad4f6f214814c41d4e0e97966f8c6a5f48b85c43",
+    "opcells-abba-1024/012-baseline-c128-p1-server.log": "8c133daebdeb97e504038d37ffe5fea83c354322b0d741bc8776e5654b3d23a7",
+    "opcells-abba-1024/012-baseline-c128-p1-warmup.log": "0c05e82b42776aab060970caf5ae72f26a0272e92439b482f2ab20d93c0c68dc",
+    "opcells-abba-1024/012-baseline-c128-p1-wrk.log": "202f68e8ce8c774b4409de84abf4f5f9dacab28af055cf1bf3f8f04a139234d1",
+    "opcells-abba-1024/013-direct-cells-c128-p1-server.log": "8ca28585028b839be684c4b8228f7eafb116d366a39e16bfb8ae780b8430e716",
+    "opcells-abba-1024/013-direct-cells-c128-p1-warmup.log": "cb1f92c8e8b1309b41f7b63fb067350c8f34bb620ff02f7a6a4cf0718bdd1648",
+    "opcells-abba-1024/013-direct-cells-c128-p1-wrk.log": "d2ea142600408ae603f9399dbd81f0ba22e36a266ff8301f97db9f04ed9afbe8",
+    "opcells-abba-1024/014-direct-cells-c128-p1-server.log": "0e92b93de2ab07e9553788541ab9e351b11ce1d0aaf24cf7ae90f02a041476dd",
+    "opcells-abba-1024/014-direct-cells-c128-p1-warmup.log": "cecbcaee8a486ff37c3fc8243e88f513b5551a2a0c971a42e55ed1cbb68a795c",
+    "opcells-abba-1024/014-direct-cells-c128-p1-wrk.log": "1366309b665545ab40f5b1bbd28a35db0919ba6efffb975d59800886b64de37a",
+    "opcells-abba-1024/015-baseline-c128-p1-server.log": "eacb207b1c808ad79a009295caf1a728d950c01bdc8621ad1129e146184ce55d",
+    "opcells-abba-1024/015-baseline-c128-p1-warmup.log": "ae87f760543c05bbd16a712183ff176210ab6ba77b92a8d6535058d6dc118b60",
+    "opcells-abba-1024/015-baseline-c128-p1-wrk.log": "301cf864ff10736b49e09a3226409f699bb56696a8e087d0a4ca5c8b3115be33",
+    "opcells-abba-1024/016-baseline-c128-p128-server.log": "05ad106aaf01703a4ddabc94578f33d61a7f6af5102d480836585d27189a433b",
+    "opcells-abba-1024/016-baseline-c128-p128-warmup.log": "0a0875ac5cc72c9928d451ae215ed3cca24d8ee43ad7e511a4114b79f3213062",
+    "opcells-abba-1024/016-baseline-c128-p128-wrk.log": "0466a2a977816b0a371a92cee0fa9f3b090e10410ed4f40948ca36f1f5fb59ff",
+    "opcells-abba-1024/017-direct-cells-c128-p128-server.log": "35c6468ea818ad672465bcdecd5327cdbed62bb51b9ed060975cfa6d96f80e68",
+    "opcells-abba-1024/017-direct-cells-c128-p128-warmup.log": "3ecf008f70978f6c9df4b331fcaa55dab96fe437feb024251506412c626c02ad",
+    "opcells-abba-1024/017-direct-cells-c128-p128-wrk.log": "2cd082c5ec449dc8a51ca7a3ca96ed47beba46c5860ffd6cda159957d6746764",
+    "opcells-abba-1024/018-direct-cells-c128-p128-server.log": "640c4bc540c544052872f12578775034ba1430387d6ed9f80c060a4676198854",
+    "opcells-abba-1024/018-direct-cells-c128-p128-warmup.log": "f964a8184f95aa8c85a0e0eed948110dc888ca2e04a473cf81ca00eeb1815876",
+    "opcells-abba-1024/018-direct-cells-c128-p128-wrk.log": "8a907529671ec05fbcb7c18dc2d18402d3833c16f4de85f6282116689f1de7ea",
+    "opcells-abba-1024/019-baseline-c128-p128-server.log": "bd65652903bdd0c2a8f5cf9f11f9c005b12d9f9372538635ad373bcc95b6bd83",
+    "opcells-abba-1024/019-baseline-c128-p128-warmup.log": "605c8fd3b262aaefecd6bff0d332f9861c56b270ec9f573a374754a2b6e13a62",
+    "opcells-abba-1024/019-baseline-c128-p128-wrk.log": "b14bc612a3b80ca5e4ba6fdc5634b8819511e7b6bb341db0f6c88ed63a0a005b",
+    "opcells-abba-1024/020-baseline-c128-p16-server.log": "4e744cd57de469e1aa455269a23cffd2d75a0d9fc22c1210c8d37b8ad0f8a042",
+    "opcells-abba-1024/020-baseline-c128-p16-warmup.log": "178c9edf2502b07993febfa6a0e5f43a5cf795dbb2d74f1892d621f46b9a1ddf",
+    "opcells-abba-1024/020-baseline-c128-p16-wrk.log": "27c36c6650140261f14ae9806bf4a195bb55baa070b89553cef8228801e07c6d",
+    "opcells-abba-1024/021-direct-cells-c128-p16-server.log": "7efaf1ac40b7e72cd3b426237df777592f8f83ad6170887a9e42a0c0c528cf42",
+    "opcells-abba-1024/021-direct-cells-c128-p16-warmup.log": "cc1a74a19c6ea0ce51415cb3220baf421f1ccfbcbd5290b330f71e12d6212399",
+    "opcells-abba-1024/021-direct-cells-c128-p16-wrk.log": "1ddc17ad5f89cfd9cb86ebe5263e5d3b1dc3f437750efc184281dd2fc0e0e5f4",
+    "opcells-abba-1024/022-direct-cells-c128-p16-server.log": "53d1d81aef405b2fd70ba20300cf9594fa785b0efc8756020b271d716cdbaed8",
+    "opcells-abba-1024/022-direct-cells-c128-p16-warmup.log": "20affe5cd9faba5d1151b905509652b857c6a9cde998440ed4e67c38aceb6183",
+    "opcells-abba-1024/022-direct-cells-c128-p16-wrk.log": "721b24dff8a0f70975de9ec0ebfd88631295182698c16b6bc6f1604066521c79",
+    "opcells-abba-1024/023-baseline-c128-p16-server.log": "5fd12364ce9913fe1e53fb1d06509a4d2c136aec9423cbbba6cb960b30324ff3",
+    "opcells-abba-1024/023-baseline-c128-p16-warmup.log": "1fe1cc727d98f570776bc2a3ce818ce79612407a4bdef317e197afb2fd102489",
+    "opcells-abba-1024/023-baseline-c128-p16-wrk.log": "84511bbf1990b1b2bcc4d67311da0506d073e9d5641d3a4930815f0a8a667029",
+    "opcells-abba-128/000-baseline-c128-p1-server.log": "0d97d113482602de1940cede36965a9819ea5d0d32a98972bceb203d5f3ac865",
+    "opcells-abba-128/000-baseline-c128-p1-warmup.log": "b0dd5fc9bb690c9188f6c226cb96e7dad0830d9b93ca8b974182e5ba0a9115b8",
+    "opcells-abba-128/000-baseline-c128-p1-wrk.log": "0efb053ed67f6d1f5ae89fab51d3327e0e2a07d610d032dd4edbdb9aa5464b57",
+    "opcells-abba-128/001-direct-cells-c128-p1-server.log": "de5752c4f4d3fa255443fc8c70d79f8a7e482553d7e2ad17d921679816ef3df2",
+    "opcells-abba-128/001-direct-cells-c128-p1-warmup.log": "8449f7a44b45dd88a26ca7c906c72b252fb5e3416a32dfc573702738e9513770",
+    "opcells-abba-128/001-direct-cells-c128-p1-wrk.log": "4dbdd8e5477b0739c101f99acd32f8582ea175fc49e7c704a65aae64aae20f80",
+    "opcells-abba-128/002-direct-cells-c128-p1-server.log": "887640f574ff27148213baaa7ae57ea05d2b02295b765c3ae17af41b896204ce",
+    "opcells-abba-128/002-direct-cells-c128-p1-warmup.log": "d3a0ac78bb3e315d0d2bfce277bdea99027284720b1c634242607398a6ae8a3c",
+    "opcells-abba-128/002-direct-cells-c128-p1-wrk.log": "d5a64769adc02a795f860adf3a0b8aa3709f5c591d3f2cb3aa33cb20f71dd165",
+    "opcells-abba-128/003-baseline-c128-p1-server.log": "5915af94b4f2862f52347d1fa19b1337f94bc13a091c1f951e2d768544309721",
+    "opcells-abba-128/003-baseline-c128-p1-warmup.log": "8b6108e3420846e09d86b9b5eed104488b3beb810bb6636bdb4e5bbc8fb9d056",
+    "opcells-abba-128/003-baseline-c128-p1-wrk.log": "0966cefbd86f83315e9d7e4e81ed5f2fe2214d90376e69b203c39cb8159daef3",
+    "opcells-abba-128/004-baseline-c128-p16-server.log": "f34da2a488e4b91742728712d7926068fbdf9e80c0c2e24c8c9942b9aa6dbd8f",
+    "opcells-abba-128/004-baseline-c128-p16-warmup.log": "4dcba5f4192d0d9103e545155e7c87bd62ffaafa94e4c5c79309161404ccee9a",
+    "opcells-abba-128/004-baseline-c128-p16-wrk.log": "ffa35086fb939c8aadd1568710e414c4036d59e793e60045cd4f0a1de37450a5",
+    "opcells-abba-128/005-direct-cells-c128-p16-server.log": "7e6afd59ad0a106d345284e32cdc94f20f92cb52eb5c5655df747c6dc05cc422",
+    "opcells-abba-128/005-direct-cells-c128-p16-warmup.log": "4097aafcef0686f538cfd533176112ac8c31282ecbede780b04fe9de82ec03db",
+    "opcells-abba-128/005-direct-cells-c128-p16-wrk.log": "aa81b0619379a24d0ef8305957bfed8a991d708a3481d85ecc67c7cbe8210614",
+    "opcells-abba-128/006-direct-cells-c128-p16-server.log": "46e486594c1eb8a9e3797f737b01b60703fe501cd60dceb29f1c35bae6313433",
+    "opcells-abba-128/006-direct-cells-c128-p16-warmup.log": "95facaf4f7333de1aecb59d179b106550e6bb18fdb0e5b726f1089295aea6e04",
+    "opcells-abba-128/006-direct-cells-c128-p16-wrk.log": "c4ec4b26c78d7fd52e38161e9d21e7c8c9e0e609c0baa930fe0757ee575aacfd",
+    "opcells-abba-128/007-baseline-c128-p16-server.log": "ef6b5e413b1975190a1f993c1c86ae8fc30f060cf2cc8ce98aacae75c50b0054",
+    "opcells-abba-128/007-baseline-c128-p16-warmup.log": "797e1f9df30539f0882c1d092f3710f096b9000b7da2095997c50068f4006e25",
+    "opcells-abba-128/007-baseline-c128-p16-wrk.log": "85ce018c5e3406a312aaefbb5252eeee8ba58ca1b634a94351057b285f2cc34a",
+    "opcells-abba-128/008-baseline-c128-p128-server.log": "af8dba5e3bfcd0d363857942534514a6ef008701bf7808c805d5a47708895776",
+    "opcells-abba-128/008-baseline-c128-p128-warmup.log": "b27e16bd1e60fa7e621a10535007e867d08c0eb0343a6fcda23cbeab50927dc2",
+    "opcells-abba-128/008-baseline-c128-p128-wrk.log": "7d29690c27279b3b3af446be7d2dd6209bf888653a6a97f8afbe419cd6931491",
+    "opcells-abba-128/009-direct-cells-c128-p128-server.log": "33cadf63765ae4680d89968f6e402127dd8b306795e1a84ca6b84e578f7b54af",
+    "opcells-abba-128/009-direct-cells-c128-p128-warmup.log": "d02cd4567629e0b74fa23cc8345924a514946c268d0ba3b2bb3d1e0737034edb",
+    "opcells-abba-128/009-direct-cells-c128-p128-wrk.log": "a074ea094abff0e95f08cd84998b0dd0e69171a735330e353c699709f2c7dfbf",
+    "opcells-abba-128/010-direct-cells-c128-p128-server.log": "ecd75d63e32800cef7372fd8e00715b6e7bb1a08fd436a82c926bd0a666025b6",
+    "opcells-abba-128/010-direct-cells-c128-p128-warmup.log": "81e9372c749922664e43d415895e9c1587a300468110d50197026ca033701fc2",
+    "opcells-abba-128/010-direct-cells-c128-p128-wrk.log": "c8a5830258acd018de083e99e68ba663f5d3f809bd48293e77f0c62f44f04997",
+    "opcells-abba-128/011-baseline-c128-p128-server.log": "820148f2c6eab41bfbabce416cbbc2d4209410934a5e122c72044616cce0ae88",
+    "opcells-abba-128/011-baseline-c128-p128-warmup.log": "8497fb95db34d80f4dbcc7383044bda2755df76e7657eafc2bb89318fd498b5c",
+    "opcells-abba-128/011-baseline-c128-p128-wrk.log": "8bf376bbe89a56c0f9d5e848f55d7a6ab82d96045e12d88591ae0cae06618f78",
+    "opcells-abba-128/012-baseline-c128-p1-server.log": "7579ce6368477e8726b9d4393c1ed947f6e042a212c1c73cf9a5f172a81714dd",
+    "opcells-abba-128/012-baseline-c128-p1-warmup.log": "89ffbe72f867a14811e58385a022ce0d2e472a8e81984997c63292dbf9a08c70",
+    "opcells-abba-128/012-baseline-c128-p1-wrk.log": "bc0ec00aca0c91a53dbd43c3fdaada4e85d284ef3aa51d8b581055adf16d5ebb",
+    "opcells-abba-128/013-direct-cells-c128-p1-server.log": "511bfc777d6ccecc815d43978efbed5044e08e0fecd1d468bc9c8e7437870c2c",
+    "opcells-abba-128/013-direct-cells-c128-p1-warmup.log": "37427554ac92d55ad8f5fae3dbdf15ef8fd0d0bb38adfba8af273b684af42e41",
+    "opcells-abba-128/013-direct-cells-c128-p1-wrk.log": "6b805c325d9035cf3ce161ccd9f6face874e282584ef083fa40902c58b005bb4",
+    "opcells-abba-128/014-direct-cells-c128-p1-server.log": "696f15ded7e4f86b5cdf04a42b7c627f3780a4365dd94de1af2d064ad63e90dd",
+    "opcells-abba-128/014-direct-cells-c128-p1-warmup.log": "f5810d39efeaf20da45982421d4ca940123d25f096f8131c056dbf6fe7683b05",
+    "opcells-abba-128/014-direct-cells-c128-p1-wrk.log": "577f8ca32ea8c4c3ef0a82ac8537ca7eef46f78dfa918bd58e1ccbad84b4ef95",
+    "opcells-abba-128/015-baseline-c128-p1-server.log": "f1f0aee3263123938e01ae893f4fe6871c2a0cf009fb56af49013bc469ce2a3b",
+    "opcells-abba-128/015-baseline-c128-p1-warmup.log": "df07c99713533e42a838b04dc25269047c63fbec865d4518edee279b129e7ec1",
+    "opcells-abba-128/015-baseline-c128-p1-wrk.log": "06880e36444093da34f2251ce2389e82ea84d6dbbde9f65e4f54f72d4738158c",
+    "opcells-abba-128/016-baseline-c128-p128-server.log": "08cc3e87344b5cdddda0f488597e378782b40f1340df13409f8ee0b8e50debe6",
+    "opcells-abba-128/016-baseline-c128-p128-warmup.log": "70878882981022911cff81e68354b1664f0287594871c17b291b700dced9cd13",
+    "opcells-abba-128/016-baseline-c128-p128-wrk.log": "afbead0580863fef536572a1e0308024efa55af2977708a6a32fa29945f6b343",
+    "opcells-abba-128/017-direct-cells-c128-p128-server.log": "b889587bb385c4c15a136c9b58814c7bb15c049da54dcf1758ab9aaa71e0a763",
+    "opcells-abba-128/017-direct-cells-c128-p128-warmup.log": "063523e622644740b1cfa45159573c39fbad3356e4d5b287abc22118db9df6cf",
+    "opcells-abba-128/017-direct-cells-c128-p128-wrk.log": "3be5c037643fcb9d20206877c503accdbc3941119e960b5e7af29b4217e28eb7",
+    "opcells-abba-128/018-direct-cells-c128-p128-server.log": "efd66db452d08913f130ae514bba4abb67187125a0ac0d6f6eb6b5ab9d70b58b",
+    "opcells-abba-128/018-direct-cells-c128-p128-warmup.log": "a2a075c44f06647bbf9402f2c76e0ccd6c472787039f4ed1729f71edd3d5b4cd",
+    "opcells-abba-128/018-direct-cells-c128-p128-wrk.log": "74acbdc02938de6e733364d3e8647b77a1dc6b73f5a613464ff6a5fda244ad92",
+    "opcells-abba-128/019-baseline-c128-p128-server.log": "bc9bc50b3558d974fe45a84f6b594c7d4c6cc7b74887567d0a5d4e588444beb8",
+    "opcells-abba-128/019-baseline-c128-p128-warmup.log": "cf27112a82818f93f5598746f085afc1e4bab7421a9adbb2b23c09697358e7f9",
+    "opcells-abba-128/019-baseline-c128-p128-wrk.log": "15694dc693cc2bf3555056e9be92544c3b1432e3019c293ff0608c05cf52d416",
+    "opcells-abba-128/020-baseline-c128-p16-server.log": "74e8e958d04a5c2f7b609b1e30b1b2c6e966517a9864e82a2e5a47e3456f6e86",
+    "opcells-abba-128/020-baseline-c128-p16-warmup.log": "215c82901f3af9c2ded03b85b586c0997d8140926d2f100127b566b674322d50",
+    "opcells-abba-128/020-baseline-c128-p16-wrk.log": "98b4ca4ed2b7dd44480d8480809ee010f58b9c91bdaa253f7fd3b738e05c549e",
+    "opcells-abba-128/021-direct-cells-c128-p16-server.log": "07c4361fa2be68e6a83f94d84e9a93dc345eec8f87ceb346e613bb94064f274c",
+    "opcells-abba-128/021-direct-cells-c128-p16-warmup.log": "b573a3547bb5270c6ffe3606de122e2e1075216c2a79b10ab3149f2a0695278f",
+    "opcells-abba-128/021-direct-cells-c128-p16-wrk.log": "e2babfb500c6acf5ee270998742a56658cb3808c8ee99ccbd3180971aa794b94",
+    "opcells-abba-128/022-direct-cells-c128-p16-server.log": "3a4900f2576fee0a152e9356bc0392329c96e2ed4f5afebc9560d146d67718b6",
+    "opcells-abba-128/022-direct-cells-c128-p16-warmup.log": "afa9c5db9498aec9b65691b2ec58441bb32077a45b6d17b7ffbf661cc09a2234",
+    "opcells-abba-128/022-direct-cells-c128-p16-wrk.log": "0d3630bd4d28d8e9fb3a2ebd2b5e2653a54a58564cd1d7e7879a3634d66c2c1a",
+    "opcells-abba-128/023-baseline-c128-p16-server.log": "8ad89910ab6725a39d8eded82417db7e8574e1eb6a319bb20b2dda4b00af77f6",
+    "opcells-abba-128/023-baseline-c128-p16-warmup.log": "ebf3990abc6912ddca68348a6de598c9bec3e0cd54ccfc7ffe0e857e337b2239",
+    "opcells-abba-128/023-baseline-c128-p16-wrk.log": "843bbd0c0719f5b3ac2375b2037058da322b373875e1d7deb7fba231d2afc314",
+    "source/benchmarks/pipeline.lua": "e0f744cdccc03668a7cbbcd5b09e175f8ef271e9708d9d055794ba752852c935",
+    "source/tests/integration.py": "66d089bc17a7f31e86e73b705d5bdce89864c0286353e23bc8928d944e9bbf20",
+    "source/tools/compare.py": "1d8157a51358d97f803cd6fa6ab4c70c37fbad80d72465873bc3442a82d921c5"
+  },
+  "artifact_sha256": {
+    "abba-1024.json": "b7b1ef9dd3a642fa19ec5c18964bad2ca4d16671a19b3be9e88ac7e8be49b4ad",
+    "abba-128.json": "6d6b0fdf31e09c718e1638b2f5a95505f93f92cd3eb4e69ecf682445acc21911",
+    "configuration-1024.json": "3e517834e6481399e693dde3e244f915dda6ecbb13303fc8c8a5e746e2fea7b7",
+    "configuration-128.json": "101daaf6ad133c1ae480a6360c14035e27338fb0f67455771b9de03ed798267a",
+    "controller.json": "d27483f44a490d04a3033bab98bb6a1ce53ec78196787ee84383a4c325eea576",
+    "lock.json": "acf109257e2a2953329350aee871fa5f8d7a7619b98cf5b450ac204d1141ab19",
+    "native-logs.tar.gz": "2cd116fa8e790c0ab0e8704c34065c8f16916ffa6866b0b8a6ebdfce3f88a333",
+    "native.json": "759a5179a43263deeae677b5814eb80150eda899fa1ee50fb42787b597b0aa63",
+    "summarize.py": "0b401e47e5f29ac0bd062005374d224c2980688197b18bcf6e6cd31bfc296803",
+    "timed-logs.tar.gz": "6f5fc50cbdc4d5b5a9de8cd518f749410d1508971186b67789828abf1445b0bb"
+  },
+  "baseline_commit": "c0f87766efa310d517d262781a33ce189c4f9f0d",
+  "binary_sha256": {
+    "bin/wrk": "c8000cec3cb25e87292c983828ecfcfd4108ce39d2bb01b9cd313f17dcf290af",
+    "candidate/zig-out/bin/zig-http": "a2e125146cb655a882580f02ee7c04a94ab98f76de01551f66457e05e31d799e",
+    "zig-http/zig-out/bin/zig-http": "860764caee352c76ec4be68fa2588a58c89dd60a8982acf0ecc394fef65cd102"
+  },
+  "candidate_commit": "2b971e14f5fd8ed9769b5cdefbea3d86c71d83fc",
+  "compiler_sha256": "2317bbb91798556d9d0f38aabdac23db83f0979b25f767259ae474546724087c",
+  "experiment": "direct Linux operation cells",
+  "harness_source_commit": "2b971e14f5fd8ed9769b5cdefbea3d86c71d83fc",
+  "limits": [
+    "Single Linux loopback host,128 active clients at both128 and1024 configured slots; this does not measure1024 active connections.",
+    "Cold first-bind and close scans, server control scans, kernel/userspace copies and ordinary callback/response construction remain.",
+    "Two ABBA blocks per workload reduce linear ordering bias but provide no confidence interval, host isolation or general capacity guarantee.",
+    "No per-response tail, open-loop latency, SLO, power-profile causal or frequency-residency claim; all16 measured depth128 corrected percentile sets fail ordering sanity.",
+    "Zero observed short sends or gather cancellation requests in this throughput run; native fixtures own those correctness witnesses.",
+    "Framework allocation counters cover requested framework heap only, excluding kernel storage, allocator bookkeeping and unrelated application allocation.",
+    "The one server CPU and four client threads sharing the same host can constrain throughput; no unconstrained-client or CPU-isolated service claim."
+  ],
+  "lock_scope": {
+    "controller": "controller.json",
+    "lock": "lock.json",
+    "lock_released": true,
+    "preexisting_workloads": [],
+    "remaining_owned_processes": [],
+    "shared_root": "/tmp/zig-http-compare.PIwh35",
+    "shared_root_preservation_reason": "External architecture agent borrows bin/wrk and libreactor; preserve this shared root. Native ephemeral_publication_root_removed refers to the separate native verification root, not this shared comparison root.",
+    "shared_root_removed": false
+  },
+  "native_snapshot_scope": "native.json is the unchanged capture-before-timing snapshot; timed_trials_started:false applies only at that capture.",
+  "ok": true,
+  "optimize": "ReleaseSafe",
+  "reproduce": "python3 reports/2026-09-05-operation-cells/summarize.py --json",
+  "schema_version": 1,
+  "summary": {
+    "counter_ranges": {
+      "framework_heap_limit_bytes": {
+        "max": 536870912,
+        "min": 536870912
+      },
+      "gather_cancel_requests": {
+        "max": 0,
+        "min": 0
+      },
+      "gather_canceled_completions": {
+        "max": 0,
+        "min": 0
+      },
+      "max_batch_responses": {
+        "max": 16,
+        "min": 16
+      },
+      "max_inline_callbacks_per_turn": {
+        "max": 64,
+        "min": 54
+      },
+      "max_send_bytes": {
+        "max": 2512,
+        "min": 2512
+      },
+      "max_send_parts": {
+        "max": 32,
+        "min": 32
+      },
+      "peak_connections": {
+        "max": 128,
+        "min": 128
+      },
+      "peak_operations": {
+        "max": 129,
+        "min": 113
+      },
+      "short_send_completions": {
+        "max": 0,
+        "min": 0
+      }
+    },
+    "exact_preflight_responses": 5120,
+    "late_allocation_calls": 0,
+    "load_errors": {
+      "connect_errors": 0,
+      "read_errors": 0,
+      "status_errors": 0,
+      "timeout_errors": 0,
+      "write_errors": 0
+    },
+    "measured_latency_sanity": {
+      "1": {
+        "sane": 16,
+        "trials": 16
+      },
+      "128": {
+        "sane": 0,
+        "trials": 16
+      },
+      "16": {
+        "sane": 16,
+        "trials": 16
+      }
+    },
+    "measured_responses": 301290349,
+    "power_endpoints": {
+      "count": 96,
+      "cpu_observations": 768,
+      "drivers": [
+        "intel_pstate"
+      ],
+      "epp": [
+        "performance"
+      ],
+      "governors": [
+        "powersave"
+      ],
+      "intel_pstate": [
+        {
+          "max_perf_pct": "100",
+          "min_perf_pct": "8",
+          "no_turbo": "0",
+          "status": "active"
+        }
+      ],
+      "profile": "performance"
+    },
+    "raw_logs_verified": 144,
+    "rows": [
+      {
+        "active_clients": 128,
+        "blocks": [
+          {
+            "abba_block": 0,
+            "abba_repeat": 1,
+            "mean_responses_per_second": {
+              "baseline": 290963.6143991167,
+              "direct-cells": 330549.6480746367
+            },
+            "ratio_of_means": 1.1360514913772675,
+            "trial_indices": [
+              0,
+              1,
+              2,
+              3
+            ]
+          },
+          {
+            "abba_block": 3,
+            "abba_repeat": 0,
+            "mean_responses_per_second": {
+              "baseline": 272167.8344871961,
+              "direct-cells": 319181.0289554274
+            },
+            "ratio_of_means": 1.1727360419235837,
+            "trial_indices": [
+              12,
+              13,
+              14,
+              15
+            ]
+          }
+        ],
+        "configured_connections": 128,
+        "pipeline": 1,
+        "ratio_of_medians": 1.138995215400033,
+        "servers": {
+          "baseline": {
+            "client_cpu_percent": {
+              "max": 126.05087069457413,
+              "median": 125.94496554426598,
+              "min": 113.06656559463819,
+              "n": 4
+            },
+            "framework_heap_peak_bytes": [
+              29618632
+            ],
+            "responses_per_second": {
+              "max": 292565.2576377617,
+              "median": 289308.66781079245,
+              "min": 255080.3045132791,
+              "n": 4
+            },
+            "rss_kib": {
+              "max": 31464,
+              "median": 31450.0,
+              "min": 31428,
+              "n": 4
+            },
+            "server_cpu_percent": {
+              "max": 67.51108271633694,
+              "median": 66.54761940731008,
+              "min": 66.29896150373239,
+              "n": 4
+            },
+            "trial_indices": [
+              0,
+              3,
+              12,
+              15
+            ]
+          },
+          "direct-cells": {
+            "client_cpu_percent": {
+              "max": 145.8279902927621,
+              "median": 142.48664366792974,
+              "min": 136.83484066166017,
+              "n": 4
+            },
+            "framework_heap_peak_bytes": [
+              29618632
+            ],
+            "responses_per_second": {
+              "max": 330675.9970937709,
+              "median": 329521.1884102501,
+              "min": 309742.980145857,
+              "n": 4
+            },
+            "rss_kib": {
+              "max": 31468,
+              "median": 31460.0,
+              "min": 31452,
+              "n": 4
+            },
+            "server_cpu_percent": {
+              "max": 62.367430839687096,
+              "median": 61.54775428858717,
+              "min": 61.29954468265552,
+              "n": 4
+            },
+            "trial_indices": [
+              1,
+              2,
+              13,
+              14
+            ]
+          }
+        }
+      },
+      {
+        "active_clients": 128,
+        "blocks": [
+          {
+            "abba_block": 1,
+            "abba_repeat": 0,
+            "mean_responses_per_second": {
+              "baseline": 1892949.0546626362,
+              "direct-cells": 1962689.053059745
+            },
+            "ratio_of_means": 1.036841983795247,
+            "trial_indices": [
+              4,
+              5,
+              6,
+              7
+            ]
+          },
+          {
+            "abba_block": 5,
+            "abba_repeat": 1,
+            "mean_responses_per_second": {
+              "baseline": 1618838.325240109,
+              "direct-cells": 1723541.0809788234
+            },
+            "ratio_of_means": 1.064677710001204,
+            "trial_indices": [
+              20,
+              21,
+              22,
+              23
+            ]
+          }
+        ],
+        "configured_connections": 128,
+        "pipeline": 16,
+        "ratio_of_medians": 1.0373657916416095,
+        "servers": {
+          "baseline": {
+            "client_cpu_percent": {
+              "max": 105.8297553016342,
+              "median": 99.09427864450578,
+              "min": 92.25349346254758,
+              "n": 4
+            },
+            "framework_heap_peak_bytes": [
+              29618632
+            ],
+            "responses_per_second": {
+              "max": 1895772.7451116005,
+              "median": 1776401.1394492905,
+              "min": 1574999.735795309,
+              "n": 4
+            },
+            "rss_kib": {
+              "max": 31468,
+              "median": 31468.0,
+              "min": 31464,
+              "n": 4
+            },
+            "server_cpu_percent": {
+              "max": 84.49691605221696,
+              "median": 83.61979689168508,
+              "min": 82.8259599033294,
+              "n": 4
+            },
+            "trial_indices": [
+              4,
+              7,
+              20,
+              23
+            ]
+          },
+          "direct-cells": {
+            "client_cpu_percent": {
+              "max": 110.95413360603321,
+              "median": 105.33616211223733,
+              "min": 99.2091248155911,
+              "n": 4
+            },
+            "framework_heap_peak_bytes": [
+              29618632
+            ],
+            "responses_per_second": {
+              "max": 1966433.7895173382,
+              "median": 1842777.7742978705,
+              "min": 1720470.9299640576,
+              "n": 4
+            },
+            "rss_kib": {
+              "max": 31464,
+              "median": 31456.0,
+              "min": 31452,
+              "n": 4
+            },
+            "server_cpu_percent": {
+              "max": 82.7526449603974,
+              "median": 82.5882841774918,
+              "min": 81.84438475717214,
+              "n": 4
+            },
+            "trial_indices": [
+              5,
+              6,
+              21,
+              22
+            ]
+          }
+        }
+      },
+      {
+        "active_clients": 128,
+        "blocks": [
+          {
+            "abba_block": 2,
+            "abba_repeat": 1,
+            "mean_responses_per_second": {
+              "baseline": 1910166.697403931,
+              "direct-cells": 1989756.8255751568
+            },
+            "ratio_of_means": 1.0416665876749893,
+            "trial_indices": [
+              8,
+              9,
+              10,
+              11
+            ]
+          },
+          {
+            "abba_block": 4,
+            "abba_repeat": 0,
+            "mean_responses_per_second": {
+              "baseline": 1745014.1652664442,
+              "direct-cells": 1798791.522742432
+            },
+            "ratio_of_means": 1.0308177197333963,
+            "trial_indices": [
+              16,
+              17,
+              18,
+              19
+            ]
+          }
+        ],
+        "configured_connections": 128,
+        "pipeline": 128,
+        "ratio_of_medians": 1.0460029215968298,
+        "servers": {
+          "baseline": {
+            "client_cpu_percent": {
+              "max": 78.34842633596682,
+              "median": 74.80901728888946,
+              "min": 72.4418748120983,
+              "n": 4
+            },
+            "framework_heap_peak_bytes": [
+              29618632
+            ],
+            "responses_per_second": {
+              "max": 1914898.9249882933,
+              "median": 1828907.6275946472,
+              "min": 1737647.545163163,
+              "n": 4
+            },
+            "rss_kib": {
+              "max": 31464,
+              "median": 31462.0,
+              "min": 31428,
+              "n": 4
+            },
+            "server_cpu_percent": {
+              "max": 79.8700262675257,
+              "median": 79.74422610285386,
+              "min": 79.40241331403274,
+              "n": 4
+            },
+            "trial_indices": [
+              8,
+              11,
+              16,
+              19
+            ]
+          },
+          "direct-cells": {
+            "client_cpu_percent": {
+              "max": 80.76256155591226,
+              "median": 77.69558464342308,
+              "min": 72.72661631852509,
+              "n": 4
+            },
+            "framework_heap_peak_bytes": [
+              29618632
+            ],
+            "responses_per_second": {
+              "max": 1989816.5447670303,
+              "median": 1913042.721794728,
+              "min": 1761194.7082786914,
+              "n": 4
+            },
+            "rss_kib": {
+              "max": 31460,
+              "median": 31452.0,
+              "min": 31436,
+              "n": 4
+            },
+            "server_cpu_percent": {
+              "max": 79.03766431614532,
+              "median": 78.88475468949508,
+              "min": 78.45580457061287,
+              "n": 4
+            },
+            "trial_indices": [
+              9,
+              10,
+              17,
+              18
+            ]
+          }
+        }
+      },
+      {
+        "active_clients": 128,
+        "blocks": [
+          {
+            "abba_block": 0,
+            "abba_repeat": 1,
+            "mean_responses_per_second": {
+              "baseline": 163869.4389663103,
+              "direct-cells": 288880.56169656396
+            },
+            "ratio_of_means": 1.7628702674447707,
+            "trial_indices": [
+              0,
+              1,
+              2,
+              3
+            ]
+          },
+          {
+            "abba_block": 3,
+            "abba_repeat": 0,
+            "mean_responses_per_second": {
+              "baseline": 163093.80603208859,
+              "direct-cells": 288622.235130263
+            },
+            "ratio_of_means": 1.7696701190079336,
+            "trial_indices": [
+              12,
+              13,
+              14,
+              15
+            ]
+          }
+        ],
+        "configured_connections": 1024,
+        "pipeline": 1,
+        "ratio_of_medians": 1.7628702674447707,
+        "servers": {
+          "baseline": {
+            "client_cpu_percent": {
+              "max": 72.71319345897926,
+              "median": 72.07203697371227,
+              "min": 71.93020428501042,
+              "n": 4
+            },
+            "framework_heap_peak_bytes": [
+              236924360
+            ],
+            "responses_per_second": {
+              "max": 165177.68770513785,
+              "median": 163869.4389663103,
+              "min": 161009.92435903935,
+              "n": 4
+            },
+            "rss_kib": {
+              "max": 234268,
+              "median": 234264.0,
+              "min": 234264,
+              "n": 4
+            },
+            "server_cpu_percent": {
+              "max": 80.58930481400026,
+              "median": 80.55719624928466,
+              "min": 80.54106885640074,
+              "n": 4
+            },
+            "trial_indices": [
+              0,
+              3,
+              12,
+              15
+            ]
+          },
+          "direct-cells": {
+            "client_cpu_percent": {
+              "max": 129.28390909778824,
+              "median": 129.2075729909585,
+              "min": 127.28241525205033,
+              "n": 4
+            },
+            "framework_heap_peak_bytes": [
+              236924360
+            ],
+            "responses_per_second": {
+              "max": 293513.57132486394,
+              "median": 288880.56169656396,
+              "min": 283730.8989356622,
+              "n": 4
+            },
+            "rss_kib": {
+              "max": 234264,
+              "median": 234262.0,
+              "min": 234248,
+              "n": 4
+            },
+            "server_cpu_percent": {
+              "max": 63.146068743463196,
+              "median": 62.96883605704154,
+              "min": 62.53707587210319,
+              "n": 4
+            },
+            "trial_indices": [
+              1,
+              2,
+              13,
+              14
+            ]
+          }
+        }
+      },
+      {
+        "active_clients": 128,
+        "blocks": [
+          {
+            "abba_block": 1,
+            "abba_repeat": 0,
+            "mean_responses_per_second": {
+              "baseline": 1363553.3643752658,
+              "direct-cells": 1758111.8533213292
+            },
+            "ratio_of_means": 1.289360504146339,
+            "trial_indices": [
+              4,
+              5,
+              6,
+              7
+            ]
+          },
+          {
+            "abba_block": 5,
+            "abba_repeat": 1,
+            "mean_responses_per_second": {
+              "baseline": 1367057.0902501661,
+              "direct-cells": 1800575.7368142032
+            },
+            "ratio_of_means": 1.3171181727931383,
+            "trial_indices": [
+              20,
+              21,
+              22,
+              23
+            ]
+          }
+        ],
+        "configured_connections": 1024,
+        "pipeline": 16,
+        "ratio_of_medians": 1.287267429820584,
+        "servers": {
+          "baseline": {
+            "client_cpu_percent": {
+              "max": 74.07995732274117,
+              "median": 72.11218378587884,
+              "min": 71.50498898532668,
+              "n": 4
+            },
+            "framework_heap_peak_bytes": [
+              236924360
+            ],
+            "responses_per_second": {
+              "max": 1381520.4373456235,
+              "median": 1365770.4782963167,
+              "min": 1348159.5153126062,
+              "n": 4
+            },
+            "rss_kib": {
+              "max": 234268,
+              "median": 234264.0,
+              "min": 234240,
+              "n": 4
+            },
+            "server_cpu_percent": {
+              "max": 87.83882674045735,
+              "median": 87.64189206134522,
+              "min": 87.4118861689474,
+              "n": 4
+            },
+            "trial_indices": [
+              4,
+              7,
+              20,
+              23
+            ]
+          },
+          "direct-cells": {
+            "client_cpu_percent": {
+              "max": 92.4939472484131,
+              "median": 88.81182379152673,
+              "min": 80.12582053680018,
+              "n": 4
+            },
+            "framework_heap_peak_bytes": [
+              236924360
+            ],
+            "responses_per_second": {
+              "max": 1883658.1224997544,
+              "median": 1758111.8533213292,
+              "min": 1717493.3511286518,
+              "n": 4
+            },
+            "rss_kib": {
+              "max": 234268,
+              "median": 234268.0,
+              "min": 234228,
+              "n": 4
+            },
+            "server_cpu_percent": {
+              "max": 86.28414830914244,
+              "median": 84.60762234323624,
+              "min": 83.76450272545252,
+              "n": 4
+            },
+            "trial_indices": [
+              5,
+              6,
+              21,
+              22
+            ]
+          }
+        }
+      },
+      {
+        "active_clients": 128,
+        "blocks": [
+          {
+            "abba_block": 2,
+            "abba_repeat": 1,
+            "mean_responses_per_second": {
+              "baseline": 1600193.123074717,
+              "direct-cells": 1867307.045514639
+            },
+            "ratio_of_means": 1.1669260532295451,
+            "trial_indices": [
+              8,
+              9,
+              10,
+              11
+            ]
+          },
+          {
+            "abba_block": 4,
+            "abba_repeat": 0,
+            "mean_responses_per_second": {
+              "baseline": 1599844.420200549,
+              "direct-cells": 1852987.457777395
+            },
+            "ratio_of_means": 1.1582297843343499,
+            "trial_indices": [
+              16,
+              17,
+              18,
+              19
+            ]
+          }
+        ],
+        "configured_connections": 1024,
+        "pipeline": 128,
+        "ratio_of_medians": 1.167180397004205,
+        "servers": {
+          "baseline": {
+            "client_cpu_percent": {
+              "max": 58.74220889656871,
+              "median": 57.92196137125108,
+              "min": 57.62511261455362,
+              "n": 4
+            },
+            "framework_heap_peak_bytes": [
+              236924360
+            ],
+            "responses_per_second": {
+              "max": 1616223.5121619669,
+              "median": 1599844.420200549,
+              "min": 1584162.7339874671,
+              "n": 4
+            },
+            "rss_kib": {
+              "max": 234268,
+              "median": 234268.0,
+              "min": 234264,
+              "n": 4
+            },
+            "server_cpu_percent": {
+              "max": 84.07666896466313,
+              "median": 83.8315613673469,
+              "min": 83.47598763858991,
+              "n": 4
+            },
+            "trial_indices": [
+              8,
+              11,
+              16,
+              19
+            ]
+          },
+          "direct-cells": {
+            "client_cpu_percent": {
+              "max": 67.3472447574421,
+              "median": 67.05381500242623,
+              "min": 66.17640283290744,
+              "n": 4
+            },
+            "framework_heap_peak_bytes": [
+              236924360
+            ],
+            "responses_per_second": {
+              "max": 1876997.5216891964,
+              "median": 1867307.045514639,
+              "min": 1828977.3938655935,
+              "n": 4
+            },
+            "rss_kib": {
+              "max": 234268,
+              "median": 234264.0,
+              "min": 234260,
+              "n": 4
+            },
+            "server_cpu_percent": {
+              "max": 81.22452422961013,
+              "median": 80.86056338571888,
+              "min": 80.78859902375524,
+              "n": 4
+            },
+            "trial_indices": [
+              9,
+              10,
+              17,
+              18
+            ]
+          }
+        }
+      }
+    ],
+    "timed_trials": 48,
+    "timing_intervals": {
+      "1024": {
+        "finished_utc": "2026-09-05T19:33:25.251813+00:00",
+        "started_utc": "2026-09-05T19:30:21.783593+00:00"
+      },
+      "128": {
+        "finished_utc": "2026-09-05T19:30:21.714905+00:00",
+        "started_utc": "2026-09-05T19:27:20.663360+00:00"
+      }
+    },
+    "warmup_responses": 65102390,
+    "warmups": 48
+  },
+  "timed_trials_completed": true,
+  "wrk_source_commit": "a211dd5a7050b1f9e8a9870b95513060e72ac4a0",
+  "zig": "0.16.0"
+}

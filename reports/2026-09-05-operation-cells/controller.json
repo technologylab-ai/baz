@@ -1,0 +1,78 @@
+{
+  "owner": {
+    "schema": 1,
+    "token": "27a7a6e7082a4de4a9574ba5c8a0f5e2",
+    "host": "omarx1",
+    "owner": "Codex /root operation-cell ABBA",
+    "owner_pid": 1021751,
+    "owner_start_ticks": "48037359",
+    "purpose": "Baseline/candidate ReleaseSafe ABBA, capacities128/1024, client depths1/16/128; no competing builds or measurements",
+    "work_root": "/tmp/zig-http-compare.PIwh35",
+    "created_utc": "2026-09-05T19:27:20.606041+00:00"
+  },
+  "waited_seconds": 0.00018668599659577012,
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "tools/compare.py",
+        "/tmp/zig-http-compare.PIwh35/opcells-config-128.json",
+        "--output",
+        "/tmp/zig-http-compare.PIwh35/opcells-abba-128",
+        "--connections",
+        "128",
+        "--pipelines",
+        "1",
+        "16",
+        "128",
+        "--seconds",
+        "5",
+        "--repeats",
+        "2",
+        "--threads",
+        "4",
+        "--seed",
+        "20260905",
+        "--order",
+        "abba"
+      ],
+      "exit": 0
+    },
+    {
+      "argv": [
+        "python3",
+        "tools/compare.py",
+        "/tmp/zig-http-compare.PIwh35/opcells-config-1024.json",
+        "--output",
+        "/tmp/zig-http-compare.PIwh35/opcells-abba-1024",
+        "--connections",
+        "128",
+        "--pipelines",
+        "1",
+        "16",
+        "128",
+        "--seconds",
+        "5",
+        "--repeats",
+        "2",
+        "--threads",
+        "4",
+        "--seed",
+        "20260905",
+        "--order",
+        "abba"
+      ],
+      "exit": 0
+    }
+  ],
+  "ok": true,
+  "preexisting_workloads": [],
+  "finished_utc": "2026-09-05T19:33:25.268271+00:00",
+  "remaining_owned_processes": [],
+  "binary_sha256": {
+    "zig-http/zig-out/bin/zig-http": "860764caee352c76ec4be68fa2588a58c89dd60a8982acf0ecc394fef65cd102",
+    "candidate/zig-out/bin/zig-http": "a2e125146cb655a882580f02ee7c04a94ab98f76de01551f66457e05e31d799e",
+    "bin/wrk": "c8000cec3cb25e87292c983828ecfcfd4108ce39d2bb01b9cd313f17dcf290af"
+  },
+  "lock_released": true
+}

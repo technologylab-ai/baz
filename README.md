@@ -252,3 +252,10 @@ drain before reuse or close. Mac honors the same token contract but keeps its
 pooled scans. This changes the low-level transport token contract; see
 [INTERFACES.md](docs/INTERFACES.md). No measured throughput gain is claimed until
 the paired comparison report is complete.
+
+[Direct operation cells](reports/2026-09-05-operation-cells.md) remove established
+Linux admission/completion scans while preserving explicit slot/generation/fd
+and target/cancel ownership. Both native gates and48 paired Linux trials passed.
+At128 active clients, capacity128 medians improved14%/4%/5% at depths1/16/128;
+capacity1024 improved76%/29%/17%. Cold binding/close still scan; batch16/global64
+and startup heap are unchanged. The report retains every sample and limitation.
