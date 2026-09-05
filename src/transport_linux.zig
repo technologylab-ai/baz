@@ -9,6 +9,8 @@ const assert = std.debug.assert;
 
 pub const Backend = struct {
     const Kind = enum { free, accept, data, cancel };
+    // A free data cell retains token generation/socket until close. Retaining
+    // this binding makes hot admission O(1) while preserving socket uniqueness.
     const Operation = struct { kind: Kind = .free, token: u64 = 0, socket: Socket = -1 };
 
     pub const operation_bytes = @sizeOf(Operation);
@@ -64,7 +66,7 @@ pub const Backend = struct {
     /// Closing the ring is not used as an ownership acknowledgement.
     pub fn deinit(self: *Backend) void {
         assert(self.outstanding == 0);
-        for (self.operations) |op| assert(op.kind == .free);
+        for (self.operations) |op| assert(op.kind == .free and op.socket == -1);
         common.closeFd(self.listener);
         common.closeFd(self.wake_fd);
         self.ring.deinit();
@@ -73,24 +75,30 @@ pub const Backend = struct {
         self.* = undefined;
     }
 
-    fn vacant(self: *Backend, token: u64, socket: Socket, kind: Kind) !*Operation {
-        var free: ?*Operation = null;
-        var data_count: usize = 0;
-        var cancel_count: usize = 0;
-        for (self.operations) |*op| {
-            if (op.kind == .free) {
-                if (free == null) free = op;
+    fn vacant(self: *Backend, token: u64, socket: Socket, expected: common.Token.Kind) !*Operation {
+        const identity = try common.Token.decode(token);
+        if (identity.kind != expected) return error.OperationKindMismatch;
+        const index = try identity.cell(self.operations.len);
+        const op = &self.operations[index];
+        if (op.kind != .free) return error.OperationCapacityExceeded;
+        // Fixed accept identity, like a connection data identity, cannot be
+        // reused while its previous cancellation acknowledgement still owns a cell.
+        if (expected == .accept or expected == .recv or expected == .send) {
+            if (self.operations[index + 1].kind != .free) return error.OperationCapacityExceeded;
+        }
+        if (expected == .recv or expected == .send) {
+            assert(socket >= 0 and socket != self.listener and socket != self.wake_fd);
+            if (op.socket == -1) {
+                // Cold first binding only. Completed data cells keep their fd,
+                // so this also rejects sockets owned by an idle other slot.
+                var other: usize = 2;
+                while (other < self.operations.len) : (other += 2) assert(self.operations[other].socket != socket);
             } else {
-                assert(op.token != token);
-                if (kind == .accept) assert(op.kind != .accept);
-                if (kind == .data and op.kind == .data) assert(op.socket != socket);
-                if (op.kind == .data) data_count += 1;
-                if (op.kind == .cancel) cancel_count += 1;
+                assert(op.socket == socket);
+                assert((common.Token.decode(op.token) catch unreachable).generation == identity.generation);
             }
         }
-        if (kind == .data and data_count >= self.operations.len / 2 - 1) return error.OperationCapacityExceeded;
-        if (kind == .cancel and cancel_count >= self.operations.len / 2) return error.OperationCapacityExceeded;
-        return free orelse error.OperationCapacityExceeded;
+        return op;
     }
 
     pub fn accept(self: *Backend, token: u64) !void {
@@ -102,7 +110,7 @@ pub const Backend = struct {
 
     pub fn recv(self: *Backend, token: u64, socket: Socket, buffer: []u8) !void {
         assert(buffer.len > 0 and buffer.len <= std.math.maxInt(i32));
-        const op = try self.vacant(token, socket, .data);
+        const op = try self.vacant(token, socket, .recv);
         _ = try self.ring.recv(token, socket, .{ .buffer = buffer }, 0);
         op.* = .{ .kind = .data, .token = token, .socket = socket };
         self.outstanding += 1;
@@ -110,7 +118,7 @@ pub const Backend = struct {
 
     pub fn send(self: *Backend, token: u64, socket: Socket, bytes: []const u8) !void {
         assert(bytes.len > 0 and bytes.len <= std.math.maxInt(i32));
-        const op = try self.vacant(token, socket, .data);
+        const op = try self.vacant(token, socket, .send);
         _ = try self.ring.send(token, socket, bytes, linux.MSG.NOSIGNAL);
         op.* = .{ .kind = .data, .token = token, .socket = socket };
         self.outstanding += 1;
@@ -118,7 +126,7 @@ pub const Backend = struct {
 
     pub fn sendv(self: *Backend, token: u64, socket: Socket, parts: []const []const u8) !void {
         const metadata = self.gather_metadata orelse return error.GatherSendNotEnabled;
-        const op = try self.vacant(token, socket, .data);
+        const op = try self.vacant(token, socket, .send);
         const index = (@intFromPtr(op) - @intFromPtr(self.operations.ptr)) / @sizeOf(Operation);
         assert(index < metadata.len);
         const gather = &metadata[index];
@@ -129,8 +137,11 @@ pub const Backend = struct {
     }
 
     pub fn cancel(self: *Backend, token: u64, target: u64) !void {
-        assert(token != target);
-        const op = try self.vacant(token, -1, .cancel);
+        if (token != try common.Token.cancellation(target)) return error.CancellationIdentityMismatch;
+        const identity = try common.Token.decode(token);
+        const op = try self.vacant(token, -1, identity.kind);
+        // Kernel cancellation matches the full identity, not merely the direct
+        // cell address: missing/stale generations return their own NOENT CQE.
         _ = try self.ring.cancel(token, target, 0);
         op.* = .{ .kind = .cancel, .token = token };
         self.outstanding += 1;
@@ -169,24 +180,29 @@ pub const Backend = struct {
             // Socket readiness hints do not extend ownership. Only single-shot,
             // caller-buffer operations are admitted: no provided buffer or ZC.
             assert(cqe.flags & (linux.IORING_CQE_F_MORE | linux.IORING_CQE_F_NOTIF | linux.IORING_CQE_F_BUFFER) == 0);
-            var matched = false;
-            for (self.operations) |*op| {
-                if (op.kind == .free or op.token != cqe.user_data) continue;
-                assert(!matched and self.outstanding > 0);
-                matched = true;
-                var result = cqe.res;
-                if (op.kind == .accept and result >= 0) {
-                    common.configureAccepted(result, false) catch {
-                        common.closeFd(result);
-                        result = -@as(i32, @intFromEnum(c.E.IO));
-                    };
-                }
-                completion.* = .{ .token = op.token, .result = result };
-                op.* = .{};
-                self.outstanding -= 1;
-                break;
+            const identity = common.Token.decode(cqe.user_data) catch unreachable;
+            const index = identity.cell(self.operations.len) catch unreachable;
+            const op = &self.operations[index];
+            const expected: Kind = switch (identity.kind) {
+                .accept => .accept,
+                .recv, .send => .data,
+                .cancel, .cancel_accept => .cancel,
+            };
+            assert(op.kind == expected and op.token == cqe.user_data and self.outstanding > 0);
+            var result = cqe.res;
+            if (op.kind == .accept and result >= 0) {
+                common.configureAccepted(result, false) catch {
+                    common.closeFd(result);
+                    result = -@as(i32, @intFromEnum(c.E.IO));
+                };
             }
-            assert(matched);
+            completion.* = .{ .token = op.token, .result = result };
+            if (op.kind == .data) {
+                // The target borrow ends here; retain connection binding until
+                // close also establishes that its cancellation cell drained.
+                op.kind = .free;
+            } else op.* = .{};
+            self.outstanding -= 1;
         }
         assert(self.ring.cq.overflow.* == 0 and self.ring.sq.dropped.* == 0);
         return count;
@@ -221,8 +237,17 @@ pub const Backend = struct {
     }
 
     pub fn close(self: *Backend, socket: Socket) void {
-        for (self.operations) |op| assert(op.kind != .data or op.socket != socket);
+        // Cold connection teardown. Overflow accepts may never have a binding.
+        var bound: ?*Operation = null;
+        var index: usize = 2;
+        while (index < self.operations.len) : (index += 2) {
+            const op = &self.operations[index];
+            if (op.socket != socket) continue;
+            assert(bound == null and op.kind == .free and self.operations[index + 1].kind == .free);
+            bound = op;
+        }
         common.closeFd(socket);
+        if (bound) |op| op.* = .{};
     }
 
     pub fn shutdown(_: *Backend, socket: Socket) void {

@@ -78,6 +78,16 @@ pub const Backend = struct {
     }
 
     fn vacant(self: *Backend, token: u64, socket: Socket, kind: Kind) !*Operation {
+        const identity = try common.Token.decode(token);
+        const expected: common.Token.Kind = switch (kind) {
+            .accept => .accept,
+            .recv => .recv,
+            .send, .sendv => .send,
+            .cancel => identity.kind,
+            .free => unreachable,
+        };
+        if (identity.kind != expected) return error.OperationKindMismatch;
+        const cell = try identity.cell(self.operations.len);
         var free: ?*Operation = null;
         var data_count: usize = 0;
         var cancel_count: usize = 0;
@@ -85,6 +95,10 @@ pub const Backend = struct {
             if (op.kind == .free) {
                 if (free == null) free = op;
             } else {
+                // Keep the shared logical reservation contract; this readiness
+                // adapter still uses its original bounded pooled-cell scan.
+                const occupied = (common.Token.decode(op.token) catch unreachable).cell(self.operations.len) catch unreachable;
+                if (occupied == cell or ((kind == .accept or isData(kind)) and occupied == cell + 1)) return error.OperationCapacityExceeded;
                 assert(op.token != token);
                 if (kind == .accept) assert(op.kind != .accept);
                 if (isData(kind)) {
@@ -194,7 +208,7 @@ pub const Backend = struct {
     }
 
     pub fn cancel(self: *Backend, token: u64, target: u64) !void {
-        assert(token != target);
+        if (token != try common.Token.cancellation(target)) return error.CancellationIdentityMismatch;
         const cancellation = try self.vacant(token, -1, .cancel);
         var result: i32 = -@as(i32, @intFromEnum(c.E.NOENT));
         for (self.operations) |*op| {

@@ -128,9 +128,9 @@ pub const Stats = struct {
 
 const Phase = enum(u8) { io, ready, running, result };
 const SendMode = enum { response, interim, reject };
-const Kind = enum(u8) { accept = 1, recv, send, cancel, cancel_accept };
-const accept_token: u64 = @intFromEnum(Kind.accept);
-const cancel_accept_token: u64 = @intFromEnum(Kind.cancel_accept);
+const Kind = transport.Token.Kind;
+const accept_token = transport.Token.accept;
+const cancel_accept_token = transport.Token.cancel_accept;
 
 const BatchNext = enum { parse, resume_flush, close };
 
@@ -472,13 +472,14 @@ pub const Server = struct {
     }
 
     fn tokenFor(slot: *const Slot, index: usize, kind: Kind) u64 {
-        return (@as(u64, slot.generation) << 32) | (@as(u64, index) << 8) | @intFromEnum(kind);
+        return transport.Token.connection(index, slot.generation, kind);
     }
 
     fn onCompletion(self: *Server, completion: transport.Completion) !void {
         assert(self.stats.live_operations > 0);
         self.stats.live_operations -= 1;
-        const kind: Kind = @enumFromInt(@as(u8, @truncate(completion.token)));
+        const identity = transport.Token.decode(completion.token) catch unreachable;
+        const kind = identity.kind;
         if (kind == .cancel_accept) {
             assert(self.accept_cancel_pending);
             self.accept_cancel_pending = false;
@@ -533,10 +534,10 @@ pub const Server = struct {
             self.backend.close(completion.result);
             return;
         }
-        const index: usize = @intCast((completion.token >> 8) & 0xffff);
+        const index: usize = identity.index;
         assert(index < self.slots.len);
         const slot = &self.slots[index];
-        assert(slot.in_use and slot.generation == completion.token >> 32);
+        assert(slot.in_use and slot.generation == identity.generation);
         if (kind == .cancel) {
             assert(slot.cancel_pending);
             slot.cancel_pending = false;
@@ -882,9 +883,9 @@ pub const Server = struct {
         slot.cancelled.store(true, .release);
         if (slot.fd >= 0) self.backend.shutdown(slot.fd);
         if (slot.op_pending and !slot.cancel_pending) {
-            const token = (slot.op_token & ~@as(u64, 255)) | @intFromEnum(Kind.cancel);
+            const token = try transport.Token.cancellation(slot.op_token);
             try self.backend.cancel(token, slot.op_token);
-            if (@as(u8, @truncate(slot.op_token)) == @intFromEnum(Kind.send) and slot.send_is_gather) {
+            if ((transport.Token.decode(slot.op_token) catch unreachable).kind == .send and slot.send_is_gather) {
                 self.stats.gather_cancel_requests += 1;
                 assert(slot.batch_count <= slot.cells.len);
                 self.stats.max_canceled_batch_responses = @max(self.stats.max_canceled_batch_responses, slot.batch_count);
@@ -892,7 +893,9 @@ pub const Server = struct {
             slot.cancel_pending = true;
             self.operationAdded();
         }
-        if (!slot.op_pending and slot.fd >= 0) {
+        // shutdown above is immediate; descriptor reuse and retained transport
+        // binding release wait for both the target and cancellation terminal.
+        if (!slot.op_pending and !slot.cancel_pending and slot.fd >= 0) {
             self.backend.close(slot.fd);
             slot.fd = -1;
         }

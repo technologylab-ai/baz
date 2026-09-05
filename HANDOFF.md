@@ -13,9 +13,16 @@ configured capacities128/1024 with128 active clients. No improvement is measured
 yet. Mac baseline at the unchanged starting commit passed14/14 steps and52/52
 ReleaseSafe tests with exact Zig0.16.0 under the host lock; the lock is released.
 The prior full native publication gates remain in the wiki's durable receipt.
-Stage at this checkpoint: baseline/inspection complete; implementation and A/B
-are next. All heavy work must acquire `/tmp/zig-http-measurement.lock` on its
-execution host. This progress record exists so interruptions do not orphan work.
+Current stage: direct-addressing implementation and ABBA harness are complete.
+The source implementation agent finished; Linux preparation finished67/67
+commands at /tmp/zig-http-compare.PIwh35 and released its reservation. Parent
+owns Linux native validation and timing next. Mac development gates passed58/58
+test executions in both Debug/ReleaseSafe,69 wire cases,8 comparator tests and
+30,000 ReleaseSafe smoke bodies. An initial fixture switch-label comptime error
+was fixed before that successful native run; failed logs are retained.
+No Linux runtime or throughput gain is established for the new code yet.
+All heavy work must acquire `/tmp/zig-http-measurement.lock` on its execution
+host. This progress record exists so interruptions do not orphan work.
 
 
 Latest measurement: [recorded performance-profile depth sweep](reports/2026-09-05-power-profile.md)

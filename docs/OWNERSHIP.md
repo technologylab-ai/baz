@@ -100,14 +100,23 @@ or real-time latency guarantee.
 
 At admission exhaustion, an accepted overflow descriptor is closed without
 allocating a slot. Kernel backlog membership is separate from admitted work.
-Each slot has a single data operation and reserved cancellation capacity. Tokens
+Each slot has a single data operation and reserved cancellation capacity. Linux
+uses fixed addressed cells and retains its fd/generation binding across completed
+operations until close. Established-operation admission and CQE dispatch use
+constant work; first binding and close still scan bounded connection storage.
+The shared transport.Token contract validates kinds, slot bounds and generation;
+Mac keeps its original pooled scans while honoring the same logical reservations.
+Tokens
 combine slot index, generation and operation kind. Generation increments are
 checked rather than wrapped silently. A cancellation acknowledgement is distinct
 from the target operation's terminal completion; neither alone permits releasing
 all owners.
 
 On stop or deadline, the I/O owner marks cancellation, shuts down networking and
-cancels outstanding transport work. A callback may inspect
+cancels outstanding transport work. Descriptor close waits for both the target
+and its cancellation acknowledgement, so fd reuse cannot overlap an old
+retained binding. The same paired-owner reuse rule covers the fixed accept token.
+A callback may inspect
 `context.cancelled.load(.acquire)` and return `.close`. Closing the socket does
 not terminate a running callback. Its request and output remain allocated until
 it returns. Workers have fixed affinity and do not steal work, so one blocking

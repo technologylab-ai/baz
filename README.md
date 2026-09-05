@@ -233,3 +233,22 @@ bounds, instantaneous endpoint frequency and Intel pstate limits before and afte
 each timed trial. An optional `expected_power_profile` configuration field rejects
 an absent or changed endpoint profile. Those snapshots are outside the timed
 region; they do not measure average frequency, residency, or continuous policy.
+
+For two-binary experiments, `tools/compare.py --order abba` runs adjacent
+A/B/B/A trials at identical connections and pipeline depth; the configuration's
+first server is A. It shuffles whole blocks only. `--repeats 2` means two blocks
+and therefore four samples per server/workload. Receipts identify each block,
+position and sample count. This reduces linear time-order bias; it does not
+isolate the host or remove thermal/client variation. The default shuffled
+ordering retains its original one-sample-per-repeat behavior. Use host-local
+`/tmp/zig-http-measurement.lock` reservations for preparation and timed runs,
+and finish all builds before measuring.
+
+The direct-operation-cell experiment makes Linux established recv/send admission
+and CQE dispatch use addressed cells. First fd binding and connection close still
+perform bounded scans. Structured tokens and retained fd/generation bindings
+preserve ownership checks; both target and cancellation terminal events must
+drain before reuse or close. Mac honors the same token contract but keeps its
+pooled scans. This changes the low-level transport token contract; see
+[INTERFACES.md](docs/INTERFACES.md). No measured throughput gain is claimed until
+the paired comparison report is complete.

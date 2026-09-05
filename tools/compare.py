@@ -75,6 +75,27 @@ def check_power_state(state, expected):
         require(state.get('profile') == expected, 'required power profile was not observed: ' + str(state))
 
 
+def trial_jobs(servers, connections, pipelines, repeats, seed, order):
+    """Shuffle whole ABBA blocks, preserving adjacent equal-workload comparisons."""
+    rng = random.Random(seed)
+    if order == 'shuffled':
+        jobs = [(rep, c, pipeline, server) for rep in range(repeats)
+                for c in connections for pipeline in pipelines for server in servers]
+        rng.shuffle(jobs)
+        return jobs
+    require(order == 'abba', 'unknown trial ordering')
+    require(len(servers) == 2 and servers[0]['name'] != servers[1]['name'],
+            'ABBA requires exactly two distinctly named servers, in A/B order')
+    blocks = [(rep, c, pipeline) for rep in range(repeats)
+              for c in connections for pipeline in pipelines]
+    rng.shuffle(blocks)
+    # Each block contributes two samples per server. Replicate IDs stay unique
+    # for each server/workload, while the receipt also records block positions.
+    return [(2 * rep + position // 2, c, pipeline, servers[server])
+            for rep, c, pipeline in blocks
+            for position, server in enumerate((0, 1, 1, 0))]
+
+
 def ticks():
     result = {}
     for path in Path('/proc').glob('[0-9]*/task/[0-9]*/stat'):
@@ -201,11 +222,14 @@ def main():
     parser.add_argument('configuration', type=Path)
     parser.add_argument('--output', required=True, type=Path)
     parser.add_argument('--seconds', type=int, default=5)
-    parser.add_argument('--repeats', type=int, default=3)
+    parser.add_argument('--repeats', type=int, default=3,
+                        help='samples per configuration, or ABBA blocks (two samples/server/block)')
     parser.add_argument('--connections', type=int, nargs='+', default=[8, 32, 128])
     parser.add_argument('--pipelines', type=int, nargs='+', choices=[1, 16, 32, 64, 128], default=[1, 16])
     parser.add_argument('--threads', type=int, default=4)
     parser.add_argument('--seed', type=int, default=20260905)
+    parser.add_argument('--order', choices=['shuffled', 'abba'], default='shuffled',
+                        help='ABBA compares exactly two servers in adjacent equal-workload blocks')
     args = parser.parse_args()
     require(sys.platform == 'linux', 'this controlled-affinity harness requires Linux')
     require(1 <= args.seconds <= 30 and 1 <= args.repeats <= 5, 'finite trial bounds')
@@ -217,6 +241,8 @@ def main():
     require(1 <= len(config['servers']) <= 4, 'bounded contender count')
     require(not set(config['server_cpus']) & set(config['client_cpus']), 'overlapping CPU budgets')
     require(set(config['server_cpus'] + config['client_cpus']) <= os.sched_getaffinity(0), 'unavailable CPU')
+    jobs = trial_jobs(config['servers'], args.connections, args.pipelines,
+                      args.repeats, args.seed, args.order)
     args.output.mkdir(parents=True, exist_ok=False)
     receipt = dict(schema_version=1, tool='zig-http-wrk-comparison', ok=False,
                    started_utc=datetime.now(timezone.utc).isoformat(), configuration=config,
@@ -225,6 +251,8 @@ def main():
                    latency_model='wrk corrected batch histogram; configured pipeline depth; closed loop',
                    validation='two exact-body/header preflight pipelines at max(16, trial depth); wrk framing/status during load',
                    duration_seconds=args.seconds, repeats=args.repeats, threads=args.threads,
+                   ordering=args.order,
+                   samples_per_configuration=args.repeats * (2 if args.order == 'abba' else 1),
                    seed=args.seed, connections=args.connections, pipeline_depths=args.pipelines,
                    environment=dict(power_state=power_state(), uname=capture(['uname', '-a']), os_release=Path('/etc/os-release').read_text(),
                        cpuinfo=Path('/proc/cpuinfo').read_text(), meminfo=Path('/proc/meminfo').read_text(),
@@ -232,9 +260,6 @@ def main():
                        lscpu=capture(['lscpu']), python=sys.version,
                        frequency_policy={str(p):p.read_text().strip() for p in Path('/sys/devices/system/cpu').glob('cpu[0-9]*/cpufreq/scaling_governor')},
                        boost_policy={str(p):p.read_text().strip() for p in Path('/sys/devices/system/cpu').glob('intel_pstate/no_turbo')}), trials=[])
-    jobs = [(rep, c, pipeline, s) for rep in range(args.repeats)
-            for c in args.connections for pipeline in args.pipelines for s in config['servers']]
-    random.Random(args.seed).shuffle(jobs)
     def interrupted(number, frame):
         raise TimeoutError(f'orchestrator signal {number}; cancel owned processes')
     for number in (signal.SIGALRM, signal.SIGTERM, signal.SIGINT):
@@ -243,6 +268,8 @@ def main():
     try:
         for index, (rep, connections, pipeline, server) in enumerate(jobs):
             trial = dict(index=index, repeat=rep, server=server['name'], connections=connections, pipeline=pipeline)
+            if args.order == 'abba':
+                trial.update(abba_block=index // 4, abba_position=index % 4, abba_repeat=rep // 2)
             receipt['trials'].append(trial)
             prefix = f"{index:03d}-{server['name']}-c{connections}-p{pipeline}"
             logpath = args.output / (prefix + '-server.log')

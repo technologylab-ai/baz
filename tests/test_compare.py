@@ -1,6 +1,7 @@
 """Check externally consumed wrk receipt semantics, including failed loads."""
 import importlib.util
 import json
+from collections import Counter
 from pathlib import Path
 import unittest
 
@@ -43,6 +44,34 @@ class WrkReceiptTests(unittest.TestCase):
         for text in ['', self.receipt() * 2, self.receipt(requests=0), self.receipt(duration_us=0)]:
             with self.assertRaises(RuntimeError):
                 compare.parse_wrk(text)
+
+    def test_abba_keeps_equal_workload_adjacent_and_balances_samples(self):
+        servers = [{'name': 'baseline'}, {'name': 'candidate'}]
+        jobs = compare.trial_jobs(servers, [8, 128], [16, 128], 2, 20260905, 'abba')
+        self.assertEqual(len(jobs), 32)
+        identities = [(rep, c, pipeline, s['name']) for rep, c, pipeline, s in jobs]
+        self.assertEqual(len(set(identities)), len(identities))
+        self.assertEqual(set(Counter((c, p, s['name']) for _, c, p, s in jobs).values()), {4})
+        for start in range(0, len(jobs), 4):
+            block = jobs[start:start + 4]
+            self.assertEqual([s['name'] for _, _, _, s in block],
+                             ['baseline', 'candidate', 'candidate', 'baseline'])
+            self.assertEqual(len({(c, p, rep // 2) for rep, c, p, _ in block}), 1)
+        self.assertEqual(jobs, compare.trial_jobs(servers, [8, 128], [16, 128], 2, 20260905, 'abba'))
+
+    def test_abba_rejects_ambiguous_or_non_pair_comparisons(self):
+        for servers in ([], [{'name': 'a'}], [{'name': 'a'}, {'name': 'a'}],
+                        [{'name': 'a'}, {'name': 'b'}, {'name': 'c'}]):
+            with self.assertRaises(RuntimeError):
+                compare.trial_jobs(servers, [128], [16], 1, 1, 'abba')
+
+    def test_default_shuffle_retains_each_requested_sample_once(self):
+        servers = [{'name': 'a'}, {'name': 'b'}, {'name': 'c'}]
+        jobs = compare.trial_jobs(servers, [8, 128], [1, 16], 3, 9, 'shuffled')
+        self.assertEqual({(rep, c, p, s['name']) for rep, c, p, s in jobs},
+                         {(rep, c, p, s['name']) for rep in range(3)
+                          for c in [8, 128] for p in [1, 16] for s in servers})
+        self.assertEqual(len(jobs), 36)
 
 if __name__ == '__main__':
     unittest.main()
