@@ -784,7 +784,7 @@ pub const Server = struct {
         const slot = &self.slots[index];
         assert(!slot.request_active and !slot.op_pending and slot.input_cursor <= slot.received);
         assert(slot.batch_count < slot.cells.len);
-        const parsed = slot.parser.parse(slot.input[slot.input_cursor..slot.received]) catch |err| {
+        const parsed = slot.parser.parseInto(slot.input[slot.input_cursor..slot.received], &slot.request) catch |err| {
             // Earlier successful responses retain wire order before this error.
             // Drain them, compact safely, then parse/reject the unchanged suffix.
             if (slot.batch_count != 0) return self.drainBatch(index, .parse);
@@ -798,11 +798,10 @@ pub const Server = struct {
                 else => 400,
             });
         };
-        if (parsed) |request| {
-            slot.request = request;
+        if (parsed) {
             slot.request_active = true;
             assert(slot.arena.len - slot.arena_used >= api.header_reserve_bytes);
-            slot.writer.open(slot.arena_used, request.keep_alive, request.head_only);
+            slot.writer.open(slot.arena_used, slot.request.keep_alive, slot.request.head_only);
             slot.state = @splat(0);
             slot.event = .request;
             slot.logical_written = 0;

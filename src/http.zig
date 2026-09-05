@@ -150,28 +150,36 @@ pub const Parser = struct {
     /// ownership bug, not malformed HTTP. Errors remain sticky until reset.
     /// A supplied suffix beyond the first complete request is left uninspected.
     pub fn parse(self: *Parser, bytes: []const u8) ParseError!?Request {
+        var parsed: Request = undefined;
+        if (try self.parseInto(bytes, &parsed)) return parsed;
+        return null;
+    }
+
+    /// Like parse, but fills a caller-owned Request in place and reports
+    /// whether it is complete, avoiding a copy of the request metadata.
+    pub fn parseInto(self: *Parser, bytes: []const u8, out: *Request) ParseError!bool {
         assert(bytes.len >= self.previous_length);
         if (self.input_address) |address| assert(address == bytes.ptr);
         if (bytes.len != 0) self.input_address = bytes.ptr;
         self.previous_length = bytes.len;
         if (self.failure) |failure| return failure;
-        return self.parseInner(bytes) catch |failure| {
+        return self.parseInner(bytes, out) catch |failure| {
             self.failure = failure;
             return failure;
         };
     }
 
-    fn parseInner(self: *Parser, bytes: []const u8) ParseError!?Request {
+    fn parseInner(self: *Parser, bytes: []const u8, out: *Request) ParseError!bool {
         assert(self.scan <= bytes.len);
         while (true) switch (self.state) {
             .request_line => {
-                const line = try self.nextLine(bytes, @min(self.limits.max_header_bytes, self.limits.max_wire_bytes), error.HeadersTooLarge) orelse return null;
+                const line = try self.nextLine(bytes, @min(self.limits.max_header_bytes, self.limits.max_wire_bytes), error.HeadersTooLarge) orelse return false;
                 try self.requestLine(line);
                 self.fields_start = self.scan;
                 self.state = .headers;
             },
             .headers => {
-                const line = try self.nextLine(bytes, @min(self.limits.max_header_bytes, self.limits.max_wire_bytes), error.HeadersTooLarge) orelse return null;
+                const line = try self.nextLine(bytes, @min(self.limits.max_header_bytes, self.limits.max_wire_bytes), error.HeadersTooLarge) orelse return false;
                 if (line.len != 0) {
                     try self.field(line, false);
                     continue;
@@ -181,7 +189,7 @@ pub const Parser = struct {
             .fixed_body => {
                 assert(self.headers_end <= self.consumed);
                 assert(self.consumed <= self.limits.max_wire_bytes);
-                if (bytes.len < self.consumed) return null;
+                if (bytes.len < self.consumed) return false;
                 self.scan = self.consumed;
                 self.state = .complete;
             },
@@ -190,7 +198,7 @@ pub const Parser = struct {
                 // against the total wire budget; it cannot consume body capacity
                 // without also consuming a finite framing budget.
                 const line_limit = @min(@as(u64, self.line_start) + self.limits.max_header_bytes, self.limits.max_wire_bytes);
-                const line = try self.nextLine(bytes, @intCast(line_limit), error.BodyTooLarge) orelse return null;
+                const line = try self.nextLine(bytes, @intCast(line_limit), error.BodyTooLarge) orelse return false;
                 const remaining = self.limits.max_body_bytes - self.body_bytes;
                 const count = try chunkSize(line, @intCast(remaining));
                 self.body_bytes += count;
@@ -212,7 +220,7 @@ pub const Parser = struct {
                 self.chunk_remaining -= take;
                 if (self.chunk_remaining != 0) {
                     if (self.scan == self.limits.max_wire_bytes) return error.BodyTooLarge;
-                    return null;
+                    return false;
                 }
                 self.chunk_suffix_read = 0;
                 self.state = .chunk_suffix;
@@ -220,7 +228,7 @@ pub const Parser = struct {
             .chunk_suffix => {
                 while (self.chunk_suffix_read < 2) {
                     if (self.scan == self.limits.max_wire_bytes) return error.BodyTooLarge;
-                    if (self.scan == bytes.len) return null;
+                    if (self.scan == bytes.len) return false;
                     if (bytes[self.scan] != "\r\n"[self.chunk_suffix_read]) return error.BadRequest;
                     self.scan += 1;
                     self.chunk_suffix_read += 1;
@@ -233,7 +241,7 @@ pub const Parser = struct {
                 const trailer_limit = @as(u64, self.trailer_start) + (self.limits.max_header_bytes - self.headers_end);
                 const limit = @min(trailer_limit, self.limits.max_wire_bytes);
                 const limit_error: ParseError = if (trailer_limit <= self.limits.max_wire_bytes) error.HeadersTooLarge else error.BodyTooLarge;
-                const line = try self.nextLine(bytes, @intCast(limit), limit_error) orelse return null;
+                const line = try self.nextLine(bytes, @intCast(limit), limit_error) orelse return false;
                 if (line.len != 0) {
                     try self.field(line, true);
                     continue;
@@ -241,7 +249,10 @@ pub const Parser = struct {
                 self.consumed = self.scan;
                 self.state = .complete;
             },
-            .complete => return self.request(bytes),
+            .complete => {
+                self.request(bytes, out);
+                return true;
+            },
         };
     }
 
@@ -322,22 +333,22 @@ pub const Parser = struct {
         // The interpreted field names have distinct lengths, so one length
         // switch selects the single case-insensitive comparison to perform.
         switch (name.len) {
-            "host".len => if (equalCase(name, "host")) {
+            "host".len => if (fixedEqualCase(name, "host")) {
                 if (self.host_seen) return error.BadRequest;
                 try validateAuthority(value, false);
                 self.host_seen = true;
             },
-            "content-length".len => if (equalCase(name, "content-length")) {
+            "content-length".len => if (fixedEqualCase(name, "content-length")) {
                 if (self.content_length != null or self.chunked) return error.BadRequest;
                 const length = try decimalLength(value, self.limits.max_body_bytes);
                 self.content_length = length;
             },
-            "transfer-encoding".len => if (equalCase(name, "transfer-encoding")) {
+            "transfer-encoding".len => if (fixedEqualCase(name, "transfer-encoding")) {
                 if (self.chunked or self.content_length != null) return error.BadRequest;
                 try transferEncoding(value);
                 self.chunked = true;
             },
-            "connection".len => if (equalCase(name, "connection")) {
+            "connection".len => if (fixedEqualCase(name, "connection")) {
                 var values = std.mem.splitScalar(u8, value, ',');
                 while (values.next()) |raw| {
                     const option = trim(raw);
@@ -345,16 +356,16 @@ pub const Parser = struct {
                     // elements; total elements/work are bounded by the header budget.
                     if (option.len == 0) continue;
                     if (!isToken(option)) return error.BadRequest;
-                    if (equalCase(option, "close")) self.keep_alive = false;
+                    if (fixedEqualCase(option, "close")) self.keep_alive = false;
                 }
             },
-            "expect".len => if (equalCase(name, "expect")) {
+            "expect".len => if (fixedEqualCase(name, "expect")) {
                 var values = std.mem.splitScalar(u8, value, ',');
                 var found = false;
                 while (values.next()) |raw| {
                     const expectation = trim(raw);
                     if (expectation.len == 0) continue;
-                    if (!equalCase(expectation, "100-continue")) return error.ExpectationFailed;
+                    if (!fixedEqualCase(expectation, "100-continue")) return error.ExpectationFailed;
                     found = true;
                 }
                 if (!found) return error.ExpectationFailed;
@@ -382,13 +393,13 @@ pub const Parser = struct {
         self.head_complete = true;
     }
 
-    fn request(self: *const Parser, bytes: []const u8) Request {
+    fn request(self: *const Parser, bytes: []const u8, out: *Request) void {
         assert(self.head_complete);
         assert(self.fields_start <= self.headers_end - 2);
         assert(self.headers_end <= self.consumed);
         assert(self.consumed <= bytes.len);
         assert(self.body_bytes <= self.limits.max_body_bytes);
-        return .{
+        out.* = .{
             .method = bytes[0..self.method_end],
             .target = bytes[self.target_start..self.target_end],
             .headers = bytes[self.fields_start .. self.headers_end - 2],
@@ -453,6 +464,21 @@ pub inline fn fixedEqual(bytes: []const u8, comptime expected: []const u8) bool 
     const actual: Int = @bitCast(bytes[0..expected.len].*);
     const wanted: Int = @bitCast(expected[0..expected.len].*);
     return actual == wanted;
+}
+
+/// ASCII case-insensitive equality against a comptime lowercase name made of
+/// letters, digits and '-': setting bit 5 folds letters and leaves the other
+/// permitted octets unchanged, so one masked integer compare decides.
+pub inline fn fixedEqualCase(bytes: []const u8, comptime expected: []const u8) bool {
+    comptime for (expected) |c| {
+        std.debug.assert(std.ascii.isLower(c) or std.ascii.isDigit(c) or c == '-');
+    };
+    if (bytes.len != expected.len) return false;
+    const Int = std.meta.Int(.unsigned, 8 * expected.len);
+    const fold: Int = @bitCast([_]u8{0x20} ** expected.len);
+    const actual: Int = @bitCast(bytes[0..expected.len].*);
+    const wanted: Int = @bitCast(expected[0..expected.len].*);
+    return (actual | fold) == wanted;
 }
 
 /// Index of the first CR or LF at or after `start`; one 16-byte lane per step.
