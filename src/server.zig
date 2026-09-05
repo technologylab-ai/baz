@@ -7,7 +7,13 @@ pub const api = @import("api.zig");
 pub const Budget = @import("budget.zig").Budget;
 pub const backend_name = transport.name;
 
+/// Inline handlers execute on the sole I/O owner and must be bounded and
+/// nonblocking. The framework cannot preempt or isolate a violating callback.
+/// Workers remain the default; inline mode reserves no application threads.
+pub const Execution = enum { workers, inline_event_loop };
+
 pub const Config = struct {
+    execution: Execution = .workers,
     port: u16 = 8080,
     connections: u16 = 128,
     workers: u16 = 2,
@@ -29,7 +35,11 @@ pub const Config = struct {
         return std.math.add(usize, try std.math.add(usize, body, self.max_header), 4096);
     }
     pub fn validate(self: Config) !void {
-        if (self.connections == 0 or self.connections > 4096 or self.workers == 0 or
+        const invalid_workers = switch (self.execution) {
+            .workers => self.workers == 0,
+            .inline_event_loop => self.workers != 0,
+        };
+        if (self.connections == 0 or self.connections > 4096 or invalid_workers or
             self.workers > 64 or self.workers > self.connections or self.max_header < 128 or
             self.max_header > 65536 or self.max_body > 16 * 1024 * 1024 or
             self.output_bytes == 0 or self.output_bytes > 65536 or self.timeout_ms == 0 or
@@ -46,6 +56,9 @@ pub const Config = struct {
 };
 
 pub const Stats = struct {
+    execution: Execution = .workers,
+    inline_dispatches: u64 = 0,
+    worker_dispatches: u64 = 0,
     accepted: u64 = 0,
     completed: u64 = 0,
     rejected: u64 = 0,
@@ -154,24 +167,7 @@ const Worker = struct {
                 const slot = &self.server.slots[index];
                 if (slot.phase.cmpxchgStrong(.ready, .running, .acquire, .monotonic) != null)
                     continue;
-                const started = nowNs();
-                slot.queue_ns = started - slot.queued_at;
-                if (slot.cancelled.load(.acquire)) {
-                    slot.action = .close;
-                } else {
-                    var context: api.Context = .{
-                        .request = &slot.request,
-                        .writer = &slot.writer,
-                        .event = slot.event,
-                        .state = &slot.state,
-                        .application = self.server.application,
-                        .cancelled = &slot.cancelled,
-                    };
-                    slot.action = self.server.handler(&context);
-                    if (slot.action != .close) assert(slot.writer.frozen);
-                }
-                slot.handler_ns = nowNs() - started;
-                slot.phase.store(.result, .release);
+                self.server.invokeHandler(slot);
                 self.server.backend.wake();
             }
         }
@@ -218,7 +214,7 @@ pub const Server = struct {
         const storage = try allocator.alloc(u8, per_slot * config.connections);
         errdefer allocator.free(storage);
         @memset(storage, 0);
-        self.* = .{ .allocator = allocator, .config = config, .handler = handler, .application = application, .backend = backend, .slots = slots, .workers = workers, .storage = storage, .stats = .{ .workers = config.workers } };
+        self.* = .{ .allocator = allocator, .config = config, .handler = handler, .application = application, .backend = backend, .slots = slots, .workers = workers, .storage = storage, .stats = .{ .workers = config.workers, .execution = config.execution } };
         for (slots, 0..) |*slot, index| {
             const base = storage[index * per_slot ..][0..per_slot];
             slot.* = .{
@@ -301,6 +297,7 @@ pub const Server = struct {
                 self.operationAdded();
             }
             self.refreshDate();
+            var local_result_ready = false;
             for (self.slots, 0..) |*slot, index| {
                 if (!slot.in_use) continue;
                 if (!slot.closing and (self.stopping or turn_start >= slot.deadline)) {
@@ -318,13 +315,18 @@ pub const Server = struct {
                     }
                 }
                 if (slot.closing) self.maybeFree(slot);
+                // An empty inline flush or already-buffered next request may
+                // publish another result while consuming this one. Process it
+                // on the next turn: no recursive callbacks or idle poll delay.
+                if (self.config.execution == .inline_event_loop and
+                    slot.phase.load(.acquire) == .result) local_result_ready = true;
             }
             const control_ns = nowNs() - turn_start;
             self.stats.max_loop_ns = @max(self.stats.max_loop_ns, control_ns);
             if (self.stopping and self.stats.live_connections == 0 and
                 self.stats.live_operations == 0) break;
             if (self.stopping and nowNs() >= self.stop_deadline) return error.ShutdownStalled;
-            const count = try self.backend.poll(&completions, 10);
+            const count = try self.backend.poll(&completions, if (local_result_ready) 0 else 10);
             const processing_start = nowNs();
             for (completions[0..count]) |completion| try self.onCompletion(completion);
             self.stats.max_loop_ns = @max(self.stats.max_loop_ns, control_ns + nowNs() - processing_start);
@@ -502,8 +504,45 @@ pub const Server = struct {
         const slot = &self.slots[index];
         assert(slot.phase.load(.acquire) == .io and !slot.closing and !slot.op_pending);
         slot.queued_at = nowNs();
-        slot.phase.store(.ready, .release);
-        self.workers[index % self.workers.len].wake();
+        switch (self.config.execution) {
+            .workers => {
+                assert(self.workers.len > 0);
+                self.stats.worker_dispatches += 1;
+                slot.phase.store(.ready, .release);
+                self.workers[index % self.workers.len].wake();
+            },
+            .inline_event_loop => {
+                assert(self.workers.len == 0);
+                self.stats.inline_dispatches += 1;
+                slot.phase.store(.running, .release);
+                self.invokeHandler(slot);
+            },
+        }
+    }
+
+    /// Caller exclusively owns the running phase. Publishing result ends every
+    /// callback borrow, including inline execution; response processing belongs
+    /// to the I/O loop and never recursively invokes a resumed callback here.
+    fn invokeHandler(self: *Server, slot: *Slot) void {
+        assert(slot.phase.load(.acquire) == .running);
+        const started = nowNs();
+        slot.queue_ns = started - slot.queued_at;
+        if (slot.cancelled.load(.acquire)) {
+            slot.action = .close;
+        } else {
+            var context: api.Context = .{
+                .request = &slot.request,
+                .writer = &slot.writer,
+                .event = slot.event,
+                .state = &slot.state,
+                .application = self.application,
+                .cancelled = &slot.cancelled,
+            };
+            slot.action = self.handler(&context);
+            if (slot.action != .close) assert(slot.writer.frozen);
+        }
+        slot.handler_ns = nowNs() - started;
+        slot.phase.store(.result, .release);
     }
 
     fn reject(self: *Server, index: usize, status: u16) !void {
@@ -695,4 +734,24 @@ test "configuration rejects combined resource overcommit and impossible worker l
     try std.testing.expectError(error.InvalidConfiguration, (Config{ .workers = 0 }).validate());
     try std.testing.expectError(error.InvalidConfiguration, (Config{ .connections = 1, .workers = 2 }).validate());
     try std.testing.expectError(error.MemoryBudgetExceeded, (Config{ .connections = 4096, .max_body = 1024 * 1024 }).validate());
+}
+
+test "inline execution explicitly requires no application worker resources" {
+    try (Config{ .execution = .inline_event_loop, .workers = 0 }).validate();
+    try std.testing.expectError(error.InvalidConfiguration, (Config{ .execution = .inline_event_loop }).validate());
+    const config: Config = .{ .execution = .inline_event_loop, .workers = 0, .connections = 1, .port = 0 };
+    const server = try Server.init(std.testing.allocator, config, struct {
+        fn handle(_: *api.Context) api.Action {
+            @panic("stopped server must not dispatch a callback");
+        }
+    }.handle, null);
+    defer server.deinit();
+    try std.testing.expectEqual(@as(usize, 0), server.workers.len);
+    try server.start();
+    try std.testing.expectEqual(@as(u32, 0), server.ready_workers.load(.acquire));
+    server.requestStop();
+    try server.run();
+    try std.testing.expectEqual(@as(u32, 0), server.exited_workers.load(.acquire));
+    try std.testing.expectEqual(@as(u64, 0), server.stats.worker_dispatches);
+    try std.testing.expect(server.safe_to_destroy);
 }

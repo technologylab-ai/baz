@@ -229,7 +229,7 @@ def main():
                         except OSError:
                             require(time.monotonic() < deadline, 'startup watchdog')
                             time.sleep(.05)
-                    if server['name'] == 'zig-http':
+                    if server.get('implementation', server['name']) == 'zig-http':
                         while 'READY ' not in logpath.read_text():
                             require(process.poll() is None and time.monotonic() < deadline, 'READY watchdog')
                             time.sleep(.02)
@@ -284,10 +284,14 @@ def main():
                             raise
                     trial['server_exit'] = process.returncode
                     trial['server_log'] = logpath.read_text()
-                    if server['name'] == 'zig-http' and pending_error is None:
+                    if server.get('implementation', server['name']) == 'zig-http' and pending_error is None:
                         stats = [json.loads(line[6:]) for line in trial['server_log'].splitlines() if line.startswith('STATS ')]
                         require(process.returncode == 0 and len(stats) == 1, 'Zig shutdown failed')
                         trial['stats'] = stats[0]
+                        if server.get('expected_execution'):
+                            require(stats[0]['execution'] == server['expected_execution'], 'wrong execution mode')
+                        if stats[0].get('execution') == 'inline_event_loop':
+                            require(stats[0]['workers'] == stats[0]['worker_dispatches'] == 0, 'inline worker activity')
                         require(stats[0]['allocation_calls_after_start'] == 0, 'late framework allocation')
                         require(stats[0]['live_connections'] == stats[0]['live_operations'] == 0, 'live shutdown ownership')
                         require(stats[0]['peak_connections'] <= 128, 'connection limit exceeded')

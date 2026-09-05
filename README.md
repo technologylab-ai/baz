@@ -2,8 +2,9 @@
 
 An experimental HTTP/1.1 framework and reference server for **Zig 0.16.0**.
 Linux uses a custom single-shot `io_uring` adapter; macOS uses nonblocking
-sockets with `kqueue`. Application callbacks run on a fixed set of workers,
-separate from the I/O owner. Windows support is pending and currently produces
+sockets with `kqueue`. Application callbacks can run on the I/O owner or on fixed startup workers.
+The default worker mode retains the original experiment; opt into inline mode
+for trusted bounded, nonblocking handlers. Windows support is pending and currently produces
 a compile error. This is the M4 implementation informed by the adjacent
 [Zig LLM Wiki](https://github.com/technologylab-ai/zigllmwiki/blob/main/wiki/bounded-http-server-design.md).
 
@@ -71,6 +72,21 @@ callback is the maintained example. [src/server.zig](src/server.zig) exposes
 `Config`, `Server`, `api` and `Budget`; builds link libc. Treat this API as
 experimental and read the [ownership contract](docs/OWNERSHIP.md) before
 retaining slices or adding asynchronous application work.
+
+For the no-handoff experiment, run `./zig-out/bin/zig-http --execution inline`.
+It provisions **zero application workers** and runs the same handler/writer path
+on the I/O owner. Callbacks and flush resumptions must be short and nonblocking;
+they must not sleep, perform blocking I/O or wait for work. The server cannot
+preempt a violating callback or enforce deadlines while that callback runs.
+The demo `/stall` route therefore returns501 in inline mode. Explicit
+`--execution inline --workers 2` is rejected. Worker mode remains selectable
+with `--execution workers --workers 2`; this is an execution-policy experiment,
+not yet a per-request offload API or multiple I/O shards.
+
+Run `python3 tests/inline_integration.py` for inline framing, partial sends,
+empty flush/resume, bounds and shutdown gates. Execution mode and separate
+inline/worker dispatch counters accompany READY/STATS. Both modes retain all
+safety assertions, borrowed payload ownership and configured connection limits.
 
 A callback receives `event = .request` after the complete request has arrived,
 a writer, eight zeroed state words for its continuation, an application pointer

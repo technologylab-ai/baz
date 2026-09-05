@@ -10,11 +10,12 @@ fn signalStop(_: std.posix.SIG) callconv(.c) void {
     if (active_server) |server| server.stop_requested.store(true, .release);
 }
 
-const Demo = struct { html: []const u8, stall_ms: u32 };
+const Demo = struct { html: []const u8, stall_ms: u32, execution: framework.Execution };
 
 pub fn main(init: std.process.Init) !void {
     var config: framework.Config = .{};
     var stall_ms: u32 = 1000;
+    var workers_explicit = false;
     var index_path: []const u8 = "assets/index.html";
     var args = try std.process.Args.Iterator.initAllocator(init.minimal.args, init.gpa);
     defer args.deinit();
@@ -22,7 +23,7 @@ pub fn main(init: std.process.Init) !void {
     while (args.next()) |flag| {
         if (std.mem.eql(u8, flag, "--help")) {
             std.debug.print("zig-http: bounded experimental Linux io_uring / macOS kqueue HTTP/1.1\n" ++
-                "--port N --connections N --workers N --max-body N --max-header N\n" ++
+                "--port N --connections N --execution workers|inline --workers N --max-body N --max-header N\n" ++
                 "--timeout-ms N --duration-ms N --send-chunk N --stall-ms N\n" ++
                 "--socket-send-buffer N --output-bytes N --max-response N --memory-budget N --index FILE\n", .{});
             return;
@@ -32,7 +33,10 @@ pub fn main(init: std.process.Init) !void {
             config.port = try std.fmt.parseInt(u16, value, 10);
         } else if (std.mem.eql(u8, flag, "--connections")) {
             config.connections = try std.fmt.parseInt(u16, value, 10);
+        } else if (std.mem.eql(u8, flag, "--execution")) {
+            config.execution = if (std.mem.eql(u8, value, "workers")) .workers else if (std.mem.eql(u8, value, "inline")) .inline_event_loop else return error.InvalidExecution;
         } else if (std.mem.eql(u8, flag, "--workers")) {
+            workers_explicit = true;
             config.workers = try std.fmt.parseInt(u16, value, 10);
         } else if (std.mem.eql(u8, flag, "--max-body")) {
             config.max_body = try std.fmt.parseInt(u32, value, 10);
@@ -58,10 +62,11 @@ pub fn main(init: std.process.Init) !void {
             index_path = value;
         } else return error.UnknownArgument;
     }
+    if (config.execution == .inline_event_loop and !workers_explicit) config.workers = 0;
+    try config.validate();
     const html = try std.Io.Dir.cwd().readFileAlloc(init.io, index_path, init.gpa, .limited(65536));
     defer init.gpa.free(html);
-    var demo: Demo = .{ .html = html, .stall_ms = stall_ms };
-    try config.validate();
+    var demo: Demo = .{ .html = html, .stall_ms = stall_ms, .execution = config.execution };
     var budget: framework.Budget = .{ .upstream = init.gpa, .limit_bytes = config.memory_budget_bytes - config.workers * config.worker_stack_bytes };
     defer std.debug.assert(budget.live_bytes == 0);
     const server = try framework.Server.init(budget.allocator(), config, handler, &demo);
@@ -77,8 +82,8 @@ pub fn main(init: std.process.Init) !void {
     std.posix.sigaction(.TERM, &action, null);
     try server.start();
     budget.sealed.store(true, .release);
-    std.debug.print("READY port={d} backend={s} connections={d} workers={d} optimize={s}\n", .{
-        server.backend.port(), framework.backend_name, config.connections, config.workers, @tagName(@import("builtin").mode),
+    std.debug.print("READY port={d} backend={s} connections={d} workers={d} execution={s} optimize={s}\n", .{
+        server.backend.port(), framework.backend_name, config.connections, config.workers, @tagName(config.execution), @tagName(@import("builtin").mode),
     });
     server.run() catch |err| {
         // A stuck callback or uncertain kernel submission still owns memory.
@@ -135,6 +140,12 @@ fn handle(context: *api.Context) !api.Action {
         return writer.finish();
     }
     if (std.mem.eql(u8, path, "/stall")) {
+        // A deliberately blocking demo route violates the inline opt-in
+        // contract. Keep this fixture available only in worker execution.
+        if (demo.execution == .inline_event_loop) {
+            try writer.begin(501, "text/plain", 0);
+            return writer.finish();
+        }
         var remaining: std.c.timespec = .{ .sec = demo.stall_ms / 1000, .nsec = @as(isize, demo.stall_ms % 1000) * 1_000_000 };
         while (std.c.nanosleep(&remaining, &remaining) != 0) {
             if (context.cancelled.load(.acquire)) return .close;

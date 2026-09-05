@@ -147,3 +147,19 @@ server's loop-processing metric excludes the backend poll/wait interval. More
 complete latency histograms, dynamic borrow release, alternative continuation
 styles, worker scheduling and controlled external framework comparisons remain
 experiments to perform before making production or capacity claims.
+
+## Optional inline execution experiment
+
+`Config.execution = .inline_event_loop` requires `workers = 0`. No application
+worker threads, worker pipes or worker-stack budget are provisioned. The same
+handler receives exclusive request/writer borrows on the I/O owner; it returns
+the same frozen flush/finish/close action. One callback result per slot per loop
+turn prevents recursive pipeline/empty-flush continuation; local pending work
+uses a nonblocking backend poll so it does not wait for a nonexistent worker.
+
+The application promises a bounded, nonblocking callback. The framework cannot
+preempt it, isolate a crash or enforce wall-clock deadlines during it. Worker
+mode still separates finite blocking callbacks from the I/O owner but does not
+isolate arbitrary application code. Per-request optional offload and I/O sharding
+are separate future API decisions. The inline test does not run the blocking
+/stall fixture; that demo endpoint explicitly returns501 in this mode.

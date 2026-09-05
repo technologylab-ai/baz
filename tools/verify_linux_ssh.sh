@@ -27,6 +27,8 @@ COPYFILE_DISABLE=1 tar --no-xattrs --exclude=.git --exclude=.zig-cache \
         timeout 180 zig build verify --summary all
         timeout 180 zig build verify -Doptimize=ReleaseSafe --summary all
         timeout 180 zig build -Doptimize=ReleaseSafe
+        PYTHONDONTWRITEBYTECODE=1 python3 tests/test_compare.py -v
+        PYTHONDONTWRITEBYTECODE=1 python3 tests/inline_integration.py
         PYTHONDONTWRITEBYTECODE=1 python3 tests/integration.py
         PYTHONDONTWRITEBYTECODE=1 python3 tools/smoke.py
     '
