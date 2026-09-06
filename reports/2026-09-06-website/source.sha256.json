@@ -1,0 +1,15 @@
+{
+  "docs/index.template.html": "f6c10c89ea088e05a3b7e94a070909d4f95a9527f58ca450dbd45aac7bf474cd",
+  "docs/site.css": "555c19f96f26aefcd5f386622c638715ef8914edb429473d837b0165db229be9",
+  "docs/site.js": "f7aa6803f271c7972ece9f79169a504ff8f6b296be74f75c8d3edff08f6b6aff",
+  "docs/reader.js": "cc0bef0b35a0ed1911d7b855c479cace906047cf3d39f51fbd90c0a34da15481",
+  "docs/reader.css": "092e58fbeccf4d2ebf32628ecdd321eb1df8a93a731665b830980368bc0ace17",
+  "docs/read.html": "7d9a0e940a756e559e3be814b17e2ca98b3c4a4ab061e37e48e10ee29c0190c9",
+  "docs/highlight-zig.js": "5bc0a5406878b7e9d29074a9172e903e035c4bd9228be55d52bec838fc476d0c",
+  "tools/build_pages.py": "fe2d33ccda20fd9d61e1f8e4c81b6746f5c240375b9bd7db137f02d9b18acdfd",
+  "tools/check_site.py": "ae92a78a2e4614bc3eee0304483689541798104e7c6ab7f235d29a25f5d9ff93",
+  "tools/check_site_browser.mjs": "b1b8728845638c2e9a5af16594643749533ec5c67b91176e29b823aef317777d",
+  "docs/diagrams/layers.svg": "9d9a42715d250275d58fbdd31b95e4bbe25f609346003528b15ce9fbe0296815",
+  "docs/diagrams/lifetime.svg": "973a238d734822a90d5f81f3bc1db4ef37cb394962cd40918d3d4697d686aac6",
+  "docs/diagrams/parameters.svg": "03fd774fad44e208967b1534765da08e9ee4168a88d6b8b30959987b669e9e28"
+}

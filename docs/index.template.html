@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Baz — Bounded Async Zap. A modern Zig 0.16.0 web framework on bounded/http, with typed applications, borrowed request data, explicit decoding, and bounded responses.">
+<meta name="theme-color" content="#f8f7f1">
+<meta property="og:title" content="Baz — Bounded Async Zap">
+<meta property="og:description" content="Familiar to write. Explicit by design. Typed Zig applications on bounded/http.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://technologylab-ai.github.io/baz/">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="https://technologylab-ai.github.io/baz/">
+<link rel="icon" href="docs/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="docs/site.css">
+<script defer src="docs/vendor/highlight.js"></script>
+<script defer src="docs/highlight-zig.js"></script>
+<script defer src="docs/site.js"></script>
+<title>Baz — Bounded Async Zap</title>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<aside class="rail">
+  <a class="brand" href="#top" aria-label="Baz home">baz<span>.</span><small>BOUNDED ASYNC ZAP</small></a>
+  <button class="mobile-menu" aria-expanded="false" aria-controls="navigation" type="button">Explore +</button>
+  <nav id="navigation" aria-label="Page sections">
+    <a href="#idea"><b>01</b> The idea</a><a href="#app"><b>02</b> An ordinary Zig App</a>
+    <a href="#data"><b>03</b> Data stays data</a><a href="#engine"><b>04</b> Built on bounded/http</a>
+    <a href="#start"><b>05</b> Get started</a><a href="#examples"><b>06</b> Explore the examples</a>
+    <a href="#performance"><b>07</b> Measured results</a><a href="#next"><b>08</b> What comes next</a>
+    <a href="#docs"><b>09</b> Read further</a>
+  </nav>
+  <div class="rail-note">ZIG 0.16.0 · MIT<br>EXPERIMENTAL FRAMEWORK<br><a href="docs/read.html?file=docs/APP-API.md">API guide ↗</a><br><a href="https://github.com/technologylab-ai/baz">View on GitHub ↗</a></div>
+</aside>
+<main class="page" id="main" tabindex="-1">
+  <header class="topline" id="top"><span class="lab">TECHNOLOGY LAB <span class="desktop-label">· SYSTEMS ENGINEERING</span></span><a href="https://github.com/technologylab-ai/baz">OPEN SOURCE ↗</a></header>
+  <section class="hero" aria-labelledby="headline">
+    <p class="eyebrow">A modern successor to Zap</p>
+    <h1 id="headline">Familiar to write.<br><em>Explicit by design.</em></h1>
+    <p class="lede">Meet <strong>Baz — Bounded Async Zap.</strong> Typed Zig applications on bounded/http. Ordinary endpoints, borrowed request data, and memory boundaries you can reason about.</p>
+    <div class="actions"><a class="button primary" href="#start">Build your first App <span aria-hidden="true">↗</span></a><a class="button" href="docs/read.html?file=docs/APP-API.md">Read the API guide <span aria-hidden="true">→</span></a></div>
+    <div class="tags"><span>EXACT ZIG 0.16.0</span><span>CALLER-SUPPLIED std.Io</span><span>MIT LICENSE</span></div>
+    <div class="facts"><div class="fact"><strong>Typed.</strong><p>App state and endpoint methods.<br>Ordinary Zig composition.</p></div><div class="fact"><strong>Explicit.</strong><p>Borrowed bytes in.<br>Decoding when you ask.</p></div><div class="fact"><strong>Bounded.</strong><p>Framework capacity at startup.<br>Output reserved before dispatch.</p></div></div>
+  </section>
+  <section class="chapter" id="idea">
+    <p class="eyebrow">01 / The idea</p><h2>The good parts of Zap.<br>A fresh foundation.</h2>
+    <p class="intro"><a href="https://github.com/zigzap/zap">Zap</a> made building Zig web applications approachable. Baz carries forward its App and endpoint ergonomics, with a new API and a separate, bounded HTTP engine underneath.</p>
+    <div class="principles">
+      <div><span class="number">01 — COMPOSITION</span><h3>Your types, your App.</h3><p>Use <code>App(Shared)</code>, ordinary structs, and one router. Each App owns its lifecycle; your shared state remains explicit.</p></div>
+      <div><span class="number">02 — REQUEST DATA</span><h3>Keep the original bytes.</h3><p><code>001</code> is text. So is <code>false</code>. Duplicate fields keep their order, and <code>files[]</code> is simply a name.</p></div>
+      <div><span class="number">03 — OWNERSHIP</span><h3>Know what stays alive.</h3><p>Read borrowed input during the callback. Decode into your own buffer. Build a private response in capacity reserved before your handler runs.</p></div>
+    </div>
+    <p class="note">Baz is a new framework, with its own package and API. The <a href="docs/read.html?file=docs/APP-API.md#from-zap">migration guide</a> maps familiar Zap concepts to their Baz equivalents.</p>
+  </section>
+  <section class="chapter" id="app">
+    <p class="eyebrow">02 / An ordinary Zig App</p><h2>A struct. A method.<br>A clear place for everything.</h2>
+    <p class="intro">Define your shared state, choose <code>App(Shared)</code>, and register an endpoint. The context gives you the request, your state, route captures, and a bounded response draft.</p>
+    <div class="codebox"><div class="codehead"><a href="docs/read.html?file=src/app_demo.zig">src/app_demo.zig · maintained example</a><button class="copy" type="button" hidden aria-label="Copy Hello endpoint">Copy</button></div><pre tabindex="0" aria-label="Hello endpoint source"><code class="language-zig">@@HELLO@@</code></pre></div>
+    <p class="note">This excerpt uses <code>Context = web.App(Shared).Context</code>. Register it with <code>try app.endpoint("/hello", &amp;hello)</code>. See the <a href="docs/read.html?file=examples/app_basic.zig">complete App example</a> for initialization, stable state, and shutdown.</p>
+    <div class="columns"><div><h3>Start with explicit state.</h3><p class="note">Shared state and endpoint instances stay at stable addresses through App destruction. Register routes before startup. Synchronize mutable state used by concurrent callbacks.</p></div><div><h3>Return a finished response.</h3><p class="note">Text, bytes, copied headers, JSON, and standard formatting all use bounded output. A failed handler discards its private draft before error mapping.</p></div></div>
+    <p class="annotation"><b>OWNERSHIP</b><span>The decoded name above lives on the stack. <code>response.text</code> copies it before that storage goes away.</span></p>
+  </section>
+  <section class="chapter" id="data">
+    <p class="eyebrow">03 / Data stays data</p><h2>No guessing what<br>your parameters mean.</h2>
+    <p class="intro">Query parameters and URL-encoded forms are ordered lists of raw text slices. Decode when needed, into a buffer you supply. Repeated fields remain repeated fields.</p>
+    <figure>@@PARAMETERS@@<figcaption>A raw query keeps spelling and ordering. The selected decoder determines how <code>+</code> is treated.</figcaption></figure>
+    <div class="table-scroll" tabindex="0" aria-label="Scrollable decoding reference"><table><thead><tr><th>Input</th><th>Raw value</th><th>Explicit operation</th><th>Result</th></tr></thead><tbody>
+      <tr><td><code>id=001</code></td><td><code>001</code></td><td>Read the slice</td><td>Text, including leading zeros</td></tr>
+      <tr><td><code>enabled=false</code></td><td><code>false</code></td><td>Read the slice</td><td>Text; no boolean conversion</td></tr>
+      <tr><td><code>q=a+b%2Bc</code></td><td><code>a+b%2Bc</code></td><td><code>percentDecodeInto</code></td><td><code>a+b+c</code></td></tr>
+      <tr><td><code>q=a+b%2Bc</code></td><td><code>a+b%2Bc</code></td><td><code>formDecodeInto</code></td><td><code>a b+c</code></td></tr>
+    </tbody></table></div>
+    <div class="columns"><div><h3>One multipart iterator.</h3><p class="note">Fields and files share the same flat representation: a raw name, optional filename and content type, and borrowed bytes. One file or several files use the same loop. Baz never saves an upload implicitly.</p><a href="docs/read.html?file=examples/bindataformpost.zig">Read the upload example →</a></div><div><h3>Copies have a place.</h3><p class="note">Multipart parsing validates the complete supported body before iteration. If HTTP chunks split a body, request a bounded copy into caller storage before parsing a contiguous form. Application access to borrowed views ends with the callback.</p><a href="docs/read.html?file=docs/OWNERSHIP.md">Read the ownership contract →</a></div></div>
+  </section>
+  <section class="chapter" id="engine">
+    <p class="eyebrow">04 / Built on bounded/http</p><h2>Application ergonomics above.<br>HTTP ownership underneath.</h2>
+    <p class="intro">Baz imports <code>bounded_http</code> as a pinned external dependency. The engine stays independently usable. Baz supplies the application layer: routing, request views, endpoint composition, and responses.</p>
+    <figure>@@LAYERS@@<figcaption>Two packages, one explicit boundary. Baz uses the engine’s public embedding API; transport and scheduler changes belong upstream.</figcaption></figure>
+    <div class="columns"><div><h3>Use Zig’s std.Io today.</h3><p class="note">Pass your caller’s <code>std.Io</code> at initialization. Standard memory readers and writers work inline. Finite blocking services require explicit fixed workers; the provider’s resource use remains the application’s responsibility.</p></div><div><h3>Keep the engine’s transports.</h3><p class="note">The verified Baz baseline runs on Linux with io_uring and macOS with kqueue. HTTP transport uses the engine directly. A Baz-owned <code>std.Io</code> implementation is a later design step.</p></div></div>
+    <figure>@@LIFETIME@@<figcaption>Output pressure can delay dispatch. It does not replay your one-shot handler. Storage is reusable only after all application and kernel borrows return.</figcaption></figure>
+    <div class="actions"><a class="button" href="https://technologylab-ai.github.io/bounded-http/">Explore bounded/http <span aria-hidden="true">↗</span></a><a class="button" href="https://github.com/technologylab-ai/bounded-http">Engine source <span aria-hidden="true">↗</span></a></div>
+  </section>
+  <section class="chapter" id="start">
+    <p class="eyebrow">05 / Get started</p><h2>A working App in one command.</h2>
+    <p class="intro">Use exact <strong>Zig 0.16.0</strong> and Python 3. Clone Baz, then start the demo. The pinned HTTP engine is fetched automatically.</p>
+    <div class="codebox"><div class="codehead"><span>01 · Start the App</span><button class="copy" type="button" hidden aria-label="Copy startup commands">Copy</button></div><pre tabindex="0"><code class="language-bash">git clone https://github.com/technologylab-ai/baz.git
+cd baz
+zig build run-app -Doptimize=ReleaseSafe -- --port 8080</code></pre></div>
+    <div class="codebox"><div class="codehead"><span>02 · In another terminal, from the Baz directory</span><button class="copy" type="button" hidden aria-label="Copy request commands">Copy</button></div><pre tabindex="0"><code class="language-bash">curl 'http://127.0.0.1:8080/hello?name=Hello%20Zig'
+curl --data 'value=x+y%2Bz' http://127.0.0.1:8080/form
+curl -F 'files[]=@.zig-version' http://127.0.0.1:8080/upload</code></pre></div>
+    <p class="note">The current executable serves IPv4 loopback over plain HTTP/1.1. Stop it with Ctrl-C. For embedding Baz in your own project, follow the <a href="docs/read.html?file=docs/DEPENDENCY.md">package guide</a> and <a href="docs/read.html?file=examples/embedding/build.zig">independent consumer fixture</a>.</p>
+  </section>
+  <section class="chapter" id="examples">
+    <p class="eyebrow">06 / Explore the examples</p><h2>Twenty ways to get your bearings.</h2>
+    <p class="intro">Ports of Zap’s examples, using Baz’s public API. Every card opens maintained source in the reader. Pick a small example, then follow its types.</p>
+    <div class="filter-bar" role="group" aria-label="Filter examples" hidden>
+      <button type="button" data-filter="all" aria-pressed="true">All 20</button><button type="button" data-filter="routing" aria-pressed="false">Routing</button><button type="button" data-filter="responses" aria-pressed="false">Responses</button><button type="button" data-filter="app" aria-pressed="false">App &amp; endpoints</button><button type="button" data-filter="composition" aria-pressed="false">Composition</button><button type="button" data-filter="data" aria-pressed="false">Forms &amp; uploads</button>
+    </div><p id="example-count" class="result-count" aria-live="polite">20 of 20 examples</p>
+    <div class="examples-grid">@@EXAMPLES@@</div>
+    <div class="codebox"><div class="codehead"><span>Build all examples, or run one</span><button class="copy" type="button" hidden aria-label="Copy example commands">Copy</button></div><pre tabindex="0"><code class="language-bash">zig build examples -Doptimize=ReleaseSafe
+zig build run-http_params -Doptimize=ReleaseSafe -- --port 8080</code></pre></div>
+    <p class="note">Middleware, authentication, sessions, and cookie helpers are currently example-local. The public composition API is next on the roadmap. <a href="docs/read.html?file=examples/README.md">Read the complete catalog and its deliberate adaptations →</a></p>
+  </section>
+  <section class="chapter" id="performance">
+    <p class="eyebrow">07 / Measured results</p><h2>A first comparison.<br>The conditions included.</h2>
+    <p class="intro">A basic same-host loopback comparison with <a href="https://github.com/zigzap/zap">Zap</a>, measured on 6 September 2026. These results describe the initial Baz prototype <code>c152e59</code>, before package extraction.</p>
+    <div class="legend" aria-hidden="true"><span>Baz prototype</span><span>Zap (Zig 0.16 port)</span></div>
+    <figure>@@PERFORMANCE@@<figcaption>Median requests per second at 32 connections / 2 client threads. Bar lengths share a zero baseline. Compare implementations within each host.</figcaption></figure>
+    <div class="table-scroll" tabindex="0" aria-label="All four benchmark profiles"><table class="benchmark-table"><thead><tr><th>Host</th><th>Conn. / threads</th><th>Baz req/s</th><th>Zap req/s</th><th>Baz / Zap</th></tr></thead><tbody>@@RESULTS@@</tbody></table></div>
+    <p class="note">macOS: Apple M3 Max. Linux: Intel Core Ultra 7 258V. Three paired trials per profile; one-second warmup and three-second measurements. ReleaseSafe with Zig assertions enabled, one server thread, 128 connection slots, a 13-byte response, keep-alive, no pipelining, and no CPU affinity.</p>
+    <div class="callout"><p>The Mac’s one-connection result is lower than Zap’s. These short trials establish neither production capacity nor latency guarantees, and do not isolate Baz’s API overhead. The hosts used different wrk revisions; Zap retained its inherited C optimization and sanitizer settings.</p></div>
+    <p class="note">All 24 measured trials completed with zero wrk-reported socket or non-2xx/3xx errors. Exact responses were checked before and after timing, rather than for every timed response. The report preserves ranges, versions, commands, raw results, and cleanup evidence.</p>
+    <a class="button" href="docs/read.html?file=reports/2026-09-06-basic-zap.md">Read the experiment and raw evidence <span aria-hidden="true">→</span></a>
+  </section>
+  <section class="chapter" id="next">
+    <p class="eyebrow">08 / What comes next</p><h2>A useful first slice.<br>A visible roadmap.</h2>
+    <p class="intro">Baz is experimental. Its current source baseline has native macOS and Linux verification, independent package checks, and integration coverage for all 20 examples.</p>
+    <div class="status-grid"><div class="status-card"><p class="eyebrow">Implemented</p><h3>The one-shot App.</h3><ul><li>Typed App, routes, and endpoint methods</li><li>Raw query and form views; explicit codecs</li><li>Flat multipart parsing</li><li>Reserved response drafts and JSON</li><li>Caller std.Io and fixed worker services</li></ul></div><div class="status-card"><p class="eyebrow">Next API work</p><h3>Composition, then resume.</h3><ul><li>Public middleware and typed locals</li><li>Cookie and redirect conveniences</li><li>Typed resumable endpoints</li><li>Windows dependency update and Baz verification, after the engine sharding work</li></ul></div><div class="status-card"><p class="eyebrow">Deferred / out of scope</p><h3>Keep the scope honest.</h3><ul><li>Mustache: choose a pure Zig library</li><li>WebSockets: needs an upgrade lifecycle</li><li>An owned std.Io provider: after the API MVP</li><li>TLS: out of scope</li></ul></div></div>
+    <p class="callout">The framework reserves its own storage at startup. Application code and the caller’s I/O provider have separate resource responsibilities. Fixed workers do not provide arbitrary application isolation.</p>
+    <a href="docs/read.html?file=docs/APP-API-ROADMAP.md">Follow the multi-session roadmap →</a>
+  </section>
+  <section class="chapter" id="docs">
+    <p class="eyebrow">09 / Read further</p><h2>From first route<br>to the ownership details.</h2>
+    <p class="intro">Guides stay as Markdown in the repository. The browser reader adds a table of contents, highlighted source, raw-file access, and print support.</p>
+    <div class="resource-links"><a href="docs/read.html?file=docs/APP-API.md">API guide &amp; Zap migration <span>↗</span></a><a href="docs/read.html?file=docs/OWNERSHIP.md">Ownership contract <span>↗</span></a><a href="docs/read.html?file=docs/DEPENDENCY.md">Packages &amp; embedding <span>↗</span></a><a href="docs/read.html?file=docs/STD-IO-DECISION.md">The std.Io decision <span>↗</span></a><a href="docs/read.html?file=docs/APP-API-DESIGN.md">API design &amp; predecessor analysis <span>↗</span></a><a href="docs/read.html?file=docs/APP-API-ROADMAP.md">Roadmap &amp; session ledger <span>↗</span></a><a href="docs/read.html?file=reports/2026-09-06-baz-extraction.md">Native package verification <span>↗</span></a><a href="https://technologylab-ai.github.io/bounded-http/">bounded/http engineering paper <span>↗</span></a></div>
+  </section>
+  <footer><div>BAZ · BOUNDED ASYNC ZAP<br>By Rene Schallner · Technology Lab<span id="print-source" hidden><br>https://technologylab-ai.github.io/baz/</span></div><div class="footer-links"><a href="https://github.com/technologylab-ai/baz">GitHub ↗</a><a href="docs/read.html?file=LICENSE">MIT license</a><a href="https://github.com/zigzap/zap">Predecessor: Zap ↗</a></div></footer>
+</main>
+</body>
+</html>

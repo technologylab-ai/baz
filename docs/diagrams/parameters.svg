@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 286" class="diagram diagram-wide" role="img" aria-labelledby="params-title params-desc">
+<title id="params-title">Raw input, ordered views, explicit decoding</title><desc id="params-desc">The query id=001 and two tag[] fields remain three ordered pairs borrowing the same input. The value a+b stays unchanged in the raw view; percent decoding keeps plus, while form decoding changes it to a space.</desc>
+<g font-family="ui-monospace, SFMono-Regular, Consolas, monospace" fill="#172f3e">
+<rect x="1" y="1" width="898" height="72" fill="#efeee6" stroke="#cdd3d0"/><text x="24" y="27" font-size="10" letter-spacing="1.5" fill="#4e6370">RETAINED QUERY BUFFER</text><text x="24" y="53" font-size="18">id=001&amp;tag[]=a+b&amp;tag[]=c%2Bd</text>
+<g fill="none" stroke="#9caaa9"><path d="M145 73v27M450 73v27M755 73v27"/></g>
+<g fill="#f8f7f1" stroke="#cdd3d0"><rect x="1" y="101" width="288" height="91"/><rect x="306" y="101" width="288" height="91"/><rect x="611" y="101" width="288" height="91"/></g>
+<g font-size="10" fill="#bc3c20"><text x="21" y="125">PAIR 01</text><text x="326" y="125">PAIR 02</text><text x="631" y="125">PAIR 03</text></g>
+<g font-size="16"><text x="21" y="151">id → 001</text><text x="326" y="151">tag[] → a+b</text><text x="631" y="151">tag[] → c%2Bd</text></g>
+<g font-size="11" fill="#4e6370"><text x="21" y="174">Leading zeros stay.</text><text x="326" y="174">Brackets stay in the name.</text><text x="631" y="174">Duplicates stay in order.</text></g>
+<path d="M450 192v29H180m270 0h270" stroke="#9caaa9" fill="none"/>
+<g font-size="12"><text x="60" y="255">percentDecodeInto: a+b → a+b</text><text x="514" y="255">formDecodeInto: a+b → a b</text></g>
+<text x="450" y="281" font-size="10" text-anchor="middle" fill="#4e6370">BOTH DECODERS WRITE INTO CALLER-SUPPLIED STORAGE</text>
+</g></svg>

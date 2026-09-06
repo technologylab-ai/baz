@@ -1,10 +1,13 @@
 # Standalone Baz repository
 
-Baz has an independent local Git repository, with its own object storage and branch configuration.
+Baz has an independent [GitHub repository](https://github.com/technologylab-ai/baz)
+and [GitHub Pages site](https://technologylab-ai.github.io/baz/).
+Its local Git repository has its own object storage and branch configuration.
 The local checkout is `../baz`; its primary branch is `main`.
 The original `zig-http-app-api` worktree remains a preserved source checkpoint.
-This preparation does not create or push a GitHub repository.
-The intended publication name is `technologylab-ai/baz`.
+The publication name is `technologylab-ai/baz`. Website source and its Pages
+workflow live in this repository. The `baz-website` directory is a linked
+worktree for the website branch, not a separate website repository.
 
 ## History and package boundary
 
@@ -24,7 +27,7 @@ Historical third-party archives retain their original notices and terms.
 
 | Branch | Contents | Evidence |
 | --- | --- | --- |
-| `main` | Verified Baz source from `b3d4d8a`, repository preparation, MIT license, and POSIX CI | Existing native macOS/Linux package receipt; preparation adds no new runtime claim. |
+| `main` | Verified Baz source from `b3d4d8a`, repository preparation, MIT license, POSIX CI, and the Pages website | Existing native macOS/Linux package receipt; preparation adds no new runtime claim. |
 | `work/windows-update` | Paused Windows portability, compile-only checks, Windows CI, and a newer engine pin | Windows x64 Debug cross-compilation passed before the pause; remaining gates await the engine sharding PR. |
 
 The draft branch preserves the paused work as a commit.
@@ -39,9 +42,15 @@ It runs Debug and ReleaseSafe verification on GitHub-hosted Linux and macOS runn
 It also builds and exercises all supported examples with ReleaseSafe binaries.
 Hosted logs are retained for 14 days; preserve material runtime evidence in dated reports.
 The draft branch additionally contains native x64 Windows build/unit CI.
-These workflows have not run in a Baz GitHub repository yet.
+Hosted runs provide separate evidence from the existing local receipts.
+Check [Actions](https://github.com/technologylab-ai/baz/actions) for their results.
 
-No Git remote is configured in the prepared local repository.
-The engine repository URL appears only as the dependency and documentation destination.
-When publishing is requested, create or select Baz's own repository and set its `origin` there.
-Keep the engine independently usable and submit engine changes upstream.
+Baz’s `origin` points to its own repository. The engine repository URL appears
+as the dependency and documentation destination. Keep the engine independently
+usable and submit engine changes upstream.
+
+[The website workflow](../.github/workflows/pages.yml) builds a checked static
+artifact on pull requests and publishes `main` to GitHub Pages. It uses repository
+Markdown, maintained example source, original benchmark summaries, and local
+browser libraries with preserved notices. See [website maintenance](WEBSITE.md)
+for local preview, verification, and publication details.

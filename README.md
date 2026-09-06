@@ -2,6 +2,8 @@
 
 **Bounded Async Zap.**
 
+[Website & documentation](https://technologylab-ai.github.io/baz/) · [API guide](docs/APP-API.md) · [20 examples](examples/README.md)
+
 A modern successor to [Zap](https://github.com/zigzap/zap), built in **Zig 0.16.0**
 on [bounded/http](https://github.com/technologylab-ai/bounded-http). It keeps Zap's typed
 App and endpoint ergonomics, with explicit memory ownership and simpler request
@@ -25,10 +27,11 @@ The first implementation provides:
 Baz is a separate framework package with a pinned external engine dependency.
 The package and public import are `baz`; the engine import is `bounded_http`.
 The engine remains independently usable as a standalone case study.
-Baz now has its own local Git repository. GitHub publication is pending.
+Baz has its own [GitHub repository](https://github.com/technologylab-ai/baz) and
+[GitHub Pages site](https://technologylab-ai.github.io/baz/).
 The [package boundary](docs/DEPENDENCY.md) and [roadmap](docs/APP-API-ROADMAP.md)
 record the dependency, upstream changes, and remaining work.
-See [repository preparation](docs/REPOSITORY.md) for branches, history, CI, and publication status.
+See the [repository record](docs/REPOSITORY.md) for branches, history, CI, and publication status.
 
 ## Try it
 
