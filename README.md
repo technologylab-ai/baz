@@ -129,9 +129,10 @@ All examples use [zli](https://github.com/renerocksai/zli) with Zig 0.16
 `std.process.Init` for typed startup options and `--help`. Both `--port 8080`
 and `--port=8080` work. See the [CLI guide](examples/README.md#typed-cli-options-with-process-initialization).
 
-Cookie and redirect conveniences are public APIs. Middleware and authentication
-composition still use typed example helpers; public middleware, typed locals and
-typed resumable endpoints are the next roadmap steps.
+Public [middleware and typed request locals](docs/MIDDLEWARE.md) compose global
+and route authentication hooks with deterministic cleanup. The session example
+uses 32 reusable slots, fixed server expiry, and individual or all-device logout.
+Typed resumable endpoints are the next roadmap step.
 
 ## Basic performance comparison with Zap
 

@@ -30,8 +30,8 @@ tracks transport reliability, performance, and platform work. Its
 - API-09 Mustache passed all three native gates; see the
   [verification report](../reports/2026-09-06-mustache.md). The user prioritized
   real application templating ahead of composition work.
-- Next bounded work: finish API-06's public composition/locals contract,
-  using the example-local wrappers as real use cases; then API-07.
+- Current work: verify API-06 public middleware/locals and reusable expiring
+  sessions, then API-07 typed continuations with timed waits.
   Baz now consumes an external engine package; repository and Pages publication are complete.
   IO-01–04 remains deferred until after the first API MVP by user decision.
 - Consult the receipt/session ledger for native gates and cleanup state. The
@@ -79,7 +79,7 @@ Split implementation across sessions at its named gate and record exact state.
 | API-03 | implemented; scoped receipt | App instances, one router, endpoint methods, typed Shared and startup/stop lifecycle. | API-01, API-02 | APP-COMPOSITION |
 | API-04 | implemented; scoped receipt | Body adapters and explicit URL-encoded form API. | API-01, API-03 | APP-FORM, APP-STDIO-READER |
 | API-05 | implemented; scoped receipt | Flat multipart fields/files over retained input. | API-04 | APP-MULTIPART |
-| API-06 | cookies/redirects implemented; composition queued | Typed locals, middleware and authentication composition remain. Public cookie/redirect helpers: [guide](COOKIES.md). | API-02, API-03 | APP-MIDDLEWARE |
+| API-06 | composition implemented; native gates in progress | Typed locals, middleware and authentication composition: [guide](MIDDLEWARE.md). Public cookie/redirect helpers: [guide](COOKIES.md). | API-02, API-03 | APP-MIDDLEWARE |
 | API-07 | worker streaming implemented; typed inline continuations queued | Typed explicit resumable endpoints and retention rules. | API-03, API-06 | APP-RESUME |
 | API-08 | partial: 21 ports, streaming example and external package | Finish remaining migration examples and successor MVP qualification; repository and Pages publication are integrated. | API-01–07 | APP-NATIVE |
 | API-09 | implemented; native gates passed | Pure Zig Mustache: startup template/partial ownership, bounded typed rendering into reserved HTML, original Zap compatibility and official core fixtures. | API-02, API-03 | APP-MUSTACHE |

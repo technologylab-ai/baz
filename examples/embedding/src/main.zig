@@ -66,3 +66,26 @@ test "consumer can borrow cookie tokens and publish cookies with an empty redire
     try std.testing.expectEqualStrings("", writer.committed());
     try std.testing.expect(std.mem.indexOf(u8, arena[0..writer.body_start], "Max-Age=3600") != null);
 }
+
+test "consumer registers typed locals and copied route middleware" {
+    const Shared = struct {};
+    const Application = web.AppWithLocals(Shared, struct { user_id: ?u64 = null });
+    const Hooks = struct {
+        fn authorize(ctx: *Application.Context) !Application.Decision {
+            ctx.locals.user_id = 42;
+            return .continue_request;
+        }
+        fn page(ctx: *Application.Context) !void {
+            try ctx.response.text(200, if (ctx.locals.user_id != null) "authorized" else "missing");
+        }
+    };
+    var shared: Shared = .{};
+    const app = try Application.init(.{
+        .allocator = std.testing.allocator,
+        .io = std.testing.io,
+        .shared = &shared,
+        .server = .{ .connections = 1, .shards = 1 },
+    });
+    defer app.deinit();
+    try app.routeWith("GET", "/account", Hooks.page, .{ .middleware = &.{.{ .before = Hooks.authorize }} });
+}

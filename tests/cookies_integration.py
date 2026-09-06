@@ -274,7 +274,7 @@ def run(directory):
                 ambiguous = (("Cookie", first), ("Cookie", first))
                 redirect(call(sock, reader, "/normal_page", status=303, headers=ambiguous), 303, b"/login")
                 home(sock, reader, first)
-                second = login(sock, reader)
+                second = login(sock, reader, (("Cookie", first),))
                 wire.require(first != second, "replacement login reused a retired token")
                 redirect(call(sock, reader, "/normal_page", status=303, headers=(("Cookie", first),)), 303, b"/login")
                 home(sock, reader, second)
@@ -294,13 +294,13 @@ def run(directory):
                 origins = [(("Sec-Fetch-Site", value),) for value in ("cross-site", "same-site", "unknown", "")]
                 origins.append((("Sec-Fetch-Site", "same-origin"), ("sec-fetch-site", "same-origin")))
                 for origin in origins:
-                    for route in ("/login", "/normal_page", "/logout", "/stop"):
+                    for route in ("/login", "/normal_page", "/logout", "/logout-all", "/stop"):
                         result = call(sock, reader, route, status=403, method="POST", body=b"invalid form",
                                       headers=(("Content-Type", "text/plain"), ("Cookie", token)) + origin)
                         wire.require(result[2] == b"Cross-origin POST rejected" and not rows(result, b"set-cookie"),
                                      "Fetch Metadata guard ran after parsing or changed session cookies")
                         home(sock, reader, token)  # Rejected logout/stop/login must not retire or replace it.
-                replacement = login(sock, reader, (("Sec-Fetch-Site", "same-origin"),))
+                replacement = login(sock, reader, (("Cookie", token), ("Sec-Fetch-Site", "same-origin")))
                 home(sock, reader, replacement)
                 logout = call(sock, reader, "/logout", status=303, method="POST",
                               headers=(("Cookie", replacement), ("Sec-Fetch-Site", "none")))

@@ -12,7 +12,7 @@ The public API now includes borrowed request cookie views, duplicate-rejecting
 `cookie(name)`, `setCookie`, `deleteCookie` and `redirect`. See [COOKIES.md](docs/COOKIES.md).
 Session/persistent lifetimes are explicit; JWT interpretation remains application
 work. Cookie and login examples use these APIs and separate styled page assets.
-CI includes the cookie wire/session suite. Public middleware/locals remain next.
+CI includes the cookie wire/session suite. Public middleware/locals and bounded expiring sessions are being verified in feat/middleware-locals.
 
 ## Integrated Mustache templates
 
@@ -96,7 +96,7 @@ App basics and Streaming response as adjacent tabs; `#streaming` opens the latte
 Read the [API guide](docs/APP-API.md), [ownership contract](docs/OWNERSHIP.md), and
 [multi-session roadmap](docs/APP-API-ROADMAP.md). API-01–05 and 21 example ports
 are implemented. API-06 has public cookie/redirect helpers; public middleware
-and typed locals remain; API-07 adds typed resumable endpoints and their ownership gates.
+and typed locals are implemented on the composition branch; API-07 adds typed resumable endpoints and their ownership gates.
 
 The [response copy review](docs/OWNERSHIP.md#response-copies-and-borrowing)
 records current copying paths. The large-borrow change separates the total

@@ -176,8 +176,9 @@ def run(directory):
         form_type = (("Content-Type", "application/x-www-form-urlencoded"),)
         call(server, "/login", status=401, method="POST", body=b"username=zap&password=wrong", headers=form_type)
 
-        def login():
-            result = call(server, "/login", status=303, method="POST", body=b"username=zap&password=awesome", headers=form_type)
+        def login(previous=None):
+            headers = form_type + ((("Cookie", previous),) if previous else ())
+            result = call(server, "/login", status=303, method="POST", body=b"username=zap&password=awesome", headers=headers)
             wire.require(result[1][b"location"] == b"/normal_page", "login redirect missing")
             cookie = result[1][b"set-cookie"].split(b";", 1)[0].decode()
             token = cookie.split("=", 1)[1]
@@ -190,12 +191,18 @@ def run(directory):
         call(server, "/normal_page", status=303, headers=(("Cookie", first),))
         second = login()
         wire.require(first != second, "retired session token was reused")
-        tokens = {first, second}
-        for _ in range(30):
-            tokens.add(login())
-        wire.require(len(tokens) == 32, "startup token pool repeated a token")
+        replacement = login(second)
+        wire.require(replacement not in (first, second), "rotation reused a retired token")
         call(server, "/normal_page", status=303, headers=(("Cookie", second),))
+        tokens = {replacement}
+        for _ in range(31):
+            tokens.add(login())
+        wire.require(len(tokens) == 32, "concurrent sessions repeated a token")
+        call(server, "/normal_page", headers=(("Cookie", replacement),))
         call(server, "/login", status=503, method="POST", body=b"username=zap&password=awesome", headers=form_type)
+        call(server, "/logout", status=303, method="POST", headers=(("Cookie", replacement),))
+        fresh = login()
+        wire.require(fresh not in tokens, "a reused slot restored an old token")
 
     return passed
 

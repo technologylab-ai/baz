@@ -158,10 +158,26 @@ Run `zig build run-userpass_session -Doptimize=ReleaseSafe -- --port 8080`, then
 `http://localhost:8080/login`. The public demo credentials are `zap` / `awesome`.
 The styled [login](../examples/assets/session_login.html) and
 [protected page](../examples/assets/session_home.html) are separate embedded assets.
-The example has one active session and 32 startup-generated, single-use random
-tokens. Logout and replacement retire tokens; capacity exhaustion returns 503
-until restart. The active session has no server TTL and survives until logout,
-replacement or shutdown. It deliberately uses a browser-session cookie.
+The example reserves **32 concurrent sessions** at startup. Expired or revoked
+slots are reusable; live sessions are never evicted. Each session has a fixed
+server lifetime of 30 minutes, configurable with `--session-ttl-ms`. Reading a
+session does not extend that deadline. The browser cookie deliberately remains a
+session cookie: server expiry is independent of browser retention.
+
+Login rotates the presented session while preserving other devices. Logout revokes
+one token; “Log out all devices” revokes every token for that identity. Expiry,
+revocation and restart invalidate server-side access. A full store returns 503,
+including rotation when no free slot remains. Authentication copies the identity
+under a bounded try-lock; contention returns 503. Revocation affects subsequent
+authentication, not a request that already obtained its identity snapshot.
+
+The [example store](../examples/endpoint/session_store.zig) uses a startup-generated
+secret and checked counter to derive opaque HMAC-SHA256 tokens without request-time
+entropy or allocation. Never copy a live store or reset its counter under the same
+key. Store operations take explicit monotonic timestamps; the example reads its
+boot clock while holding the guard. This is an in-memory application example,
+not a persistent identity service. [Middleware and locals](MIDDLEWARE.md) keep
+credential checks separate from the protected handlers.
 
 Unsafe POST handlers accept absent `Sec-Fetch-Site` for CLI clients, or exact
 `same-origin`/`none`; they reject other values and duplicate fields with 403 before
@@ -174,7 +190,8 @@ authentication, authorization or an application's CSRF protections.
 
 `zig build verify` compiles the codec, request/response tests, independent consumer,
 and examples. `tests/cookies_integration.py` checks actual HTTP fields and the
-session workflow with ReleaseSafe binaries; existing CLI, App, example, streaming,
+session workflow with ReleaseSafe binaries; `tests/session_integration.py` adds
+expiry, reuse, revocation, capacity and concurrent-client checks; existing CLI, App, example, streaming,
 borrow and Mustache suites remain required. CI runs these gates natively on Linux,
 macOS and Windows. See [the wire fixture](../examples/cookie_fixture.zig) for the
 supported profile. Browser expiry policies are documented semantics, not simulated

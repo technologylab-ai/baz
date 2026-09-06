@@ -1,32 +1,28 @@
-//! Middleware passes typed locals directly to an ordinary endpoint method.
+//! An ordinary endpoint method reads locals filled by public middleware.
 const std = @import("std");
 const support = @import("example_support");
 const parts = @import("endpoint/middleware_parts.zig");
 
 const HtmlEndpoint = struct {
-    pub fn get(_: *HtmlEndpoint, ctx: *parts.Application.Context, locals: *const parts.Locals) !void {
+    pub fn get(_: *HtmlEndpoint, ctx: *parts.Application.Context) !void {
         try ctx.response.header("X-Middleware-Order", "user, session, endpoint");
-        return parts.render(ctx, locals);
-    }
-};
-
-const Pipeline = struct {
-    endpoint: HtmlEndpoint = .{},
-
-    pub fn get(self: *Pipeline, ctx: *parts.Application.Context) !void {
-        var locals: parts.Locals = .{};
-        if (try parts.UserMiddleware.before(ctx, &locals) == .respond) return;
-        if (parts.SessionMiddleware.before(ctx, &locals) == .respond) return;
-        return self.endpoint.get(ctx, &locals);
+        return parts.render(ctx);
     }
 };
 
 pub fn main(init: std.process.Init) !void {
     var shared: parts.Shared = .{};
-    const app = try parts.Application.init(.{ .allocator = init.gpa, .io = init.io, .shared = &shared, .server = try support.config(init) });
+    const app = try parts.Application.init(.{
+        .allocator = init.gpa,
+        .io = init.io,
+        .shared = &shared,
+        .server = try support.config(init),
+        .middleware = &.{parts.user_middleware},
+    });
     defer app.deinit();
-    var pipeline: Pipeline = .{};
-    try app.endpoint("/", &pipeline);
-    try app.endpoint("/test", &pipeline);
+    var endpoint: HtmlEndpoint = .{};
+    const options: parts.Application.RouteOptions = .{ .middleware = &.{parts.session_middleware} };
+    try app.endpointWith("/", &endpoint, options);
+    try app.endpointWith("/test", &endpoint, options);
     try support.run(app, init);
 }
