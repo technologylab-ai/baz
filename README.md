@@ -15,7 +15,7 @@ explains its architecture, embedding API, and ownership model; the
 [engine source](https://github.com/technologylab-ai/bounded-http) is a separate repository.
 
 Its foundation, [bounded/http](https://technologylab-ai.github.io/bounded-http/),
-takes inspiration from **Tiger Style**: set explicit limits, reserve resources
+takes inspiration from **[TigerStyle](https://tigerstyle.dev)**: set explicit limits, reserve resources
 up front, and check ownership invariants. Connections, buffers, queues, and
 workers have fixed capacities; request sizes, response sizes, and I/O deadlines
 have enforced limits. When capacity runs out, the engine applies backpressure
