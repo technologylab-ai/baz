@@ -4,10 +4,12 @@
 
 [Website & documentation](https://technologylab-ai.github.io/baz/) · [API guide](docs/APP-API.md) · [20 examples](examples/README.md)
 
-A modern successor to [Zap](https://github.com/zigzap/zap), built in **Zig 0.16.0**
+A **pure Zig** successor to [Zap](https://github.com/zigzap/zap), built in **Zig 0.16.0**
 on [bounded/http](https://github.com/technologylab-ai/bounded-http). It keeps Zap's typed
 App and endpoint ergonomics, with explicit memory ownership and simpler request
 data.
+Both Baz and its HTTP engine are implemented in Zig. Baz replaces Zap’s
+facil.io C foundation with bounded/http.
 The engine's [GitHub Pages documentation](https://technologylab-ai.github.io/bounded-http/)
 explains its architecture, embedding API, and ownership model.
 
