@@ -1,6 +1,6 @@
 //! Plain typed functions compose middleware without a second framework context.
 const std = @import("std");
-const web = @import("http_app");
+const web = @import("baz");
 
 pub const Shared = struct { requests: std.atomic.Value(u64) = .init(0) };
 pub const Application = web.App(Shared);

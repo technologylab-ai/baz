@@ -21,14 +21,16 @@ This is an accepted sequencing decision, not a decision that a custom provider i
 unnecessary. If the prototype establishes the benefits and ownership gates,
 an opt-in managed execution mode is a useful target for this successor to Zap.
 
-## What zig-http actually uses
+## What the engine actually uses
+
+This source inspection used engine revision `4b3cd5551d80b422ec6ef763627d019e6f1dfb83`.
 
 | Layer | Current implementation |
 | --- | --- |
-| Startup asset loading | `std.process.Init.io` is passed to `std.Io.Dir` operations in [main.zig](../src/main.zig). |
-| HTTP engine | [server.zig](../src/server.zig) drives its own transport contract and callback phases. |
-| Linux transport | [transport_linux.zig](../src/transport_linux.zig) owns a `std.os.linux.IoUring`, submits accept/recv/send/sendmsg/cancel, and reports cell/token completions. |
-| macOS transport | [transport_macos.zig](../src/transport_macos.zig) uses nonblocking sockets and kqueue under the same contract. |
+| Startup asset loading | `std.process.Init.io` is passed to `std.Io.Dir` operations in [main.zig](https://github.com/technologylab-ai/bounded-http/blob/4b3cd5551d80b422ec6ef763627d019e6f1dfb83/src/main.zig). |
+| HTTP engine | [server.zig](https://github.com/technologylab-ai/bounded-http/blob/4b3cd5551d80b422ec6ef763627d019e6f1dfb83/src/server.zig) drives its own transport contract and callback phases. |
+| Linux transport | [transport_linux.zig](https://github.com/technologylab-ai/bounded-http/blob/4b3cd5551d80b422ec6ef763627d019e6f1dfb83/src/transport_linux.zig) owns a `std.os.linux.IoUring`, submits accept/recv/send/sendmsg/cancel, and reports cell/token completions. |
+| macOS transport | [transport_macos.zig](https://github.com/technologylab-ai/bounded-http/blob/4b3cd5551d80b422ec6ef763627d019e6f1dfb83/src/transport_macos.zig) uses nonblocking sockets and kqueue under the same contract. |
 | Application execution | Direct inline callbacks or fixed startup workers, with `.request`/`.flushed` events and `.flush`/`.finish`/`.close` actions. |
 
 Using a Zig standard-library io_uring wrapper is different from implementing
@@ -40,7 +42,7 @@ The source baseline is zig-http
 `4b3cd5551d80b422ec6ef763627d019e6f1dfb83`. The installed compiler reported
 `0.16.0`; inspection used its `lib/std/Io.zig`, `Io/Uring.zig`,
 `Io/Reader.zig`, `Io/Writer.zig`, and the wiki's
-[stdlib source record](../../zigllmwiki/sources/zig-0.16.0-stdlib.md).
+[stdlib source record](https://github.com/technologylab-ai/zigllmwiki/blob/362da3b8023e6918d4b72c046821334ebd3722ca/sources/zig-0.16.0-stdlib.md).
 Existing engine runtime receipts are linked by
 [EVIDENCE.md](EVIDENCE.md); they are not evidence for a std.Io provider.
 
@@ -110,8 +112,8 @@ maps netAccept/netRead/netWrite to functions returning `NetworkDown`, task
 creation can allocate, and `Fiber.min_stack_size` is 60 MiB. Selected batch paths
 still contain TODO panics. These source facts are enough to reject an untested
 drop-in adoption; they are not a benchmark or a judgment about later Zig releases.
-See the wiki's [evented landscape](../../zigllmwiki/wiki/evented-io-backends.md)
-and [async/concurrent contract](../../zigllmwiki/wiki/async-vs-concurrent.md).
+See the wiki's [evented landscape](https://github.com/technologylab-ai/zigllmwiki/blob/362da3b8023e6918d4b72c046821334ebd3722ca/wiki/evented-io-backends.md)
+and [async/concurrent contract](https://github.com/technologylab-ai/zigllmwiki/blob/362da3b8023e6918d4b72c046821334ebd3722ca/wiki/async-vs-concurrent.md).
 
 ## Proposed owned-runtime boundary
 

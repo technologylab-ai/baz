@@ -1,0 +1,151 @@
+{
+  "audited_utc": "2026-09-06T14:06:12.098033+00:00",
+  "observed_groups": [
+    {
+      "pgid": 49866,
+      "present": false
+    },
+    {
+      "pgid": 50836,
+      "present": false
+    },
+    {
+      "pgid": 52284,
+      "present": false
+    },
+    {
+      "pgid": 52986,
+      "present": false
+    },
+    {
+      "pgid": 53828,
+      "present": false
+    },
+    {
+      "pgid": 56630,
+      "present": false
+    },
+    {
+      "pgid": 63608,
+      "present": false
+    },
+    {
+      "pgid": 64411,
+      "present": false
+    },
+    {
+      "pgid": 65590,
+      "present": false
+    },
+    {
+      "pgid": 66031,
+      "present": false
+    },
+    {
+      "pgid": 66032,
+      "present": false
+    },
+    {
+      "pgid": 66042,
+      "present": false
+    },
+    {
+      "pgid": 66043,
+      "present": false
+    },
+    {
+      "pgid": 66044,
+      "present": false
+    },
+    {
+      "pgid": 66046,
+      "present": false
+    },
+    {
+      "pgid": 66049,
+      "present": false
+    },
+    {
+      "pgid": 66072,
+      "present": false
+    },
+    {
+      "pgid": 66077,
+      "present": false
+    },
+    {
+      "pgid": 66080,
+      "present": false
+    },
+    {
+      "pgid": 66082,
+      "present": false
+    },
+    {
+      "pgid": 66090,
+      "present": false
+    },
+    {
+      "pgid": 66118,
+      "present": false
+    },
+    {
+      "pgid": 66120,
+      "present": false
+    },
+    {
+      "pgid": 66122,
+      "present": false
+    },
+    {
+      "pgid": 66138,
+      "present": false
+    },
+    {
+      "pgid": 66148,
+      "present": false
+    },
+    {
+      "pgid": 66180,
+      "present": false
+    },
+    {
+      "pgid": 66216,
+      "present": false
+    },
+    {
+      "pgid": 66248,
+      "present": false
+    },
+    {
+      "pgid": 66278,
+      "present": false
+    },
+    {
+      "pgid": 66311,
+      "present": false
+    },
+    {
+      "pgid": 66360,
+      "present": false
+    },
+    {
+      "pgid": 66386,
+      "present": false
+    },
+    {
+      "pgid": 66398,
+      "present": false
+    },
+    {
+      "pgid": 66401,
+      "present": false
+    },
+    {
+      "pgid": 66405,
+      "present": false
+    }
+  ],
+  "active_measurement_processes": [],
+  "source_manifest": "efc717de434032960de5a95266866f62808674ee51e4e0756ac25eaa4f76d53e"
+}

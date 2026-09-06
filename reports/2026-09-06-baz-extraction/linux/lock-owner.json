@@ -1,0 +1,14 @@
+{
+  "host": "omarx1",
+  "owner": "/root/parser_api_review",
+  "owner_pid": 1676695,
+  "process_start_ticks": "54595340",
+  "purpose": "Completed native engine seam gates; final isolated Baz public URL dependency gates",
+  "started_utc": "2026-09-06T13:40:20.427792+00:00",
+  "token": "7cb134a4-311e-49ce-80c6-c2ca7b75957f",
+  "working_directories": [
+    "/tmp/zig-http.seam.f0gylvbx",
+    "/tmp/zig-http.seam.baz.b1f9uxxl"
+  ],
+  "working_directory": "/tmp/zig-http.seam.baz.b1f9uxxl"
+}

@@ -1,0 +1,8 @@
+.{
+    .name = .baz_embedding,
+    .version = "0.0.1",
+    .fingerprint = 0x28ec9f429de74fd6,
+    .minimum_zig_version = "0.16.0",
+    .dependencies = .{ .baz = .{ .path = "../.." } },
+    .paths = .{ "build.zig", "build.zig.zon", "src" },
+}

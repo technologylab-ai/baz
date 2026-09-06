@@ -1,6 +1,6 @@
 //! Runnable first application slice. All request helpers use the public module.
 const std = @import("std");
-const web = @import("http_app");
+const web = @import("baz");
 
 const Shared = struct {
     greeting: []const u8 = "Hello from the App API",

@@ -1,0 +1,26 @@
+{
+  "build_mode": "ReleaseSafe",
+  "files": {
+    "zig-out/bin/accept": "ebba9a652776b299e0439749a0c2826d2f36137318963c95151a1ed1787ee04d",
+    "zig-out/bin/app_auth": "df13ef74ac47faa8a79b87a2f1616434cdbed3f04b4ac421182cf8c5ccc744c6",
+    "zig-out/bin/app_basic": "454eb3c3c3901537dd2bda1d9d26e24d9caebe73bacc93484086db4e94f11785",
+    "zig-out/bin/app_errors": "e706e71ac060ceed57e2d5c6567d98fe4cc31471b9619bff9d43acc0a5d05481",
+    "zig-out/bin/baz": "90cbed6a4bf189217b6e7b3fed0fa199154ad9b58a4f1e84fc3d10ec9d459c2b",
+    "zig-out/bin/bindataformpost": "c16ecd1ec379a12ab966d76a31f525c36d02b35b9d6e052bd321d07c7c885904",
+    "zig-out/bin/cookies": "bead5582915601582e420f183c072f85763c106a7767a188ea60eedd1af0bf24",
+    "zig-out/bin/endpoint": "af24cd1f40d4416923e7debb77cdf97fca2c8569df4799553286510151aeb56f",
+    "zig-out/bin/endpoint_auth": "65bc323d21dddc8aba9ed4af599eac76ba34917096745a3af89e32e1e7839c0f",
+    "zig-out/bin/hello": "a7ea8ad0e54ef15b2692d6bc98cd9554405f545aec6d014f22c7460edf26894e",
+    "zig-out/bin/hello2": "dc364824ee0a36113afbc7b95caa2972dd9d620ad79553aa227c149a2e24b752",
+    "zig-out/bin/hello_json": "eae0e421b79bc9efd1b3f3fadf2710d8ac04e404457242913202b357084fca6e",
+    "zig-out/bin/http_params": "789e1f04a396dbe0f0c71393443cc029d0cea4be3a4d227efb04cc04c6bf4206",
+    "zig-out/bin/middleware": "2f50184763cc1118c8c09e20394e867bdfd9982b206d16bd2e1f28abe6814f93",
+    "zig-out/bin/middleware_with_endpoint": "cf662554edb21bce95a4a90cf4dcde65b06700a8400c7a2ae6d04aeebf2f363c",
+    "zig-out/bin/routes": "7ddb5ef3c0833501524654aa82afa2aa2d4dfc57dcc1ad22a618251197b41e15",
+    "zig-out/bin/senderror": "58e16b218e5c6c1b94d455ba05aa66d45263cf8fb6c99b544616ee29cd719631",
+    "zig-out/bin/sendfile": "7772e8f7ee7b39ff84a1459f0847f5ceb43bed090749cf452552b4ba66534ddf",
+    "zig-out/bin/serve": "550f7e56a1eea572f22c446eaad4099d29f1bc59b751bc92218a75a71f8a5ab0",
+    "zig-out/bin/simple_router": "c0e6539c0ef18a129f19bfff9468eecb7e11e49fe3661e1352027213a411595a",
+    "zig-out/bin/userpass_session": "157439bd1530360ed3b561822fd87f68ccc70f588bf2caf0bade659df90f6830"
+  }
+}

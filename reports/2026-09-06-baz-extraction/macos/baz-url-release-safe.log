@@ -1,0 +1,43 @@
+Build Summary: 41/41 steps succeeded; 60/60 tests passed
+verify success
++- compile exe baz ReleaseSafe native success 6s MaxRSS:409M
++- compile exe hello ReleaseSafe native success 6s MaxRSS:393M
++- compile exe hello2 ReleaseSafe native success 6s MaxRSS:398M
++- compile exe hello_json ReleaseSafe native success 6s MaxRSS:395M
++- compile exe simple_router ReleaseSafe native success 6s MaxRSS:396M
++- compile exe routes ReleaseSafe native success 6s MaxRSS:399M
++- compile exe serve ReleaseSafe native success 6s MaxRSS:395M
++- compile exe sendfile ReleaseSafe native success 6s MaxRSS:399M
++- compile exe senderror ReleaseSafe native success 6s MaxRSS:400M
++- compile exe accept ReleaseSafe native success 6s MaxRSS:401M
++- compile exe app_basic ReleaseSafe native success 6s MaxRSS:401M
++- compile exe app_auth ReleaseSafe native success 6s MaxRSS:403M
++- compile exe app_errors ReleaseSafe native success 6s MaxRSS:397M
++- compile exe endpoint ReleaseSafe native success 7s MaxRSS:428M
++- compile exe endpoint_auth ReleaseSafe native success 6s MaxRSS:394M
++- compile exe middleware ReleaseSafe native success 6s MaxRSS:394M
++- compile exe middleware_with_endpoint ReleaseSafe native success 6s MaxRSS:398M
++- compile exe userpass_session ReleaseSafe native success 6s MaxRSS:404M
++- compile exe cookies ReleaseSafe native success 6s MaxRSS:395M
++- compile exe http_params ReleaseSafe native success 6s MaxRSS:400M
++- compile exe bindataformpost ReleaseSafe native success 6s MaxRSS:406M
++- zig fmt --check success
++- run python3 success 65ms
++- run /Users/rs/renerocksai.stow/nvim/.local/share/zigup/0.16.0/files/zig success 5s
++- run test 3 pass (3 total) 285ms MaxRSS:1M
+|  +- compile test ReleaseSafe native success 4s MaxRSS:353M
++- run test 5 pass (5 total) 289ms MaxRSS:1M
+|  +- compile test ReleaseSafe native success 4s MaxRSS:353M
++- run test 12 pass (12 total) 307ms MaxRSS:1M
+|  +- compile test ReleaseSafe native success 5s MaxRSS:379M
++- run test 8 pass (8 total) 292ms MaxRSS:2M
+|  +- compile test ReleaseSafe native success 4s MaxRSS:362M
++- run test 6 pass (6 total) 290ms MaxRSS:2M
+|  +- compile test ReleaseSafe native success 4s MaxRSS:361M
++- run test 2 pass (2 total) 304ms MaxRSS:1M
+|  +- compile test ReleaseSafe native success 4s MaxRSS:350M
++- run test 24 pass (24 total) 305ms MaxRSS:2M
+|  +- compile test ReleaseSafe native success 7s MaxRSS:459M
++- run test success 301ms MaxRSS:1M
+   +- compile test ReleaseSafe native success 4s MaxRSS:342M
+

@@ -1,6 +1,6 @@
 //! Worker callbacks parse bounded JSON and serialize a fixed, synchronized user table.
 const std = @import("std");
-const web = @import("http_app");
+const web = @import("baz");
 const support = @import("example_support");
 const users = @import("endpoint/users.zig");
 

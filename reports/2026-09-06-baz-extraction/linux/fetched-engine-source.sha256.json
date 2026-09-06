@@ -1,0 +1,10 @@
+{
+  "baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/api.zig": "e76b76f31a152adbde55760554b562df63c16a1cea660e5ec402eeca96e6e4b5",
+  "baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/budget.zig": "1a1f2dc2ac3418289590ed8868e588df6039e9fe69ff52412bec368ebfb4dcc9",
+  "baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/http.zig": "9f54c8bc607da60294ac042ec90f93642e67f5acbef7b5e1dceebba6e41f6a4f",
+  "baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/main.zig": "2fa95737fb4424f5ea5ead9eccbd34125a4eb58b3aa7d3ca41ffb61b45690a12",
+  "baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig": "3e5cead3e61b236dd93349e610469460aeb7ed53b04989fa555c9bc9751384e0",
+  "baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/transport.zig": "324245cbdbe8810591985807b4d737d21fa48699695374ace1c8fe800287d8a2",
+  "baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/transport_linux.zig": "5dfe71c3cb3fd3fd275dae1c729e5cfc175ce4b6ee4f8d5f3ec6ec8bee1ce2c9",
+  "baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/transport_macos.zig": "2a1b2ad432a143079c0cfc7bf860e50fb2cbb0f56dd9a4ac571bb7512b45578a"
+}

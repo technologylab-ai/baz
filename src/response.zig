@@ -3,7 +3,7 @@
 //! needed. The scheduler reserves Limits.reservationBytes before application
 //! execution. Earlier frozen responses are never part of this draft.
 const std = @import("std");
-const api = @import("api.zig");
+const api = @import("bounded_http").api;
 
 pub const Limits = struct {
     /// Serialized extra fields, including names, separators and CRLFs.
@@ -31,6 +31,7 @@ pub const Limits = struct {
 
 pub const Response = struct {
     writer: *api.Writer,
+    storage: []u8,
     limits: Limits,
     header_len: usize = 0,
     header_count: u16 = 0,
@@ -42,28 +43,27 @@ pub const Response = struct {
     published: bool = false,
 
     pub fn init(writer: *api.Writer, limits: Limits) !Response {
-        if (writer.frozen or writer.began or writer.headers_committed or writer.reserved != 0 or writer.buffered != writer.base)
-            return error.InvalidState;
-        if (try limits.reservationBytes() > writer.arena.len - writer.base)
-            return error.OutputReservationUnavailable;
-        return .{ .writer = writer, .limits = limits };
+        const storage = writer.draftStorage(try limits.reservationBytes()) catch |err| {
+            return if (err == error.WouldBlock) error.OutputReservationUnavailable else err;
+        };
+        return .{ .writer = writer, .storage = storage, .limits = limits };
     }
 
     fn typeStorage(self: *Response) []u8 {
-        return self.writer.arena[self.writer.base + api.header_reserve_bytes ..][0..api.max_content_type_bytes];
+        return self.storage[api.header_reserve_bytes..][0..api.max_content_type_bytes];
     }
 
     fn headerStorage(self: *Response) []u8 {
-        return self.writer.arena[self.writer.base + api.header_reserve_bytes + api.max_content_type_bytes ..][0..self.limits.header_bytes];
+        return self.storage[api.header_reserve_bytes + api.max_content_type_bytes ..][0..self.limits.header_bytes];
     }
 
     fn bodyStorage(self: *Response) []u8 {
-        return self.writer.arena[self.writer.base + api.header_reserve_bytes + api.max_content_type_bytes + self.limits.header_bytes ..][0..self.limits.body_bytes];
+        return self.storage[api.header_reserve_bytes + api.max_content_type_bytes + self.limits.header_bytes ..][0..self.limits.body_bytes];
     }
 
     fn checkDraft(self: *const Response) !void {
-        if (self.published or self.writer.began or self.writer.frozen or self.writer.headers_committed)
-            return error.InvalidState;
+        if (self.published) return error.InvalidState;
+        _ = try self.writer.draftStorage(0);
     }
 
     fn checkBody(self: *const Response, status: u16, content_type: []const u8, length: usize) !void {
@@ -169,10 +169,7 @@ pub const Response = struct {
         if (self.borrowed) |span| {
             try self.writer.borrow(span);
         } else {
-            const destination = try self.writer.reserve(body.len);
-            std.mem.copyForwards(u8, destination, body);
-            self.writer.commit(body.len);
-            self.writer.draft_copy_bytes = body.len;
+            try self.writer.writeDraftBody(body);
         }
         self.published = true;
         return self.writer.finish();
@@ -181,8 +178,8 @@ pub const Response = struct {
     /// Reset only the current unpublished draft. A mapper may now prepare a
     /// replacement response; older arena prefixes/cells remain untouched.
     pub fn discard(self: *Response) !void {
-        if (self.published or self.writer.frozen or self.writer.headers_committed) return error.InvalidState;
-        self.writer.open(self.writer.base, self.writer.keep_alive, self.writer.head_only);
+        if (self.published) return error.InvalidState;
+        try self.writer.discardDraft();
         self.header_len = 0;
         self.header_count = 0;
         self.content_type_len = 0;

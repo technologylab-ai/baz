@@ -2,7 +2,7 @@
 //! POST / using curl -F img=@some-file -F img=@another-file http://localhost:8080/
 //! Up to 32 KiB body / 8 parts; binary content is shown as a bounded hex preview.
 const std = @import("std");
-const web = @import("http_app");
+const web = @import("baz");
 const support = @import("example_support");
 
 const Shared = struct {};

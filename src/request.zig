@@ -2,7 +2,7 @@
 //! Every raw view retains the core borrow; caller-buffer results retain only
 //! their destination. No operation here allocates or initiates service/socket I/O.
 const std = @import("std");
-pub const http = @import("http.zig");
+pub const http = @import("bounded_http").api.http;
 pub const params = @import("params.zig");
 pub const form = @import("form.zig");
 pub const multipart = @import("multipart.zig");

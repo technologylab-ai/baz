@@ -1,6 +1,6 @@
 //! Shared example helpers keep authentication inputs as bounded borrowed bytes.
 const std = @import("std");
-const web = @import("http_app");
+const web = @import("baz");
 
 pub fn bearer(comptime length: usize, request: web.Request, expected: *const [length]u8) bool {
     var authorization: ?[]const u8 = null;

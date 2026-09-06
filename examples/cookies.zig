@@ -1,6 +1,6 @@
 //! Cookie values remain borrowed text. The response reports values without logging.
 const std = @import("std");
-const web = @import("http_app");
+const web = @import("baz");
 const support = @import("example_support");
 const auth = @import("endpoint/auth_helpers.zig");
 

@@ -1,18 +1,18 @@
-# A modern application framework on zig-http
+# Baz: a modern application framework on bounded/http
 
 Status: design reference, 2026-09-06. The first implementation is described in
 [APP-API.md](APP-API.md); sketches below also include future features. The implementation sequence and session ledger are in
 [APP-API-ROADMAP.md](APP-API-ROADMAP.md).
 
-Build a modern successor to [Zap](https://github.com/zigzap/zap), with a different name, using exact Zig 0.16.0
-and zig-http. Keep Zap's pleasant application model: typed shared context,
+Baz (Bounded Async Zap) is a modern successor to [Zap](https://github.com/zigzap/zap), using exact Zig 0.16.0
+and the external bounded/http engine. Keep Zap's pleasant application model: typed shared context,
 stateful endpoint structs, named HTTP methods, composable authentication and
 short response calls. Use Zig's explicit capabilities and ordinary byte slices
 throughout. The new framework should be useful for real application code while
-retaining zig-http's bounded ownership and progress contract.
+retaining bounded/http's ownership and progress contract.
 
-The name is intentionally undecided. `web` below is design notation for the
-future public module, not a selected product name or an existing import.
+The user selected Baz on 2026-09-06. `web` below is a local alias for `@import("baz")`.
+The sketches also describe future APIs; check the implemented guide for current spellings.
 Compatibility is conceptual; source compatibility with Zap is not a goal.
 
 ## What we inspected
@@ -24,29 +24,29 @@ Compatibility is conceptual; source compatibility with Zap is not a goal.
 | Zig wiki | Read-only consultation at `362da3b8023e6918d4b72c046821334ebd3722ca`, using its `zig-wiki` skill and query command. Relevant guidance and evidence are linked below. |
 | Installed compiler | `zig version` reported `0.16.0`; `zig env` identified the installed release source and `aarch64-macos.26.6.2...26.6.2-none`. Read `std/process.zig`, `std/Io/Reader.zig`, `std/Io/Writer.zig` and `std/json/Stringify.zig`. This is source inspection, not a new runtime gate. |
 
-Zap references below are local sibling links into that reviewed checkout. They
+Zap references below link to the exact public revision of the reviewed port. They
 describe public contracts and examples; facil.io internals are not an
-implementation template. These planning files stay in zig-http. No wiki source
-records or existing native/performance receipts are changed.
+implementation template. These planning files belong to Baz. The original
+engine source and runtime evidence remain in the separate engine repository.
 
 ## Zap ideas to retain and modernize
 
 | Zap API / example | Useful idea | Successor decision |
 | --- | --- | --- |
-| [App.Create / register](../../fi/deps/zap/src/App.zig), [basic App](../../fi/deps/zap/examples/app/basic.zig) | One application context type shared by endpoints; endpoint instance state; compile-time signature checks. | `App(Shared)` is a real instance. Register borrowed endpoint pointers before startup. Multiple instances with the same Shared type must work independently. |
-| [App.Endpoint method dispatch](../../fi/deps/zap/src/App.zig) | `get`, `post`, `put`, `delete`, `patch`, `head`, `options` methods are easy to discover. | Keep method conventions as optional registration sugar over one router. Endpoint structs need no embedded framework base object or mandatory `error_strategy` field. |
-| [Router](../../fi/deps/zap/src/router.zig) | Plain functions and bound struct methods are both useful. | Support both, through the same typed request context and routing rules used by endpoints. |
-| [Raw query helpers](../../fi/deps/zap/src/request.zig) (`getParamSlice`, `getParamSlices`) | Borrowed, undecoded text without a preceding parse call. | Make this the primary parameter model; add deliberate duplicate, bare-key and decoding semantics. |
-| [Request response helpers](../../fi/deps/zap/src/request.zig) (`sendBody`, `sendJson`, headers, cookies, redirects) | Common responses take little code. | Separate immutable Request from mutable Response; short helpers copy into reserved output, with an explicitly named borrowing alternative. Distinguish pre-encoded JSON from serialization of a Zig value. |
-| [App authentication](../../fi/deps/zap/examples/app/auth.zig), [middleware](../../fi/deps/zap/src/middleware.zig) | Typed composition, early responses, application-specific authentication. | One middleware system, typed request locals, explicit continue/respond result, and ordinary endpoint wrappers. |
-| [App error example](../../fi/deps/zap/examples/app/errors.zig) | Handlers can use `try`; application policy maps failures. | Preserve error unions; supply a safe default 500 and a configurable error mapper. Never send error traces to clients by default. |
-| [App.init](../../fi/deps/zap/src/App.zig) in the local port | Explicit `std.Io` is already threaded into the modernized Zap port. | Keep capability injection and extend it coherently to startup/services and bounded reader/writer interoperability. |
+| [App.Create / register](https://github.com/zigzap/zap/blob/f6099ecec496c7ec623c5913baa5b6b5da2e883d/src/App.zig), [basic App](https://github.com/zigzap/zap/blob/f6099ecec496c7ec623c5913baa5b6b5da2e883d/examples/app/basic.zig) | One application context type shared by endpoints; endpoint instance state; compile-time signature checks. | `App(Shared)` is a real instance. Register borrowed endpoint pointers before startup. Multiple instances with the same Shared type must work independently. |
+| [App.Endpoint method dispatch](https://github.com/zigzap/zap/blob/f6099ecec496c7ec623c5913baa5b6b5da2e883d/src/App.zig) | `get`, `post`, `put`, `delete`, `patch`, `head`, `options` methods are easy to discover. | Keep method conventions as optional registration sugar over one router. Endpoint structs need no embedded framework base object or mandatory `error_strategy` field. |
+| [Router](https://github.com/zigzap/zap/blob/f6099ecec496c7ec623c5913baa5b6b5da2e883d/src/router.zig) | Plain functions and bound struct methods are both useful. | Support both, through the same typed request context and routing rules used by endpoints. |
+| [Raw query helpers](https://github.com/zigzap/zap/blob/f6099ecec496c7ec623c5913baa5b6b5da2e883d/src/request.zig) (`getParamSlice`, `getParamSlices`) | Borrowed, undecoded text without a preceding parse call. | Make this the primary parameter model; add deliberate duplicate, bare-key and decoding semantics. |
+| [Request response helpers](https://github.com/zigzap/zap/blob/f6099ecec496c7ec623c5913baa5b6b5da2e883d/src/request.zig) (`sendBody`, `sendJson`, headers, cookies, redirects) | Common responses take little code. | Separate immutable Request from mutable Response; short helpers copy into reserved output, with an explicitly named borrowing alternative. Distinguish pre-encoded JSON from serialization of a Zig value. |
+| [App authentication](https://github.com/zigzap/zap/blob/f6099ecec496c7ec623c5913baa5b6b5da2e883d/examples/app/auth.zig), [middleware](https://github.com/zigzap/zap/blob/f6099ecec496c7ec623c5913baa5b6b5da2e883d/src/middleware.zig) | Typed composition, early responses, application-specific authentication. | One middleware system, typed request locals, explicit continue/respond result, and ordinary endpoint wrappers. |
+| [App error example](https://github.com/zigzap/zap/blob/f6099ecec496c7ec623c5913baa5b6b5da2e883d/examples/app/errors.zig) | Handlers can use `try`; application policy maps failures. | Preserve error unions; supply a safe default 500 and a configurable error mapper. Never send error traces to clients by default. |
+| [App.init](https://github.com/zigzap/zap/blob/f6099ecec496c7ec623c5913baa5b6b5da2e883d/src/App.zig) in the local port | Explicit `std.Io` is already threaded into the modernized Zap port. | Keep capability injection and extend it coherently to startup/services and bounded reader/writer interoperability. |
 
 The new API removes the combined query/body parameter bag, Bool/Int/Float
 coercion, conversion back into owned strings, and the `Hash_Binfile` versus
 `Array_Binfile` distinction visible in
-[request.zig](../../fi/deps/zap/src/request.zig) and the
-[upload example](../../fi/deps/zap/examples/bindataformpost/bindataformpost.zig).
+[request.zig](https://github.com/zigzap/zap/blob/f6099ecec496c7ec623c5913baa5b6b5da2e883d/src/request.zig) and the
+[upload example](https://github.com/zigzap/zap/blob/f6099ecec496c7ec623c5913baa5b6b5da2e883d/examples/bindataformpost/bindataformpost.zig).
 It also replaces App's public singleton restriction, implicit prefix matching,
 per-thread growable request arenas, and separate App/Endpoint/Middleware context
 mechanisms with explicit instances, routes, bounded storage and one context model.
@@ -66,12 +66,11 @@ main(std.process.Init) -> caller's std.Io + allocator -> startup / services
 retained input and reserved output <-> std.Io.Reader / std.Io.Writer
 ```
 
-Implement the framework as modules in this repository first, with a distinct
-public root and the existing `bounded_http` module still usable directly.
-User direction now selects a separate framework repository after the useful
-vertical slice, importing a pinned zig-http package. Keep zig-http independently
-usable as the engine/case study. Current development still uses relative engine
-imports within this worktree; the roadmap records the extraction steps.
+Baz exports a distinct `baz` module and consumes the external `bounded_http` module.
+Consumers can also import the same engine module directly.
+The [dependency record](DEPENDENCY.md) describes the public adapter contract and immutable pin.
+bounded/http remains independently usable as the engine case study.
+Baz's own repository publication is still pending.
 
 `std.process.Init` belongs in executable examples. Libraries receive the narrow
 capabilities they need: an allocator for startup, the caller's `std.Io` where
@@ -102,10 +101,10 @@ runtime, exact-release alternatives, required task/operation ownership and
 prototype gates. The initial capability-injection design keeps that option open.
 
 These distinctions follow the wiki's
-[std.Io](../../zigllmwiki/wiki/std-io.md),
-[process capabilities](../../zigllmwiki/wiki/process-init-and-capabilities.md),
-[small truthful API contracts](../../zigllmwiki/wiki/lower-dimensional-api-contracts.md)
-and [startup allocation](../../zigllmwiki/wiki/static-allocation-and-constant-work.md)
+[std.Io](https://github.com/technologylab-ai/zigllmwiki/blob/362da3b8023e6918d4b72c046821334ebd3722ca/wiki/std-io.md),
+[process capabilities](https://github.com/technologylab-ai/zigllmwiki/blob/362da3b8023e6918d4b72c046821334ebd3722ca/wiki/process-init-and-capabilities.md),
+[small truthful API contracts](https://github.com/technologylab-ai/zigllmwiki/blob/362da3b8023e6918d4b72c046821334ebd3722ca/wiki/lower-dimensional-api-contracts.md)
+and [startup allocation](https://github.com/technologylab-ai/zigllmwiki/blob/362da3b8023e6918d4b72c046821334ebd3722ca/wiki/static-allocation-and-constant-work.md)
 guidance. The installed exact release source remains authoritative for Zig API
 spellings; synthesized guidance does not replace source or runtime evidence.
 
@@ -402,7 +401,7 @@ The current engine's implementation and measured scope are in
 [INTERFACES.md](INTERFACES.md), [OWNERSHIP.md](OWNERSHIP.md),
 [EVIDENCE.md](EVIDENCE.md), and the
 [arena adoption report](../reports/2026-09-05-arena-adoption.md). The wiki's
-[adoption source record](../../zigllmwiki/sources/zig-http-arena-adoption-2026-09-05.md)
+[adoption source record](https://github.com/technologylab-ai/zigllmwiki/blob/362da3b8023e6918d4b72c046821334ebd3722ca/sources/zig-http-arena-adoption-2026-09-05.md)
 pins those receipts. They establish neither this proposed framework nor a
 performance cost for its future conveniences.
 

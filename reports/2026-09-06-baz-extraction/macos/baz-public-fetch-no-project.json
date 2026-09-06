@@ -1,0 +1,16 @@
+{
+  "command": [
+    "/Users/rs/bin/zig",
+    "fetch",
+    "--global-cache-dir",
+    "/tmp/baz-public-fetch-0wzwpkcx/cache",
+    "https://github.com/technologylab-ai/bounded-http/archive/e52f09f723388685263d14a9bfa265f2456a3744.tar.gz"
+  ],
+  "cwd": "/tmp/baz-public-fetch-0wzwpkcx",
+  "cache_existed": false,
+  "started_utc": "2026-09-06T14:04:28.094537+00:00",
+  "returncode": 1,
+  "stdout": "",
+  "stderr": "info: initialize build.zig template file with 'zig init'\ninfo: see 'zig --help' for more options\nerror: no build.zig file found, in the current directory or any parent directories\n",
+  "finished_utc": "2026-09-06T14:04:28.130708+00:00"
+}

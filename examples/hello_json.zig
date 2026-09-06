@@ -1,7 +1,7 @@
 //! Small immutable application data and JSON output. Path conversion is an
 //! explicit application decision; malformed/overflowing IDs are ordinary 400s.
 const std = @import("std");
-const web = @import("http_app");
+const web = @import("baz");
 const support = @import("example_support");
 
 const User = struct { first_name: ?[]const u8 = null, last_name: ?[]const u8 = null };

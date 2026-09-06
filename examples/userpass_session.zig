@@ -1,7 +1,7 @@
 //! A local login example has one active session and 32 startup-generated tokens.
 //! Credentials are public demo data. This example is not a production identity service.
 const std = @import("std");
-const web = @import("http_app");
+const web = @import("baz");
 const support = @import("example_support");
 const auth = @import("endpoint/auth_helpers.zig");
 

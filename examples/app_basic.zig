@@ -2,7 +2,7 @@
 //! The old callback-local arena and demonstration sleep are removed: formatting
 //! writes into reserved output and inline callbacks remain nonblocking.
 const std = @import("std");
-const web = @import("http_app");
+const web = @import("baz");
 const support = @import("example_support");
 
 const Shared = struct { db_connection: []const u8 = "db connection established!" };

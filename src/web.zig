@@ -1,5 +1,4 @@
-//! Experimental application API for exact Zig 0.16.0. `http_app` is the working
-//! module name; the final framework name remains undecided.
+//! Baz: Bounded Async Zap. Experimental application API for exact Zig 0.16.0.
 pub const App = @import("App.zig").App;
 pub const Request = @import("request.zig").Request;
 pub const Response = @import("response.zig").Response;
@@ -9,9 +8,9 @@ pub const form = @import("form.zig");
 pub const multipart = @import("multipart.zig");
 pub const router = @import("router.zig");
 
-/// Both build-module names refer to this same module, preserving one type
-/// identity when applications use the high-level and raw APIs together.
-pub const engine = @import("server.zig");
+/// Reexport the dependency's actual module. Applications can mix framework
+/// and engine types without creating a second engine module identity.
+pub const engine = @import("bounded_http");
 pub const api = engine.api;
 pub const Budget = engine.Budget;
 pub const Config = engine.Config;

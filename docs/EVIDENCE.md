@@ -1,4 +1,17 @@
-# Evidence inputs
+# Baz evidence inputs
+
+Baz owns the application API and its verification. The
+[dependency record](DEPENDENCY.md) identifies the selected external engine.
+[bounded/http](https://github.com/technologylab-ai/bounded-http) maintains the server
+contracts and core evidence; its [Pages site](https://technologylab-ai.github.io/bounded-http/)
+provides the architecture reader.
+
+The original [App correctness receipt](../reports/2026-09-06-app-api.md) and
+[Zap comparison](../reports/2026-09-06-basic-zap.md) describe the prototype before extraction.
+Their source manifests and raw measurements remain historical records.
+The [package receipt](../reports/2026-09-06-baz-extraction.md) records external-dependency verification.
+The engine inputs below explain that lineage; they do not replace Baz-specific evidence.
+
 
 Authoritative API source: installed exact Zig 0.16.0 standard library, especially
 `std/os/linux/IoUring.zig`, `std/Thread.zig`, `std/atomic.zig`, `std/c.zig`.
@@ -22,7 +35,7 @@ OS and design inputs already pinned in the wiki before implementation:
   explain the default x86 Debug backend. The new ELF linker/default backend
   distinction matters for Linux CRT compatibility; see the verification report.
 
-This project begins as an experimental bounded HTTP/1.1 implementation. Source
+The underlying engine began as an experimental bounded HTTP/1.1 implementation. Source
 inputs do not establish runtime or performance. Test reports name exact
 commits, compiler, OS/kernel, commands, limits and unexercised paths.
 

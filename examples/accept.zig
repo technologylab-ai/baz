@@ -4,7 +4,7 @@
 //! Repeated Accept fields are processed in wire order, with at most 32 ranges
 //! and 4096 aggregate value bytes. This is example policy, not a general parser.
 const std = @import("std");
-const web = @import("http_app");
+const web = @import("baz");
 const support = @import("example_support");
 
 const Shared = struct {};

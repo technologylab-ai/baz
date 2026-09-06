@@ -1,0 +1,27 @@
+{
+  "host": "omarx1",
+  "keeper_exit_code": 0,
+  "keeper_output": "LOCK_RELEASED 7cb134a4-311e-49ce-80c6-c2ca7b75957f 2026-09-06T14:14:49.597792+00:00",
+  "keeper_pid_absent": true,
+  "lock_directory_absent": true,
+  "metadata_absent": true,
+  "owner": {
+    "host": "omarx1",
+    "owner": "/root/parser_api_review",
+    "owner_pid": 1676695,
+    "process_start_ticks": "54595340",
+    "purpose": "Completed native engine seam gates; final isolated Baz public URL dependency gates",
+    "started_utc": "2026-09-06T13:40:20.427792+00:00",
+    "token": "7cb134a4-311e-49ce-80c6-c2ca7b75957f",
+    "working_directories": [
+      "/tmp/zig-http.seam.f0gylvbx",
+      "/tmp/zig-http.seam.baz.b1f9uxxl"
+    ],
+    "working_directory": "/tmp/zig-http.seam.baz.b1f9uxxl"
+  },
+  "receipts_retrieved_by_parent": true,
+  "release_requested_utc": "2026-09-06T14:14:49.593692+00:00",
+  "released_utc": "2026-09-06T14:14:49.597792+00:00",
+  "verified_utc": "2026-09-06T14:15:06.078275+00:00",
+  "workspace_processes_before_release": []
+}

@@ -1,9 +1,13 @@
-# HTTP App (working name)
+# Baz
+
+**Bounded Async Zap.**
 
 A modern successor to [Zap](https://github.com/zigzap/zap), built in **Zig 0.16.0**
-on [zig-http](https://github.com/technologylab-ai/zig-http). It keeps Zap's typed
+on [bounded/http](https://github.com/technologylab-ai/bounded-http). It keeps Zap's typed
 App and endpoint ergonomics, with explicit memory ownership and simpler request
 data.
+The engine's [GitHub Pages documentation](https://technologylab-ai.github.io/bounded-http/)
+explains its architecture, embedding API, and ownership model.
 
 The first implementation provides:
 
@@ -15,15 +19,15 @@ The first implementation provides:
   metadata and borrowed bytes.
 - Bounded one-shot responses, JSON and copied headers; output capacity is secured
   before the handler runs.
-- Caller-supplied `std.Io` and standard memory readers/writers, on zig-http's
+- Caller-supplied `std.Io` and standard memory readers/writers, on bounded/http's
   io_uring and kqueue transports. Blocking services use explicit fixed workers.
 
-**This framework will become its own repository with its own name and a pinned
-zig-http dependency.** Today it is developed in a zig-http worktree and shares
-engine sources; `http_app` is the provisional public module name. zig-http
-remains independently usable as the underlying engine and standalone case study.
-The [extraction roadmap](docs/APP-API-ROADMAP.md#api-08--migration-examples-and-successor-mvp-qualification)
-records the package boundary and remaining work.
+Baz is a separate framework package with a pinned external engine dependency.
+The package and public import are `baz`; the engine import is `bounded_http`.
+The engine remains independently usable as a standalone case study.
+Development continues in this worktree until Baz receives its own repository.
+The [package boundary](docs/DEPENDENCY.md) and [roadmap](docs/APP-API-ROADMAP.md)
+record the dependency, upstream changes, and remaining work.
 
 ## Try it
 
@@ -57,11 +61,12 @@ are the next roadmap steps.
 
 ## Basic performance comparison with Zap
 
-Native results from 2026-09-06, comparing this framework's public App/Response API
+Native results from the initial App prototype at `c152e59` on 2026-09-06,
+before package extraction. These compare the public App/Response API
 with its predecessor [Zap](https://github.com/zigzap/zap), using the local Zig
 0.16 port pinned at `f6099ecec496c7ec623c5913baa5b6b5da2e883d`.
 
-| Host | Connections / client threads | HTTP App requests/s | Zap requests/s | App / Zap |
+| Host | Connections / client threads | Baz prototype requests/s | Zap requests/s | App / Zap |
 | --- | --- | ---: | ---: | ---: |
 | macOS, Apple M3 Max | 32 / 2 | 254,261 | 245,054 | 1.038× |
 | Linux, Intel Core Ultra 7 258V | 32 / 2 | 363,594 | 205,310 | 1.771× |
@@ -86,11 +91,11 @@ not individually for every timed response. See the
 ## Status and documentation
 
 This is an experimental first implementation. Native macOS and Linux passed
-Debug and ReleaseSafe verification, all 20 example behavior groups, 14 App
-groups, the existing engine suites and 30,000 exact smoke responses per host.
-The [correctness receipt](reports/2026-09-06-app-api.md) records counts, skipped
-Linux-only tests on Mac, source hashes and the successful retry after a cold
-Linux build exceeded its first watchdog.
+Debug/ReleaseSafe verification, package embedding, all 20 example groups,
+and all 14 App groups. The engine passed its own native verification gates.
+The [package receipt](reports/2026-09-06-baz-extraction.md) records external-dependency
+verification and source identity. The [prototype receipt](reports/2026-09-06-app-api.md)
+preserves the earlier combined engine/framework gates.
 
 Current deployment is IPv4 loopback, plain HTTP/1.1. TLS is out of scope.
 Mustache is postponed pending a [pure Zig library choice](docs/MUSTACHE-CANDIDATES.md).

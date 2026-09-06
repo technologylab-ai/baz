@@ -1,0 +1,953 @@
+{
+  "commands": [
+    {
+      "cleanup": {
+        "initial_workspace_survivors": [],
+        "remaining_workspace_processes": []
+      },
+      "command": [
+        "zig",
+        "fetch",
+        "--global-cache-dir",
+        "/tmp/zig-http.seam.baz.b1f9uxxl/global-cache",
+        "https://github.com/technologylab-ai/bounded-http/archive/e52f09f723388685263d14a9bfa265f2456a3744.tar.gz"
+      ],
+      "exit_code": 0,
+      "finished_utc": "2026-09-06T14:08:06.297571+00:00",
+      "leader_pid": 1694307,
+      "observed_processes": [
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/bin/zig fetch --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache https://github.com/technologylab-ai/bounded-http/archive/e52f09f723388685263d14a9bfa265f2456a3744.tar.gz ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1694307,
+          "pid": 1694307,
+          "ppid": 1694295,
+          "start_ticks": "54761802"
+        }
+      ],
+      "process_group": 1694307,
+      "sequence": 1,
+      "started_utc": "2026-09-06T14:08:05.017343+00:00",
+      "watchdog_seconds": 180
+    },
+    {
+      "cleanup": {
+        "initial_workspace_survivors": [],
+        "remaining_workspace_processes": []
+      },
+      "command": [
+        "zig",
+        "build",
+        "verify",
+        "-Doptimize=Debug",
+        "-j2",
+        "--summary",
+        "all"
+      ],
+      "exit_code": 0,
+      "finished_utc": "2026-09-06T14:08:47.021814+00:00",
+      "leader_pid": 1694338,
+      "observed_processes": [
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/bin/zig build verify -Doptimize=Debug -j2 --summary all ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1694338,
+          "pid": 1694338,
+          "ppid": 1694295,
+          "start_ticks": "54761930"
+        },
+        {
+          "command": ".zig-cache/o/bf06a257a8fb65f9809fe65909e345ad/build /home/rs/.local/share/mise/installs/zig/0.16.0/zig /home/rs/.local/share/mise/installs/zig/0.16.0/lib /tmp/zig-http.seam.baz.b1f9uxxl/baz .zig-cache /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --seed 0xae1f5a23 -Zc9d80070d35b0ff9 verify -Doptimize=Debug -j2 --summary all ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/tmp/zig-http.seam.baz.b1f9uxxl/baz/.zig-cache/o/bf06a257a8fb65f9809fe65909e345ad/build",
+          "pgid": 1694338,
+          "pid": 1694382,
+          "ppid": 1694338,
+          "start_ticks": "54762266"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig test -fllvm -flld -ODebug --dep bounded_http -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/web.zig -ODebug -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name test --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1694338,
+          "pid": 1694385,
+          "ppid": 1694382,
+          "start_ticks": "54762268"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig build-exe -fllvm -flld -ODebug --dep baz --dep example_support -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/bindataformpost.zig -ODebug --dep bounded_http -Mbaz=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/web.zig -ODebug --dep baz -Mexample_support=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/support.zig -ODebug -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name bindataformpost --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1694338,
+          "pid": 1694386,
+          "ppid": 1694382,
+          "start_ticks": "54762268"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig build-exe -fllvm -flld -ODebug --dep baz --dep example_support -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/hello2.zig -ODebug --dep bounded_http -Mbaz=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/web.zig -ODebug --dep baz -Mexample_support=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/support.zig -ODebug -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name hello2 --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1694338,
+          "pid": 1694387,
+          "ppid": 1694382,
+          "start_ticks": "54762268"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig test -fllvm -flld -ODebug --dep bounded_http -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/params.zig -ODebug -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name test --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1694338,
+          "pid": 1694778,
+          "ppid": 1694382,
+          "start_ticks": "54762714"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig build-exe -fllvm -flld -ODebug --dep baz -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/app_demo.zig -ODebug --dep bounded_http -Mbaz=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/web.zig -ODebug -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name baz --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1694338,
+          "pid": 1694779,
+          "ppid": 1694382,
+          "start_ticks": "54762714"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig build-exe -fllvm -flld -ODebug --dep baz --dep example_support -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/app_auth.zig -ODebug --dep bounded_http -Mbaz=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/web.zig -ODebug --dep baz -Mexample_support=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/support.zig -ODebug -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name app_auth --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1694338,
+          "pid": 1694780,
+          "ppid": 1694382,
+          "start_ticks": "54762714"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig build-exe -fllvm -flld -ODebug --dep baz --dep example_support -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/hello.zig -ODebug --dep bounded_http -Mbaz=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/web.zig -ODebug --dep baz -Mexample_support=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/support.zig -ODebug -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name hello --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1694338,
+          "pid": 1695036,
+          "ppid": 1694382,
+          "start_ticks": "54762982"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig build-exe -fllvm -flld -ODebug --dep baz --dep example_support -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/app_basic.zig -ODebug --dep bounded_http -Mbaz=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/web.zig -ODebug --dep baz -Mexample_support=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/support.zig -ODebug -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name app_basic --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1694338,
+          "pid": 1695037,
+          "ppid": 1694382,
+          "start_ticks": "54762982"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig build-exe -fllvm -flld -ODebug --dep baz --dep example_support -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/endpoint_auth.zig -ODebug --dep bounded_http -Mbaz=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/web.zig -ODebug --dep baz -Mexample_support=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/support.zig -ODebug -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name endpoint_auth --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1694338,
+          "pid": 1695038,
+          "ppid": 1694382,
+          "start_ticks": "54762982"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig build-exe -fllvm -flld -ODebug --dep baz --dep example_support -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/sendfile.zig -ODebug --dep bounded_http -Mbaz=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/web.zig -ODebug --dep baz -Mexample_support=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/support.zig -ODebug -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name sendfile --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1694338,
+          "pid": 1695148,
+          "ppid": 1694382,
+          "start_ticks": "54763232"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig test -fllvm -flld -ODebug --dep bounded_http -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/App.zig -ODebug -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name test --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1694338,
+          "pid": 1695149,
+          "ppid": 1694382,
+          "start_ticks": "54763232"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig build-exe -fllvm -flld -ODebug --dep baz --dep example_support -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/simple_router.zig -ODebug --dep bounded_http -Mbaz=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/web.zig -ODebug --dep baz -Mexample_support=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/support.zig -ODebug -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name simple_router --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1694338,
+          "pid": 1695150,
+          "ppid": 1694382,
+          "start_ticks": "54763232"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig test -fllvm -flld -ODebug --dep bounded_http -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/form.zig -ODebug -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name test --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1694338,
+          "pid": 1695254,
+          "ppid": 1694382,
+          "start_ticks": "54763542"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig build-exe -fllvm -flld -ODebug --dep baz --dep example_support -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/serve.zig -ODebug --dep bounded_http -Mbaz=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/web.zig -ODebug --dep baz -Mexample_support=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/support.zig -ODebug -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name serve --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1694338,
+          "pid": 1695255,
+          "ppid": 1694382,
+          "start_ticks": "54763542"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig build-exe -fllvm -flld -ODebug --dep baz --dep example_support -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/hello_json.zig -ODebug --dep bounded_http -Mbaz=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/web.zig -ODebug --dep baz -Mexample_support=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/support.zig -ODebug -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name hello_json --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1694338,
+          "pid": 1695296,
+          "ppid": 1694382,
+          "start_ticks": "54763750"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig test -fllvm -flld -ODebug --dep bounded_http -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/response.zig -ODebug -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name test --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1694338,
+          "pid": 1695378,
+          "ppid": 1694382,
+          "start_ticks": "54763980"
+        },
+        {
+          "command": "python3 tools/check_version.py ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/usr/bin/python3.14",
+          "pgid": 1694338,
+          "pid": 1695379,
+          "ppid": 1694382,
+          "start_ticks": "54763980"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig build-exe -fllvm -flld -ODebug --dep baz --dep example_support -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/routes.zig -ODebug --dep bounded_http -Mbaz=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/web.zig -ODebug --dep baz -Mexample_support=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/support.zig -ODebug -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name routes --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1694338,
+          "pid": 1695380,
+          "ppid": 1694382,
+          "start_ticks": "54763980"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig ld.lld --error-limit=0 -mllvm -float-abi=hard --entry _start -z stack-size=16777216 --build-id=none --image-base=16777216 --eh-frame-hdr -znow -m elf_x86_64 -o .zig-cache/o/6ebeb959c6541312c807f6c38d291042/test /usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib/crt1.o /usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib/crti.o -L /usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib --dynamic-linker /lib64/ld-linux-x86-64.so.2 .zig-cache/o/6ebeb959c6541312c807f6c38d291042/test_zcu.o --as-needed -lm -lpthread -lc -ldl -lrt -lutil /tmp/zig-http.seam.baz.b1f9uxxl/global-cache/o/a939f8bacc52f5711be92b3be91a195e/libcompiler_rt.a /usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib/crtn.o ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1694338,
+          "pid": 1695415,
+          "ppid": 1695378,
+          "start_ticks": "54764196"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig build test -Doptimize=Debug -j2 ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/embedding",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1694338,
+          "pid": 1695424,
+          "ppid": 1694382,
+          "start_ticks": "54764201"
+        },
+        {
+          "command": ".zig-cache/o/e2cede2db552cf81e75f024e2c529d34/build /home/rs/.local/share/mise/installs/zig/0.16.0/zig /home/rs/.local/share/mise/installs/zig/0.16.0/lib /tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/embedding .zig-cache /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --seed 0xfd463a16 -Z16be0b8b430673f2 test -Doptimize=Debug -j2 ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/embedding",
+          "exe": "/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/embedding/.zig-cache/o/e2cede2db552cf81e75f024e2c529d34/build",
+          "pgid": 1694338,
+          "pid": 1695439,
+          "ppid": 1695424,
+          "start_ticks": "54764318"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig test -fllvm -flld -ODebug --dep baz --dep bounded_http -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/embedding/src/main.zig -ODebug --dep bounded_http -Mbaz=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/web.zig -ODebug -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/embedding/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name test --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/embedding",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1694338,
+          "pid": 1695441,
+          "ppid": 1695439,
+          "start_ticks": "54764319"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig build-exe -fllvm -flld -ODebug --dep baz --dep example_support -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/middleware.zig -ODebug --dep bounded_http -Mbaz=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/web.zig -ODebug --dep baz -Mexample_support=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/support.zig -ODebug -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name middleware --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1694338,
+          "pid": 1695497,
+          "ppid": 1694382,
+          "start_ticks": "54764538"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig build-exe -fllvm -flld -ODebug --dep baz --dep example_support -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/userpass_session.zig -ODebug --dep bounded_http -Mbaz=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/web.zig -ODebug --dep baz -Mexample_support=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/support.zig -ODebug -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name userpass_session --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1694338,
+          "pid": 1695498,
+          "ppid": 1694382,
+          "start_ticks": "54764538"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig build-exe -fllvm -flld -ODebug --dep baz --dep example_support -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/accept.zig -ODebug --dep bounded_http -Mbaz=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/web.zig -ODebug --dep baz -Mexample_support=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/support.zig -ODebug -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name accept --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1694338,
+          "pid": 1695499,
+          "ppid": 1694382,
+          "start_ticks": "54764538"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig test -fllvm -flld -ODebug --dep bounded_http -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/request.zig -ODebug -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name test --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1694338,
+          "pid": 1695836,
+          "ppid": 1694382,
+          "start_ticks": "54764790"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig test -fllvm -flld -ODebug --dep bounded_http -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/multipart.zig -ODebug -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name test --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1694338,
+          "pid": 1695837,
+          "ppid": 1694382,
+          "start_ticks": "54764790"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig build-exe -fllvm -flld -ODebug --dep baz --dep example_support -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/http_params.zig -ODebug --dep bounded_http -Mbaz=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/web.zig -ODebug --dep baz -Mexample_support=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/support.zig -ODebug -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name http_params --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1694338,
+          "pid": 1695838,
+          "ppid": 1694382,
+          "start_ticks": "54764790"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig test -fllvm -flld -ODebug --dep bounded_http -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/router.zig -ODebug -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name test --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1694338,
+          "pid": 1696430,
+          "ppid": 1694382,
+          "start_ticks": "54765050"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig ld.lld --error-limit=0 -mllvm -float-abi=hard --entry _start -z stack-size=16777216 --build-id=none --image-base=16777216 --eh-frame-hdr -znow -m elf_x86_64 -o .zig-cache/o/474eebe4f56ecee728c21df926e41181/test /usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib/crt1.o /usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib/crti.o -L /usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib --dynamic-linker /lib64/ld-linux-x86-64.so.2 .zig-cache/o/474eebe4f56ecee728c21df926e41181/test_zcu.o --as-needed -lm -lpthread -lc -ldl -lrt -lutil /tmp/zig-http.seam.baz.b1f9uxxl/global-cache/o/a939f8bacc52f5711be92b3be91a195e/libcompiler_rt.a /usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib/crtn.o ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1694338,
+          "pid": 1696907,
+          "ppid": 1696430,
+          "start_ticks": "54765254"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig build-exe -fllvm -flld -ODebug --dep baz --dep example_support -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/cookies.zig -ODebug --dep bounded_http -Mbaz=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/web.zig -ODebug --dep baz -Mexample_support=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/support.zig -ODebug -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name cookies --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1694338,
+          "pid": 1696916,
+          "ppid": 1694382,
+          "start_ticks": "54765257"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig build-exe -fllvm -flld -ODebug --dep baz --dep example_support -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/senderror.zig -ODebug --dep bounded_http -Mbaz=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/web.zig -ODebug --dep baz -Mexample_support=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/support.zig -ODebug -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name senderror --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1694338,
+          "pid": 1696917,
+          "ppid": 1694382,
+          "start_ticks": "54765257"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig ld.lld --error-limit=0 -mllvm -float-abi=hard --entry _start -z stack-size=16777216 --build-id=none --image-base=16777216 --eh-frame-hdr -znow -m elf_x86_64 -o .zig-cache/o/6f98cc9045d61189280631c03f1fbf58/cookies /usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib/crt1.o /usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib/crti.o -L /usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib --dynamic-linker /lib64/ld-linux-x86-64.so.2 .zig-cache/o/6f98cc9045d61189280631c03f1fbf58/cookies_zcu.o --as-needed -lm -lpthread -lc -ldl -lrt -lutil /tmp/zig-http.seam.baz.b1f9uxxl/global-cache/o/a939f8bacc52f5711be92b3be91a195e/libcompiler_rt.a /usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib/crtn.o ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1694338,
+          "pid": 1697315,
+          "ppid": 1696916,
+          "start_ticks": "54765497"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig build-exe -fllvm -flld -ODebug --dep baz --dep example_support -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/middleware_with_endpoint.zig -ODebug --dep bounded_http -Mbaz=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/web.zig -ODebug --dep baz -Mexample_support=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/support.zig -ODebug -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name middleware_with_endpoint --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1694338,
+          "pid": 1697332,
+          "ppid": 1694382,
+          "start_ticks": "54765500"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig build-exe -fllvm -flld -ODebug --dep baz --dep example_support -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/endpoint.zig -ODebug --dep bounded_http -Mbaz=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/web.zig -ODebug --dep baz -Mexample_support=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/support.zig -ODebug -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name endpoint --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1694338,
+          "pid": 1697333,
+          "ppid": 1694382,
+          "start_ticks": "54765500"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig build-exe -fllvm -flld -ODebug --dep baz --dep example_support -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/app_errors.zig -ODebug --dep bounded_http -Mbaz=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/web.zig -ODebug --dep baz -Mexample_support=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/support.zig -ODebug -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name app_errors --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1694338,
+          "pid": 1697460,
+          "ppid": 1694382,
+          "start_ticks": "54765754"
+        }
+      ],
+      "process_group": 1694338,
+      "sequence": 2,
+      "started_utc": "2026-09-06T14:08:06.299006+00:00",
+      "watchdog_seconds": 600
+    },
+    {
+      "cleanup": {
+        "initial_workspace_survivors": [],
+        "remaining_workspace_processes": []
+      },
+      "command": [
+        "zig",
+        "build",
+        "verify",
+        "-Doptimize=ReleaseSafe",
+        "-j2",
+        "--summary",
+        "all"
+      ],
+      "exit_code": 0,
+      "finished_utc": "2026-09-06T14:12:01.188896+00:00",
+      "leader_pid": 1697507,
+      "observed_processes": [
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/bin/zig build verify -Doptimize=ReleaseSafe -j2 --summary all ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1697507,
+          "pid": 1697507,
+          "ppid": 1694295,
+          "start_ticks": "54766002"
+        },
+        {
+          "command": ".zig-cache/o/bf06a257a8fb65f9809fe65909e345ad/build /home/rs/.local/share/mise/installs/zig/0.16.0/zig /home/rs/.local/share/mise/installs/zig/0.16.0/lib /tmp/zig-http.seam.baz.b1f9uxxl/baz .zig-cache /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --seed 0xd0d2191e -Z86c897c7a269f16c verify -Doptimize=ReleaseSafe -j2 --summary all ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/tmp/zig-http.seam.baz.b1f9uxxl/baz/.zig-cache/o/bf06a257a8fb65f9809fe65909e345ad/build",
+          "pgid": 1697507,
+          "pid": 1697517,
+          "ppid": 1697507,
+          "start_ticks": "54766003"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig test -OReleaseSafe --dep bounded_http -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/form.zig -OReleaseSafe -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name test --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1697507,
+          "pid": 1697520,
+          "ppid": 1697517,
+          "start_ticks": "54766005"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig build-exe -OReleaseSafe --dep baz --dep example_support -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/bindataformpost.zig -OReleaseSafe --dep bounded_http -Mbaz=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/web.zig -OReleaseSafe --dep baz -Mexample_support=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/support.zig -OReleaseSafe -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name bindataformpost --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1697507,
+          "pid": 1697521,
+          "ppid": 1697517,
+          "start_ticks": "54766005"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig build test -Doptimize=ReleaseSafe -j2 ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/embedding",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1697507,
+          "pid": 1697522,
+          "ppid": 1697517,
+          "start_ticks": "54766005"
+        },
+        {
+          "command": ".zig-cache/o/e2cede2db552cf81e75f024e2c529d34/build /home/rs/.local/share/mise/installs/zig/0.16.0/zig /home/rs/.local/share/mise/installs/zig/0.16.0/lib /tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/embedding .zig-cache /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --seed 0x9674c530 -Z5e85811dbe35d99c test -Doptimize=ReleaseSafe -j2 ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/embedding",
+          "exe": "/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/embedding/.zig-cache/o/e2cede2db552cf81e75f024e2c529d34/build",
+          "pgid": 1697507,
+          "pid": 1697528,
+          "ppid": 1697522,
+          "start_ticks": "54766005"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig test -OReleaseSafe --dep baz --dep bounded_http -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/embedding/src/main.zig -OReleaseSafe --dep bounded_http -Mbaz=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/web.zig -OReleaseSafe -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/embedding/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name test --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/embedding",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1697507,
+          "pid": 1697546,
+          "ppid": 1697528,
+          "start_ticks": "54766007"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig build-exe -OReleaseSafe --dep baz --dep example_support -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/sendfile.zig -OReleaseSafe --dep bounded_http -Mbaz=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/web.zig -OReleaseSafe --dep baz -Mexample_support=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/support.zig -OReleaseSafe -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name sendfile --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1697507,
+          "pid": 1697642,
+          "ppid": 1697517,
+          "start_ticks": "54767234"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig ld.lld --error-limit=0 -mllvm -float-abi=hard -O3 --entry _start -z stack-size=16777216 --build-id=none --image-base=16777216 --gc-sections --eh-frame-hdr -znow -m elf_x86_64 -o .zig-cache/o/8bda4ef82529a39f915e2e3df2c3aa97/bindataformpost /usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib/crt1.o /usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib/crti.o -L /usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib --dynamic-linker /lib64/ld-linux-x86-64.so.2 .zig-cache/o/8bda4ef82529a39f915e2e3df2c3aa97/bindataformpost_zcu.o --as-needed -lm -lpthread -lc -ldl -lrt -lutil /tmp/zig-http.seam.baz.b1f9uxxl/global-cache/o/7ef3b093af50b99833d890d6be42c886/libcompiler_rt.a /usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib/crtn.o ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1697507,
+          "pid": 1697712,
+          "ppid": 1697521,
+          "start_ticks": "54767451"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig build-exe -OReleaseSafe --dep baz --dep example_support -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/middleware_with_endpoint.zig -OReleaseSafe --dep bounded_http -Mbaz=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/web.zig -OReleaseSafe --dep baz -Mexample_support=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/support.zig -OReleaseSafe -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name middleware_with_endpoint --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1697507,
+          "pid": 1697796,
+          "ppid": 1697517,
+          "start_ticks": "54768359"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig build-exe -OReleaseSafe --dep baz --dep example_support -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/cookies.zig -OReleaseSafe --dep bounded_http -Mbaz=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/web.zig -OReleaseSafe --dep baz -Mexample_support=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/support.zig -OReleaseSafe -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name cookies --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1697507,
+          "pid": 1697797,
+          "ppid": 1697517,
+          "start_ticks": "54768359"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig build-exe -OReleaseSafe --dep baz --dep example_support -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/hello.zig -OReleaseSafe --dep bounded_http -Mbaz=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/web.zig -OReleaseSafe --dep baz -Mexample_support=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/support.zig -OReleaseSafe -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name hello --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1697507,
+          "pid": 1697798,
+          "ppid": 1697517,
+          "start_ticks": "54768359"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig build-exe -OReleaseSafe --dep baz --dep example_support -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/routes.zig -OReleaseSafe --dep bounded_http -Mbaz=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/web.zig -OReleaseSafe --dep baz -Mexample_support=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/support.zig -OReleaseSafe -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name routes --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1697507,
+          "pid": 1697957,
+          "ppid": 1697517,
+          "start_ticks": "54769599"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig test -OReleaseSafe --dep bounded_http -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/router.zig -OReleaseSafe -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name test --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1697507,
+          "pid": 1697958,
+          "ppid": 1697517,
+          "start_ticks": "54769599"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig build-exe -OReleaseSafe --dep baz --dep example_support -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/userpass_session.zig -OReleaseSafe --dep bounded_http -Mbaz=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/web.zig -OReleaseSafe --dep baz -Mexample_support=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/support.zig -OReleaseSafe -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name userpass_session --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1697507,
+          "pid": 1698097,
+          "ppid": 1697517,
+          "start_ticks": "54771010"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig test -OReleaseSafe --dep bounded_http -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/App.zig -OReleaseSafe -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name test --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1697507,
+          "pid": 1698098,
+          "ppid": 1697517,
+          "start_ticks": "54771010"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig test -OReleaseSafe --dep bounded_http -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/params.zig -OReleaseSafe -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name test --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1697507,
+          "pid": 1698099,
+          "ppid": 1697517,
+          "start_ticks": "54771010"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig build-exe -OReleaseSafe --dep baz --dep example_support -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/http_params.zig -OReleaseSafe --dep bounded_http -Mbaz=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/web.zig -OReleaseSafe --dep baz -Mexample_support=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/support.zig -OReleaseSafe -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name http_params --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1697507,
+          "pid": 1698277,
+          "ppid": 1697517,
+          "start_ticks": "54772625"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig build-exe -OReleaseSafe --dep baz --dep example_support -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/endpoint.zig -OReleaseSafe --dep bounded_http -Mbaz=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/web.zig -OReleaseSafe --dep baz -Mexample_support=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/support.zig -OReleaseSafe -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name endpoint --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1697507,
+          "pid": 1698278,
+          "ppid": 1697517,
+          "start_ticks": "54772625"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig build-exe -OReleaseSafe --dep baz --dep example_support -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/serve.zig -OReleaseSafe --dep bounded_http -Mbaz=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/web.zig -OReleaseSafe --dep baz -Mexample_support=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/support.zig -OReleaseSafe -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name serve --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1697507,
+          "pid": 1698535,
+          "ppid": 1697517,
+          "start_ticks": "54774157"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig build-exe -OReleaseSafe --dep baz --dep example_support -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/senderror.zig -OReleaseSafe --dep bounded_http -Mbaz=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/web.zig -OReleaseSafe --dep baz -Mexample_support=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/support.zig -OReleaseSafe -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name senderror --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1697507,
+          "pid": 1698536,
+          "ppid": 1697517,
+          "start_ticks": "54774157"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig test -OReleaseSafe --dep bounded_http -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/response.zig -OReleaseSafe -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name test --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1697507,
+          "pid": 1698643,
+          "ppid": 1697517,
+          "start_ticks": "54775578"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig build-exe -OReleaseSafe --dep baz --dep example_support -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/accept.zig -OReleaseSafe --dep bounded_http -Mbaz=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/web.zig -OReleaseSafe --dep baz -Mexample_support=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/support.zig -OReleaseSafe -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name accept --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1697507,
+          "pid": 1698644,
+          "ppid": 1697517,
+          "start_ticks": "54775578"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig ld.lld --error-limit=0 -mllvm -float-abi=hard -O3 --entry _start -z stack-size=16777216 --build-id=none --image-base=16777216 --gc-sections --eh-frame-hdr -znow -m elf_x86_64 -o .zig-cache/o/386f816980ed31ad06b69ca47fed9ad6/test /usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib/crt1.o /usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib/crti.o -L /usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib --dynamic-linker /lib64/ld-linux-x86-64.so.2 .zig-cache/o/386f816980ed31ad06b69ca47fed9ad6/test_zcu.o --as-needed -lm -lpthread -lc -ldl -lrt -lutil /tmp/zig-http.seam.baz.b1f9uxxl/global-cache/o/7ef3b093af50b99833d890d6be42c886/libcompiler_rt.a /usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib/crtn.o ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1697507,
+          "pid": 1698758,
+          "ppid": 1698643,
+          "start_ticks": "54776870"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig test -OReleaseSafe --dep bounded_http -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/multipart.zig -OReleaseSafe -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name test --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1697507,
+          "pid": 1698767,
+          "ppid": 1697517,
+          "start_ticks": "54776875"
+        },
+        {
+          "command": "python3 tools/check_version.py ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/usr/bin/python3.14",
+          "pgid": 1697507,
+          "pid": 1698869,
+          "ppid": 1697517,
+          "start_ticks": "54777898"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig build-exe -OReleaseSafe --dep baz --dep example_support -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/simple_router.zig -OReleaseSafe --dep bounded_http -Mbaz=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/web.zig -OReleaseSafe --dep baz -Mexample_support=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/support.zig -OReleaseSafe -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name simple_router --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1697507,
+          "pid": 1698870,
+          "ppid": 1697517,
+          "start_ticks": "54777898"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig build-exe -OReleaseSafe --dep baz --dep example_support -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/app_basic.zig -OReleaseSafe --dep bounded_http -Mbaz=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/web.zig -OReleaseSafe --dep baz -Mexample_support=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/support.zig -OReleaseSafe -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name app_basic --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1697507,
+          "pid": 1698884,
+          "ppid": 1697517,
+          "start_ticks": "54777901"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig ld.lld --error-limit=0 -mllvm -float-abi=hard -O3 --entry _start -z stack-size=16777216 --build-id=none --image-base=16777216 --gc-sections --eh-frame-hdr -znow -m elf_x86_64 -o .zig-cache/o/51f55dc6d72737640f3f8ad3b436c4ae/simple_router /usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib/crt1.o /usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib/crti.o -L /usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib --dynamic-linker /lib64/ld-linux-x86-64.so.2 .zig-cache/o/51f55dc6d72737640f3f8ad3b436c4ae/simple_router_zcu.o --as-needed -lm -lpthread -lc -ldl -lrt -lutil /tmp/zig-http.seam.baz.b1f9uxxl/global-cache/o/7ef3b093af50b99833d890d6be42c886/libcompiler_rt.a /usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib/crtn.o ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1697507,
+          "pid": 1698983,
+          "ppid": 1698870,
+          "start_ticks": "54779283"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig build-exe -OReleaseSafe --dep baz --dep example_support -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/hello_json.zig -OReleaseSafe --dep bounded_http -Mbaz=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/web.zig -OReleaseSafe --dep baz -Mexample_support=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/support.zig -OReleaseSafe -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name hello_json --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1697507,
+          "pid": 1699018,
+          "ppid": 1697517,
+          "start_ticks": "54779287"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig test -OReleaseSafe --dep bounded_http -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/request.zig -OReleaseSafe -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name test --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1697507,
+          "pid": 1699019,
+          "ppid": 1697517,
+          "start_ticks": "54779287"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig build-exe -OReleaseSafe --dep baz --dep example_support -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/middleware.zig -OReleaseSafe --dep bounded_http -Mbaz=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/web.zig -OReleaseSafe --dep baz -Mexample_support=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/support.zig -OReleaseSafe -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name middleware --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1697507,
+          "pid": 1699229,
+          "ppid": 1697517,
+          "start_ticks": "54780741"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig build-exe -OReleaseSafe --dep baz --dep example_support -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/hello2.zig -OReleaseSafe --dep bounded_http -Mbaz=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/web.zig -OReleaseSafe --dep baz -Mexample_support=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/support.zig -OReleaseSafe -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name hello2 --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1697507,
+          "pid": 1699230,
+          "ppid": 1697517,
+          "start_ticks": "54780741"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig build-exe -OReleaseSafe --dep baz --dep example_support -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/app_errors.zig -OReleaseSafe --dep bounded_http -Mbaz=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/web.zig -OReleaseSafe --dep baz -Mexample_support=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/support.zig -OReleaseSafe -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name app_errors --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1697507,
+          "pid": 1699231,
+          "ppid": 1697517,
+          "start_ticks": "54780741"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig ld.lld --error-limit=0 -mllvm -float-abi=hard -O3 --entry _start -z stack-size=16777216 --build-id=none --image-base=16777216 --gc-sections --eh-frame-hdr -znow -m elf_x86_64 -o .zig-cache/o/3d4f22e100b7bba78dcad96d1af95a07/middleware /usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib/crt1.o /usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib/crti.o -L /usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib --dynamic-linker /lib64/ld-linux-x86-64.so.2 .zig-cache/o/3d4f22e100b7bba78dcad96d1af95a07/middleware_zcu.o --as-needed -lm -lpthread -lc -ldl -lrt -lutil /tmp/zig-http.seam.baz.b1f9uxxl/global-cache/o/7ef3b093af50b99833d890d6be42c886/libcompiler_rt.a /usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib/crtn.o ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1697507,
+          "pid": 1699363,
+          "ppid": 1699229,
+          "start_ticks": "54782476"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig build-exe -OReleaseSafe --dep baz -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/app_demo.zig -OReleaseSafe --dep bounded_http -Mbaz=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/web.zig -OReleaseSafe -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name baz --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1697507,
+          "pid": 1699372,
+          "ppid": 1697517,
+          "start_ticks": "54782481"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig ld.lld --error-limit=0 -mllvm -float-abi=hard -O3 --entry _start -z stack-size=16777216 --build-id=none --image-base=16777216 --gc-sections --eh-frame-hdr -znow -m elf_x86_64 -o .zig-cache/o/96133557a1dce9e52d9d191ff521ec80/baz /usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib/crt1.o /usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib/crti.o -L /usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib --dynamic-linker /lib64/ld-linux-x86-64.so.2 .zig-cache/o/96133557a1dce9e52d9d191ff521ec80/baz_zcu.o --as-needed -lm -lpthread -lc -ldl -lrt -lutil /tmp/zig-http.seam.baz.b1f9uxxl/global-cache/o/7ef3b093af50b99833d890d6be42c886/libcompiler_rt.a /usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib/crtn.o ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1697507,
+          "pid": 1699495,
+          "ppid": 1699372,
+          "start_ticks": "54783765"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig build-exe -OReleaseSafe --dep baz --dep example_support -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/endpoint_auth.zig -OReleaseSafe --dep bounded_http -Mbaz=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/web.zig -OReleaseSafe --dep baz -Mexample_support=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/support.zig -OReleaseSafe -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name endpoint_auth --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1697507,
+          "pid": 1699504,
+          "ppid": 1697517,
+          "start_ticks": "54783770"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig build-exe -OReleaseSafe --dep baz --dep example_support -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/app_auth.zig -OReleaseSafe --dep bounded_http -Mbaz=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/web.zig -OReleaseSafe --dep baz -Mexample_support=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/support.zig -OReleaseSafe -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name app_auth --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1697507,
+          "pid": 1699505,
+          "ppid": 1697517,
+          "start_ticks": "54783770"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig test -OReleaseSafe --dep bounded_http -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/web.zig -OReleaseSafe -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name test --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1697507,
+          "pid": 1699506,
+          "ppid": 1697517,
+          "start_ticks": "54783770"
+        }
+      ],
+      "process_group": 1697507,
+      "sequence": 3,
+      "started_utc": "2026-09-06T14:08:47.022190+00:00",
+      "watchdog_seconds": 600
+    },
+    {
+      "cleanup": {
+        "initial_workspace_survivors": [],
+        "remaining_workspace_processes": []
+      },
+      "command": [
+        "zig",
+        "build",
+        "install",
+        "examples",
+        "-Doptimize=ReleaseSafe",
+        "-j2",
+        "--summary",
+        "all"
+      ],
+      "exit_code": 0,
+      "finished_utc": "2026-09-06T14:12:01.414645+00:00",
+      "leader_pid": 1699701,
+      "observed_processes": [
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/bin/zig build install examples -Doptimize=ReleaseSafe -j2 --summary all ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1699701,
+          "pid": 1699701,
+          "ppid": 1694295,
+          "start_ticks": "54785419"
+        },
+        {
+          "command": ".zig-cache/o/bf06a257a8fb65f9809fe65909e345ad/build /home/rs/.local/share/mise/installs/zig/0.16.0/zig /home/rs/.local/share/mise/installs/zig/0.16.0/lib /tmp/zig-http.seam.baz.b1f9uxxl/baz .zig-cache /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --seed 0x82d1fe3e -Z3ac7006524544f6e install examples -Doptimize=ReleaseSafe -j2 --summary all ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/tmp/zig-http.seam.baz.b1f9uxxl/baz/.zig-cache/o/bf06a257a8fb65f9809fe65909e345ad/build",
+          "pgid": 1699701,
+          "pid": 1699711,
+          "ppid": 1699701,
+          "start_ticks": "54785420"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig build-exe -OReleaseSafe --dep baz --dep example_support -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/bindataformpost.zig -OReleaseSafe --dep bounded_http -Mbaz=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/web.zig -OReleaseSafe --dep baz -Mexample_support=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/support.zig -OReleaseSafe -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name bindataformpost --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1699701,
+          "pid": 1699754,
+          "ppid": 1699711,
+          "start_ticks": "54785429"
+        },
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig build-exe -OReleaseSafe --dep baz --dep example_support -Mroot=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/app_auth.zig -OReleaseSafe --dep bounded_http -Mbaz=/tmp/zig-http.seam.baz.b1f9uxxl/baz/src/web.zig -OReleaseSafe --dep baz -Mexample_support=/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/support.zig -OReleaseSafe -Mbounded_http=/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-pkg/zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv/src/server.zig -lc --cache-dir .zig-cache --global-cache-dir /tmp/zig-http.seam.baz.b1f9uxxl/global-cache --name app_auth --zig-lib-dir /home/rs/.local/share/mise/installs/zig/0.16.0/lib/ --listen=- ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1699701,
+          "pid": 1699755,
+          "ppid": 1699711,
+          "start_ticks": "54785429"
+        }
+      ],
+      "process_group": 1699701,
+      "sequence": 4,
+      "started_utc": "2026-09-06T14:12:01.189259+00:00",
+      "watchdog_seconds": 600
+    },
+    {
+      "cleanup": {
+        "initial_workspace_survivors": [],
+        "remaining_workspace_processes": []
+      },
+      "command": [
+        "python3",
+        "-B",
+        "tests/app_integration.py"
+      ],
+      "exit_code": 0,
+      "finished_utc": "2026-09-06T14:12:02.166634+00:00",
+      "leader_pid": 1699798,
+      "observed_processes": [
+        {
+          "command": "python3 -B tests/app_integration.py ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/usr/bin/python3.14",
+          "pgid": 1699798,
+          "pid": 1699798,
+          "ppid": 1694295,
+          "start_ticks": "54785441"
+        },
+        {
+          "command": "/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-out/bin/baz --port 0 --connections 16 --execution workers --workers 2 --shards 1 --max-body 8192 --max-header 2048 --timeout-ms 3000 --send-chunk 7 --output-bytes 16384 --response-body 8192 --stall-ms 150 ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-out/bin/baz",
+          "pgid": 1699803,
+          "pid": 1699803,
+          "ppid": 1699798,
+          "start_ticks": "54785449"
+        },
+        {
+          "command": "/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-out/bin/baz --port 0 --connections 16 --execution inline --workers 0 --shards 1 --max-body 8192 --max-header 2048 --timeout-ms 80 --send-chunk 7 --output-bytes 16384 --response-body 8192 ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-out/bin/baz",
+          "pgid": 1699807,
+          "pid": 1699807,
+          "ppid": 1699798,
+          "start_ticks": "54785466"
+        },
+        {
+          "command": "/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-out/bin/baz --port 0 --connections 2 --execution inline --workers 0 --shards 1 --max-body 8192 --max-header 2048 --timeout-ms 1000 --send-chunk 7 --output-bytes 16384 --response-body 8192 ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-out/bin/baz",
+          "pgid": 1699809,
+          "pid": 1699809,
+          "ppid": 1699798,
+          "start_ticks": "54785476"
+        },
+        {
+          "command": "/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-out/bin/baz --port 0 --connections 16 --execution workers --workers 1 --shards 1 --max-body 8192 --max-header 2048 --timeout-ms 50 --send-chunk 7 --output-bytes 16384 --response-body 8192 --stall-ms 200 ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/tmp/zig-http.seam.baz.b1f9uxxl/baz/zig-out/bin/baz",
+          "pgid": 1699811,
+          "pid": 1699811,
+          "ppid": 1699798,
+          "start_ticks": "54785487"
+        }
+      ],
+      "process_group": 1699798,
+      "sequence": 5,
+      "started_utc": "2026-09-06T14:12:01.415172+00:00",
+      "watchdog_seconds": 120
+    },
+    {
+      "cleanup": {
+        "initial_workspace_survivors": [],
+        "remaining_workspace_processes": []
+      },
+      "command": [
+        "python3",
+        "-B",
+        "tests/examples_integration.py"
+      ],
+      "exit_code": 0,
+      "finished_utc": "2026-09-06T14:12:02.389010+00:00",
+      "leader_pid": 1699815,
+      "observed_processes": [
+        {
+          "command": "python3 -B tests/examples_integration.py ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz",
+          "exe": "/usr/bin/python3.14",
+          "pgid": 1699815,
+          "pid": 1699815,
+          "ppid": 1694295,
+          "start_ticks": "54785517"
+        }
+      ],
+      "process_group": 1699815,
+      "sequence": 6,
+      "started_utc": "2026-09-06T14:12:02.167120+00:00",
+      "watchdog_seconds": 120
+    }
+  ],
+  "complete": true,
+  "fetched_engine_source_files": 8,
+  "final_workspace_processes": [],
+  "finished_utc": "2026-09-06T14:12:02.389977+00:00",
+  "source_after": {
+    "entries": 50,
+    "manifest_sha256": "efc717de434032960de5a95266866f62808674ee51e4e0756ac25eaa4f76d53e"
+  },
+  "source_before": {
+    "entries": 50,
+    "manifest_sha256": "efc717de434032960de5a95266866f62808674ee51e4e0756ac25eaa4f76d53e"
+  },
+  "started_utc": "2026-09-06T14:08:04.994979+00:00"
+}

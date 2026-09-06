@@ -2,7 +2,7 @@
 //! growable formatting strings become bounded output generation. Mutable state
 //! uses finite atomic retries so explicit multi-shard execution is safe too.
 const std = @import("std");
-const web = @import("http_app");
+const web = @import("baz");
 const support = @import("example_support");
 
 const Shared = struct {};

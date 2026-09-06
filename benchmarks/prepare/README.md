@@ -1,4 +1,11 @@
-# Reproduce the Linux comparison preparation
+# Historical engine comparison preparation
+
+This directory preserves the engine comparison tooling before Baz extraction.
+It requires the engine executable and comparator from
+[bounded/http](https://github.com/technologylab-ai/bounded-http/blob/4b3cd5551d80b422ec6ef763627d019e6f1dfb83/benchmarks/prepare/README.md).
+Run those commands in that engine revision, not in the Baz package.
+Baz's separate [Zap comparison](../../reports/2026-09-06-basic-zap.md) has its own fixture.
+
 
 `prepare.py` downloads pinned primary sources and package artifacts, verifies their
 hashes, builds the three contenders and wrk, and generates the input for

@@ -1,0 +1,39 @@
+SUITE app_integration
+PASS raw query bytes, explicit decode and borrowed target forms
+PASS typed endpoint, raw captures, case/trailing-slash routing, HEAD and Allow
+PASS crossing routes in both registration orders, explicit HEAD and extension method
+PASS URL-encoded forms remain separate; explicit copy spans HTTP chunks
+PASS flat repeated fields/files, binary and empty uploads, chunk splits and validation before side effects
+PASS copied and explicitly borrowed binary response bodies
+PASS copied header metadata, repeated Set-Cookie and redirect framing
+PASS unpublished response failures recover; inline service I/O is explicit
+PASS fragmented input and ordered recovery around a failed draft
+PASS 128 side-effecting requests execute once across bounded arena drains
+PASS caller std.Io works in explicitly selected fixed workers
+PASS incomplete-request deadline and subsequent recovery
+PASS connection overload refusal and admitted-slot recovery
+PASS deadline during worker service retains storage through callback return and shutdown
+{"passed": 14, "cases": ["raw query bytes, explicit decode and borrowed target forms", "typed endpoint, raw captures, case/trailing-slash routing, HEAD and Allow", "crossing routes in both registration orders, explicit HEAD and extension method", "URL-encoded forms remain separate; explicit copy spans HTTP chunks", "flat repeated fields/files, binary and empty uploads, chunk splits and validation before side effects", "copied and explicitly borrowed binary response bodies", "copied header metadata, repeated Set-Cookie and redirect framing", "unpublished response failures recover; inline service I/O is explicit", "fragmented input and ordered recovery around a failed draft", "128 side-effecting requests execute once across bounded arena drains", "caller std.Io works in explicitly selected fixed workers", "incomplete-request deadline and subsequent recovery", "connection overload refusal and admitted-slot recovery", "deadline during worker service retains storage through callback return and shutdown"]}
+SUITE examples_integration
+PASS hello
+PASS hello2
+PASS hello_json
+PASS simple_router
+PASS routes
+PASS serve
+PASS sendfile
+PASS senderror
+PASS accept
+PASS app_basic
+PASS app_auth
+PASS endpoint_auth
+PASS app_errors
+PASS cookies
+PASS middleware
+PASS middleware_with_endpoint
+PASS http_params
+PASS bindataformpost
+PASS endpoint
+PASS userpass_session
+{"passed": 20, "cases": ["hello", "hello2", "hello_json", "simple_router", "routes", "serve", "sendfile", "senderror", "accept", "app_basic", "app_auth", "endpoint_auth", "app_errors", "cookies", "middleware", "middleware_with_endpoint", "http_params", "bindataformpost", "endpoint", "userpass_session"]}
+CHILD GROUPS 26 all absent True

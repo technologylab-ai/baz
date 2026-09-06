@@ -1,8 +1,10 @@
-# Bounded Zig HTTP MVP
+# Baz — Bounded Async Zap
 
-Use exact Zig 0.16.0 from `.zig-version`. This standalone M4 implementation is
-informed by `../zigllmwiki`; runnable server code belongs here under `src/` and
-tests, not copied into wiki pages. Preserve the wiki's source/evidence hierarchy.
+Use exact Zig 0.16.0 from `.zig-version`. Baz consumes the separate bounded/http
+engine through its exported `bounded_http` module. Keep engine parser, transport and scheduler changes in that dependency
+and submit an upstream PR. This repository owns App, routing, request/form views,
+responses, examples and their tests. The sibling `../zigllmwiki` provides pinned
+source guidance. Preserve its source/evidence hierarchy.
 
 Preallocate framework threads, buffers, queues and operation state at startup.
 Never allocate, spawn threads or perform blocking work on the request I/O loop.

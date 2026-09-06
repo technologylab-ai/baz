@@ -1,7 +1,8 @@
 # Closing the plaintext gap: sharded owners and a contiguous output arena
 
 Status: historical design proposal, 2026-09-05.
-The implemented contract is [OWNERSHIP.md](OWNERSHIP.md), and current adoption
+This document describes the predecessor engine, before Baz package extraction.
+The implemented engine contract is [upstream OWNERSHIP.md](https://github.com/technologylab-ai/bounded-http/blob/4b3cd5551d80b422ec6ef763627d019e6f1dfb83/docs/OWNERSHIP.md), and historical adoption
 evidence is [the integration report](../reports/2026-09-05-arena-adoption.md).
 The proposal below preserves its original hypotheses and models; it is not the
 current resource/API specification. In particular, current shards each reserve
@@ -12,7 +13,7 @@ Original proposal: Nothing below is measured unless it cites
 a report. Model numbers are labeled as such. This document proposes changes to
 the maintained MVP so the pinned Linux comparison against libreactor/mrhttp
 moves from a 2–6× deficit to parity or better, while keeping every startup
-bound, assertion and ownership rule in [OWNERSHIP.md](OWNERSHIP.md).
+bound, assertion and ownership rule in the [engine ownership contract](https://github.com/technologylab-ai/bounded-http/blob/4b3cd5551d80b422ec6ef763627d019e6f1dfb83/docs/OWNERSHIP.md).
 
 ## 1. What the measurements say
 

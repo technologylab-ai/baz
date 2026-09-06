@@ -1,7 +1,7 @@
 //! Static and dynamic route functions with a fallback menu. The fixed route
 //! table replaces the example's global map; the bounded counter is shared safely.
 const std = @import("std");
-const web = @import("http_app");
+const web = @import("baz");
 const support = @import("example_support");
 
 const Shared = struct { counter: std.atomic.Value(u32) = .init(0) };

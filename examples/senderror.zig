@@ -1,7 +1,7 @@
 //! Application error propagation and a custom bounded mapper. Internal errors
 //! are not HTTP-version errors; the response is a generic 500 with no trace.
 const std = @import("std");
-const web = @import("http_app");
+const web = @import("baz");
 const support = @import("example_support");
 
 const Shared = struct {};

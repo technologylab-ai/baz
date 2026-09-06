@@ -1,10 +1,13 @@
 # Application API, first implementation
 
-This is a modern successor to [Zap](https://github.com/zigzap/zap), built on
-[zig-http](https://github.com/technologylab-ai/zig-http). The working public
-module is `http_app`; the product name is still open. The framework will become
-its own repository with a pinned engine dependency. It currently shares engine
-sources in this worktree; see the [extraction plan](APP-API-ROADMAP.md#api-08--migration-examples-and-successor-mvp-qualification).
+Baz means **Bounded Async Zap**. It is a modern successor to
+[Zap](https://github.com/zigzap/zap), built on the separate
+[bounded/http engine](https://github.com/technologylab-ai/bounded-http).
+The package and public import are `baz`. The engine import is `bounded_http`.
+The engine's [GitHub Pages documentation](https://technologylab-ai.github.io/bounded-http/)
+covers architecture, embedding, and ownership.
+Baz consumes a pinned external engine package; it does not contain engine sources.
+See the [dependency boundary](DEPENDENCY.md) and [extraction plan](APP-API-ROADMAP.md#api-08--migration-examples-and-successor-mvp-qualification).
 This experimental API uses exact Zig **0.16.0**, the existing Linux io_uring /
 macOS kqueue HTTP engine, caller-supplied `std.Io`, and bounded standard memory
 readers/writers. An owned `std.Io` provider is deferred until after the API MVP.
@@ -13,7 +16,7 @@ Run the maintained, compiled [example](../src/app_demo.zig):
 
 ```sh
 zig build -Doptimize=ReleaseSafe
-./zig-out/bin/http-app --port 8080
+./zig-out/bin/baz --port 8080
 curl 'http://127.0.0.1:8080/hello?name=Hello%20Zig'
 curl 'http://127.0.0.1:8080/users/a%2Fb'
 curl --data 'value=x+y%2Bz' http://127.0.0.1:8080/form
@@ -32,7 +35,7 @@ The core shape below is exercised by the maintained example:
 
 ```zig
 const std = @import("std");
-const web = @import("http_app");
+const web = @import("baz");
 
 const Shared = struct { greeting: []const u8 };
 const Application = web.App(Shared);
@@ -235,13 +238,14 @@ and ports use the local Zig 0.16 revision recorded in the design and receipts.
 Use the [roadmap](APP-API-ROADMAP.md) for the next session and named verification
 gates. The [20 supported Zap example ports](../examples/README.md) are implemented.
 This remains an experimental checkpoint before complete successor-MVP
-qualification, public middleware/resumable APIs, naming and repository extraction.
+qualification, public middleware/resumable APIs and publication in its own repository.
 
 ## Basic performance comparison
 
-Native 2026-09-06 results against the pinned Zig 0.16 port of Zap, in requests/s:
+Results from the initial App prototype at `c152e59`, before package extraction,
+on 2026-09-06 against the pinned Zig 0.16 port of Zap, in requests/s:
 
-| Host | Connections / client threads | HTTP App median | Zap median | App / Zap |
+| Host | Connections / client threads | Baz prototype median | Zap median | App / Zap |
 | --- | --- | ---: | ---: | ---: |
 | macOS, Apple M3 Max | 32 / 2 | 254,261 | 245,054 | 1.038× |
 | Linux, Intel Core Ultra 7 258V | 32 / 2 | 363,594 | 205,310 | 1.771× |

@@ -1,7 +1,7 @@
 //! A typed App wraps an endpoint with bearer authentication.
 //! The fixed token is public example data, not a production credential.
 const std = @import("std");
-const web = @import("http_app");
+const web = @import("baz");
 const support = @import("example_support");
 const auth = @import("endpoint/auth_helpers.zig");
 

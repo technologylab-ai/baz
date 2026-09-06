@@ -1,0 +1,184 @@
+SOURCE {"entries": 50, "manifest_sha256": "efc717de434032960de5a95266866f62808674ee51e4e0756ac25eaa4f76d53e"}
+COMMAND {"sequence": 1, "command": ["zig", "fetch", "--global-cache-dir", "/tmp/zig-http.seam.baz.b1f9uxxl/global-cache", "https://github.com/technologylab-ai/bounded-http/archive/e52f09f723388685263d14a9bfa265f2456a3744.tar.gz"], "watchdog_seconds": 180, "started_utc": "2026-09-06T14:08:05.017343+00:00"}
+zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv
+COMMAND_FINISHED {"sequence": 1, "command": ["zig", "fetch", "--global-cache-dir", "/tmp/zig-http.seam.baz.b1f9uxxl/global-cache", "https://github.com/technologylab-ai/bounded-http/archive/e52f09f723388685263d14a9bfa265f2456a3744.tar.gz"], "watchdog_seconds": 180, "started_utc": "2026-09-06T14:08:05.017343+00:00", "leader_pid": 1694307, "process_group": 1694307, "exit_code": 0, "cleanup": {"initial_workspace_survivors": [], "remaining_workspace_processes": []}, "finished_utc": "2026-09-06T14:08:06.297571+00:00"}
+FRESH_DEPENDENCY_FETCH {"url": "https://github.com/technologylab-ai/bounded-http/archive/e52f09f723388685263d14a9bfa265f2456a3744.tar.gz", "expected_hash": "zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv", "source_files": 8}
+COMMAND {"sequence": 2, "command": ["zig", "build", "verify", "-Doptimize=Debug", "-j2", "--summary", "all"], "watchdog_seconds": 600, "started_utc": "2026-09-06T14:08:06.299006+00:00"}
+Build Summary: 41/41 steps succeeded; 60/60 tests passed
+verify success
++- compile exe baz Debug native success 2s MaxRSS:370M
++- compile exe hello Debug native success 2s MaxRSS:367M
++- compile exe hello2 Debug native success 4s MaxRSS:365M
++- compile exe hello_json Debug native success 2s MaxRSS:363M
++- compile exe simple_router Debug native success 2s MaxRSS:362M
++- compile exe routes Debug native success 2s MaxRSS:370M
++- compile exe serve Debug native success 2s MaxRSS:364M
++- compile exe sendfile Debug native success 2s MaxRSS:364M
++- compile exe senderror Debug native success 2s MaxRSS:364M
++- compile exe accept Debug native success 2s MaxRSS:368M
++- compile exe app_basic Debug native success 2s MaxRSS:367M
++- compile exe app_auth Debug native success 2s MaxRSS:361M
++- compile exe app_errors Debug native success 2s MaxRSS:361M
++- compile exe endpoint Debug native success 2s MaxRSS:400M
++- compile exe endpoint_auth Debug native success 2s MaxRSS:366M
++- compile exe middleware Debug native success 2s MaxRSS:363M
++- compile exe middleware_with_endpoint Debug native success 2s MaxRSS:376M
++- compile exe userpass_session Debug native success 2s MaxRSS:367M
++- compile exe cookies Debug native success 2s MaxRSS:367M
++- compile exe http_params Debug native success 2s MaxRSS:376M
++- compile exe bindataformpost Debug native success 4s MaxRSS:370M
++- zig fmt --check success
++- run python3 success 22ms
++- run /home/rs/.local/share/mise/installs/zig/0.16.0/zig success 3s
++- run test 3 pass (3 total) 7ms MaxRSS:5M
+|  +- compile test Debug native success 2s MaxRSS:337M
++- run test 5 pass (5 total) 7ms MaxRSS:6M
+|  +- compile test Debug native success 2s MaxRSS:343M
++- run test 12 pass (12 total) 7ms MaxRSS:6M
+|  +- compile test Debug native success 2s MaxRSS:361M
++- run test 8 pass (8 total) 6ms MaxRSS:6M
+|  +- compile test Debug native success 2s MaxRSS:347M
++- run test 6 pass (6 total) 6ms MaxRSS:6M
+|  +- compile test Debug native success 2s MaxRSS:352M
++- run test 2 pass (2 total) 5ms MaxRSS:6M
+|  +- compile test Debug native success 2s MaxRSS:337M
++- run test 24 pass (24 total) 18ms MaxRSS:7M
+|  +- compile test Debug native success 3s MaxRSS:446M
++- run test success 6ms MaxRSS:6M
+   +- compile test Debug native success 4s MaxRSS:347M
+
+COMMAND_FINISHED {"sequence": 2, "command": ["zig", "build", "verify", "-Doptimize=Debug", "-j2", "--summary", "all"], "watchdog_seconds": 600, "started_utc": "2026-09-06T14:08:06.299006+00:00", "leader_pid": 1694338, "process_group": 1694338, "exit_code": 0, "cleanup": {"initial_workspace_survivors": [], "remaining_workspace_processes": []}, "finished_utc": "2026-09-06T14:08:47.021814+00:00"}
+COMMAND {"sequence": 3, "command": ["zig", "build", "verify", "-Doptimize=ReleaseSafe", "-j2", "--summary", "all"], "watchdog_seconds": 600, "started_utc": "2026-09-06T14:08:47.022190+00:00"}
+Build Summary: 41/41 steps succeeded; 60/60 tests passed
+verify success
++- compile exe baz ReleaseSafe native success 12s MaxRSS:503M
++- compile exe hello ReleaseSafe native success 12s MaxRSS:493M
++- compile exe hello2 ReleaseSafe native success 17s MaxRSS:475M
++- compile exe hello_json ReleaseSafe native success 14s MaxRSS:497M
++- compile exe simple_router ReleaseSafe native success 13s MaxRSS:464M
++- compile exe routes ReleaseSafe native success 14s MaxRSS:475M
++- compile exe serve ReleaseSafe native success 14s MaxRSS:457M
++- compile exe sendfile ReleaseSafe native success 11s MaxRSS:473M
++- compile exe senderror ReleaseSafe native success 14s MaxRSS:489M
++- compile exe accept ReleaseSafe native success 14s MaxRSS:460M
++- compile exe app_basic ReleaseSafe native success 13s MaxRSS:462M
++- compile exe app_auth ReleaseSafe native success 16s MaxRSS:475M
++- compile exe app_errors ReleaseSafe native success 17s MaxRSS:466M
++- compile exe endpoint ReleaseSafe native success 15s MaxRSS:489M
++- compile exe endpoint_auth ReleaseSafe native success 16s MaxRSS:488M
++- compile exe middleware ReleaseSafe native success 17s MaxRSS:487M
++- compile exe middleware_with_endpoint ReleaseSafe native success 12s MaxRSS:476M
++- compile exe userpass_session ReleaseSafe native success 16s MaxRSS:473M
++- compile exe cookies ReleaseSafe native success 12s MaxRSS:468M
++- compile exe http_params ReleaseSafe native success 15s MaxRSS:484M
++- compile exe bindataformpost ReleaseSafe native success 14s MaxRSS:500M
++- zig fmt --check success
++- run python3 success 34ms
++- run /home/rs/.local/share/mise/installs/zig/0.16.0/zig success 12s
++- run test 3 pass (3 total) 2ms MaxRSS:5M
+|  +- compile test ReleaseSafe native success 13s MaxRSS:414M
++- run test 5 pass (5 total) 2ms MaxRSS:4M
+|  +- compile test ReleaseSafe native success 12s MaxRSS:420M
++- run test 12 pass (12 total) 2ms MaxRSS:6M
+|  +- compile test ReleaseSafe native success 13s MaxRSS:459M
++- run test 8 pass (8 total) 2ms MaxRSS:6M
+|  +- compile test ReleaseSafe native success 10s MaxRSS:434M
++- run test 6 pass (6 total) 2ms MaxRSS:6M
+|  +- compile test ReleaseSafe native success 12s MaxRSS:445M
++- run test 2 pass (2 total) 3ms MaxRSS:5M
+|  +- compile test ReleaseSafe native success 11s MaxRSS:426M
++- run test 24 pass (24 total) 14ms MaxRSS:6M
+|  +- compile test ReleaseSafe native success 19s MaxRSS:550M
++- run test success 2ms MaxRSS:6M
+   +- compile test ReleaseSafe native success 13s MaxRSS:425M
+
+COMMAND_FINISHED {"sequence": 3, "command": ["zig", "build", "verify", "-Doptimize=ReleaseSafe", "-j2", "--summary", "all"], "watchdog_seconds": 600, "started_utc": "2026-09-06T14:08:47.022190+00:00", "leader_pid": 1697507, "process_group": 1697507, "exit_code": 0, "cleanup": {"initial_workspace_survivors": [], "remaining_workspace_processes": []}, "finished_utc": "2026-09-06T14:12:01.188896+00:00"}
+COMMAND {"sequence": 4, "command": ["zig", "build", "install", "examples", "-Doptimize=ReleaseSafe", "-j2", "--summary", "all"], "watchdog_seconds": 600, "started_utc": "2026-09-06T14:12:01.189259+00:00"}
+Build Summary: 44/44 steps succeeded
+install success
++- install baz success
+   +- compile exe baz ReleaseSafe native cached 11ms MaxRSS:38M
+examples success
++- install hello success
+|  +- compile exe hello ReleaseSafe native cached 13ms MaxRSS:41M
++- install hello2 success
+|  +- compile exe hello2 ReleaseSafe native cached 13ms MaxRSS:41M
++- install hello_json success
+|  +- compile exe hello_json ReleaseSafe native cached 12ms MaxRSS:41M
++- install simple_router success
+|  +- compile exe simple_router ReleaseSafe native cached 11ms MaxRSS:41M
++- install routes success
+|  +- compile exe routes ReleaseSafe native cached 13ms MaxRSS:38M
++- install serve success
+|  +- compile exe serve ReleaseSafe native cached 11ms MaxRSS:41M
++- install sendfile success
+|  +- compile exe sendfile ReleaseSafe native cached 12ms MaxRSS:41M
++- install senderror success
+|  +- compile exe senderror ReleaseSafe native cached 13ms MaxRSS:41M
++- install accept success
+|  +- compile exe accept ReleaseSafe native cached 10ms MaxRSS:41M
++- install app_basic success
+|  +- compile exe app_basic ReleaseSafe native cached 11ms MaxRSS:41M
++- install app_auth success
+|  +- compile exe app_auth ReleaseSafe native cached 13ms MaxRSS:41M
++- install app_errors success
+|  +- compile exe app_errors ReleaseSafe native cached 11ms MaxRSS:41M
++- install endpoint success
+|  +- compile exe endpoint ReleaseSafe native cached 13ms MaxRSS:36M
++- install endpoint_auth success
+|  +- compile exe endpoint_auth ReleaseSafe native cached 10ms MaxRSS:41M
++- install middleware success
+|  +- compile exe middleware ReleaseSafe native cached 12ms MaxRSS:41M
++- install middleware_with_endpoint success
+|  +- compile exe middleware_with_endpoint ReleaseSafe native cached 12ms MaxRSS:41M
++- install userpass_session success
+|  +- compile exe userpass_session ReleaseSafe native cached 14ms MaxRSS:41M
++- install cookies success
+|  +- compile exe cookies ReleaseSafe native cached 14ms MaxRSS:41M
++- install http_params success
+|  +- compile exe http_params ReleaseSafe native cached 12ms MaxRSS:36M
++- install bindataformpost success
+   +- compile exe bindataformpost ReleaseSafe native cached 11ms MaxRSS:41M
+
+COMMAND_FINISHED {"sequence": 4, "command": ["zig", "build", "install", "examples", "-Doptimize=ReleaseSafe", "-j2", "--summary", "all"], "watchdog_seconds": 600, "started_utc": "2026-09-06T14:12:01.189259+00:00", "leader_pid": 1699701, "process_group": 1699701, "exit_code": 0, "cleanup": {"initial_workspace_survivors": [], "remaining_workspace_processes": []}, "finished_utc": "2026-09-06T14:12:01.414645+00:00"}
+COMMAND {"sequence": 5, "command": ["python3", "-B", "tests/app_integration.py"], "watchdog_seconds": 120, "started_utc": "2026-09-06T14:12:01.415172+00:00"}
+PASS raw query bytes, explicit decode and borrowed target forms
+PASS typed endpoint, raw captures, case/trailing-slash routing, HEAD and Allow
+PASS crossing routes in both registration orders, explicit HEAD and extension method
+PASS URL-encoded forms remain separate; explicit copy spans HTTP chunks
+PASS flat repeated fields/files, binary and empty uploads, chunk splits and validation before side effects
+PASS copied and explicitly borrowed binary response bodies
+PASS copied header metadata, repeated Set-Cookie and redirect framing
+PASS unpublished response failures recover; inline service I/O is explicit
+PASS fragmented input and ordered recovery around a failed draft
+PASS 128 side-effecting requests execute once across bounded arena drains
+PASS caller std.Io works in explicitly selected fixed workers
+PASS incomplete-request deadline and subsequent recovery
+PASS connection overload refusal and admitted-slot recovery
+PASS deadline during worker service retains storage through callback return and shutdown
+{"passed": 14, "cases": ["raw query bytes, explicit decode and borrowed target forms", "typed endpoint, raw captures, case/trailing-slash routing, HEAD and Allow", "crossing routes in both registration orders, explicit HEAD and extension method", "URL-encoded forms remain separate; explicit copy spans HTTP chunks", "flat repeated fields/files, binary and empty uploads, chunk splits and validation before side effects", "copied and explicitly borrowed binary response bodies", "copied header metadata, repeated Set-Cookie and redirect framing", "unpublished response failures recover; inline service I/O is explicit", "fragmented input and ordered recovery around a failed draft", "128 side-effecting requests execute once across bounded arena drains", "caller std.Io works in explicitly selected fixed workers", "incomplete-request deadline and subsequent recovery", "connection overload refusal and admitted-slot recovery", "deadline during worker service retains storage through callback return and shutdown"]}
+COMMAND_FINISHED {"sequence": 5, "command": ["python3", "-B", "tests/app_integration.py"], "watchdog_seconds": 120, "started_utc": "2026-09-06T14:12:01.415172+00:00", "leader_pid": 1699798, "process_group": 1699798, "exit_code": 0, "cleanup": {"initial_workspace_survivors": [], "remaining_workspace_processes": []}, "finished_utc": "2026-09-06T14:12:02.166634+00:00"}
+COMMAND {"sequence": 6, "command": ["python3", "-B", "tests/examples_integration.py"], "watchdog_seconds": 120, "started_utc": "2026-09-06T14:12:02.167120+00:00"}
+PASS hello
+PASS hello2
+PASS hello_json
+PASS simple_router
+PASS routes
+PASS serve
+PASS sendfile
+PASS senderror
+PASS accept
+PASS app_basic
+PASS app_auth
+PASS endpoint_auth
+PASS app_errors
+PASS cookies
+PASS middleware
+PASS middleware_with_endpoint
+PASS http_params
+PASS bindataformpost
+PASS endpoint
+PASS userpass_session
+{"passed": 20, "cases": ["hello", "hello2", "hello_json", "simple_router", "routes", "serve", "sendfile", "senderror", "accept", "app_basic", "app_auth", "endpoint_auth", "app_errors", "cookies", "middleware", "middleware_with_endpoint", "http_params", "bindataformpost", "endpoint", "userpass_session"]}
+COMMAND_FINISHED {"sequence": 6, "command": ["python3", "-B", "tests/examples_integration.py"], "watchdog_seconds": 120, "started_utc": "2026-09-06T14:12:02.167120+00:00", "leader_pid": 1699815, "process_group": 1699815, "exit_code": 0, "cleanup": {"initial_workspace_survivors": [], "remaining_workspace_processes": []}, "finished_utc": "2026-09-06T14:12:02.389010+00:00"}
+VERIFICATION_FINISHED {"complete": true, "finished_utc": "2026-09-06T14:12:02.389977+00:00", "remaining_processes": [], "error": null}

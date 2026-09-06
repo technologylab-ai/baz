@@ -1,16 +1,17 @@
-# Modern Zap successor: implementation roadmap
+# Baz implementation roadmap
 
-Status: first implementation and supported example ports, 2026-09-06.
+Status: first implementation, example ports, and external engine packaging, 2026-09-06.
 Exact target: Zig 0.16.0. See the [implemented API](APP-API.md),
 [20 example ports](../examples/README.md), and
 [native receipt](../reports/2026-09-06-app-api.md) for exact evidence and limits.
 
-Build a framework with a new name, Zap's typed App/endpoint ergonomics, sane
-borrowed-byte request APIs, modern Zig capabilities, and zig-http underneath.
+Build Baz (Bounded Async Zap) with Zap's typed App/endpoint ergonomics, borrowed-byte
+request APIs, modern Zig capabilities, and the external bounded/http engine.
 The detailed API decisions are in [APP-API-DESIGN.md](APP-API-DESIGN.md).
 [STD-IO-DECISION.md](STD-IO-DECISION.md) evaluates supplying our own std.Io.
-This track complements the [engine roadmap](../ROADMAP.md); it does not replace
-the engine's unfinished reliability, performance or platform work.
+The separate [engine roadmap](https://github.com/technologylab-ai/bounded-http/blob/main/ROADMAP.md)
+tracks transport reliability, performance, and platform work. Its
+[Pages documentation](https://technologylab-ai.github.io/bounded-http/) explains the engine contracts.
 
 ## Resume here
 
@@ -24,7 +25,8 @@ the engine's unfinished reliability, performance or platform work.
   TLS is out of scope; WebSockets needs upgrade support; Mustache is postponed
   pending a [pure Zig library evaluation](MUSTACHE-CANDIDATES.md).
 - Next bounded work: finish API-06's public composition/locals/cookie contract,
-  using the example-local wrappers as real use cases; then API-07 and extraction.
+  using the example-local wrappers as real use cases; then API-07.
+  Baz now consumes an external engine package; repository publication remains separate.
   IO-01–04 remains deferred until after the first API MVP by user decision.
 - Consult the receipt/session ledger for native gates and cleanup state. The
   separate [basic Zap comparison](../reports/2026-09-06-basic-zap.md) records
@@ -42,7 +44,7 @@ Inspect Git state before editing; do not overwrite another session's work.
 
 | Topic | Working decision |
 | --- | --- |
-| Product | New name and public module; modern successor, no Zap source-compatibility layer. Prototype here, then extract into its own repository with a pinned zig-http dependency. zig-http remains a standalone engine/case study (user direction, 2026-09-06). |
+| Product | Baz (Bounded Async Zap), package/import `baz`, external dependency/import `bounded_http`. Repository publication remains pending. bounded/http stays independently usable. No Zap source-compatibility layer. |
 | Platform/version | Exact Zig 0.16.0; initial plain HTTP/1.1 on the existing Linux/macOS engine. Public bind addresses need later qualification. TLS is out of scope. |
 | Windows | Await the other session's engine support on main before adding framework compilation/CI checks; no Windows work in this checkpoint (user correction, 2026-09-06). |
 | App | Real instances; typed Shared; borrowed endpoint instances; startup-only registration; one routing/context model. |
@@ -55,9 +57,8 @@ Inspect Git state before editing; do not overwrite another session's work.
 | Memory | Framework storage reserved at startup; fixed buffers/reservations and optional bounded locals/scratch, no growable request arena or hidden heap fallback. |
 | Ownership | Input/output/task borrows survive until their real terminal transitions; scratch cannot become a dynamic output borrow without a later lease protocol. |
 
-Names and spellings in the design are provisional. These semantic decisions can
-change with evidence or user direction; record a short dated decision when they
-do. Do not wait for naming decisions to implement the first vertical slice.
+The product and public import are Baz and `baz`. Future API spellings remain
+proposals until implemented. Record semantic changes and their evidence in the ledger.
 
 ## Milestones and dependencies
 
@@ -74,7 +75,7 @@ Split implementation across sessions at its named gate and record exact state.
 | API-05 | implemented; scoped receipt | Flat multipart fields/files over retained input. | API-04 | APP-MULTIPART |
 | API-06 | queued | Typed locals, middleware, authentication composition, cookies and redirects. | API-02, API-03 | APP-MIDDLEWARE |
 | API-07 | queued | Typed explicit resumable endpoints and retention rules. | API-03, API-06 | APP-RESUME |
-| API-08 | partial: 20 examples ported | Finish public migration examples, package naming/extraction and native successor MVP qualification. | API-01–07 | APP-NATIVE |
+| API-08 | partial: 20 examples and external package | Finish remaining migration examples, repository publication, and successor MVP qualification. | API-01–07 | APP-NATIVE |
 | IO-01–04 | deferred | Owned std.Io feasibility, isolated prototype, HTTP integration and adoption decision. | First API MVP; see STD-IO-DECISION | STDIO-PROTOTYPE, STDIO-HTTP-OWNERSHIP, STDIO-ADOPTION |
 
 API-01 and API-02 can proceed independently after agreeing on module exports.
@@ -271,22 +272,16 @@ new completion paths are introduced.
 
 ### API-08 — migration examples and successor MVP qualification
 
-Choose the project/module name and extract the framework into its own repository
-with a pinned zig-http dependency. The user wants zig-http to remain the first
-standalone case study; this framework takes the next step. Current development
-imports engine sources inside this worktree, and `http_app` / `bounded_http`
-temporarily share one module identity. This is not yet an external dependency.
+Baz now imports the separate engine through its public `bounded_http` module.
+The [dependency record](DEPENDENCY.md) documents the immutable URL/hash pin and upstream PR.
+App, routing, forms, responses, examples, and application tests remain in Baz.
+Engine framing, scheduling, transports, and core suites belong upstream.
+The independent consumer imports both packages using one engine module identity.
 
-Land the independently useful engine changes (pre-dispatch output reservation,
-transactional custom headers and copy accounting) in zig-http with their core
-tests. Move App, routing, request/form/multipart conveniences, Response, examples
-and their tests to the new repository. Replace relative engine source imports
-with the exported `bounded_http` package surface, make any signal/ownership seam
-explicit, and pin the qualified engine commit in `build.zig.zon`. Do not copy
-and maintain a private fork of the engine. Verify both repositories independently
-on native Linux/macOS; exercise importing the raw engine and framework together
-without duplicate type identities. Record license/source attribution for the
-ported examples and keep the case-study history intact.
+The user selected the product name and package name on 2026-09-06.
+Publishing Baz as its own repository remains a separate step.
+Keep the original case-study history and port attribution available.
+Future dependency updates require native Linux/macOS verification of the selected revision.
 
 Provide compiled examples for App + Shared + endpoint state, exact/captured
 routes, raw query + explicit decoding, URL-encoded forms, one/many file uploads,
@@ -319,7 +314,7 @@ compiles all 20 port executables through `verify`.
 Before heavy builds or runtime suites on maxross/omarx1, inspect existing
 measurement processes and acquire `/tmp/zig-http-measurement.lock` atomically
 on the execution host. Follow the wiki's
-[full protocol](../../zigllmwiki/docs/platform-testing.md#cooperative-host-measurement-lock).
+[full protocol](https://github.com/technologylab-ai/zigllmwiki/blob/362da3b8023e6918d4b72c046821334ebd3722ca/docs/platform-testing.md#cooperative-host-measurement-lock).
 Hold off if busy, including incomplete/stale-looking metadata; never steal by
 age. Record ownership, retain the reservation through child cleanup, and remove
 only the owner's metadata/directory. Other agents' Mac measurements take
@@ -332,13 +327,7 @@ Baseline commands once the host is reserved and exact compiler is selected:
 zig version
 zig build verify -Doptimize=Debug
 zig build verify -Doptimize=ReleaseSafe
-zig build -Doptimize=ReleaseSafe
-python3 tests/integration.py --server zig-out/bin/zig-http
-python3 tests/inline_integration.py
-python3 tests/gather_integration.py
-python3 tests/batch_integration.py
-python3 tests/arena_lifecycle_integration.py
-zig build examples -Doptimize=ReleaseSafe
+zig build install examples -Doptimize=ReleaseSafe
 python3 tests/app_integration.py
 python3 tests/examples_integration.py
 ```
@@ -346,9 +335,9 @@ python3 tests/examples_integration.py
 The maintained App integration suite and all supported example ports now have
 the invocations above. The required coverage includes wire framing,
 fragmented progress, overload/recovery, deadlines, shutdown and changed ownership
-paths. Use finite process watchdogs. Retain existing comparator/smoke gates for
-native publication where required by the current engine runbook; do not run
-performance load merely to validate a documentation edit.
+paths. Use finite process watchdogs. Run the engine's comparator, core wire, and
+smoke gates in its own repository when changing the engine. Documentation edits
+do not require performance load.
 
 Performance comparisons and their warmups must use ReleaseSafe, never Debug,
 by explicit user decision on 2026-09-06. Keep assertions enabled and verify the
@@ -370,6 +359,8 @@ the conversation.
 | 2026-09-06: API planning | New `roadmap/app-api` worktree; inspected current engine and local Zap public API; used zig-wiki; specified modern framework, raw forms/uploads, response reservation and std.Io provider research. | Source review and document checks only; no Zig code added, builds/runtime suites/benchmarks not run. | API-01; independently design API-02 reservation and IO-01 compatibility matrix. |
 | 2026-09-06: first implementation | API-01–05: typed App/router, raw request/form/multipart views, explicit codecs, reserved one-shot Response and standard memory I/O adapters. Core changes confined to response headers/reservation/copy accounting. Added 20 supported example ports and maintained wire harnesses. Parent owned integration/build/docs; parser, lifecycle and composition work had explicit agent file ownership. | [Native receipt](../reports/2026-09-06-app-api.md): Debug and ReleaseSafe, 51/51 steps on each host; Linux 194/194 test executions, Mac 190/194 with four Linux-only skips. Each host passed 14 App, 20 example, 84 core, 8 comparator checks and 30,000 exact smoke bodies. [63-file source identity](../reports/2026-09-06-app-api-source.sha256). | API-06 public middleware/locals/cookies; then API-07 resumable endpoints and API-08 extraction/remaining qualification. Caller std.Io remains; own provider deferred. |
 | 2026-09-06: basic comparison | Isolated fixture using the public App API versus pinned Zig 0.16 Zap; ReleaseSafe only, c1/t1 and c32/t2, three alternating pairs per profile on each host. TLS excluded; Mustache postponed with a pure Zig shortlist; Windows waits for the engine session. | [Raw trials, results and cleanup](../reports/2026-09-06-basic-zap.md). All 24 measured trials completed with zero wrk socket/non-2xx-or-3xx errors. Owned server groups are gone and both host reservations released. Benchmark fixture remains separate from framework dependencies. | No benchmark is left running. Continue the API roadmap; reconcile incoming engine/docs changes before extraction. |
+
+| 2026-09-06: Baz package extraction | Selected Baz (Bounded Async Zap), package/import `baz`. Removed copied engine sources and switched to URL/hash-pinned `bounded_http`. Added a separate consumer fixture and public draft/signal methods through [bounded/http PR #1](https://github.com/technologylab-ai/bounded-http/pull/1). Reconciled current engine contracts and linked its repository/Pages site. | [Package receipt](../reports/2026-09-06-baz-extraction.md): native macOS/Linux, Debug and ReleaseSafe, 41/41 steps and 60/60 root tests per mode, independent consumers, 14 App and 20 example groups. [50-file source manifest](../reports/2026-09-06-baz-extraction-source.sha256.json). Engine gates passed separately. Prototype performance evidence remains unchanged and explicitly predates extraction. | API-06 public composition, then API-07 resumable endpoints. Merge/update the engine pin through the normal upstream process. Publish Baz's repository separately when requested. |
 
 For each implementation session add: commit(s), owned/changed files, decisions,
 named gates passed/pending and exact receipts, remaining blocker (if any), and

@@ -1,0 +1,8 @@
+{
+  "consumer_zig_pkg_exists": false,
+  "dependency_hash": "zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv",
+  "dependency_url": "https://github.com/technologylab-ai/bounded-http/archive/e52f09f723388685263d14a9bfa265f2456a3744.tar.gz",
+  "global_cache_entries": [],
+  "root_zig_pkg_exists": false,
+  "sibling_engine_exists": false
+}

@@ -8,33 +8,24 @@ pub fn build(b: *std.Build) void {
     if (optimize == .ReleaseFast or optimize == .ReleaseSmall) {
         @panic("This MVP requires Debug or ReleaseSafe so its invariants remain enabled");
     }
-    const module = b.addModule("bounded_http", .{
+    const engine = b.dependency("bounded_http", .{
+        .target = target,
+        .optimize = optimize,
+    }).module("bounded_http");
+    const module = b.addModule("baz", .{
         .root_source_file = b.path("src/web.zig"),
         .target = target,
         .optimize = optimize,
         .link_libc = true,
+        .imports = &.{.{ .name = "bounded_http", .module = engine }},
     });
-    // One module identity, two entry names: existing low-level imports remain
-    // valid and can be mixed with the application API without duplicate types.
-    b.modules.put(b.allocator, b.dupe("http_app"), module) catch @panic("out of memory");
+    // Consumers may import the framework and its exact engine module together.
+    b.modules.put(b.allocator, b.dupe("bounded_http"), engine) catch @panic("out of memory");
     // Arch's GCC 16 CRT contains .sframe R_X86_64_PC64 relocations which
     // Zig 0.16's native ELF linker rejects. Use the bundled LLVM/LLD path
     // for Linux Debug only. ReleaseSafe uses its default toolchain selection.
-    const exe = b.addExecutable(.{
-        .use_llvm = if (target.result.os.tag == .linux and optimize == .Debug) true else null,
-        .use_lld = if (target.result.os.tag == .linux and optimize == .Debug) true else null,
-        .name = "zig-http",
-        .root_module = b.createModule(.{
-            .root_source_file = b.path("src/main.zig"),
-            .target = target,
-            .optimize = optimize,
-            .link_libc = true,
-            .imports = &.{.{ .name = "bounded_http", .module = module }},
-        }),
-    });
-    b.installArtifact(exe);
     const app_exe = b.addExecutable(.{
-        .name = "http-app",
+        .name = "baz",
         .use_llvm = if (target.result.os.tag == .linux and optimize == .Debug) true else null,
         .use_lld = if (target.result.os.tag == .linux and optimize == .Debug) true else null,
         .root_module = b.createModule(.{
@@ -42,24 +33,21 @@ pub fn build(b: *std.Build) void {
             .target = target,
             .optimize = optimize,
             .link_libc = true,
-            .imports = &.{.{ .name = "http_app", .module = module }},
+            .imports = &.{.{ .name = "baz", .module = module }},
         }),
     });
     b.installArtifact(app_exe);
     const app_run = b.addRunArtifact(app_exe);
     if (b.args) |args| app_run.addArgs(args);
     b.step("run-app", "Run the application API example").dependOn(&app_run.step);
-    const run = b.addRunArtifact(exe);
-    if (b.args) |args| run.addArgs(args);
-    b.step("run", "Run the bounded HTTP experiment").dependOn(&run.step);
+    b.step("run", "Run the application API example").dependOn(&app_run.step);
     const verify = b.step("verify", "Compile and test the exact-version MVP");
-    verify.dependOn(&exe.step);
     verify.dependOn(&app_exe.step);
     const example_support = b.createModule(.{
         .root_source_file = b.path("examples/support.zig"),
         .target = target,
         .optimize = optimize,
-        .imports = &.{.{ .name = "http_app", .module = module }},
+        .imports = &.{.{ .name = "baz", .module = module }},
     });
     const examples = b.step("examples", "Build and install all supported Zap example ports");
     for ([_][]const u8{ "hello", "hello2", "hello_json", "simple_router", "routes", "serve", "sendfile", "senderror", "accept", "app_basic", "app_auth", "app_errors", "endpoint", "endpoint_auth", "middleware", "middleware_with_endpoint", "userpass_session", "cookies", "http_params", "bindataformpost" }) |name| {
@@ -72,7 +60,7 @@ pub fn build(b: *std.Build) void {
                 .target = target,
                 .optimize = optimize,
                 .link_libc = true,
-                .imports = &.{ .{ .name = "http_app", .module = module }, .{ .name = "example_support", .module = example_support } },
+                .imports = &.{ .{ .name = "baz", .module = module }, .{ .name = "example_support", .module = example_support } },
             }),
         });
         const install_example = b.addInstallArtifact(example, .{});
@@ -87,13 +75,17 @@ pub fn build(b: *std.Build) void {
     verify.dependOn(&format.step);
     const version = b.addSystemCommand(&.{ "python3", "tools/check_version.py" });
     verify.dependOn(&version.step);
-    const test_step = b.step("test", "Run unit and transport tests");
-    for ([_][]const u8{ "src/http.zig", "src/api.zig", "src/budget.zig", "src/transport.zig", "src/server.zig", "src/params.zig", "src/form.zig", "src/request.zig", "src/multipart.zig", "src/response.zig", "src/router.zig", "src/App.zig", "src/web.zig" }) |path| {
+    const consumer = b.addSystemCommand(&.{ b.graph.zig_exe, "build", "test", b.fmt("-Doptimize={s}", .{@tagName(optimize)}), "-j2" });
+    consumer.setCwd(b.path("examples/embedding"));
+    verify.dependOn(&consumer.step);
+    const test_step = b.step("test", "Run framework unit tests");
+    for ([_][]const u8{ "src/params.zig", "src/form.zig", "src/request.zig", "src/multipart.zig", "src/response.zig", "src/router.zig", "src/App.zig", "src/web.zig" }) |path| {
         const tests = b.addTest(.{ .use_llvm = if (target.result.os.tag == .linux and optimize == .Debug) true else null, .use_lld = if (target.result.os.tag == .linux and optimize == .Debug) true else null, .root_module = b.createModule(.{
             .root_source_file = b.path(path),
             .target = target,
             .optimize = optimize,
             .link_libc = true,
+            .imports = &.{.{ .name = "bounded_http", .module = engine }},
         }) });
         const run_tests = b.addRunArtifact(tests);
         verify.dependOn(&run_tests.step);

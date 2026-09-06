@@ -5,7 +5,7 @@ from contextlib import contextmanager
 import json
 from pathlib import Path
 
-import integration as wire
+import wire_support as wire
 from app_integration import request_bytes
 
 

@@ -1,6 +1,6 @@
 //! A stateful endpoint owns its authentication wrapper and endpoint configuration.
 const std = @import("std");
-const web = @import("http_app");
+const web = @import("baz");
 const support = @import("example_support");
 const auth = @import("endpoint/auth_helpers.zig");
 

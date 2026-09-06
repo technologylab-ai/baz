@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 import time
 
-import integration as wire
+import wire_support as wire
 
 
 class AppServer(wire.Server):
@@ -201,7 +201,7 @@ def run(binary):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--server", type=Path, default=wire.ROOT / "zig-out/bin/http-app")
+    parser.add_argument("--server", type=Path, default=wire.ROOT / "zig-out/bin/baz")
     parser.add_argument("--json", type=Path)
     args = parser.parse_args()
     cases = run(args.server.resolve())

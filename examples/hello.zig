@@ -1,7 +1,7 @@
 //! Zap's smallest greeting example, using one explicit route and no callback
 //! logging or hidden per-request allocations.
 const std = @import("std");
-const web = @import("http_app");
+const web = @import("baz");
 const support = @import("example_support");
 
 const Shared = struct {};

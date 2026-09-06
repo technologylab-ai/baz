@@ -2,7 +2,7 @@
 //! JSON at /inspect instead of performing blocking logging on an inline owner.
 //! Form bytes stay raw; no automatic parameter or type conversion occurs.
 const std = @import("std");
-const web = @import("http_app");
+const web = @import("baz");
 const support = @import("example_support");
 
 const Shared = struct {};

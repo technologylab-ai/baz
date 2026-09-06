@@ -1,0 +1,17 @@
+{
+  "command": [
+    "/Users/rs/bin/zig",
+    "fetch",
+    "--global-cache-dir",
+    "/tmp/baz-public-fetch-0wzwpkcx/cache",
+    "https://github.com/technologylab-ai/bounded-http/archive/e52f09f723388685263d14a9bfa265f2456a3744.tar.gz"
+  ],
+  "cwd": "/tmp/baz-public-fetch-0wzwpkcx",
+  "package_dir_existed": false,
+  "cache_existed": true,
+  "started_utc": "2026-09-06T14:05:00.364515+00:00",
+  "returncode": 0,
+  "stdout": "zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv\n",
+  "stderr": "",
+  "finished_utc": "2026-09-06T14:05:01.661375+00:00"
+}

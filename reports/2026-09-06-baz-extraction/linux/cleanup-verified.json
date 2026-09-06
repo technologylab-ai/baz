@@ -1,0 +1,200 @@
+{
+  "all_observed_groups_absent": true,
+  "checked_utc": "2026-09-06T14:13:05.560019+00:00",
+  "group_checks": [
+    {
+      "killpg_signal_0": "absent (ESRCH)",
+      "pgid": 1678274,
+      "process_table_members": []
+    },
+    {
+      "killpg_signal_0": "absent (ESRCH)",
+      "pgid": 1678549,
+      "process_table_members": []
+    },
+    {
+      "killpg_signal_0": "absent (ESRCH)",
+      "pgid": 1678558,
+      "process_table_members": []
+    },
+    {
+      "killpg_signal_0": "absent (ESRCH)",
+      "pgid": 1679120,
+      "process_table_members": []
+    },
+    {
+      "killpg_signal_0": "absent (ESRCH)",
+      "pgid": 1679338,
+      "process_table_members": []
+    },
+    {
+      "killpg_signal_0": "absent (ESRCH)",
+      "pgid": 1679355,
+      "process_table_members": []
+    },
+    {
+      "killpg_signal_0": "absent (ESRCH)",
+      "pgid": 1679357,
+      "process_table_members": []
+    },
+    {
+      "killpg_signal_0": "absent (ESRCH)",
+      "pgid": 1679378,
+      "process_table_members": []
+    },
+    {
+      "killpg_signal_0": "absent (ESRCH)",
+      "pgid": 1679417,
+      "process_table_members": []
+    },
+    {
+      "killpg_signal_0": "absent (ESRCH)",
+      "pgid": 1679573,
+      "process_table_members": []
+    },
+    {
+      "killpg_signal_0": "absent (ESRCH)",
+      "pgid": 1679609,
+      "process_table_members": []
+    },
+    {
+      "killpg_signal_0": "absent (ESRCH)",
+      "pgid": 1679643,
+      "process_table_members": []
+    },
+    {
+      "killpg_signal_0": "absent (ESRCH)",
+      "pgid": 1679659,
+      "process_table_members": []
+    },
+    {
+      "killpg_signal_0": "absent (ESRCH)",
+      "pgid": 1679669,
+      "process_table_members": []
+    },
+    {
+      "killpg_signal_0": "absent (ESRCH)",
+      "pgid": 1679696,
+      "process_table_members": []
+    },
+    {
+      "killpg_signal_0": "absent (ESRCH)",
+      "pgid": 1679759,
+      "process_table_members": []
+    },
+    {
+      "killpg_signal_0": "absent (ESRCH)",
+      "pgid": 1679782,
+      "process_table_members": []
+    },
+    {
+      "killpg_signal_0": "absent (ESRCH)",
+      "pgid": 1679802,
+      "process_table_members": []
+    },
+    {
+      "killpg_signal_0": "absent (ESRCH)",
+      "pgid": 1679811,
+      "process_table_members": []
+    },
+    {
+      "killpg_signal_0": "absent (ESRCH)",
+      "pgid": 1679825,
+      "process_table_members": []
+    },
+    {
+      "killpg_signal_0": "absent (ESRCH)",
+      "pgid": 1679826,
+      "process_table_members": []
+    },
+    {
+      "killpg_signal_0": "absent (ESRCH)",
+      "pgid": 1679832,
+      "process_table_members": []
+    },
+    {
+      "killpg_signal_0": "absent (ESRCH)",
+      "pgid": 1679837,
+      "process_table_members": []
+    },
+    {
+      "killpg_signal_0": "absent (ESRCH)",
+      "pgid": 1679841,
+      "process_table_members": []
+    },
+    {
+      "killpg_signal_0": "absent (ESRCH)",
+      "pgid": 1679850,
+      "process_table_members": []
+    },
+    {
+      "killpg_signal_0": "absent (ESRCH)",
+      "pgid": 1679855,
+      "process_table_members": []
+    },
+    {
+      "killpg_signal_0": "absent (ESRCH)",
+      "pgid": 1679866,
+      "process_table_members": []
+    },
+    {
+      "killpg_signal_0": "absent (ESRCH)",
+      "pgid": 1679870,
+      "process_table_members": []
+    },
+    {
+      "killpg_signal_0": "absent (ESRCH)",
+      "pgid": 1694307,
+      "process_table_members": []
+    },
+    {
+      "killpg_signal_0": "absent (ESRCH)",
+      "pgid": 1694338,
+      "process_table_members": []
+    },
+    {
+      "killpg_signal_0": "absent (ESRCH)",
+      "pgid": 1697507,
+      "process_table_members": []
+    },
+    {
+      "killpg_signal_0": "absent (ESRCH)",
+      "pgid": 1699701,
+      "process_table_members": []
+    },
+    {
+      "killpg_signal_0": "absent (ESRCH)",
+      "pgid": 1699798,
+      "process_table_members": []
+    },
+    {
+      "killpg_signal_0": "absent (ESRCH)",
+      "pgid": 1699803,
+      "process_table_members": []
+    },
+    {
+      "killpg_signal_0": "absent (ESRCH)",
+      "pgid": 1699807,
+      "process_table_members": []
+    },
+    {
+      "killpg_signal_0": "absent (ESRCH)",
+      "pgid": 1699809,
+      "process_table_members": []
+    },
+    {
+      "killpg_signal_0": "absent (ESRCH)",
+      "pgid": 1699811,
+      "process_table_members": []
+    },
+    {
+      "killpg_signal_0": "absent (ESRCH)",
+      "pgid": 1699815,
+      "process_table_members": []
+    }
+  ],
+  "host": "omarx1",
+  "lock_currently_retained_for_receipt_collection": true,
+  "remaining_workspace_processes": [],
+  "scope": "Combined observed engine and Baz original process groups, plus all current zig-http.seam workspaces"
+}

@@ -1,0 +1,42 @@
+{
+  "command": [
+    "/Users/rs/bin/zig",
+    "build",
+    "verify",
+    "-Doptimize=Debug",
+    "-j2",
+    "--summary",
+    "all"
+  ],
+  "workdir": "/Users/rs/code/github.com/technologylab.ai/zig-http-app-api",
+  "label": "baz-url-debug",
+  "started_utc": "2026-09-06T14:00:42.920491+00:00",
+  "lock_owner": {
+    "agent": "Codex /root Baz external dependency",
+    "purpose": "Exact Zig 0.16 engine PR and Baz external-dependency native correctness gates",
+    "host": "renerocksai-M3-Max-6.local",
+    "started_utc": "2026-09-06T13:39:28.667021+00:00",
+    "owner_pid": 49408,
+    "token": "d09e7376-960f-45d2-b669-e781c50883a3",
+    "workdir": "/Users/rs/code/github.com/technologylab.ai/zig-http-app-api"
+  },
+  "watchdog_seconds": 600,
+  "cleanup_runner_sha256": "434e854ece41747e2ab76b52adea62e0c77f091b667f1512ea8756c9393bbfba",
+  "returncode": 0,
+  "finished_utc": "2026-09-06T14:01:07.916944+00:00",
+  "elapsed_seconds": 24.996,
+  "process_group_cleanup": [
+    {
+      "pgid": 63608,
+      "started_utc": "2026-09-06T14:01:07.916756+00:00",
+      "signals": [],
+      "term_timeout_seconds": 8.0,
+      "kill_timeout_seconds": 5.0,
+      "group_disappeared": true,
+      "leader_returncode": 0,
+      "finished_utc": "2026-09-06T14:01:07.916841+00:00"
+    }
+  ],
+  "owned_groups_remaining": [],
+  "complete": true
+}

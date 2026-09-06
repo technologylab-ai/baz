@@ -3,7 +3,7 @@
 //! GET /?one=001&string=hello+world&bool=false&flag&tag=a&tag=b
 //! POST /?one=query with application/x-www-form-urlencoded body one=form.
 const std = @import("std");
-const web = @import("http_app");
+const web = @import("baz");
 const support = @import("example_support");
 
 const Shared = struct {};

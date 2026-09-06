@@ -2,7 +2,7 @@
 //! The current framework has no sendfile/range/gzip implementation. This
 //! adaptation sends a complete ordinary body; it advertises no range support.
 const std = @import("std");
-const web = @import("http_app");
+const web = @import("baz");
 const support = @import("example_support");
 
 const Shared = struct {};

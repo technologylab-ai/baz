@@ -1,6 +1,6 @@
 //! Executable-only lifecycle support shared by the migration examples.
 const std = @import("std");
-const web = @import("http_app");
+const web = @import("baz");
 
 pub fn config(init: std.process.Init) !web.Config {
     return parseConfig(init, false);

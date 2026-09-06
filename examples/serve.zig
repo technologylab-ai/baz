@@ -2,7 +2,7 @@
 //! allowlist. This is not a public-directory server: no filesystem access,
 //! directory traversal, automatic index discovery or runtime file loading.
 const std = @import("std");
-const web = @import("http_app");
+const web = @import("baz");
 const support = @import("example_support");
 
 const Shared = struct {};

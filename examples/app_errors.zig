@@ -1,6 +1,6 @@
 //! Endpoint failures reach an instance-specific error mapper.
 const std = @import("std");
-const web = @import("http_app");
+const web = @import("baz");
 const support = @import("example_support");
 
 const Shared = struct {

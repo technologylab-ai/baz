@@ -1,0 +1,48 @@
+{
+  "all_fetched_engine_zig_sources_match_tested_engine": true,
+  "checked_utc": "2026-09-06T14:08:52.617329+00:00",
+  "public_dependency_commit": "e52f09f723388685263d14a9bfa265f2456a3744",
+  "source_files": [
+    {
+      "file": "src/api.zig",
+      "matches_tested_engine": true,
+      "sha256": "e76b76f31a152adbde55760554b562df63c16a1cea660e5ec402eeca96e6e4b5"
+    },
+    {
+      "file": "src/budget.zig",
+      "matches_tested_engine": true,
+      "sha256": "1a1f2dc2ac3418289590ed8868e588df6039e9fe69ff52412bec368ebfb4dcc9"
+    },
+    {
+      "file": "src/http.zig",
+      "matches_tested_engine": true,
+      "sha256": "9f54c8bc607da60294ac042ec90f93642e67f5acbef7b5e1dceebba6e41f6a4f"
+    },
+    {
+      "file": "src/main.zig",
+      "matches_tested_engine": true,
+      "sha256": "2fa95737fb4424f5ea5ead9eccbd34125a4eb58b3aa7d3ca41ffb61b45690a12"
+    },
+    {
+      "file": "src/server.zig",
+      "matches_tested_engine": true,
+      "sha256": "3e5cead3e61b236dd93349e610469460aeb7ed53b04989fa555c9bc9751384e0"
+    },
+    {
+      "file": "src/transport.zig",
+      "matches_tested_engine": true,
+      "sha256": "324245cbdbe8810591985807b4d737d21fa48699695374ace1c8fe800287d8a2"
+    },
+    {
+      "file": "src/transport_linux.zig",
+      "matches_tested_engine": true,
+      "sha256": "5dfe71c3cb3fd3fd275dae1c729e5cfc175ce4b6ee4f8d5f3ec6ec8bee1ce2c9"
+    },
+    {
+      "file": "src/transport_macos.zig",
+      "matches_tested_engine": true,
+      "sha256": "2a1b2ad432a143079c0cfc7bf860e50fb2cbb0f56dd9a4ac571bb7512b45578a"
+    }
+  ],
+  "tested_engine_manifest_sha256": "8e64f6697d84079b8ffc2cb46ffd277def318388b7c463830f42c103d13f4ba7"
+}

@@ -1,6 +1,6 @@
 //! Typed, instance-owned application composition over the bounded HTTP engine.
 const std = @import("std");
-const engine = @import("server.zig");
+const engine = @import("bounded_http");
 const Request = @import("request.zig").Request;
 const responses = @import("response.zig");
 const routing = @import("router.zig");
@@ -234,7 +234,7 @@ pub fn App(comptime Shared: type) type {
         /// Only atomic stop flags, matching the maintained POSIX demo. Install
         /// signal handling in main, after start, and keep App alive through it.
         pub fn requestStopFromSignal(self: *Self) void {
-            if (self.cluster) |cluster| for (cluster.shards) |shard| shard.stop_requested.store(true, .release);
+            if (self.cluster) |cluster| cluster.requestStopFromSignal();
         }
 
         /// On an error, ownership may remain outstanding: terminate the process

@@ -1,0 +1,38 @@
+{
+  "consumer": "examples/embedding",
+  "interpretation": "Root verify depends on the independent consumer zig build test command; a consumer compile/test failure fails that root gate",
+  "modes": [
+    {
+      "independent_consumer_commands": [
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig build test -Doptimize=Debug -j2 ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/embedding",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1694338,
+          "pid": 1695424,
+          "ppid": 1694382,
+          "start_ticks": "54764201"
+        }
+      ],
+      "mode": "Debug",
+      "root_verify_exit_code": 0
+    },
+    {
+      "independent_consumer_commands": [
+        {
+          "command": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig build test -Doptimize=ReleaseSafe -j2 ",
+          "cwd": "/tmp/zig-http.seam.baz.b1f9uxxl/baz/examples/embedding",
+          "exe": "/home/rs/.local/share/mise/installs/zig/0.16.0/zig",
+          "pgid": 1697507,
+          "pid": 1697522,
+          "ppid": 1697517,
+          "start_ticks": "54766005"
+        }
+      ],
+      "mode": "ReleaseSafe",
+      "root_verify_exit_code": 0
+    }
+  ],
+  "source_sha256": "f2a266eac407e26a1897f5406ee5cfce5b0e45dff5487fe87b047e1d12708a3c",
+  "test": "consumer mixes framework and dependency types without duplicate engine identity"
+}

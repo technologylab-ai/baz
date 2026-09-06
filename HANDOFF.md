@@ -1,4 +1,35 @@
-# App API implementation handoff — 2026-09-06
+# Baz package handoff — 2026-09-06
+
+Baz means **Bounded Async Zap**. Worktree `../zig-http-app-api`, branch `roadmap/app-api`.
+The package/import is `baz`; the external engine dependency/import is `bounded_http`.
+The engine is [bounded/http](https://github.com/technologylab-ai/bounded-http), with
+[Pages documentation](https://technologylab-ai.github.io/bounded-http/).
+The [dependency record](docs/DEPENDENCY.md) identifies the immutable pin and engine PR.
+Baz's own repository has not been published.
+The engine PR is open; Baz pins its exact commit while review is pending.
+Native macOS/Linux passed both verify modes, package embedding, and every App/example group.
+
+The engine owns framing, scheduling, transport, and core verification.
+Baz owns App, routing, request/form/multipart views, response helpers, and 20 example ports.
+A separate consumer fixture verifies framework/engine type identity.
+Writer drafting and signal stopping now use public engine methods.
+
+Start with the [API guide](docs/APP-API.md), [roadmap](docs/APP-API-ROADMAP.md),
+and [package verification receipt](reports/2026-09-06-baz-extraction.md).
+Next bounded API work is API-06: public middleware, typed locals, and cookie composition.
+API-07 then adds typed resumable endpoints and their retention gates.
+Publication of Baz as a separate repository remains a later step.
+
+Use caller `std.Io` and the existing io_uring/kqueue engine for this MVP.
+Owned `std.Io` remains deferred. TLS is out of scope; Mustache awaits a pure Zig library choice.
+Windows work waits for the engine session's support on main.
+
+The [Zap comparison](reports/2026-09-06-basic-zap.md) measured the first prototype at `c152e59`.
+It predates package extraction; its raw inputs and results are preserved.
+Both native runs finished; all observed child groups are gone, and both host reservations were released.
+The handoffs below are historical and describe their original source layouts.
+
+# Historical App API implementation handoff — 2026-09-06
 
 Worktree `../zig-http-app-api`, branch `roadmap/app-api`, based on engine
 `4b3cd5551d80b422ec6ef763627d019e6f1dfb83` and planning `db8d7ce`.
