@@ -1,6 +1,6 @@
-# bounded/http engine reference
+# [bounded/http](https://technologylab-ai.github.io/bounded-http/) engine reference
 
-Baz uses [bounded/http](https://github.com/technologylab-ai/bounded-http) as its HTTP engine.
+Baz uses [bounded/http](https://technologylab-ai.github.io/bounded-http/) as its HTTP engine.
 The engine has its own repository and [GitHub Pages documentation](https://technologylab-ai.github.io/bounded-http/).
 
 Use the engine's [embedding guide](https://github.com/technologylab-ai/bounded-http/blob/main/docs/USING.md)

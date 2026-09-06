@@ -1,9 +1,9 @@
-# Baz and bounded/http
+# Baz and [bounded/http](https://technologylab-ai.github.io/bounded-http/)
 
 Baz means **Bounded Async Zap**.
-It provides application composition over the separate bounded/http server.
+It provides application composition over the separate [bounded/http](https://technologylab-ai.github.io/bounded-http/) server.
 
-- [bounded/http repository](https://github.com/technologylab-ai/bounded-http)
+- [engine repository](https://github.com/technologylab-ai/bounded-http)
 - [bounded/http GitHub Pages documentation](https://technologylab-ai.github.io/bounded-http/)
 - [Engine embedding guide](https://github.com/technologylab-ai/bounded-http/blob/main/docs/USING.md)
 - [Engine architecture](https://github.com/technologylab-ai/bounded-http/blob/main/docs/ARCHITECTURE.md)
@@ -41,7 +41,7 @@ App delegates signal stopping to `Cluster.requestStopFromSignal`.
 That helper only stores atomic stop flags and performs no wake or other system call.
 The callback-progress and external-watchdog limits still apply.
 
-These generic extensions landed through [bounded/http PR #1](https://github.com/technologylab-ai/bounded-http/pull/1).
+These generic extensions landed through [engine PR #1](https://github.com/technologylab-ai/bounded-http/pull/1).
 PR #1 merged on 2026-09-06 as `c90281b600deb699a667e2bcc115da32862c794f`.
 The current engine pin is `7c24003924bcc76b2a3808cc2fae194082a40105`, with Zig package hash
 `bounded_http-0.1.0-N3A1uJjOEAD4Yg0JPgeoRomLUpBJeFlfujb4gpSUDcgc`.

@@ -14,6 +14,6 @@ The engine's [module contracts](https://github.com/technologylab-ai/bounded-http
 describe its parser, scheduler, and transport interfaces.
 See its [documentation website](https://technologylab-ai.github.io/bounded-http/) for the architecture and embedding guide.
 
-Keep engine changes in the [bounded/http repository](https://github.com/technologylab-ai/bounded-http).
+Keep engine changes in the [engine repository](https://github.com/technologylab-ai/bounded-http).
 Baz uses checked draft methods instead of accessing writer lifecycle fields.
 The [dependency guide](DEPENDENCY.md) describes that boundary.

@@ -5,13 +5,14 @@
 [Website & documentation](https://technologylab-ai.github.io/baz/) · [API guide](docs/APP-API.md) · [20 examples](examples/README.md)
 
 A **pure Zig** successor to [Zap](https://github.com/zigzap/zap), built in **Zig 0.16.0**
-on [bounded/http](https://github.com/technologylab-ai/bounded-http). It keeps Zap's typed
+on [bounded/http](https://technologylab-ai.github.io/bounded-http/). It keeps Zap's typed
 App and endpoint ergonomics, with explicit memory ownership and simpler request
 data.
 Both Baz and its HTTP engine are implemented in Zig. Baz replaces Zap’s
-facil.io C foundation with bounded/http.
+facil.io C foundation with [bounded/http](https://technologylab-ai.github.io/bounded-http/).
 The engine's [GitHub Pages documentation](https://technologylab-ai.github.io/bounded-http/)
-explains its architecture, embedding API, and ownership model.
+explains its architecture, embedding API, and ownership model; the
+[engine source](https://github.com/technologylab-ai/bounded-http) is a separate repository.
 
 The first implementation provides:
 
@@ -23,7 +24,7 @@ The first implementation provides:
   metadata and borrowed bytes.
 - Bounded one-shot responses, JSON and copied headers; output capacity is secured
   before the handler runs.
-- Caller-supplied `std.Io` and standard memory readers/writers, on bounded/http's
+- Caller-supplied `std.Io` and standard memory readers/writers, on [bounded/http](https://technologylab-ai.github.io/bounded-http/)'s
   io_uring and kqueue transports. Blocking services use explicit fixed workers.
 
 Baz is a separate framework package with a pinned external engine dependency.
@@ -39,7 +40,7 @@ See the [repository record](docs/REPOSITORY.md) for branches, history, CI, and p
 
 **Linux, macOS, and native Windows x64 are supported.** Baz adds native Windows
 support beyond [Zap’s facil.io-based platform support](https://github.com/zigzap/zap/blob/master/README.md).
-Both the framework and its bounded/http engine are written in Zig.
+Both the framework and its [bounded/http](https://technologylab-ai.github.io/bounded-http/) engine are written in Zig.
 
 All three platforms passed Debug and ReleaseSafe verification, the independent
 package consumer, all 14 App groups, and all 20 example groups. Windows also

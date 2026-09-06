@@ -3,7 +3,7 @@
 Work from the independent `baz` repository, primary branch `main`.
 Public repository: <https://github.com/technologylab-ai/baz>.
 GitHub Pages: <https://technologylab-ai.github.io/baz/>.
-Baz and its bounded/http engine are implemented in Zig. Baz is MIT licensed.
+Baz and its [bounded/http](https://technologylab-ai.github.io/bounded-http/) engine are implemented in Zig. Baz is MIT licensed.
 The website, reader, diagrams, and publishing workflow belong to this repository.
 
 ## Verified current baseline
@@ -40,7 +40,7 @@ preserved for history. Continue new work from current Baz, not those checkpoints
 reader, sanitization, and live file-hash checks. The `.zig-version` reader entry
 uses a public alias because Pages hides dot-prefixed paths.
 The README and site explicitly identify pure Zig implementation, Windows support,
-and both the bounded/http website and source repository.
+and both the [bounded/http](https://technologylab-ai.github.io/bounded-http/) website and source repository.
 
 ## Next API sessions
 

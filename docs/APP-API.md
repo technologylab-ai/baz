@@ -2,7 +2,7 @@
 
 Baz means **Bounded Async Zap**. It is a modern successor to
 [Zap](https://github.com/zigzap/zap), built on the separate
-[bounded/http engine](https://github.com/technologylab-ai/bounded-http).
+[bounded/http](https://technologylab-ai.github.io/bounded-http/) engine.
 The package and public import are `baz`. The engine import is `bounded_http`.
 The engine's [GitHub Pages documentation](https://technologylab-ai.github.io/bounded-http/)
 covers architecture, embedding, and ownership.
@@ -224,7 +224,7 @@ internals and kernel buffers are outside the framework's requested-byte ledger.
 
 The predecessor is [Zap](https://github.com/zigzap/zap). The public API review
 and ports use the local Zig 0.16 revision recorded in the design and receipts.
-Baz and bounded/http are implemented in Zig, replacing the facil.io C foundation.
+Baz and [bounded/http](https://technologylab-ai.github.io/bounded-http/) are implemented in Zig, replacing the facil.io C foundation.
 Baz additionally supports native Windows x64, with [its own native gate](../reports/2026-09-06-windows-baz.md).
 
 | Old API concept | Current replacement |

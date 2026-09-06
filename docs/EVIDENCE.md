@@ -2,7 +2,7 @@
 
 Baz owns the application API and its verification. The
 [dependency record](DEPENDENCY.md) identifies the selected external engine.
-[bounded/http](https://github.com/technologylab-ai/bounded-http) maintains the server
+[bounded/http](https://technologylab-ai.github.io/bounded-http/) maintains the server
 contracts and core evidence; its [Pages site](https://technologylab-ai.github.io/bounded-http/)
 provides the architecture reader.
 

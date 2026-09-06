@@ -1,15 +1,15 @@
-# Baz: a modern application framework on bounded/http
+# Baz: a modern application framework on [bounded/http](https://technologylab-ai.github.io/bounded-http/)
 
 Status: design reference, 2026-09-06. The first implementation is described in
 [APP-API.md](APP-API.md); sketches below also include future features. The implementation sequence and session ledger are in
 [APP-API-ROADMAP.md](APP-API-ROADMAP.md).
 
 Baz (Bounded Async Zap) is a modern successor to [Zap](https://github.com/zigzap/zap), using exact Zig 0.16.0
-and the external bounded/http engine. Keep Zap's pleasant application model: typed shared context,
+and the external [bounded/http](https://technologylab-ai.github.io/bounded-http/) engine. Keep Zap's pleasant application model: typed shared context,
 stateful endpoint structs, named HTTP methods, composable authentication and
 short response calls. Use Zig's explicit capabilities and ordinary byte slices
 throughout. The new framework should be useful for real application code while
-retaining bounded/http's ownership and progress contract.
+retaining [bounded/http](https://technologylab-ai.github.io/bounded-http/)'s ownership and progress contract.
 
 The user selected Baz on 2026-09-06. `web` below is a local alias for `@import("baz")`.
 The sketches also describe future APIs; check the implemented guide for current spellings.
@@ -69,7 +69,7 @@ retained input and reserved output <-> std.Io.Reader / std.Io.Writer
 Baz exports a distinct `baz` module and consumes the external `bounded_http` module.
 Consumers can also import the same engine module directly.
 The [dependency record](DEPENDENCY.md) describes the public adapter contract and immutable pin.
-bounded/http remains independently usable as the engine case study.
+[bounded/http](https://technologylab-ai.github.io/bounded-http/) remains independently usable as the engine case study.
 Baz's own repository publication is still pending.
 
 `std.process.Init` belongs in executable examples. Libraries receive the narrow

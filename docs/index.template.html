@@ -25,7 +25,7 @@
   <button class="mobile-menu" aria-expanded="false" aria-controls="navigation" type="button">Explore +</button>
   <nav id="navigation" aria-label="Page sections">
     <a href="#idea"><b>01</b> The idea</a><a href="#app"><b>02</b> An ordinary Zig App</a>
-    <a href="#data"><b>03</b> Data stays data</a><a href="#engine"><b>04</b> Built on bounded/http</a>
+    <a href="#data"><b>03</b> Data stays data</a><a href="#engine"><b>04</b> HTTP engine</a>
     <a href="#start"><b>05</b> Get started</a><a href="#examples"><b>06</b> Explore the examples</a>
     <a href="#performance"><b>07</b> Measured results</a><a href="#next"><b>08</b> What comes next</a>
     <a href="#docs"><b>09</b> Read further</a>
@@ -75,7 +75,7 @@
     <div class="columns"><div><h3>One multipart iterator.</h3><p class="note">Fields and files share the same flat representation: a raw name, optional filename and content type, and borrowed bytes. One file or several files use the same loop. Baz never saves an upload implicitly.</p><a href="docs/read.html?file=examples/bindataformpost.zig">Read the upload example →</a></div><div><h3>Copies have a place.</h3><p class="note">Multipart parsing validates the complete supported body before iteration. If HTTP chunks split a body, request a bounded copy into caller storage before parsing a contiguous form. Application access to borrowed views ends with the callback.</p><a href="docs/read.html?file=docs/OWNERSHIP.md">Read the ownership contract →</a></div></div>
   </section>
   <section class="chapter" id="engine">
-    <p class="eyebrow">04 / Built on bounded/http</p><h2>Application ergonomics above.<br>HTTP ownership underneath.</h2>
+    <p class="eyebrow">04 / Built on <a href="https://technologylab-ai.github.io/bounded-http/">bounded/http</a></p><h2>Application ergonomics above.<br>HTTP ownership underneath.</h2>
     <p class="intro">Baz imports <code>bounded_http</code> as a pinned external dependency. The engine stays independently usable. Baz supplies the application layer: routing, request views, endpoint composition, and responses.</p>
     <figure>@@LAYERS@@<figcaption>Two packages, one explicit boundary. Baz uses the engine’s public embedding API; transport and scheduler changes belong upstream.</figcaption></figure>
     <div class="columns"><div><h3>Use Zig’s std.Io today.</h3><p class="note">Pass your caller’s <code>std.Io</code> at initialization. Standard memory readers and writers work inline. Finite blocking services require explicit fixed workers; the provider’s resource use remains the application’s responsibility.</p></div><div><h3>Keep the engine’s transports.</h3><p class="note">Baz supports Linux with io_uring, macOS with kqueue, and native Windows x64 with IOCP. HTTP transport uses the engine directly. A Baz-owned <code>std.Io</code> implementation is a later design step.</p></div></div>

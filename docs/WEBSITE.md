@@ -72,7 +72,7 @@ Browser dependencies are vendored with their original notices and checksums:
 
 [The vendor manifest](vendor/manifest.json) preserves archive URLs, package
 integrity strings, source revisions, and file hashes. The build verifies them.
-These assets came from the existing bounded/http documentation bundle.
+These assets came from the existing [bounded/http](https://technologylab-ai.github.io/bounded-http/) documentation bundle.
 Their licenses remain separate from Baz’s MIT license.
 
 ## Verification

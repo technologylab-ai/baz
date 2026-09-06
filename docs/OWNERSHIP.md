@@ -1,6 +1,6 @@
 # Baz ownership contract
 
-Baz uses the [bounded/http engine](https://github.com/technologylab-ai/bounded-http).
+Baz uses the [bounded/http](https://technologylab-ai.github.io/bounded-http/) engine.
 The engine's [ownership contract](https://github.com/technologylab-ai/bounded-http/blob/main/docs/OWNERSHIP.md)
 and [documentation website](https://technologylab-ai.github.io/bounded-http/) define network and scheduler ownership.
 This document adds Baz's application boundary.

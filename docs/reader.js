@@ -48,10 +48,44 @@
       const count = counts.get(slug) || 0; counts.set(slug, count + 1);
       heading.id = slug + (count ? '-' + count : '');
       if (heading.tagName !== 'H2' && heading.tagName !== 'H3') return;
-      const link = document.createElement('a'); link.href = '#' + heading.id; link.textContent = heading.textContent;
+      const link = document.createElement('a'); link.href = '#' + heading.id; link.textContent = heading.textContent.replaceAll('bounded/http', 'HTTP engine');
       if (heading.tagName === 'H3') link.className = 'sub'; toc.append(link);
     });
     toc.hidden = !toc.children.length;
+  }
+  function linkEngineName(container) {
+    // Historical Markdown stays unchanged; rendered prose follows the brand-link rule.
+    const website = 'https://technologylab-ai.github.io/bounded-http/';
+    container.querySelectorAll('a').forEach(link => {
+      if (!link.textContent.includes('bounded/http') || link.href === website) return;
+      if (link.textContent.trim() === 'bounded/http' || link.href === 'https://github.com/technologylab-ai/bounded-http') {
+        link.href = website;
+      } else {
+        // Keep the destination of named source/PR links and use a source label.
+        const walker = document.createTreeWalker(link, NodeFilter.SHOW_TEXT);
+        while (walker.nextNode()) {
+          const node = walker.currentNode;
+          if (!node.parentElement.closest('code,pre')) node.textContent = node.textContent.replaceAll('bounded/http', 'engine');
+        }
+      }
+    });
+    const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
+    const nodes = [];
+    while (walker.nextNode()) {
+      const node = walker.currentNode;
+      if (node.textContent.includes('bounded/http') && !node.parentElement.closest('a,code,pre')) nodes.push(node);
+    }
+    for (const node of nodes) {
+      const parts = node.textContent.split('bounded/http'); const fragment = document.createDocumentFragment();
+      parts.forEach((part, index) => {
+        if (index) {
+          const link = document.createElement('a'); link.href = website;
+          link.textContent = 'bounded/http'; fragment.append(link);
+        }
+        fragment.append(document.createTextNode(part));
+      });
+      node.replaceWith(fragment);
+    }
   }
   function decorate() {
     article.querySelectorAll('pre code').forEach(code => {
@@ -95,7 +129,7 @@
         USE_PROFILES: {html: true}, FORBID_TAGS: ['style', 'form', 'input', 'button', 'textarea', 'select', 'video', 'audio', 'source'],
         FORBID_ATTR: ['style', 'id', 'name', 'srcset'], ALLOW_DATA_ATTR: false, RETURN_DOM_FRAGMENT: true
       });
-      links(new URL(file, root), fragment); article.replaceChildren(fragment); contents();
+      links(new URL(file, root), fragment); article.replaceChildren(fragment); linkEngineName(article); contents();
     } else {
       const title = document.createElement('h1'); title.textContent = file.split('/').pop();
       const pre = document.createElement('pre'); const code = document.createElement('code');

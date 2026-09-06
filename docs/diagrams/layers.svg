@@ -11,7 +11,7 @@
 <text x="658" y="247" font-size="11" fill="#bc3c20" font-family="ui-monospace, monospace">NO AUTOMATIC CANCELLATION</text>
 <path d="M605 140h30M303 176v20" stroke="#9caaa9"/>
 <rect x="1" y="196" width="604" height="73" fill="#f8f7f1" stroke="#bc3c20"/>
-<text x="25" y="227" font-size="22">bounded/http</text><text x="25" y="251" font-size="13" fill="#4e6370">HTTP parser · scheduler · reservations · connection ownership</text>
+<a href="https://technologylab-ai.github.io/bounded-http/" aria-label="bounded/http website"><text x="25" y="227" font-size="22">bounded/http</text></a><text x="25" y="251" font-size="13" fill="#4e6370">HTTP parser · scheduler · reservations · connection ownership</text>
 <path d="M99 269v25m204-25v25m204-25v25" stroke="#9caaa9"/>
 <g stroke="#cdd3d0" fill="#efeee6"><rect x="1" y="294" width="196" height="45"/><rect x="205" y="294" width="196" height="45"/><rect x="409" y="294" width="196" height="45"/></g>
 <g font-size="13" text-anchor="middle"><text x="99" y="322">Linux · io_uring</text><text x="303" y="322">macOS · kqueue</text><text x="507" y="322">Windows · IOCP</text></g>

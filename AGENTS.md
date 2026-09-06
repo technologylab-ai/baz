@@ -1,12 +1,12 @@
 # Baz — Bounded Async Zap
 
-Use exact Zig 0.16.0 from `.zig-version`. Baz consumes the separate bounded/http
+Use exact Zig 0.16.0 from `.zig-version`. Baz consumes the separate [bounded/http](https://technologylab-ai.github.io/bounded-http/)
 engine through its exported `bounded_http` module. Keep engine parser, transport and scheduler changes in that dependency
 and submit an upstream PR. This repository owns App, routing, request/form views,
 responses, examples and their tests. The [Zig wiki](https://github.com/technologylab-ai/zigllmwiki)
 provides pinned source guidance; a sibling checkout is optional. Preserve its
 source/evidence hierarchy. Baz is an independent repository; never push Baz
-branches to the bounded/http engine repository.
+branches to the [bounded/http](https://technologylab-ai.github.io/bounded-http/) engine repository.
 
 Preallocate framework threads, buffers, queues and operation state at startup.
 Never allocate, spawn threads or perform blocking work on the request I/O loop.
@@ -33,7 +33,13 @@ measurement processes that may not honor the new protocol. Retain your lock
 through child cleanup and remove only your own metadata/directory. Never steal
 an old lock by age alone. Read the wiki's [full cooperative protocol](https://github.com/technologylab-ai/zigllmwiki/blob/main/docs/platform-testing.md). Mac measurements by another agent take precedence
 while that agent holds its reservation. Windows performance remains deferred.
-The user resumed the Windows dependency update after bounded/http PR #2 merged.
+The user resumed the Windows dependency update after [bounded/http](https://technologylab-ai.github.io/bounded-http/) PR #2 merged.
 Keep native Windows compilation, wire behavior, shard handoff, and shutdown
 evidence separate from cross-compilation. Read HANDOFF.md for the baseline and
 current verification state.
+
+In README, website, and documentation prose, the engine brand `bounded/http`
+always links to https://technologylab-ai.github.io/bounded-http/. Use a separate
+“engine source” label for GitHub links. Code identifiers remain `bounded_http`.
+Streaming must become a prominent website feature after its implementation and
+wire/ownership gates pass; do not describe the one-shot API as streaming.
