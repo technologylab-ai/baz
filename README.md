@@ -14,6 +14,10 @@ The engine's [GitHub Pages documentation](https://technologylab-ai.github.io/bou
 explains its architecture, embedding API, and ownership model; the
 [engine source](https://github.com/technologylab-ai/bounded-http) is a separate repository.
 
+**Native HTTP backends: Linux · io_uring, macOS · kqueue, Windows · IOCP.**
+Baz uses these transports directly through [bounded/http](https://technologylab-ai.github.io/bounded-http/),
+alongside your application's caller-supplied `std.Io`.
+
 The first implementation provides:
 
 - **Streaming responses:** write, flush, sleep, and write again inside one handler,
@@ -44,6 +48,12 @@ See the [repository record](docs/REPOSITORY.md) for branches, history, CI, and p
 **Linux, macOS, and native Windows x64 are supported.** Baz adds native Windows
 support beyond [Zap’s facil.io-based platform support](https://github.com/zigzap/zap/blob/master/README.md).
 Both the framework and its [bounded/http](https://technologylab-ai.github.io/bounded-http/) engine are written in Zig.
+
+| Platform | Native HTTP backend |
+| --- | --- |
+| Linux | **io_uring** |
+| macOS | **kqueue** |
+| Windows x64 | **IOCP** |
 
 All three platforms passed Debug and ReleaseSafe verification, the independent
 package consumer, all 14 App groups, all 20 ported-example groups, and all 14
