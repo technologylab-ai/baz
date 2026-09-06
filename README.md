@@ -2,7 +2,7 @@
 
 **Bounded Async Zap.**
 
-[Website & documentation](https://technologylab-ai.github.io/baz/) · [API guide](docs/APP-API.md) · [22 examples](examples/README.md)
+[Website & documentation](https://technologylab-ai.github.io/baz/) · [API guide](docs/APP-API.md) · [23 examples](examples/README.md)
 
 A **pure Zig** successor to [Zap](https://github.com/zigzap/zap), built in **Zig 0.16.0**
 on [bounded/http](https://technologylab-ai.github.io/bounded-http/). It keeps Zap's typed

@@ -207,8 +207,9 @@ def run(directory):
                 reader = CookieReader(sock)
                 redirect(call(sock, reader, "/stop", status=303, method="POST"), 303, b"/login")
                 token = login(sock, reader)
-                response = call(sock, reader, "/stop", method="POST", headers=(("Cookie", token),))
-                wire.require(response[2] == b"Stop requested", "authenticated shutdown response changed")
+                # requestStop may retire this connection before its prepared response is sent.
+                # Authorization and terminal ownership are the guarantees under test here.
+                sock.sendall(request_bytes("/stop", method="POST", headers=(("Cookie", token),)))
             wire.require(server.process.wait(timeout=5) == 0, "authenticated shutdown did not finish")
         passed("only an authenticated request can stop the session example in " + execution, server)
 
