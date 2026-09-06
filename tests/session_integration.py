@@ -25,6 +25,7 @@ import wire_support as wire
 class SessionServer(CookieServer):
     def __init__(self, binary, execution, workers, ttl_ms=1800000):
         super().__init__(binary, execution, workers)
+        self.options["connections"] = max(1, workers)
         self.options["session_ttl_ms"] = ttl_ms
 
 
@@ -210,7 +211,7 @@ def run(directory):
                 # requestStop may retire this connection before its prepared response is sent.
                 # Authorization and terminal ownership are the guarantees under test here.
                 sock.sendall(request_bytes("/stop", method="POST", headers=(("Cookie", token),)))
-            wire.require(server.process.wait(timeout=5) == 0, "authenticated shutdown did not finish")
+                wire.require(server.process.wait(timeout=5) == 0, "authenticated shutdown did not finish")
         passed("only an authenticated request can stop the session example in " + execution, server)
 
     executable = SessionServer(binary, "inline", 0).binary

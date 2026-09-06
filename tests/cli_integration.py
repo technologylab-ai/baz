@@ -204,7 +204,7 @@ def run(directory):
 
     base = ["--port=0", "--connections=4", "--shards=1", "--duration-ms=15000"]
     for name in FIXTURES:
-        workers = 0 if name in ("baz", "baz-cookies") else 2
+        workers = 0 if name in ("baz", "baz-cookies", "baz-middleware") else 2
         startup(name, "fixture execution default", base, workers,
                 "workers" if workers else "inline_event_loop")
 
