@@ -5,7 +5,7 @@ It writes, flushes, sleeps, and writes again before the handler returns.
 Run `zig build run-streaming -Doptimize=ReleaseSafe -- --port 8080`, then use
 `curl -N http://127.0.0.1:8080/` in another terminal.
 See the [streaming guide](../docs/STREAMING.md) for its worker and lifetime bounds.
-This new example accompanies the 20 Zap ports below, for 21 examples in total.
+This new example accompanies the 21 Zap ports below, for 22 examples in total.
 
 These examples adapt the public behavior of our predecessor
 [Zap](https://github.com/zigzap/zap), using the local Zig 0.16 port at
@@ -13,8 +13,8 @@ These examples adapt the public behavior of our predecessor
 the external [bounded/http](https://technologylab-ai.github.io/bounded-http/) engine. Original source: [the pinned Zap examples](https://github.com/zigzap/zap/tree/f6099ecec496c7ec623c5913baa5b6b5da2e883d/examples).
 Zap's copyright/license is preserved in [LICENSE-ZAP](LICENSE-ZAP).
 
-The 20 supported examples are standalone executables on Linux, macOS, and native
-Windows x64. All 20 passed the [native three-platform gate](../reports/2026-09-06-windows-baz.md). Each uses the public
+The 21 Zap ports are standalone executables on Linux, macOS, and native
+Windows x64. The original 20 passed the [native three-platform gate](../reports/2026-09-06-windows-baz.md). Each uses the public
 framework import and [shared executable support](support.zig); there is no
 facil.io dependency. Names retain the original build targets for easy comparison.
 
@@ -38,7 +38,7 @@ before delivery; only terminal shutdown establishes released storage.
 
 ## Typed CLI options with process initialization
 
-All 21 public examples use [zli](https://github.com/renerocksai/zli) through
+All 22 public examples use [zli](https://github.com/renerocksai/zli) through
 [shared executable support](support.zig). The main App demonstration and both
 wire fixtures use the same parser with their own typed option structs. Each
 entry point receives Zig 0.16's `std.process.Init`:
@@ -76,6 +76,7 @@ arguments before startup, both option spellings, worker defaults, and shutdown.
 
 | Original target | Port | Preserved purpose and deliberate adaptation |
 | --- | --- | --- |
+| `mustache` | [mustache.zig](mustache.zig) | Real HTML with typed lists, dotted/parent lookup, escaped text, and explicit partials. Startup parsing and bounded rendering; exact original outputs also have library compatibility tests. |
 | `hello` | [hello.zig](hello.zig) | Minimal HTML response with an explicit route. |
 | `hello2` | [hello2.zig](hello2.zig) | GET/POST inspection of method, raw query, headers and bounded body; response inspection replaces blocking callback logging. |
 | `hello_json` | [hello_json.zig](hello_json.zig) | Small JSON user lookup with explicit ID parsing. |
@@ -110,17 +111,28 @@ part; each binary preview is limited to 64 bytes. The underlying framework raw
 views and explicit decoders preserve arbitrary bytes. Unsupported Content-Type
 or Content-Encoding produces an ordinary error.
 
-Three original targets are deliberately absent:
+## Mustache pages
+
+[mustache.zig](mustache.zig) serves a greeting form and typed user cards, with
+[page markup](assets/mustache.html) and a [user partial](assets/mustache-user.html)
+in separate files. Parse once at startup, then call `ctx.response.mustache`.
+The renderer writes directly into the reserved response draft, with no allocated
+rendered string. See the [guide](../docs/MUSTACHE.md) for limits, escaping, and copying.
+
+```sh
+zig build run-mustache -Doptimize=ReleaseSafe -- --port 8080
+python3 tests/mustache_integration.py
+```
+
+Two original targets are deliberately absent:
 
 | Target | Disposition |
 | --- | --- |
 | `https` | TLS is out of scope by user decision. |
 | `websockets` | Requires HTTP upgrade and WebSocket connection/message ownership, absent from the current engine; queued separately. |
-| `mustache` | Postponed until a suitable pure Zig library is selected. Prefer explicit allocator, startup parsing and rendering into caller-bounded output. The original exercises sections, changed delimiters, escaped/raw interpolation and nested lookup; static HTML would not preserve that example. |
 
-The source-reviewed [Mustache shortlist](../docs/MUSTACHE-CANDIDATES.md) records
-two pure Zig candidates and their unresolved exact-version, license and work-bound
-questions. No renderer dependency has been added.
+The [Mustache selection record](../docs/MUSTACHE-CANDIDATES.md) records provenance,
+pure Zig alternatives, and the independent original-Zap and official-core tests.
 
 The [framework roadmap](../docs/APP-API-ROADMAP.md) tracks repository publication
 with a pinned [bounded/http](https://technologylab-ai.github.io/bounded-http/) dependency, public middleware/resumable API work and

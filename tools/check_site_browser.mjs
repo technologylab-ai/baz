@@ -129,7 +129,7 @@ try {
   await check('desktop-landing', async () => {
     await navigate();
     const state = await evaluate(`({title:document.title,headline:document.querySelector('h1').textContent,diagrams:document.querySelectorAll('svg[role="img"]').length,examples:document.querySelectorAll('.example-card').length,highlight:!!document.querySelector('.hljs-keyword')})`);
-    assert.equal(state.title,'Baz — Bounded Async Zap'); assert.equal(state.diagrams,4); assert.equal(state.examples,21); assert(state.highlight);
+    assert.equal(state.title,'Baz — Bounded Async Zap'); assert.equal(state.diagrams,4); assert.equal(state.examples,22); assert(state.highlight);
     await noOverflow(); await screenshot('baz-desktop'); return state;
   });
   await check('maintained-source-excerpt', async () => {
@@ -199,12 +199,12 @@ try {
   });
   await check('example-filters', async () => {
     await evaluate('document.querySelector("#examples").scrollIntoView({behavior:"instant"})');
-    for (const [group,count] of [['data',2],['composition',6],['app',3],['routing',5],['responses',5],['all',21]]) {
+    for (const [group,count] of [['data',2],['composition',6],['app',3],['routing',5],['responses',6],['all',22]]) {
       await click(`button[data-filter="${group}"]`);
       assert.equal(await evaluate('document.querySelectorAll(".example-card:not([hidden])").length'),count);
-      assert.equal(await evaluate('document.querySelector("#example-count").textContent'),`${count} of 21 examples`);
+      assert.equal(await evaluate('document.querySelector("#example-count").textContent'),`${count} of 22 examples`);
     }
-    return {groups:6,total:21};
+    return {groups:6,total:22};
   });
   await check('desktop-diagrams-and-benchmark', async () => {
     await evaluate('document.querySelector("#engine").scrollIntoView({behavior:"instant"})'); await screenshot('baz-engine');
@@ -298,10 +298,10 @@ try {
     await writeFile(path.join(output,'baz-print.pdf'),Buffer.from(pdf.data,'base64'));
     await send('Emulation.setEmulatedMedia',{media:''}); await send('Emulation.setScriptExecutionDisabled',{value:true});
     await navigate();
-    assert.equal(await evaluate('document.querySelectorAll(".example-card:not([hidden])").length'),21);
+    assert.equal(await evaluate('document.querySelectorAll(".example-card:not([hidden])").length'),22);
     assert(await evaluate('document.querySelector(".language-zig").textContent.includes("percentDecodeInto")'));
     assert(await evaluate('[...document.querySelectorAll("[role=tabpanel]")].every(panel => !panel.hidden && getComputedStyle(panel).display !== "none")'));
-    await send('Emulation.setScriptExecutionDisabled',{value:false}); return {printBytes:Buffer.from(pdf.data,'base64').length,noJsExamples:21};
+    await send('Emulation.setScriptExecutionDisabled',{value:false}); return {printBytes:Buffer.from(pdf.data,'base64').length,noJsExamples:22};
   });
   await check('no-unexpected-network-or-errors', async () => {
     assert.equal(exceptions.length,0,JSON.stringify(exceptions));

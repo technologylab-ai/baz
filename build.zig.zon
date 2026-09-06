@@ -4,6 +4,10 @@
     .fingerprint = 0x78240498d30be4ab,
     .minimum_zig_version = "0.16.0",
     .dependencies = .{
+        .mustache = .{
+            .url = "https://github.com/technologylab-ai/mustache-zig/archive/22487e4082537aa5b707dd902def866d990fdea1.tar.gz",
+            .hash = "mustache-0.0.1-bbBABwAsCgDDzOEicjx4peKWHmhxxwbzAzhf-UC7wJp1",
+        },
         .zli = .{
             .url = "https://github.com/renerocksai/zli/archive/4f17b1f1eacda7b87c49461e34b1520c392788b2.tar.gz",
             .hash = "zli-0.1.1-pechgr4WAQBsw7p7JPU-GHHZ5xsBpEdfCRNpNtnQYnBz",

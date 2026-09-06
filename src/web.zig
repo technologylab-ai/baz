@@ -8,6 +8,7 @@ pub const params = @import("params.zig");
 pub const form = @import("form.zig");
 pub const multipart = @import("multipart.zig");
 pub const router = @import("router.zig");
+pub const mustache = @import("mustache.zig");
 
 /// Reexport the dependency's actual module. Applications can mix framework
 /// and engine types without creating a second engine module identity.

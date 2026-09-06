@@ -24,6 +24,7 @@ EXAMPLES = [
     ('sendfile', 'responses', 'File content as an embedded asset; no sendfile syscall.'),
     ('senderror', 'responses', 'Controlled errors, with no client-visible stack trace.'),
     ('accept', 'responses', 'Explicit, bounded content negotiation.'),
+    ('mustache', 'responses', 'A greeting form and user cards: startup templates, typed data, bounded HTML.'),
     ('streaming', 'responses', 'Write, flush, sleep, and write again through a standard Zig writer.'),
     ('app_basic', 'app', 'Typed Shared, endpoint state, and instance shutdown.'),
     ('app_errors', 'app', 'Error mapping and discarded private response drafts.'),
@@ -41,7 +42,8 @@ EXAMPLES = [
 
 def documents():
     paths = {'README.md', 'ROADMAP.md', 'LICENSE', '.zig-version', 'build.zig', 'build.zig.zon',
-             'examples/README.md', 'examples/LICENSE-ZAP', 'examples/embedding/build.zig',
+             'examples/README.md', 'examples/LICENSE-ZAP',
+             'examples/assets/mustache.html', 'examples/assets/mustache-user.html', 'examples/embedding/build.zig',
              'examples/embedding/build.zig.zon', 'examples/embedding/src/main.zig',
              'reports/2026-09-06-basic-zap.md', 'reports/2026-09-06-app-api.md',
              'reports/2026-09-06-baz-extraction.md', 'reports/2026-09-06-windows-baz.md',

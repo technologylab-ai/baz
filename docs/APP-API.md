@@ -171,6 +171,7 @@ first, preserving the request and running application side effects once.
 | `header(name, value)` | Validates and copies a header immediately; ordered repeats remain separate. |
 | `text(status, bytes)` / `bytes(status, content_type, bytes)` | Copies caller data immediately, including stack data. |
 | `jsonBytes(status, encoded)` | Copies pre-encoded JSON. |
+| `mustache(status, template, data)` | Renders typed Mustache data into the reserved HTML draft. [Startup setup and bounds](MUSTACHE.md). |
 | `jsonValue(status, value)` | Serializes once into a bounded fixed standard writer. |
 | `print(status, content_type, format, args)` | Standard formatting into the reserved body. |
 | `borrowBody(status, content_type, bytes)` | Selects the entire body from retained input or an immutable server-lifetime asset; bounded by server.max_response_bytes rather than staging. Cannot be mixed with stream/body helpers. |

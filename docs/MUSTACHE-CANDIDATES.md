@@ -1,27 +1,33 @@
-# Deferred pure Zig Mustache evaluation
+# Pure Zig Mustache selection
 
-Source review: 2026-09-06. The user prefers Zig libraries over C wrappers so
-startup parsing, allocator use and request output memory remain controllable.
-No dependency was installed or integrated; these are candidates, not qualified
-runtime features. Mustache integration follows the current API/examples work.
+Source review: 2026-09-06. Baz adopts an MIT-licensed Zig 0.16 library and extends
+its cached renderer with work/depth bounds. The user prefers Zig over C so startup
+parsing, allocator use, and generated response memory remain under application control.
+See the [integration guide](MUSTACHE.md) for the public API and limits.
 
-| Candidate and pinned source | Memory/API fit | Evidence and remaining work |
-| --- | --- | --- |
-| [corvohq/zigstache](https://github.com/corvohq/zigstache/tree/2d59501af015bc470e7fb4b5dbeee37b6d5fb205) | Pure Zig, MIT. Template storage is a configured fixed array (default 1,024 elements), with a bounded parse stack (default 64). Rendering accepts caller output storage and returns overflow; the examined path needs no allocator. | Best first memory-shape candidate. The reviewed CI targets Zig 0.15.2 and package minimum is 0.14.0; exact 0.16.0 compatibility is unverified. Parser nesting bounds do not prove bounded recursive partial rendering. No published release found; pin the reviewed commit. |
-| [limistah/mustache-zig](https://github.com/limistah/mustache-zig/tree/50ff8d472afed5c6907379476f88089639d9bd4e) | Pure Zig. Parsing takes an allocator and owns an arena, suitable for startup. Ordinary rendering targets `*std.Io.Writer`, suitable for a fixed unpublished response. Extended lambda rendering can allocate/reparse and needs a separate policy. | Exact 0.16.0 is declared and exercised by [CI](https://github.com/limistah/mustache-zig/actions/runs/26158127497). Tests were not reproduced here. No license was found in the reviewed tree, so do not adopt without clarification. Rendering/partial work bounds also need qualification. Pin a commit because release and package version labels differ. |
+| Candidate and reviewed source | Decision |
+| --- | --- |
+| [diogok/mustache-zig at eb023612](https://github.com/diogok/mustache-zig/tree/eb023612e85774861e6a9be18e674a497a340f0f) | Selected. Pure Zig, MIT, exact Zig 0.16.0, cached templates and `std.Io.Writer`, typed contexts, a substantial inherited test suite. Baz's [fork](https://github.com/technologylab-ai/mustache-zig) adds bounded cached APIs, parser guards, and independent specification/Zap tests. |
+| [corvohq/zigstache at 2d59501a](https://github.com/corvohq/zigstache/tree/2d59501af015bc470e7fb4b5dbeee37b6d5fb205) | Attractive fixed storage and small API. Its 47 baseline tests passed locally with Zig 0.16, but source review exposed incomplete array/context/partial behavior and no render-work bound. Qualifying it would require replacing too much of the renderer. |
+| [limistah/mustache-zig at 50ff8d47](https://github.com/limistah/mustache-zig/tree/50ff8d472afed5c6907379476f88089639d9bd4e) | Zig 0.16 and writer API fit. No license in the reviewed tree; not adopted. |
+| [batiati/mustache-zig](https://github.com/batiati/mustache-zig) | The selected library's older upstream lineage. Its existing Zig 0.16 fork avoids a new full compiler port. Attribution remains in the dependency. |
 
-Primary implementation evidence:
-[zigstache source](https://github.com/corvohq/zigstache/blob/2d59501af015bc470e7fb4b5dbeee37b6d5fb205/src/zigstache.zig),
-[zigstache CI](https://github.com/corvohq/zigstache/blob/2d59501af015bc470e7fb4b5dbeee37b6d5fb205/.github/workflows/ci.yml),
-[mustache-zig renderer](https://github.com/limistah/mustache-zig/blob/50ff8d472afed5c6907379476f88089639d9bd4e/src/render.zig),
-[mustache-zig package](https://github.com/limistah/mustache-zig/blob/50ff8d472afed5c6907379476f88089639d9bd4e/build.zig.zon).
+The selected baseline's local Debug suite passed 329 tests with 29 upstream
+comptime-disabled skips. Those skips are not counted as core-spec evidence.
+The independent runner vendors the six official core JSON suites at
+[`e8ec001d`](https://github.com/mustache/spec/tree/e8ec001db7f594521e773c34866aca2b5d6b0037):
+136 cases, each rendered with normal and exact output capacity, without skips.
+It uncovered inherited standalone-partial indentation bugs, repaired in the fork.
 
-Evaluate zigstache first under exact 0.16.0 Debug/ReleaseSafe. Require the
-original Zap example's changed delimiters, list sections, dotted lookup, escaped
-and unescaped interpolation. Check startup storage exhaustion, exact-fit and
-one-byte-overflow output, malformed templates, input escaping, partial cycles
-and nesting/work bounds. Start with bounded acyclic templates and no lambdas;
-render into an unpublished fixed response and discard any overflow prefix.
-Use allocator instrumentation where applicable. Do not add a renderer merely
-because its simplest greeting compiles; preserve official-spec evidence and
-native framework ownership tests separately.
+The fork's additive bounded API disallows lambdas, inheritance/blocks, and dynamic
+partials. Nodes, iterations (even empty ones), lookups, and source/output bytes
+consume a finite shared budget. Depth limits cover recursion through sections,
+partials, and context lookup. Parser recursion is guarded before descent. Failed
+renders can leave a writer prefix; Baz keeps response output private until success.
+
+Original Zap behavior is pinned to
+[`f6099ece`](https://github.com/zigzap/zap/tree/f6099ecec496c7ec623c5913baa5b6b5da2e883d).
+Compatibility tests preserve its exact typed array/slice output, raw versus
+escaped interpolation, changed delimiters, separately parsed partials, dotted
+lookup, and final-newline differences. The runnable Baz example presents those
+capabilities as a small real HTML page with concise Zig source.

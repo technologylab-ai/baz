@@ -4,6 +4,7 @@
 //! Earlier frozen responses are never part of this draft.
 const std = @import("std");
 const api = @import("bounded_http").api;
+const templates = @import("mustache.zig");
 
 pub const Limits = struct {
     /// Serialized extra fields, including names, separators and CRLFs.
@@ -156,6 +157,18 @@ pub const Response = struct {
         try self.checkBody(status, content_type, 0);
         var out: std.Io.Writer = .fixed(self.bodyStorage());
         try out.print(format, args);
+        try self.checkBody(status, content_type, out.end);
+        self.setBody(status, content_type, out.end);
+    }
+
+    /// Render HTML once into reserved unpublished body storage. Template and
+    /// data are borrowed during rendering only. A failed render never prepares
+    /// or publishes its prefix; App's error path discards the private draft.
+    pub fn mustache(self: *Response, status: u16, template: *const templates.Template, data: anytype) !void {
+        const content_type = "text/html; charset=utf-8";
+        try self.checkBody(status, content_type, 0);
+        var out: std.Io.Writer = .fixed(self.bodyStorage());
+        try template.renderTo(&out, data);
         try self.checkBody(status, content_type, out.end);
         self.setBody(status, content_type, out.end);
     }
@@ -654,4 +667,50 @@ test "configured reservation includes all draft storage and exact output fit" {
     try testing.expectError(error.OutputReservationUnavailable, Response.init(&writer, limits));
     try testing.expectError(error.InvalidResponseLimits, (Limits{ .body_bytes = 1024 * 1024 }).reservationBytes());
     try testing.expectError(error.InvalidResponseLimits, (Limits{ .max_headers = 1025 }).validate());
+}
+
+test "Mustache writes directly to unpublished storage and selects the whole HTML body" {
+    var template = try templates.Template.init(testing.allocator, "Hello {{name}}", .{});
+    defer template.deinit();
+    var arena: [1024]u8 = undefined;
+    const cache = testCache();
+    var writer = api.Writer.init(&arena, &cache, 0);
+    writer.open(0, true, false);
+    var response = try Response.init(&writer, .{ .header_bytes = 0, .body_bytes = 14 });
+    try response.mustache(200, &template, .{ .name = "<>" });
+    try testing.expect(!writer.began and !writer.frozen and response.prepared);
+    try testing.expectEqualStrings("Hello &lt;&gt;", response.bodyStorage()[0..response.body_len]);
+    try testing.expectEqual(@as(usize, 0), writer.draft_copy_bytes);
+    try testing.expectError(error.InvalidState, response.mustache(200, &template, .{}));
+    try testing.expectError(error.InvalidState, response.text(200, "suffix"));
+    _ = try response.finish();
+    try testing.expectEqualStrings("Hello &lt;&gt;", writer.committed());
+    try testing.expectEqual(@as(usize, 14), writer.draft_copy_bytes);
+    try testing.expect(std.mem.indexOf(u8, arena[0..writer.body_start], "Content-Type: text/html; charset=utf-8\r\n") != null);
+}
+
+test "Mustache overflow work exhaustion and bodyless status keep prefixes private" {
+    var template = try templates.Template.init(testing.allocator, "private {{name}}", .{});
+    defer template.deinit();
+    var budgeted = try templates.Template.init(testing.allocator, "private {{#rows}}{{/rows}}", .{ .render_limits = .{ .max_work = 64 } });
+    defer budgeted.deinit();
+    var arena: [1024]u8 = undefined;
+    const cache = testCache();
+    var writer = api.Writer.init(&arena, &cache, 0);
+    for (0..3) |failure| {
+        writer.open(0, true, false);
+        var response = try Response.init(&writer, .{ .header_bytes = 0, .body_bytes = 16 });
+        switch (failure) {
+            0 => try testing.expectError(error.WriteFailed, response.mustache(200, &template, .{ .name = "<&>" })),
+            1 => try testing.expectError(error.WorkLimitExceeded, response.mustache(200, &budgeted, .{ .rows = [_]bool{true} ** 100 })),
+            2 => try testing.expectError(error.InvalidResponse, response.mustache(204, &template, .{ .name = "x" })),
+            else => unreachable,
+        }
+        try testing.expect(!response.prepared and !writer.began and writer.buffered == 0);
+        try response.text(500, "fallback");
+        _ = try response.finish();
+        try testing.expectEqualStrings("fallback", writer.committed());
+        try testing.expect(std.mem.indexOf(u8, arena[0..writer.buffered], "private") == null);
+        writer.release();
+    }
 }

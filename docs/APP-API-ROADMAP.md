@@ -1,8 +1,8 @@
 # Baz implementation roadmap
 
-Status: first implementation, 20 example ports plus worker streaming, published pure Zig package/site, and native Windows x64/Linux/macOS support, 2026-09-06.
+Status: first implementation, 21 example ports plus worker streaming, published pure Zig package/site, and native Windows x64/Linux/macOS support, 2026-09-06.
 Exact target: Zig 0.16.0. See the [implemented API](APP-API.md),
-[20 example ports](../examples/README.md), and
+[21 example ports](../examples/README.md), and
 [current native receipt](../reports/2026-09-06-streaming.md) for exact evidence and limits.
 
 Build Baz (Bounded Async Zap) with Zap's typed App/endpoint ergonomics, borrowed-byte
@@ -21,12 +21,14 @@ tracks transport reliability, performance, and platform work. Its
 - Starting engine commit: `4b3cd5551d80b422ec6ef763627d019e6f1dfb83`.
 - Reviewed Zap port: `../fi/deps/zap` at
   `f6099ecec496c7ec623c5913baa5b6b5da2e883d` (its own Git repository).
-- API-01–05 are implemented as the first bounded one-shot slice. Twenty of the
-  23 original example targets are ported/adapted, with explicit differences.
-  TLS is out of scope; WebSockets needs upgrade support; Mustache is postponed
-  pending a [pure Zig library evaluation](MUSTACHE-CANDIDATES.md).
+- API-01–05 are implemented as the first bounded one-shot slice. Twenty-one of
+  23 original example targets are ported/adapted, including Mustache pages with
+  startup parsing and bounded typed rendering. See [MUSTACHE.md](MUSTACHE.md).
+  TLS is out of scope; WebSockets needs upgrade support.
 - Worker streaming is implemented and passed native gates on all three platforms;
   see [STREAMING.md](STREAMING.md). Typed inline continuations remain API-07.
+- Current priority: qualify API-09 Mustache on all three native platforms;
+  the user prioritized real application templating ahead of composition work.
 - Next bounded work: finish API-06's public composition/locals/cookie contract,
   using the example-local wrappers as real use cases; then API-07.
   Baz now consumes an external engine package; repository and Pages publication are complete.
@@ -78,7 +80,8 @@ Split implementation across sessions at its named gate and record exact state.
 | API-05 | implemented; scoped receipt | Flat multipart fields/files over retained input. | API-04 | APP-MULTIPART |
 | API-06 | queued | Typed locals, middleware, authentication composition, cookies and redirects. | API-02, API-03 | APP-MIDDLEWARE |
 | API-07 | worker streaming implemented; typed inline continuations queued | Typed explicit resumable endpoints and retention rules. | API-03, API-06 | APP-RESUME |
-| API-08 | partial: 20 examples and external package | Finish remaining migration examples and successor MVP qualification; repository and Pages publication are integrated. | API-01–07 | APP-NATIVE |
+| API-08 | partial: 21 ports, streaming example and external package | Finish remaining migration examples and successor MVP qualification; repository and Pages publication are integrated. | API-01–07 | APP-NATIVE |
+| API-09 | implemented; native gates pending | Pure Zig Mustache: startup template/partial ownership, bounded typed rendering into reserved HTML, original Zap compatibility and official core fixtures. | API-02, API-03 | APP-MUSTACHE |
 | IO-01–04 | deferred | Owned std.Io feasibility, isolated prototype, HTTP integration and adoption decision. | First API MVP; see STD-IO-DECISION | STDIO-PROTOTYPE, STDIO-HTTP-OWNERSHIP, STDIO-ADOPTION |
 
 API-01 and API-02 can proceed independently after agreeing on module exports.
@@ -338,7 +341,7 @@ Planning-only edits need source/link review and `git diff --check`; they do not
 establish new Zig/runtime evidence. Every implementation step registers all new
 Zig modules and examples in `zig build verify`, including instantiated generic
 APIs. The current build formats `src`, `examples` and named build files, and
-compiles all 20 port executables, the streaming example, and its wire fixture through `verify`.
+compiles all 21 port executables, the streaming example, and its wire fixture through `verify`.
 
 Before heavy builds or runtime suites on maxross/omarx1, inspect existing
 measurement processes and acquire `/tmp/zig-http-measurement.lock` atomically
@@ -400,3 +403,21 @@ For each implementation session add: commit(s), owned/changed files, decisions,
 named gates passed/pending and exact receipts, remaining blocker (if any), and
 the next bounded task. Refresh [HANDOFF.md](../HANDOFF.md) briefly when this track
 becomes the active implementation. Keep historical engine evidence intact.
+
+
+### API-09 — bounded Mustache pages
+
+The user prioritized templating over the other open features. The first slice
+uses the [pure Zig library selection](MUSTACHE-CANDIDATES.md), immutable startup
+owners, explicit partial sources, and `Response.mustache` into private output
+storage. There is no rendered-string allocation or extra scratch-body copy;
+the existing publication compaction remains. See [the guide](MUSTACHE.md).
+
+APP-MUSTACHE requires Debug/ReleaseSafe wrapper and response tests, an independent
+package consumer, all 136 official core cases and original Zap array/slice/partial
+outputs, plus 12 native HTTP groups on Linux/macOS/Windows. Output overflow,
+empty-output work exhaustion, partial cycles, parser nesting/path limits,
+concurrent template reuse, terminal ownership, and no framework allocation after
+startup are separate checks. Template startup storage is an explicit application
+allocation outside the engine's heap statistics. Lambdas, inheritance, dynamic
+partials and implicit filesystem lookup remain outside this slice.
