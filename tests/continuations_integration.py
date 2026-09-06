@@ -149,10 +149,14 @@ def run(binary):
         with ContinuationServer(binary, execution, workers) as server:
             with server.connect() as sock:
                 reader = StreamReader(sock)
-                sock.sendall(request_bytes("/events?slot=0&mode=wait_first") + request_bytes("/ping"))
+                sock.sendall(request_bytes("/ping") + request_bytes("/events?slot=0&mode=wait_first") + request_bytes("/ping"))
                 first = reader.response()
-                wire.require(first[0] == 200 and first[2] == b"after timer\n", "first timer could not prepare the response")
-                wire.require(reader.response()[2] == b"ok", "queued request overtook a waiting continuation")
+                wire.require(first[0] == 200 and first[2] == b"ok", "initial response did not precede the waiting continuation")
+                delayed = reader.response()
+                wire.require(delayed[0] == 200 and delayed[2] == b"after timer\n", "first timer could not prepare the response")
+                wire.require(delayed[1].get(b"x-wait") == b"retained", "initial-wait arena rebasing lost private response headers")
+                final = reader.response()
+                wire.require(final[0] == 200 and final[2] == b"ok", "queued request overtook a waiting continuation")
                 observed = reconciled(sock, reader, 0)
                 wire.require(observed["starts"] == observed["timers"] == observed["resumes"] == observed["after"] == 1
                              and observed["flushed"] == 0, "wait-before-first dispatched extra callbacks")

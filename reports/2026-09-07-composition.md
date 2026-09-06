@@ -33,9 +33,10 @@ desktop/mobile, tabs, source identity, all published documents, print, no-JavaSc
 behavior and network/error checks. The continuation section was visually reviewed
 beside the worker-streaming example. [Browser receipt](2026-09-07-composition/browser.json).
 
-The initial full ReleaseSafe build passed 89/89 steps and 161 unit test executions,
-plus four package-consumer tests. Final-source native CI (including the fifth
-consumer test) remains in progress. [Zig source hashes](2026-09-07-composition/zig-sources.sha256)
+Local verification passed Debug 59/59 steps and ReleaseSafe verify/install/examples
+89/89 steps, with 161 unit test executions and five independent package-consumer
+tests in each mode. The final pipeline/header regression also passed the 20-group
+ReleaseSafe continuation suite. Hosted native CI remains in progress. [Zig source hashes](2026-09-07-composition/zig-sources.sha256)
 identify the final application source independently of documentation-only commits.
 
 ## Engine qualification

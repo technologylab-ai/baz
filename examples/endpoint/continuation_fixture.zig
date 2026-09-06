@@ -151,7 +151,10 @@ fn start(ctx: *Context, state: *State) !Step {
         return .finish;
     }
     if (state.mode == .wait_hold) return .{ .wait = 10 * std.time.ns_per_s };
-    if (state.mode == .wait_first) return .{ .wait = 100 * std.time.ns_per_ms };
+    if (state.mode == .wait_first) {
+        try ctx.response.header("X-Wait", "retained");
+        return .{ .wait = 100 * std.time.ns_per_ms };
+    }
     var output = try ctx.response.snapshot(200, "text/plain; charset=utf-8", .{
         .content_length = if (state.mode == .known) 19 else null,
     });
