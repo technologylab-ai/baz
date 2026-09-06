@@ -1,0 +1,77 @@
+name: Windows build and unit tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: baz-windows-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  windows-x64:
+    runs-on: windows-latest
+    timeout-minutes: 25
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Install checksum-verified Zig from .zig-version
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $version = (Get-Content -Raw .zig-version).Trim()
+          if ($version -cne "0.16.0") { throw "Expected the exact Zig 0.16.0 baseline" }
+          $index = Invoke-RestMethod https://ziglang.org/download/index.json -TimeoutSec 30
+          $artifact = $index.PSObject.Properties[$version].Value.PSObject.Properties["x86_64-windows"].Value
+          $url = [string] $artifact.tarball
+          $expected = ([string] $artifact.shasum).ToLowerInvariant()
+          if ($url -notmatch '^https://ziglang\.org/' -or $expected -notmatch '^[0-9a-f]{64}$') {
+            throw "Invalid official compiler metadata"
+          }
+          $archive = Join-Path $env:RUNNER_TEMP "baz-zig.zip"
+          Invoke-WebRequest $url -TimeoutSec 180 -OutFile $archive
+          if ((Get-FileHash $archive -Algorithm SHA256).Hash.ToLowerInvariant() -cne $expected) {
+            throw "Compiler checksum mismatch"
+          }
+          $installation = Join-Path $env:RUNNER_TEMP "baz-zig"
+          Expand-Archive $archive -DestinationPath $installation
+          $compiler = @(Get-ChildItem $installation -Recurse -Filter zig.exe -File)
+          if ($compiler.Count -ne 1) { throw "Expected one compiler" }
+          $compiler[0].Directory.FullName | Out-File $env:GITHUB_PATH -Encoding utf8 -Append
+
+      - name: Compile examples and run unit and package-consumer tests
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          New-Item -ItemType Directory -Path "$env:RUNNER_TEMP/baz-windows-logs" -Force | Out-Null
+          if ([Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString() -cne "X64") {
+            throw "This job requires native x64 Windows"
+          }
+          $version = (& zig version).Trim()
+          if ($LASTEXITCODE -ne 0 -or $version -cne (Get-Content -Raw .zig-version).Trim()) {
+            throw "Compiler version mismatch"
+          }
+          "commit=$env:GITHUB_SHA image=$env:ImageOS version=$env:ImageVersion zig=$version" |
+            Set-Content "$env:RUNNER_TEMP/baz-windows-logs/environment.txt"
+          Get-CimInstance Win32_OperatingSystem | Select-Object Caption, Version, BuildNumber, OSArchitecture |
+            ConvertTo-Json | Add-Content "$env:RUNNER_TEMP/baz-windows-logs/environment.txt"
+          foreach ($mode in @("Debug", "ReleaseSafe")) {
+            & zig build verify "-Doptimize=$mode" -j2 --summary all 2>&1 |
+              Tee-Object "$env:RUNNER_TEMP/baz-windows-logs/$mode.log"
+            if ($LASTEXITCODE -ne 0) { throw "$mode verification failed" }
+          }
+
+      - name: Upload build logs
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: baz-windows-x64-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/baz-windows-logs
+          if-no-files-found: warn
+          retention-days: 14

@@ -1,0 +1,14 @@
+{
+  "checked_utc": "2026-09-06T15:38:43.402936+00:00",
+  "groups": [
+    {
+      "pgid": 26075,
+      "present": false
+    },
+    {
+      "pgid": 27010,
+      "present": false
+    }
+  ],
+  "user_pause": true
+}

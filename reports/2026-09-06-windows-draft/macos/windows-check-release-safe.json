@@ -1,0 +1,43 @@
+{
+  "command": [
+    "/Users/rs/bin/zig",
+    "build",
+    "check",
+    "-Dtarget=x86_64-windows",
+    "-Doptimize=ReleaseSafe",
+    "-j2",
+    "--summary",
+    "all"
+  ],
+  "workdir": "/Users/rs/code/github.com/technologylab.ai/zig-http-app-api",
+  "label": "windows-check-release-safe",
+  "started_utc": "2026-09-06T15:36:45.585827+00:00",
+  "lock_owner": {
+    "agent": "Codex /root Baz external dependency",
+    "purpose": "Baz merged engine update, Windows cross-compilation and native macOS correctness gates",
+    "host": "renerocksai-M3-Max-6.local",
+    "started_utc": "2026-09-06T15:34:56.851107+00:00",
+    "owner_pid": 25698,
+    "token": "651db754-718b-48fe-987e-998d7026c6f0",
+    "workdir": "/Users/rs/code/github.com/technologylab.ai/zig-http-app-api"
+  },
+  "watchdog_seconds": 900,
+  "cleanup_runner_sha256": "434e854ece41747e2ab76b52adea62e0c77f091b667f1512ea8756c9393bbfba",
+  "returncode": -15,
+  "finished_utc": "2026-09-06T15:38:12.254666+00:00",
+  "elapsed_seconds": 86.669,
+  "process_group_cleanup": [
+    {
+      "pgid": 27010,
+      "started_utc": "2026-09-06T15:38:12.254567+00:00",
+      "signals": [],
+      "term_timeout_seconds": 8.0,
+      "kill_timeout_seconds": 5.0,
+      "group_disappeared": true,
+      "leader_returncode": -15,
+      "finished_utc": "2026-09-06T15:38:12.254625+00:00"
+    }
+  ],
+  "owned_groups_remaining": [],
+  "complete": false
+}

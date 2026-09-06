@@ -1,0 +1,15 @@
+{
+  "builds_or_runtime_suites_started": false,
+  "keeper_exit_code": 0,
+  "keeper_output": "LOCK_RELEASED 1cbdcf02-f755-4e54-aab8-e492aed187d8 2026-09-06T15:38:20.119525+00:00",
+  "keeper_pid_absent": true,
+  "keeper_session": 92828,
+  "lock_absent": true,
+  "owner_metadata_absent": true,
+  "owner_pid": 1760109,
+  "process_start_ticks": "55296581",
+  "released_utc": "2026-09-06T15:38:20.119525+00:00",
+  "status": "paused",
+  "token": "1cbdcf02-f755-4e54-aab8-e492aed187d8",
+  "verified_utc": "2026-09-06T15:38:34.118103+00:00"
+}

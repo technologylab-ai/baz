@@ -18,5 +18,6 @@ pub fn build(b: *std.Build) void {
             },
         }),
     });
+    b.step("check", "Compile the independent consumer without executing its tests").dependOn(&tests.step);
     b.step("test", "Verify independent framework consumption and engine type identity").dependOn(&b.addRunArtifact(tests).step);
 }

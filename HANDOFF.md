@@ -21,6 +21,7 @@ Repository preparation changes documentation and package contents, not runtime b
 ## Paused Windows work
 
 The local `work/windows-update` branch preserves the paused draft.
+Its [partial receipts](reports/2026-09-06-windows-draft/README.md) are retained on that branch.
 It adds portable process exits, counted console-handler borrows, target-aware compile-only checks, and Windows build/unit CI.
 Its provisional engine pin is `bb14d98756152936fadb6e8353852a686e8d315d`.
 The user paused this update while another agent implements bounded connection handoff to Windows shards.

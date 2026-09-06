@@ -1,0 +1,8 @@
+{
+  "paused_utc": "2026-09-06T15:38:12.207366+00:00",
+  "reason": "User paused dependency update while another agent implements Windows shard handoff",
+  "running_command": "/Users/rs/bin/zig build check -Dtarget=x86_64-windows -Doptimize=ReleaseSafe -j2 --summary all",
+  "pgid": 27010,
+  "action": "SIGTERM to owned build group; finite wrapper reconciles children",
+  "native_windows_executed": false
+}

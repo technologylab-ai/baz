@@ -262,7 +262,7 @@ pub fn App(comptime Shared: type) type {
         pub fn deinit(self: *Self) void {
             if (self.phase == .started) {
                 self.requestStop();
-                self.run() catch std.c._exit(70);
+                self.run() catch engine.failFast(70);
             }
             std.debug.assert(self.phase == .registration or self.phase == .failed or self.phase == .stopped);
             if (self.cluster) |cluster| cluster.deinit();
@@ -433,8 +433,8 @@ test "two prepared Apps have independent ports and stop ownership" {
     try std.testing.expectEqual(@as(u64, 0), second.stats().accepted);
     first.requestStop();
     try std.testing.expect(!second.cluster.?.shards[0].stop_requested.load(.acquire));
-    first.run() catch std.c._exit(70);
-    second.run() catch std.c._exit(70);
+    first.run() catch engine.failFast(70);
+    second.run() catch engine.failFast(70);
     try std.testing.expectEqual(@as(usize, 0), first.budget.late_calls.load(.acquire));
     try std.testing.expectEqual(@as(usize, 0), second.budget.late_calls.load(.acquire));
 }

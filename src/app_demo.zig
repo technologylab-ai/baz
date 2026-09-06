@@ -1,6 +1,10 @@
 //! Runnable first application slice. All request helpers use the public module.
 const std = @import("std");
 const web = @import("baz");
+const builtin = @import("builtin");
+const win32 = struct {
+    extern "kernel32" fn SetConsoleCtrlHandler(?*const fn (u32) callconv(.winapi) i32, i32) callconv(.winapi) i32;
+};
 
 const Shared = struct {
     greeting: []const u8 = "Hello from the App API",
@@ -10,10 +14,25 @@ const Shared = struct {
 };
 const Application = web.App(Shared);
 const Context = Application.Context;
-var active_app: ?*Application = null;
+var active_app: std.atomic.Value(?*Application) = .init(null);
+var active_controls: std.atomic.Value(u32) = .init(0);
 
 fn stopSignal(_: std.posix.SIG) callconv(.c) void {
-    if (active_app) |app| app.requestStopFromSignal();
+    requestControlStop();
+}
+
+fn stopConsole(kind: u32) callconv(.winapi) i32 {
+    if (kind != 0 and kind != 1) return 0; // CTRL_C_EVENT and CTRL_BREAK_EVENT
+    requestControlStop();
+    return 1;
+}
+
+fn requestControlStop() void {
+    // Register the borrow before loading the pointer. Teardown clears the
+    // pointer, then waits for every earlier handler to release its borrow.
+    _ = active_controls.fetchAdd(1, .seq_cst);
+    defer _ = active_controls.fetchSub(1, .seq_cst);
+    if (active_app.load(.seq_cst)) |app| app.requestStopFromSignal();
 }
 
 const Hello = struct {
@@ -259,15 +278,31 @@ pub fn main(init: std.process.Init) !void {
     try app.route("HEAD", "/head", explicitHead);
     try app.route("M-SEARCH", "/extension", earlierStatic);
     try app.start();
-    active_app = app;
-    defer active_app = null;
-    const action: std.posix.Sigaction = .{ .handler = .{ .handler = stopSignal }, .mask = std.posix.sigemptyset(), .flags = 0 };
-    std.posix.sigaction(.INT, &action, null);
-    std.posix.sigaction(.TERM, &action, null);
-    std.debug.print("READY port={d} backend={s} execution={s} optimize={s}\n", .{ app.port(), web.backend_name, @tagName(server.execution), @tagName(@import("builtin").mode) });
+    active_app.store(app, .seq_cst);
+    defer {
+        // Windows invokes console handlers on separate threads. Keep App alive
+        // until every handler that observed its pointer has returned.
+        active_app.store(null, .seq_cst);
+        const deadline = web.nowNs() + @as(u64, server.shutdown_ms) * std.time.ns_per_ms;
+        while (active_controls.load(.seq_cst) != 0) {
+            if (web.nowNs() >= deadline) web.engine.failFast(70);
+            std.Thread.yield() catch {};
+        }
+    }
+    if (builtin.os.tag == .windows) {
+        if (win32.SetConsoleCtrlHandler(stopConsole, 1) == 0) return error.ConsoleHandlerFailed;
+    } else {
+        const action: std.posix.Sigaction = .{ .handler = .{ .handler = stopSignal }, .mask = std.posix.sigemptyset(), .flags = 0 };
+        std.posix.sigaction(.INT, &action, null);
+        std.posix.sigaction(.TERM, &action, null);
+    }
+    defer if (builtin.os.tag == .windows) {
+        std.debug.assert(win32.SetConsoleCtrlHandler(stopConsole, 0) != 0);
+    };
+    std.debug.print("READY port={d} backend={s} execution={s} optimize={s}\n", .{ app.port(), web.backend_name, @tagName(server.execution), @tagName(builtin.mode) });
     app.run() catch |err| {
         std.debug.print("FATAL {s}; App storage remains borrowed\n", .{@errorName(err)});
-        std.c._exit(70);
+        web.engine.failFast(70);
     };
     const stats = try std.json.Stringify.valueAlloc(init.gpa, app.stats(), .{});
     defer init.gpa.free(stats);

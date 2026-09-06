@@ -1,6 +1,10 @@
 //! Executable-only lifecycle support shared by the migration examples.
 const std = @import("std");
 const web = @import("baz");
+const builtin = @import("builtin");
+const win32 = struct {
+    extern "kernel32" fn SetConsoleCtrlHandler(?*const fn (u32) callconv(.winapi) i32, i32) callconv(.winapi) i32;
+};
 
 pub fn config(init: std.process.Init) !web.Config {
     return parseConfig(init, false);
@@ -48,21 +52,52 @@ fn parseConfig(init: std.process.Init, workers_required: bool) !web.Config {
 
 pub fn run(app: anytype, init: std.process.Init) !void {
     const Signals = struct {
-        var active: ?@TypeOf(app) = null;
+        var active: std.atomic.Value(?@TypeOf(app)) = .init(null);
+        var borrowers: std.atomic.Value(u32) = .init(0);
+
         fn stop(_: std.posix.SIG) callconv(.c) void {
-            if (active) |application| application.requestStopFromSignal();
+            requestStop();
+        }
+
+        fn consoleStop(kind: u32) callconv(.winapi) i32 {
+            if (kind != 0 and kind != 1) return 0; // CTRL_C_EVENT and CTRL_BREAK_EVENT
+            requestStop();
+            return 1;
+        }
+
+        fn requestStop() void {
+            // Publish the borrow before reading the application pointer.
+            _ = borrowers.fetchAdd(1, .seq_cst);
+            defer _ = borrowers.fetchSub(1, .seq_cst);
+            if (active.load(.seq_cst)) |application| application.requestStopFromSignal();
         }
     };
     try app.start();
-    Signals.active = app;
-    defer Signals.active = null;
-    const action: std.posix.Sigaction = .{ .handler = .{ .handler = Signals.stop }, .mask = std.posix.sigemptyset(), .flags = 0 };
-    std.posix.sigaction(.INT, &action, null);
-    std.posix.sigaction(.TERM, &action, null);
-    std.debug.print("READY port={d} backend={s} execution={s} optimize={s}\n", .{ app.port(), web.backend_name, @tagName(app.config.execution), @tagName(@import("builtin").mode) });
+    Signals.active.store(app, .seq_cst);
+    defer {
+        // Windows console handlers run on separate threads. Reconcile their
+        // borrows before returning to the caller that owns App teardown.
+        Signals.active.store(null, .seq_cst);
+        const deadline = web.nowNs() + @as(u64, app.config.shutdown_ms) * std.time.ns_per_ms;
+        while (Signals.borrowers.load(.seq_cst) != 0) {
+            if (web.nowNs() >= deadline) web.engine.failFast(70);
+            std.Thread.yield() catch {};
+        }
+    }
+    if (builtin.os.tag == .windows) {
+        if (win32.SetConsoleCtrlHandler(Signals.consoleStop, 1) == 0) return error.ConsoleHandlerFailed;
+    } else {
+        const action: std.posix.Sigaction = .{ .handler = .{ .handler = Signals.stop }, .mask = std.posix.sigemptyset(), .flags = 0 };
+        std.posix.sigaction(.INT, &action, null);
+        std.posix.sigaction(.TERM, &action, null);
+    }
+    defer if (builtin.os.tag == .windows) {
+        std.debug.assert(win32.SetConsoleCtrlHandler(Signals.consoleStop, 0) != 0);
+    };
+    std.debug.print("READY port={d} backend={s} execution={s} optimize={s}\n", .{ app.port(), web.backend_name, @tagName(app.config.execution), @tagName(builtin.mode) });
     app.run() catch |err| {
         std.debug.print("FATAL {s}; application storage remains borrowed\n", .{@errorName(err)});
-        std.c._exit(70);
+        web.engine.failFast(70);
     };
     const stats = try std.json.Stringify.valueAlloc(init.gpa, app.stats(), .{});
     defer init.gpa.free(stats);

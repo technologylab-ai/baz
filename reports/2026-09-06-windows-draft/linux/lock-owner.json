@@ -1,0 +1,10 @@
+{
+  "host": "omarx1",
+  "owner": "/root/parser_api_review",
+  "owner_pid": 1760109,
+  "process_start_ticks": "55296581",
+  "purpose": "Native Linux Baz regression against merged bounded/http with Windows support; no performance comparison",
+  "started_utc": "2026-09-06T15:37:12.840914+00:00",
+  "token": "1cbdcf02-f755-4e54-aab8-e492aed187d8",
+  "working_directory": "/tmp/baz-windows-linux.0h7c_368"
+}

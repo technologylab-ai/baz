@@ -1,0 +1,22 @@
+{
+  "builds_started": 0,
+  "dependency_commit_requested": "bb14d98756152936fadb6e8353852a686e8d315d",
+  "dependency_fetches_started": 0,
+  "lock_owner": {
+    "host": "omarx1",
+    "owner": "/root/parser_api_review",
+    "owner_pid": 1760109,
+    "process_start_ticks": "55296581",
+    "purpose": "Native Linux Baz regression against merged bounded/http with Windows support; no performance comparison",
+    "started_utc": "2026-09-06T15:37:12.840914+00:00",
+    "token": "1cbdcf02-f755-4e54-aab8-e492aed187d8",
+    "working_directory": "/tmp/baz-windows-linux.0h7c_368"
+  },
+  "owned_workspace_processes_before_release": [],
+  "reason": "User requested waiting for upstream bounded Windows shard connection handoff PR and native evidence",
+  "recorded_utc": "2026-09-06T15:38:20.111753+00:00",
+  "runtime_suites_started": 0,
+  "source_manifest_requested_sha256": "1c3e81be836e367a0fecd98f02ce78f3858310d32ccd87f504520cbb4b2f501c",
+  "source_transferred": false,
+  "status": "paused_before_source_transfer_or_verification"
+}

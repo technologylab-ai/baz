@@ -42,6 +42,8 @@ pub fn build(b: *std.Build) void {
     b.step("run-app", "Run the application API example").dependOn(&app_run.step);
     b.step("run", "Run the application API example").dependOn(&app_run.step);
     const verify = b.step("verify", "Compile and test the exact-version MVP");
+    const check = b.step("check", "Compile all framework tests and examples without executing target binaries");
+    check.dependOn(&app_exe.step);
     verify.dependOn(&app_exe.step);
     const example_support = b.createModule(.{
         .root_source_file = b.path("examples/support.zig"),
@@ -70,14 +72,21 @@ pub fn build(b: *std.Build) void {
         if (b.args) |args| run_example.addArgs(args);
         b.step(b.fmt("run-{s}", .{name}), b.fmt("Run {s}", .{name})).dependOn(&run_example.step);
         verify.dependOn(&example.step);
+        check.dependOn(&example.step);
     }
     const format = b.addFmt(.{ .paths = &.{ "build.zig", "build.zig.zon", "src", "examples" }, .check = true });
     verify.dependOn(&format.step);
+    check.dependOn(&format.step);
     const version = b.addSystemCommand(&.{ "python3", "tools/check_version.py" });
     verify.dependOn(&version.step);
-    const consumer = b.addSystemCommand(&.{ b.graph.zig_exe, "build", "test", b.fmt("-Doptimize={s}", .{@tagName(optimize)}), "-j2" });
-    consumer.setCwd(b.path("examples/embedding"));
-    verify.dependOn(&consumer.step);
+    check.dependOn(&version.step);
+    const target_arg = b.fmt("-Dtarget={s}", .{target.query.zigTriple(b.allocator) catch @panic("out of memory")});
+    const cpu_arg = b.fmt("-Dcpu={s}", .{target.query.serializeCpuAlloc(b.allocator) catch @panic("out of memory")});
+    for ([_][]const u8{ "test", "check" }) |step| {
+        const consumer = b.addSystemCommand(&.{ b.graph.zig_exe, "build", step, target_arg, cpu_arg, b.fmt("-Doptimize={s}", .{@tagName(optimize)}), "-j2", "--summary", "all" });
+        consumer.setCwd(b.path("examples/embedding"));
+        if (std.mem.eql(u8, step, "test")) verify.dependOn(&consumer.step) else check.dependOn(&consumer.step);
+    }
     const test_step = b.step("test", "Run framework unit tests");
     for ([_][]const u8{ "src/params.zig", "src/form.zig", "src/request.zig", "src/multipart.zig", "src/response.zig", "src/router.zig", "src/App.zig", "src/web.zig" }) |path| {
         const tests = b.addTest(.{ .use_llvm = if (target.result.os.tag == .linux and optimize == .Debug) true else null, .use_lld = if (target.result.os.tag == .linux and optimize == .Debug) true else null, .root_module = b.createModule(.{
@@ -87,6 +96,7 @@ pub fn build(b: *std.Build) void {
             .link_libc = true,
             .imports = &.{.{ .name = "bounded_http", .module = engine }},
         }) });
+        check.dependOn(&tests.step);
         const run_tests = b.addRunArtifact(tests);
         verify.dependOn(&run_tests.step);
         test_step.dependOn(&run_tests.step);

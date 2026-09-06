@@ -1,0 +1,39 @@
+Build Summary: 2/2 steps succeeded
+check success
++- compile test Debug x86_64-windows success 1s MaxRSS:312M
+
+Build Summary: 33/33 steps succeeded
+check success
++- compile exe baz Debug x86_64-windows success 1s MaxRSS:322M
++- compile exe hello Debug x86_64-windows success 1s MaxRSS:316M
++- compile exe hello2 Debug x86_64-windows success 1s MaxRSS:318M
++- compile exe hello_json Debug x86_64-windows success 1s MaxRSS:322M
++- compile exe simple_router Debug x86_64-windows success 1s MaxRSS:314M
++- compile exe routes Debug x86_64-windows success 1s MaxRSS:315M
++- compile exe serve Debug x86_64-windows success 1s MaxRSS:313M
++- compile exe sendfile Debug x86_64-windows success 1s MaxRSS:314M
++- compile exe senderror Debug x86_64-windows success 1s MaxRSS:315M
++- compile exe accept Debug x86_64-windows success 1s MaxRSS:318M
++- compile exe app_basic Debug x86_64-windows success 1s MaxRSS:313M
++- compile exe app_auth Debug x86_64-windows success 1s MaxRSS:316M
++- compile exe app_errors Debug x86_64-windows success 1s MaxRSS:316M
++- compile exe endpoint Debug x86_64-windows success 1s MaxRSS:328M
++- compile exe endpoint_auth Debug x86_64-windows success 1s MaxRSS:317M
++- compile exe middleware Debug x86_64-windows success 1s MaxRSS:314M
++- compile exe middleware_with_endpoint Debug x86_64-windows success 1s MaxRSS:317M
++- compile exe userpass_session Debug x86_64-windows success 1s MaxRSS:323M
++- compile exe cookies Debug x86_64-windows success 1s MaxRSS:315M
++- compile exe http_params Debug x86_64-windows success 1s MaxRSS:319M
++- compile exe bindataformpost Debug x86_64-windows success 1s MaxRSS:319M
++- zig fmt --check success
++- run python3 success 92ms
++- run /Users/rs/renerocksai.stow/nvim/.local/share/zigup/0.16.0/files/zig success 5s
++- compile test Debug x86_64-windows success 1s MaxRSS:301M
++- compile test Debug x86_64-windows success 1s MaxRSS:300M
++- compile test Debug x86_64-windows success 1s MaxRSS:315M
++- compile test Debug x86_64-windows success 1s MaxRSS:305M
++- compile test Debug x86_64-windows success 1s MaxRSS:304M
++- compile test Debug x86_64-windows success 1s MaxRSS:298M
++- compile test Debug x86_64-windows success 1s MaxRSS:386M
++- compile test Debug x86_64-windows success 1s MaxRSS:291M
+
