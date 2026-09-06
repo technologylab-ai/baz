@@ -1,0 +1,2347 @@
+{
+  "binary_sha256": {
+    "app": "b58bee483f87b2196a7fdf224ead0fcfd380e442119c98bb4eb9e96cba56f4aa",
+    "zap": "ba608dc541093367c0233adc40c6df0ac07f1513eaa52d0fa69d570b1ffd0cf0"
+  },
+  "build_command": [
+    "zig",
+    "build",
+    "verify",
+    "-Doptimize=ReleaseSafe",
+    "-Dframework-root=/Users/rs/code/github.com/technologylab.ai/zig-http-app-api",
+    "--summary",
+    "all"
+  ],
+  "complete": true,
+  "finished_utc": "2026-09-06T13:02:58.333257+00:00",
+  "fixture_preflights": [
+    {
+      "build_mode": "ReleaseSafe",
+      "command": [
+        "/private/tmp/zig-http-basic-zap-20260906/zig-out/bin/basic-app",
+        "--port",
+        "59138"
+      ],
+      "contender": "app",
+      "method": {
+        "body_bytes": 18,
+        "body_hex": "4d6574686f64204e6f7420416c6c6f776564",
+        "headers": {
+          "allow": [
+            "GET, HEAD, OPTIONS"
+          ],
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "18"
+          ],
+          "content-type": [
+            "text/plain; charset=utf-8"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:05 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 405 Method Not Allowed\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:02:05 GMT\r\nContent-Type: text/plain; charset=utf-8\r\nContent-Length: 18\r\nConnection: close\r\nAllow: GET, HEAD, OPTIONS",
+        "status": 405
+      },
+      "not_found": {
+        "body_bytes": 9,
+        "body_hex": "4e6f7420466f756e64",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "9"
+          ],
+          "content-type": [
+            "text/plain; charset=utf-8"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:05 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 404 Not Found\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:02:05 GMT\r\nContent-Type: text/plain; charset=utf-8\r\nContent-Length: 9\r\nConnection: close",
+        "status": 404
+      },
+      "plaintext": {
+        "body_bytes": 13,
+        "body_hex": "48656c6c6f2c20576f726c6421",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "13"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:05 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 200 OK\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:02:05 GMT\r\nContent-Type: text/plain\r\nContent-Length: 13\r\nConnection: close",
+        "status": 200
+      },
+      "process_layout": [
+        {
+          "command": "/private/tmp/zig-http-basic-zap-20260906/zig-out/bin/basic-app --port 59138",
+          "pgid": 21285,
+          "pid": 21285,
+          "ppid": 20967,
+          "thread_count": 1,
+          "threads_raw": {
+            "command": [
+              "ps",
+              "-M",
+              "-p",
+              "21285"
+            ],
+            "output": "USER   PID   TT   %CPU STAT PRI     STIME     UTIME COMMAND\nrs   21285   ??    0.0 S    31T   0:00.01   0:00.00 /private/tmp/zig-http-basic-zap-20260906/zig-out/bin/basic-app --port 59138\n",
+            "returncode": 0
+          }
+        }
+      ],
+      "server_exit_code": 0
+    },
+    {
+      "build_mode": "ReleaseSafe",
+      "command": [
+        "/private/tmp/zig-http-basic-zap-20260906/zig-out/bin/basic-zap",
+        "--port",
+        "59142"
+      ],
+      "contender": "zap",
+      "method": {
+        "body_bytes": 18,
+        "body_hex": "4d6574686f64204e6f7420416c6c6f776564",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "18"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:06 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:02:06 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 405 Method Not Allowed\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:18\r\ndate:Sun, 06 Sep 2026 13:02:06 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:02:06 GMT",
+        "status": 405
+      },
+      "not_found": {
+        "body_bytes": 9,
+        "body_hex": "4e6f7420466f756e64",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "9"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:06 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:02:06 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 404 Not Found\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:9\r\ndate:Sun, 06 Sep 2026 13:02:06 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:02:06 GMT",
+        "status": 404
+      },
+      "plaintext": {
+        "body_bytes": 13,
+        "body_hex": "48656c6c6f2c20576f726c6421",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "13"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:06 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:02:06 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 200 OK\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:13\r\ndate:Sun, 06 Sep 2026 13:02:06 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:02:06 GMT",
+        "status": 200
+      },
+      "process_layout": [
+        {
+          "command": "/private/tmp/zig-http-basic-zap-20260906/zig-out/bin/basic-zap --port 59142",
+          "pgid": 21289,
+          "pid": 21289,
+          "ppid": 20967,
+          "thread_count": 1,
+          "threads_raw": {
+            "command": [
+              "ps",
+              "-M",
+              "-p",
+              "21289"
+            ],
+            "output": "USER   PID   TT   %CPU STAT PRI     STIME     UTIME COMMAND\nrs   21289   ??    0.0 S    31T   0:00.01   0:00.01 /private/tmp/zig-http-basic-zap-20260906/zig-out/bin/basic-zap --port 59142\n",
+            "returncode": 0
+          }
+        }
+      ],
+      "server_exit_code": 0
+    }
+  ],
+  "interpretation": "Basic indicative same-host loopback throughput only; no latency/SLO/capacity claims",
+  "medians": [
+    {
+      "app_over_zap_ratio_of_medians": 0.6286683064195587,
+      "connections": 1,
+      "median_rps": {
+        "app": 33199.2,
+        "zap": 52808.77
+      },
+      "rates": {
+        "app": [
+          32975.42,
+          33225.42,
+          33199.2
+        ],
+        "zap": [
+          53544.36,
+          51338.33,
+          52808.77
+        ]
+      }
+    },
+    {
+      "app_over_zap_ratio_of_medians": 1.037572940630372,
+      "connections": 32,
+      "median_rps": {
+        "app": 254261.14,
+        "zap": 245053.75
+      },
+      "rates": {
+        "app": [
+          251895.21,
+          254261.14,
+          255807.45
+        ],
+        "zap": [
+          245053.75,
+          245550.26,
+          218679.65
+        ]
+      }
+    }
+  ],
+  "owned_process_groups_remaining": [],
+  "started_utc": "2026-09-06T13:01:55.525238+00:00",
+  "trials": [
+    {
+      "build_mode": "ReleaseSafe",
+      "client_threads": 1,
+      "connections": 1,
+      "contender": "app",
+      "finished_utc": "2026-09-06T13:02:10.564730+00:00",
+      "measurement": {
+        "non_2xx_or_3xx": 0,
+        "reported_seconds": 3.1,
+        "requests": 102208,
+        "requests_per_second": 32975.42,
+        "socket_errors": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "measurement_command": [
+        "/opt/homebrew/bin/wrk",
+        "-c",
+        "1",
+        "-t",
+        "1",
+        "-d",
+        "3s",
+        "http://127.0.0.1:59146/plaintext"
+      ],
+      "method_preflight": {
+        "body_bytes": 18,
+        "body_hex": "4d6574686f64204e6f7420416c6c6f776564",
+        "headers": {
+          "allow": [
+            "GET, HEAD, OPTIONS"
+          ],
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "18"
+          ],
+          "content-type": [
+            "text/plain; charset=utf-8"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:06 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 405 Method Not Allowed\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:02:06 GMT\r\nContent-Type: text/plain; charset=utf-8\r\nContent-Length: 18\r\nConnection: close\r\nAllow: GET, HEAD, OPTIONS",
+        "status": 405
+      },
+      "name": "01-c1-t1-pair1-app",
+      "not_found_preflight": {
+        "body_bytes": 9,
+        "body_hex": "4e6f7420466f756e64",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "9"
+          ],
+          "content-type": [
+            "text/plain; charset=utf-8"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:06 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 404 Not Found\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:02:06 GMT\r\nContent-Type: text/plain; charset=utf-8\r\nContent-Length: 9\r\nConnection: close",
+        "status": 404
+      },
+      "pair": 1,
+      "plaintext_preflight": {
+        "body_bytes": 13,
+        "body_hex": "48656c6c6f2c20576f726c6421",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "13"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:06 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 200 OK\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:02:06 GMT\r\nContent-Type: text/plain\r\nContent-Length: 13\r\nConnection: close",
+        "status": 200
+      },
+      "postflight": {
+        "body_bytes": 13,
+        "body_hex": "48656c6c6f2c20576f726c6421",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "13"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:10 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 200 OK\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:02:10 GMT\r\nContent-Type: text/plain\r\nContent-Length: 13\r\nConnection: close",
+        "status": 200
+      },
+      "process_layout": [
+        {
+          "command": "/private/tmp/zig-http-basic-zap-20260906/zig-out/bin/basic-app --port 59146",
+          "pgid": 21295,
+          "pid": 21295,
+          "ppid": 20967,
+          "thread_count": 1,
+          "threads_raw": {
+            "command": [
+              "ps",
+              "-M",
+              "-p",
+              "21295"
+            ],
+            "output": "USER   PID   TT   %CPU STAT PRI     STIME     UTIME COMMAND\nrs   21295   ??    0.0 S    31T   0:00.00   0:00.00 /private/tmp/zig-http-basic-zap-20260906/zig-out/bin/basic-app --port 59146\n",
+            "returncode": 0
+          }
+        }
+      ],
+      "sequence": 1,
+      "server_command": [
+        "/private/tmp/zig-http-basic-zap-20260906/zig-out/bin/basic-app",
+        "--port",
+        "59146"
+      ],
+      "server_exit_code": 0,
+      "started_utc": "2026-09-06T13:02:06.244988+00:00",
+      "warmup": {
+        "non_2xx_or_3xx": 0,
+        "reported_seconds": 1.1,
+        "requests": 35983,
+        "requests_per_second": 32725.18,
+        "socket_errors": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "warmup_command": [
+        "/opt/homebrew/bin/wrk",
+        "-c",
+        "1",
+        "-t",
+        "1",
+        "-d",
+        "1s",
+        "http://127.0.0.1:59146/plaintext"
+      ]
+    },
+    {
+      "build_mode": "ReleaseSafe",
+      "client_threads": 1,
+      "connections": 1,
+      "contender": "zap",
+      "finished_utc": "2026-09-06T13:02:14.889307+00:00",
+      "measurement": {
+        "non_2xx_or_3xx": 0,
+        "reported_seconds": 3.1,
+        "requests": 165958,
+        "requests_per_second": 53544.36,
+        "socket_errors": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "measurement_command": [
+        "/opt/homebrew/bin/wrk",
+        "-c",
+        "1",
+        "-t",
+        "1",
+        "-d",
+        "3s",
+        "http://127.0.0.1:59157/plaintext"
+      ],
+      "method_preflight": {
+        "body_bytes": 18,
+        "body_hex": "4d6574686f64204e6f7420416c6c6f776564",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "18"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:10 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:02:10 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 405 Method Not Allowed\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:18\r\ndate:Sun, 06 Sep 2026 13:02:10 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:02:10 GMT",
+        "status": 405
+      },
+      "name": "02-c1-t1-pair1-zap",
+      "not_found_preflight": {
+        "body_bytes": 9,
+        "body_hex": "4e6f7420466f756e64",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "9"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:10 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:02:10 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 404 Not Found\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:9\r\ndate:Sun, 06 Sep 2026 13:02:10 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:02:10 GMT",
+        "status": 404
+      },
+      "pair": 1,
+      "plaintext_preflight": {
+        "body_bytes": 13,
+        "body_hex": "48656c6c6f2c20576f726c6421",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "13"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:10 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:02:10 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 200 OK\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:13\r\ndate:Sun, 06 Sep 2026 13:02:10 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:02:10 GMT",
+        "status": 200
+      },
+      "postflight": {
+        "body_bytes": 13,
+        "body_hex": "48656c6c6f2c20576f726c6421",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "13"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:14 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:02:14 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 200 OK\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:13\r\ndate:Sun, 06 Sep 2026 13:02:14 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:02:14 GMT",
+        "status": 200
+      },
+      "process_layout": [
+        {
+          "command": "/private/tmp/zig-http-basic-zap-20260906/zig-out/bin/basic-zap --port 59157",
+          "pgid": 21320,
+          "pid": 21320,
+          "ppid": 20967,
+          "thread_count": 1,
+          "threads_raw": {
+            "command": [
+              "ps",
+              "-M",
+              "-p",
+              "21320"
+            ],
+            "output": "USER   PID   TT   %CPU STAT PRI     STIME     UTIME COMMAND\nrs   21320   ??    1.5 S    31T   0:00.00   0:00.00 /private/tmp/zig-http-basic-zap-20260906/zig-out/bin/basic-zap --port 59157\n",
+            "returncode": 0
+          }
+        }
+      ],
+      "sequence": 2,
+      "server_command": [
+        "/private/tmp/zig-http-basic-zap-20260906/zig-out/bin/basic-zap",
+        "--port",
+        "59157"
+      ],
+      "server_exit_code": 0,
+      "started_utc": "2026-09-06T13:02:10.565566+00:00",
+      "warmup": {
+        "non_2xx_or_3xx": 0,
+        "reported_seconds": 1.1,
+        "requests": 57942,
+        "requests_per_second": 52718.83,
+        "socket_errors": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "warmup_command": [
+        "/opt/homebrew/bin/wrk",
+        "-c",
+        "1",
+        "-t",
+        "1",
+        "-d",
+        "1s",
+        "http://127.0.0.1:59157/plaintext"
+      ]
+    },
+    {
+      "build_mode": "ReleaseSafe",
+      "client_threads": 1,
+      "connections": 1,
+      "contender": "zap",
+      "finished_utc": "2026-09-06T13:02:19.217326+00:00",
+      "measurement": {
+        "non_2xx_or_3xx": 0,
+        "reported_seconds": 3.1,
+        "requests": 159131,
+        "requests_per_second": 51338.33,
+        "socket_errors": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "measurement_command": [
+        "/opt/homebrew/bin/wrk",
+        "-c",
+        "1",
+        "-t",
+        "1",
+        "-d",
+        "3s",
+        "http://127.0.0.1:59170/plaintext"
+      ],
+      "method_preflight": {
+        "body_bytes": 18,
+        "body_hex": "4d6574686f64204e6f7420416c6c6f776564",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "18"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:14 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:02:14 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 405 Method Not Allowed\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:18\r\ndate:Sun, 06 Sep 2026 13:02:14 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:02:14 GMT",
+        "status": 405
+      },
+      "name": "03-c1-t1-pair2-zap",
+      "not_found_preflight": {
+        "body_bytes": 9,
+        "body_hex": "4e6f7420466f756e64",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "9"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:14 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:02:14 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 404 Not Found\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:9\r\ndate:Sun, 06 Sep 2026 13:02:14 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:02:14 GMT",
+        "status": 404
+      },
+      "pair": 2,
+      "plaintext_preflight": {
+        "body_bytes": 13,
+        "body_hex": "48656c6c6f2c20576f726c6421",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "13"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:14 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:02:14 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 200 OK\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:13\r\ndate:Sun, 06 Sep 2026 13:02:14 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:02:14 GMT",
+        "status": 200
+      },
+      "postflight": {
+        "body_bytes": 13,
+        "body_hex": "48656c6c6f2c20576f726c6421",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "13"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:19 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:02:19 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 200 OK\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:13\r\ndate:Sun, 06 Sep 2026 13:02:19 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:02:19 GMT",
+        "status": 200
+      },
+      "process_layout": [
+        {
+          "command": "/private/tmp/zig-http-basic-zap-20260906/zig-out/bin/basic-zap --port 59170",
+          "pgid": 21353,
+          "pid": 21353,
+          "ppid": 20967,
+          "thread_count": 1,
+          "threads_raw": {
+            "command": [
+              "ps",
+              "-M",
+              "-p",
+              "21353"
+            ],
+            "output": "USER   PID   TT   %CPU STAT PRI     STIME     UTIME COMMAND\nrs   21353   ??    0.0 S    31T   0:00.00   0:00.00 /private/tmp/zig-http-basic-zap-20260906/zig-out/bin/basic-zap --port 59170\n",
+            "returncode": 0
+          }
+        }
+      ],
+      "sequence": 3,
+      "server_command": [
+        "/private/tmp/zig-http-basic-zap-20260906/zig-out/bin/basic-zap",
+        "--port",
+        "59170"
+      ],
+      "server_exit_code": 0,
+      "started_utc": "2026-09-06T13:02:14.890437+00:00",
+      "warmup": {
+        "non_2xx_or_3xx": 0,
+        "reported_seconds": 1.1,
+        "requests": 57693,
+        "requests_per_second": 52493.18,
+        "socket_errors": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "warmup_command": [
+        "/opt/homebrew/bin/wrk",
+        "-c",
+        "1",
+        "-t",
+        "1",
+        "-d",
+        "1s",
+        "http://127.0.0.1:59170/plaintext"
+      ]
+    },
+    {
+      "build_mode": "ReleaseSafe",
+      "client_threads": 1,
+      "connections": 1,
+      "contender": "app",
+      "finished_utc": "2026-09-06T13:02:23.588965+00:00",
+      "measurement": {
+        "non_2xx_or_3xx": 0,
+        "reported_seconds": 3.1,
+        "requests": 102988,
+        "requests_per_second": 33225.42,
+        "socket_errors": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "measurement_command": [
+        "/opt/homebrew/bin/wrk",
+        "-c",
+        "1",
+        "-t",
+        "1",
+        "-d",
+        "3s",
+        "http://127.0.0.1:59182/plaintext"
+      ],
+      "method_preflight": {
+        "body_bytes": 18,
+        "body_hex": "4d6574686f64204e6f7420416c6c6f776564",
+        "headers": {
+          "allow": [
+            "GET, HEAD, OPTIONS"
+          ],
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "18"
+          ],
+          "content-type": [
+            "text/plain; charset=utf-8"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:19 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 405 Method Not Allowed\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:02:19 GMT\r\nContent-Type: text/plain; charset=utf-8\r\nContent-Length: 18\r\nConnection: close\r\nAllow: GET, HEAD, OPTIONS",
+        "status": 405
+      },
+      "name": "04-c1-t1-pair2-app",
+      "not_found_preflight": {
+        "body_bytes": 9,
+        "body_hex": "4e6f7420466f756e64",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "9"
+          ],
+          "content-type": [
+            "text/plain; charset=utf-8"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:19 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 404 Not Found\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:02:19 GMT\r\nContent-Type: text/plain; charset=utf-8\r\nContent-Length: 9\r\nConnection: close",
+        "status": 404
+      },
+      "pair": 2,
+      "plaintext_preflight": {
+        "body_bytes": 13,
+        "body_hex": "48656c6c6f2c20576f726c6421",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "13"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:19 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 200 OK\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:02:19 GMT\r\nContent-Type: text/plain\r\nContent-Length: 13\r\nConnection: close",
+        "status": 200
+      },
+      "postflight": {
+        "body_bytes": 13,
+        "body_hex": "48656c6c6f2c20576f726c6421",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "13"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:23 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 200 OK\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:02:23 GMT\r\nContent-Type: text/plain\r\nContent-Length: 13\r\nConnection: close",
+        "status": 200
+      },
+      "process_layout": [
+        {
+          "command": "/private/tmp/zig-http-basic-zap-20260906/zig-out/bin/basic-app --port 59182",
+          "pgid": 21392,
+          "pid": 21392,
+          "ppid": 20967,
+          "thread_count": 1,
+          "threads_raw": {
+            "command": [
+              "ps",
+              "-M",
+              "-p",
+              "21392"
+            ],
+            "output": "USER   PID   TT   %CPU STAT PRI     STIME     UTIME COMMAND\nrs   21392   ??    1.0 S    31T   0:00.00   0:00.00 /private/tmp/zig-http-basic-zap-20260906/zig-out/bin/basic-app --port 59182\n",
+            "returncode": 0
+          }
+        }
+      ],
+      "sequence": 4,
+      "server_command": [
+        "/private/tmp/zig-http-basic-zap-20260906/zig-out/bin/basic-app",
+        "--port",
+        "59182"
+      ],
+      "server_exit_code": 0,
+      "started_utc": "2026-09-06T13:02:19.218473+00:00",
+      "warmup": {
+        "non_2xx_or_3xx": 0,
+        "reported_seconds": 1.1,
+        "requests": 36188,
+        "requests_per_second": 32896.87,
+        "socket_errors": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "warmup_command": [
+        "/opt/homebrew/bin/wrk",
+        "-c",
+        "1",
+        "-t",
+        "1",
+        "-d",
+        "1s",
+        "http://127.0.0.1:59182/plaintext"
+      ]
+    },
+    {
+      "build_mode": "ReleaseSafe",
+      "client_threads": 1,
+      "connections": 1,
+      "contender": "app",
+      "finished_utc": "2026-09-06T13:02:27.955701+00:00",
+      "measurement": {
+        "non_2xx_or_3xx": 0,
+        "reported_seconds": 3.1,
+        "requests": 102919,
+        "requests_per_second": 33199.2,
+        "socket_errors": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "measurement_command": [
+        "/opt/homebrew/bin/wrk",
+        "-c",
+        "1",
+        "-t",
+        "1",
+        "-d",
+        "3s",
+        "http://127.0.0.1:59192/plaintext"
+      ],
+      "method_preflight": {
+        "body_bytes": 18,
+        "body_hex": "4d6574686f64204e6f7420416c6c6f776564",
+        "headers": {
+          "allow": [
+            "GET, HEAD, OPTIONS"
+          ],
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "18"
+          ],
+          "content-type": [
+            "text/plain; charset=utf-8"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:23 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 405 Method Not Allowed\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:02:23 GMT\r\nContent-Type: text/plain; charset=utf-8\r\nContent-Length: 18\r\nConnection: close\r\nAllow: GET, HEAD, OPTIONS",
+        "status": 405
+      },
+      "name": "05-c1-t1-pair3-app",
+      "not_found_preflight": {
+        "body_bytes": 9,
+        "body_hex": "4e6f7420466f756e64",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "9"
+          ],
+          "content-type": [
+            "text/plain; charset=utf-8"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:23 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 404 Not Found\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:02:23 GMT\r\nContent-Type: text/plain; charset=utf-8\r\nContent-Length: 9\r\nConnection: close",
+        "status": 404
+      },
+      "pair": 3,
+      "plaintext_preflight": {
+        "body_bytes": 13,
+        "body_hex": "48656c6c6f2c20576f726c6421",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "13"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:23 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 200 OK\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:02:23 GMT\r\nContent-Type: text/plain\r\nContent-Length: 13\r\nConnection: close",
+        "status": 200
+      },
+      "postflight": {
+        "body_bytes": 13,
+        "body_hex": "48656c6c6f2c20576f726c6421",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "13"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:27 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 200 OK\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:02:27 GMT\r\nContent-Type: text/plain\r\nContent-Length: 13\r\nConnection: close",
+        "status": 200
+      },
+      "process_layout": [
+        {
+          "command": "/private/tmp/zig-http-basic-zap-20260906/zig-out/bin/basic-app --port 59192",
+          "pgid": 21414,
+          "pid": 21414,
+          "ppid": 20967,
+          "thread_count": 1,
+          "threads_raw": {
+            "command": [
+              "ps",
+              "-M",
+              "-p",
+              "21414"
+            ],
+            "output": "USER   PID   TT   %CPU STAT PRI     STIME     UTIME COMMAND\nrs   21414   ??    1.2 S    31T   0:00.00   0:00.00 /private/tmp/zig-http-basic-zap-20260906/zig-out/bin/basic-app --port 59192\n",
+            "returncode": 0
+          }
+        }
+      ],
+      "sequence": 5,
+      "server_command": [
+        "/private/tmp/zig-http-basic-zap-20260906/zig-out/bin/basic-app",
+        "--port",
+        "59192"
+      ],
+      "server_exit_code": 0,
+      "started_utc": "2026-09-06T13:02:23.590260+00:00",
+      "warmup": {
+        "non_2xx_or_3xx": 0,
+        "reported_seconds": 1.1,
+        "requests": 36295,
+        "requests_per_second": 33012.89,
+        "socket_errors": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "warmup_command": [
+        "/opt/homebrew/bin/wrk",
+        "-c",
+        "1",
+        "-t",
+        "1",
+        "-d",
+        "1s",
+        "http://127.0.0.1:59192/plaintext"
+      ]
+    },
+    {
+      "build_mode": "ReleaseSafe",
+      "client_threads": 1,
+      "connections": 1,
+      "contender": "zap",
+      "finished_utc": "2026-09-06T13:02:32.269917+00:00",
+      "measurement": {
+        "non_2xx_or_3xx": 0,
+        "reported_seconds": 3.1,
+        "requests": 163663,
+        "requests_per_second": 52808.77,
+        "socket_errors": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "measurement_command": [
+        "/opt/homebrew/bin/wrk",
+        "-c",
+        "1",
+        "-t",
+        "1",
+        "-d",
+        "3s",
+        "http://127.0.0.1:59204/plaintext"
+      ],
+      "method_preflight": {
+        "body_bytes": 18,
+        "body_hex": "4d6574686f64204e6f7420416c6c6f776564",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "18"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:27 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:02:27 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 405 Method Not Allowed\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:18\r\ndate:Sun, 06 Sep 2026 13:02:27 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:02:27 GMT",
+        "status": 405
+      },
+      "name": "06-c1-t1-pair3-zap",
+      "not_found_preflight": {
+        "body_bytes": 9,
+        "body_hex": "4e6f7420466f756e64",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "9"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:27 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:02:27 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 404 Not Found\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:9\r\ndate:Sun, 06 Sep 2026 13:02:27 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:02:27 GMT",
+        "status": 404
+      },
+      "pair": 3,
+      "plaintext_preflight": {
+        "body_bytes": 13,
+        "body_hex": "48656c6c6f2c20576f726c6421",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "13"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:27 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:02:27 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 200 OK\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:13\r\ndate:Sun, 06 Sep 2026 13:02:27 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:02:27 GMT",
+        "status": 200
+      },
+      "postflight": {
+        "body_bytes": 13,
+        "body_hex": "48656c6c6f2c20576f726c6421",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "13"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:32 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:02:32 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 200 OK\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:13\r\ndate:Sun, 06 Sep 2026 13:02:32 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:02:32 GMT",
+        "status": 200
+      },
+      "process_layout": [
+        {
+          "command": "/private/tmp/zig-http-basic-zap-20260906/zig-out/bin/basic-zap --port 59204",
+          "pgid": 21438,
+          "pid": 21438,
+          "ppid": 20967,
+          "thread_count": 1,
+          "threads_raw": {
+            "command": [
+              "ps",
+              "-M",
+              "-p",
+              "21438"
+            ],
+            "output": "USER   PID   TT   %CPU STAT PRI     STIME     UTIME COMMAND\nrs   21438   ??    1.6 S    31T   0:00.00   0:00.00 /private/tmp/zig-http-basic-zap-20260906/zig-out/bin/basic-zap --port 59204\n",
+            "returncode": 0
+          }
+        }
+      ],
+      "sequence": 6,
+      "server_command": [
+        "/private/tmp/zig-http-basic-zap-20260906/zig-out/bin/basic-zap",
+        "--port",
+        "59204"
+      ],
+      "server_exit_code": 0,
+      "started_utc": "2026-09-06T13:02:27.957057+00:00",
+      "warmup": {
+        "non_2xx_or_3xx": 0,
+        "reported_seconds": 1.1,
+        "requests": 58501,
+        "requests_per_second": 53207.15,
+        "socket_errors": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "warmup_command": [
+        "/opt/homebrew/bin/wrk",
+        "-c",
+        "1",
+        "-t",
+        "1",
+        "-d",
+        "1s",
+        "http://127.0.0.1:59204/plaintext"
+      ]
+    },
+    {
+      "build_mode": "ReleaseSafe",
+      "client_threads": 2,
+      "connections": 32,
+      "contender": "zap",
+      "finished_utc": "2026-09-06T13:02:36.588015+00:00",
+      "measurement": {
+        "non_2xx_or_3xx": 0,
+        "reported_seconds": 3.1,
+        "requests": 759623,
+        "requests_per_second": 245053.75,
+        "socket_errors": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "measurement_command": [
+        "/opt/homebrew/bin/wrk",
+        "-c",
+        "32",
+        "-t",
+        "2",
+        "-d",
+        "3s",
+        "http://127.0.0.1:59213/plaintext"
+      ],
+      "method_preflight": {
+        "body_bytes": 18,
+        "body_hex": "4d6574686f64204e6f7420416c6c6f776564",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "18"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:32 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:02:32 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 405 Method Not Allowed\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:18\r\ndate:Sun, 06 Sep 2026 13:02:32 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:02:32 GMT",
+        "status": 405
+      },
+      "name": "07-c32-t2-pair1-zap",
+      "not_found_preflight": {
+        "body_bytes": 9,
+        "body_hex": "4e6f7420466f756e64",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "9"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:32 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:02:32 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 404 Not Found\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:9\r\ndate:Sun, 06 Sep 2026 13:02:32 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:02:32 GMT",
+        "status": 404
+      },
+      "pair": 1,
+      "plaintext_preflight": {
+        "body_bytes": 13,
+        "body_hex": "48656c6c6f2c20576f726c6421",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "13"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:32 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:02:32 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 200 OK\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:13\r\ndate:Sun, 06 Sep 2026 13:02:32 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:02:32 GMT",
+        "status": 200
+      },
+      "postflight": {
+        "body_bytes": 13,
+        "body_hex": "48656c6c6f2c20576f726c6421",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "13"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:36 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:02:36 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 200 OK\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:13\r\ndate:Sun, 06 Sep 2026 13:02:36 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:02:36 GMT",
+        "status": 200
+      },
+      "process_layout": [
+        {
+          "command": "/private/tmp/zig-http-basic-zap-20260906/zig-out/bin/basic-zap --port 59213",
+          "pgid": 21462,
+          "pid": 21462,
+          "ppid": 20967,
+          "thread_count": 1,
+          "threads_raw": {
+            "command": [
+              "ps",
+              "-M",
+              "-p",
+              "21462"
+            ],
+            "output": "USER   PID   TT   %CPU STAT PRI     STIME     UTIME COMMAND\nrs   21462   ??    0.0 S    31T   0:00.00   0:00.00 /private/tmp/zig-http-basic-zap-20260906/zig-out/bin/basic-zap --port 59213\n",
+            "returncode": 0
+          }
+        }
+      ],
+      "sequence": 7,
+      "server_command": [
+        "/private/tmp/zig-http-basic-zap-20260906/zig-out/bin/basic-zap",
+        "--port",
+        "59213"
+      ],
+      "server_exit_code": 0,
+      "started_utc": "2026-09-06T13:02:32.271299+00:00",
+      "warmup": {
+        "non_2xx_or_3xx": 0,
+        "reported_seconds": 1.1,
+        "requests": 273903,
+        "requests_per_second": 248988.24,
+        "socket_errors": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "warmup_command": [
+        "/opt/homebrew/bin/wrk",
+        "-c",
+        "32",
+        "-t",
+        "2",
+        "-d",
+        "1s",
+        "http://127.0.0.1:59213/plaintext"
+      ]
+    },
+    {
+      "build_mode": "ReleaseSafe",
+      "client_threads": 2,
+      "connections": 32,
+      "contender": "app",
+      "finished_utc": "2026-09-06T13:02:40.925264+00:00",
+      "measurement": {
+        "non_2xx_or_3xx": 0,
+        "reported_seconds": 3.1,
+        "requests": 780788,
+        "requests_per_second": 251895.21,
+        "socket_errors": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "measurement_command": [
+        "/opt/homebrew/bin/wrk",
+        "-c",
+        "32",
+        "-t",
+        "2",
+        "-d",
+        "3s",
+        "http://127.0.0.1:59288/plaintext"
+      ],
+      "method_preflight": {
+        "body_bytes": 18,
+        "body_hex": "4d6574686f64204e6f7420416c6c6f776564",
+        "headers": {
+          "allow": [
+            "GET, HEAD, OPTIONS"
+          ],
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "18"
+          ],
+          "content-type": [
+            "text/plain; charset=utf-8"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:36 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 405 Method Not Allowed\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:02:36 GMT\r\nContent-Type: text/plain; charset=utf-8\r\nContent-Length: 18\r\nConnection: close\r\nAllow: GET, HEAD, OPTIONS",
+        "status": 405
+      },
+      "name": "08-c32-t2-pair1-app",
+      "not_found_preflight": {
+        "body_bytes": 9,
+        "body_hex": "4e6f7420466f756e64",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "9"
+          ],
+          "content-type": [
+            "text/plain; charset=utf-8"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:36 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 404 Not Found\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:02:36 GMT\r\nContent-Type: text/plain; charset=utf-8\r\nContent-Length: 9\r\nConnection: close",
+        "status": 404
+      },
+      "pair": 1,
+      "plaintext_preflight": {
+        "body_bytes": 13,
+        "body_hex": "48656c6c6f2c20576f726c6421",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "13"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:36 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 200 OK\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:02:36 GMT\r\nContent-Type: text/plain\r\nContent-Length: 13\r\nConnection: close",
+        "status": 200
+      },
+      "postflight": {
+        "body_bytes": 13,
+        "body_hex": "48656c6c6f2c20576f726c6421",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "13"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:40 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 200 OK\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:02:40 GMT\r\nContent-Type: text/plain\r\nContent-Length: 13\r\nConnection: close",
+        "status": 200
+      },
+      "process_layout": [
+        {
+          "command": "/private/tmp/zig-http-basic-zap-20260906/zig-out/bin/basic-app --port 59288",
+          "pgid": 21499,
+          "pid": 21499,
+          "ppid": 20967,
+          "thread_count": 1,
+          "threads_raw": {
+            "command": [
+              "ps",
+              "-M",
+              "-p",
+              "21499"
+            ],
+            "output": "USER   PID   TT   %CPU STAT PRI     STIME     UTIME COMMAND\nrs   21499   ??    1.0 S    31T   0:00.00   0:00.00 /private/tmp/zig-http-basic-zap-20260906/zig-out/bin/basic-app --port 59288\n",
+            "returncode": 0
+          }
+        }
+      ],
+      "sequence": 8,
+      "server_command": [
+        "/private/tmp/zig-http-basic-zap-20260906/zig-out/bin/basic-app",
+        "--port",
+        "59288"
+      ],
+      "server_exit_code": 0,
+      "started_utc": "2026-09-06T13:02:36.589529+00:00",
+      "warmup": {
+        "non_2xx_or_3xx": 0,
+        "reported_seconds": 1.1,
+        "requests": 271411,
+        "requests_per_second": 246905.17,
+        "socket_errors": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "warmup_command": [
+        "/opt/homebrew/bin/wrk",
+        "-c",
+        "32",
+        "-t",
+        "2",
+        "-d",
+        "1s",
+        "http://127.0.0.1:59288/plaintext"
+      ]
+    },
+    {
+      "build_mode": "ReleaseSafe",
+      "client_threads": 2,
+      "connections": 32,
+      "contender": "app",
+      "finished_utc": "2026-09-06T13:02:45.281485+00:00",
+      "measurement": {
+        "non_2xx_or_3xx": 0,
+        "reported_seconds": 3.1,
+        "requests": 788058,
+        "requests_per_second": 254261.14,
+        "socket_errors": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "measurement_command": [
+        "/opt/homebrew/bin/wrk",
+        "-c",
+        "32",
+        "-t",
+        "2",
+        "-d",
+        "3s",
+        "http://127.0.0.1:59365/plaintext"
+      ],
+      "method_preflight": {
+        "body_bytes": 18,
+        "body_hex": "4d6574686f64204e6f7420416c6c6f776564",
+        "headers": {
+          "allow": [
+            "GET, HEAD, OPTIONS"
+          ],
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "18"
+          ],
+          "content-type": [
+            "text/plain; charset=utf-8"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:40 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 405 Method Not Allowed\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:02:40 GMT\r\nContent-Type: text/plain; charset=utf-8\r\nContent-Length: 18\r\nConnection: close\r\nAllow: GET, HEAD, OPTIONS",
+        "status": 405
+      },
+      "name": "09-c32-t2-pair2-app",
+      "not_found_preflight": {
+        "body_bytes": 9,
+        "body_hex": "4e6f7420466f756e64",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "9"
+          ],
+          "content-type": [
+            "text/plain; charset=utf-8"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:40 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 404 Not Found\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:02:40 GMT\r\nContent-Type: text/plain; charset=utf-8\r\nContent-Length: 9\r\nConnection: close",
+        "status": 404
+      },
+      "pair": 2,
+      "plaintext_preflight": {
+        "body_bytes": 13,
+        "body_hex": "48656c6c6f2c20576f726c6421",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "13"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:40 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 200 OK\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:02:40 GMT\r\nContent-Type: text/plain\r\nContent-Length: 13\r\nConnection: close",
+        "status": 200
+      },
+      "postflight": {
+        "body_bytes": 13,
+        "body_hex": "48656c6c6f2c20576f726c6421",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "13"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:45 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 200 OK\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:02:45 GMT\r\nContent-Type: text/plain\r\nContent-Length: 13\r\nConnection: close",
+        "status": 200
+      },
+      "process_layout": [
+        {
+          "command": "/private/tmp/zig-http-basic-zap-20260906/zig-out/bin/basic-app --port 59365",
+          "pgid": 21592,
+          "pid": 21592,
+          "ppid": 20967,
+          "thread_count": 1,
+          "threads_raw": {
+            "command": [
+              "ps",
+              "-M",
+              "-p",
+              "21592"
+            ],
+            "output": "USER   PID   TT   %CPU STAT PRI     STIME     UTIME COMMAND\nrs   21592   ??    0.0 S    31T   0:00.00   0:00.00 /private/tmp/zig-http-basic-zap-20260906/zig-out/bin/basic-app --port 59365\n",
+            "returncode": 0
+          }
+        }
+      ],
+      "sequence": 9,
+      "server_command": [
+        "/private/tmp/zig-http-basic-zap-20260906/zig-out/bin/basic-app",
+        "--port",
+        "59365"
+      ],
+      "server_exit_code": 0,
+      "started_utc": "2026-09-06T13:02:40.926830+00:00",
+      "warmup": {
+        "non_2xx_or_3xx": 0,
+        "reported_seconds": 1.1,
+        "requests": 277783,
+        "requests_per_second": 252672.65,
+        "socket_errors": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "warmup_command": [
+        "/opt/homebrew/bin/wrk",
+        "-c",
+        "32",
+        "-t",
+        "2",
+        "-d",
+        "1s",
+        "http://127.0.0.1:59365/plaintext"
+      ]
+    },
+    {
+      "build_mode": "ReleaseSafe",
+      "client_threads": 2,
+      "connections": 32,
+      "contender": "zap",
+      "finished_utc": "2026-09-06T13:02:49.631391+00:00",
+      "measurement": {
+        "non_2xx_or_3xx": 0,
+        "reported_seconds": 3.1,
+        "requests": 761084,
+        "requests_per_second": 245550.26,
+        "socket_errors": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "measurement_command": [
+        "/opt/homebrew/bin/wrk",
+        "-c",
+        "32",
+        "-t",
+        "2",
+        "-d",
+        "3s",
+        "http://127.0.0.1:59437/plaintext"
+      ],
+      "method_preflight": {
+        "body_bytes": 18,
+        "body_hex": "4d6574686f64204e6f7420416c6c6f776564",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "18"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:45 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:02:45 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 405 Method Not Allowed\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:18\r\ndate:Sun, 06 Sep 2026 13:02:45 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:02:45 GMT",
+        "status": 405
+      },
+      "name": "10-c32-t2-pair2-zap",
+      "not_found_preflight": {
+        "body_bytes": 9,
+        "body_hex": "4e6f7420466f756e64",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "9"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:45 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:02:45 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 404 Not Found\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:9\r\ndate:Sun, 06 Sep 2026 13:02:45 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:02:45 GMT",
+        "status": 404
+      },
+      "pair": 2,
+      "plaintext_preflight": {
+        "body_bytes": 13,
+        "body_hex": "48656c6c6f2c20576f726c6421",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "13"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:45 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:02:45 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 200 OK\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:13\r\ndate:Sun, 06 Sep 2026 13:02:45 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:02:45 GMT",
+        "status": 200
+      },
+      "postflight": {
+        "body_bytes": 13,
+        "body_hex": "48656c6c6f2c20576f726c6421",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "13"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:49 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:02:49 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 200 OK\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:13\r\ndate:Sun, 06 Sep 2026 13:02:49 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:02:49 GMT",
+        "status": 200
+      },
+      "process_layout": [
+        {
+          "command": "/private/tmp/zig-http-basic-zap-20260906/zig-out/bin/basic-zap --port 59437",
+          "pgid": 21854,
+          "pid": 21854,
+          "ppid": 20967,
+          "thread_count": 1,
+          "threads_raw": {
+            "command": [
+              "ps",
+              "-M",
+              "-p",
+              "21854"
+            ],
+            "output": "USER   PID   TT   %CPU STAT PRI     STIME     UTIME COMMAND\nrs   21854   ??    0.0 S    31T   0:00.00   0:00.00 /private/tmp/zig-http-basic-zap-20260906/zig-out/bin/basic-zap --port 59437\n",
+            "returncode": 0
+          }
+        }
+      ],
+      "sequence": 10,
+      "server_command": [
+        "/private/tmp/zig-http-basic-zap-20260906/zig-out/bin/basic-zap",
+        "--port",
+        "59437"
+      ],
+      "server_exit_code": 0,
+      "started_utc": "2026-09-06T13:02:45.283342+00:00",
+      "warmup": {
+        "non_2xx_or_3xx": 0,
+        "reported_seconds": 1.1,
+        "requests": 268342,
+        "requests_per_second": 243929.09,
+        "socket_errors": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "warmup_command": [
+        "/opt/homebrew/bin/wrk",
+        "-c",
+        "32",
+        "-t",
+        "2",
+        "-d",
+        "1s",
+        "http://127.0.0.1:59437/plaintext"
+      ]
+    },
+    {
+      "build_mode": "ReleaseSafe",
+      "client_threads": 2,
+      "connections": 32,
+      "contender": "zap",
+      "finished_utc": "2026-09-06T13:02:53.964354+00:00",
+      "measurement": {
+        "non_2xx_or_3xx": 0,
+        "reported_seconds": 3.1,
+        "requests": 678135,
+        "requests_per_second": 218679.65,
+        "socket_errors": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "measurement_command": [
+        "/opt/homebrew/bin/wrk",
+        "-c",
+        "32",
+        "-t",
+        "2",
+        "-d",
+        "3s",
+        "http://127.0.0.1:59513/plaintext"
+      ],
+      "method_preflight": {
+        "body_bytes": 18,
+        "body_hex": "4d6574686f64204e6f7420416c6c6f776564",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "18"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:49 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:02:49 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 405 Method Not Allowed\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:18\r\ndate:Sun, 06 Sep 2026 13:02:49 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:02:49 GMT",
+        "status": 405
+      },
+      "name": "11-c32-t2-pair3-zap",
+      "not_found_preflight": {
+        "body_bytes": 9,
+        "body_hex": "4e6f7420466f756e64",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "9"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:49 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:02:49 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 404 Not Found\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:9\r\ndate:Sun, 06 Sep 2026 13:02:49 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:02:49 GMT",
+        "status": 404
+      },
+      "pair": 3,
+      "plaintext_preflight": {
+        "body_bytes": 13,
+        "body_hex": "48656c6c6f2c20576f726c6421",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "13"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:49 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:02:49 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 200 OK\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:13\r\ndate:Sun, 06 Sep 2026 13:02:49 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:02:49 GMT",
+        "status": 200
+      },
+      "postflight": {
+        "body_bytes": 13,
+        "body_hex": "48656c6c6f2c20576f726c6421",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "13"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:53 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:02:53 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 200 OK\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:13\r\ndate:Sun, 06 Sep 2026 13:02:53 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:02:53 GMT",
+        "status": 200
+      },
+      "process_layout": [
+        {
+          "command": "/private/tmp/zig-http-basic-zap-20260906/zig-out/bin/basic-zap --port 59513",
+          "pgid": 21876,
+          "pid": 21876,
+          "ppid": 20967,
+          "thread_count": 1,
+          "threads_raw": {
+            "command": [
+              "ps",
+              "-M",
+              "-p",
+              "21876"
+            ],
+            "output": "USER   PID   TT   %CPU STAT PRI     STIME     UTIME COMMAND\nrs   21876   ??    0.0 S    31T   0:00.00   0:00.00 /private/tmp/zig-http-basic-zap-20260906/zig-out/bin/basic-zap --port 59513\n",
+            "returncode": 0
+          }
+        }
+      ],
+      "sequence": 11,
+      "server_command": [
+        "/private/tmp/zig-http-basic-zap-20260906/zig-out/bin/basic-zap",
+        "--port",
+        "59513"
+      ],
+      "server_exit_code": 0,
+      "started_utc": "2026-09-06T13:02:49.633245+00:00",
+      "warmup": {
+        "non_2xx_or_3xx": 0,
+        "reported_seconds": 1.1,
+        "requests": 238292,
+        "requests_per_second": 216677.15,
+        "socket_errors": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "warmup_command": [
+        "/opt/homebrew/bin/wrk",
+        "-c",
+        "32",
+        "-t",
+        "2",
+        "-d",
+        "1s",
+        "http://127.0.0.1:59513/plaintext"
+      ]
+    },
+    {
+      "build_mode": "ReleaseSafe",
+      "client_threads": 2,
+      "connections": 32,
+      "contender": "app",
+      "finished_utc": "2026-09-06T13:02:58.318026+00:00",
+      "measurement": {
+        "non_2xx_or_3xx": 0,
+        "reported_seconds": 3.1,
+        "requests": 792999,
+        "requests_per_second": 255807.45,
+        "socket_errors": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "measurement_command": [
+        "/opt/homebrew/bin/wrk",
+        "-c",
+        "32",
+        "-t",
+        "2",
+        "-d",
+        "3s",
+        "http://127.0.0.1:59643/plaintext"
+      ],
+      "method_preflight": {
+        "body_bytes": 18,
+        "body_hex": "4d6574686f64204e6f7420416c6c6f776564",
+        "headers": {
+          "allow": [
+            "GET, HEAD, OPTIONS"
+          ],
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "18"
+          ],
+          "content-type": [
+            "text/plain; charset=utf-8"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:53 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 405 Method Not Allowed\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:02:53 GMT\r\nContent-Type: text/plain; charset=utf-8\r\nContent-Length: 18\r\nConnection: close\r\nAllow: GET, HEAD, OPTIONS",
+        "status": 405
+      },
+      "name": "12-c32-t2-pair3-app",
+      "not_found_preflight": {
+        "body_bytes": 9,
+        "body_hex": "4e6f7420466f756e64",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "9"
+          ],
+          "content-type": [
+            "text/plain; charset=utf-8"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:53 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 404 Not Found\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:02:53 GMT\r\nContent-Type: text/plain; charset=utf-8\r\nContent-Length: 9\r\nConnection: close",
+        "status": 404
+      },
+      "pair": 3,
+      "plaintext_preflight": {
+        "body_bytes": 13,
+        "body_hex": "48656c6c6f2c20576f726c6421",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "13"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:53 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 200 OK\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:02:53 GMT\r\nContent-Type: text/plain\r\nContent-Length: 13\r\nConnection: close",
+        "status": 200
+      },
+      "postflight": {
+        "body_bytes": 13,
+        "body_hex": "48656c6c6f2c20576f726c6421",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "13"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:58 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 200 OK\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:02:58 GMT\r\nContent-Type: text/plain\r\nContent-Length: 13\r\nConnection: close",
+        "status": 200
+      },
+      "process_layout": [
+        {
+          "command": "/private/tmp/zig-http-basic-zap-20260906/zig-out/bin/basic-app --port 59643",
+          "pgid": 21960,
+          "pid": 21960,
+          "ppid": 20967,
+          "thread_count": 1,
+          "threads_raw": {
+            "command": [
+              "ps",
+              "-M",
+              "-p",
+              "21960"
+            ],
+            "output": "USER   PID   TT   %CPU STAT PRI     STIME     UTIME COMMAND\nrs   21960   ??    1.0 S    31T   0:00.00   0:00.00 /private/tmp/zig-http-basic-zap-20260906/zig-out/bin/basic-app --port 59643\n",
+            "returncode": 0
+          }
+        }
+      ],
+      "sequence": 12,
+      "server_command": [
+        "/private/tmp/zig-http-basic-zap-20260906/zig-out/bin/basic-app",
+        "--port",
+        "59643"
+      ],
+      "server_exit_code": 0,
+      "started_utc": "2026-09-06T13:02:53.966173+00:00",
+      "warmup": {
+        "non_2xx_or_3xx": 0,
+        "reported_seconds": 1.1,
+        "requests": 256597,
+        "requests_per_second": 233280.39,
+        "socket_errors": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "warmup_command": [
+        "/opt/homebrew/bin/wrk",
+        "-c",
+        "32",
+        "-t",
+        "2",
+        "-d",
+        "1s",
+        "http://127.0.0.1:59643/plaintext"
+      ]
+    }
+  ]
+}

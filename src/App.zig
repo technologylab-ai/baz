@@ -1,0 +1,440 @@
+//! Typed, instance-owned application composition over the bounded HTTP engine.
+const std = @import("std");
+const engine = @import("server.zig");
+const Request = @import("request.zig").Request;
+const responses = @import("response.zig");
+const routing = @import("router.zig");
+
+pub fn App(comptime Shared: type) type {
+    return struct {
+        const Self = @This();
+        pub const Handler = *const fn (*Context) anyerror!void;
+        pub const ErrorHandler = *const fn (*Context, anyerror) anyerror!void;
+        const BoundHandler = *const fn (?*anyopaque, *Context) anyerror!void;
+        const Phase = enum { registration, starting, started, running, stopped, failed, unsafe };
+
+        pub const Options = struct {
+            allocator: std.mem.Allocator,
+            io: std.Io,
+            shared: *Shared,
+            server: engine.Config = .{},
+            response: responses.Limits = .{},
+            max_routes: u16 = 128,
+            /// Combined owned route/method strings and generated Allow values.
+            route_bytes: u32 = 16384,
+            not_found: ?Handler = null,
+            on_error: ?ErrorHandler = null,
+        };
+
+        pub const Context = struct {
+            shared: *Shared,
+            request: Request,
+            response: *responses.Response,
+            captures: routing.Captures,
+            app: *Self,
+            cancelled: *const std.atomic.Value(bool),
+
+            pub fn param(self: *const Context, name: []const u8) ?[]const u8 {
+                return self.captures.get(name);
+            }
+
+            /// The selected implementation may block. Inline callbacks cannot
+            /// obtain it through this helper; shared services remain responsible
+            /// for their own capabilities, deadlines and allocation behavior.
+            pub fn serviceIo(self: *const Context) error{IoRequiresWorkers}!std.Io {
+                if (self.app.config.execution != .workers) return error.IoRequiresWorkers;
+                return self.app.io;
+            }
+        };
+
+        const Route = struct {
+            method: []const u8,
+            pattern: []const u8,
+            rank: u32,
+            call: BoundHandler,
+            instance: ?*anyopaque,
+            allow: []const u8 = "",
+        };
+
+        // init returns a stable allocation; all callbacks retain this address.
+        budget: engine.Budget,
+        io: std.Io,
+        shared: *Shared,
+        config: engine.Config,
+        response_limits: responses.Limits,
+        routes: []Route,
+        routes_len: usize = 0,
+        names: []u8,
+        names_len: usize = 0,
+        global_allow: []const u8 = "",
+        not_found: ?Handler,
+        on_error: ?ErrorHandler,
+        cluster: ?*engine.Cluster = null,
+        phase: Phase = .registration,
+
+        pub fn init(options: Options) !*Self {
+            if (options.max_routes == 0 or options.max_routes > 4096 or
+                options.route_bytes < 64 or options.route_bytes > 1024 * 1024)
+                return error.InvalidConfiguration;
+            var config = options.server;
+            config.callback_output_reserve = @intCast(try options.response.reservationBytes());
+            if (config.max_response_bytes < options.response.body_bytes) return error.InvalidConfiguration;
+            try engine.Cluster.validate(config);
+            const stacks = try engine.Cluster.stackBytes(config);
+            var heap = try std.math.add(usize, @sizeOf(Self), try engine.Cluster.heapBytes(config));
+            heap = try std.math.add(usize, heap, try std.math.mul(usize, options.max_routes, @sizeOf(Route)));
+            heap = try std.math.add(usize, heap, options.route_bytes);
+            if (try std.math.add(usize, heap, stacks) > config.memory_budget_bytes)
+                return error.MemoryBudgetExceeded;
+
+            // Bootstrap the stable owner, then explicitly include those bytes
+            // in the same ledger used for all subsequent framework allocations.
+            const self = try options.allocator.create(Self);
+            self.* = .{
+                .budget = .{ .upstream = options.allocator, .limit_bytes = config.memory_budget_bytes - stacks, .live_bytes = @sizeOf(Self), .peak_bytes = @sizeOf(Self) },
+                .io = options.io,
+                .shared = options.shared,
+                .config = config,
+                .response_limits = options.response,
+                .routes = &.{},
+                .names = &.{},
+                .not_found = options.not_found,
+                .on_error = options.on_error,
+            };
+            const allocator = self.budget.allocator();
+            errdefer allocator.destroy(self);
+            self.routes = try allocator.alloc(Route, options.max_routes);
+            errdefer allocator.free(self.routes);
+            self.names = try allocator.alloc(u8, options.route_bytes);
+            return self;
+        }
+
+        /// Register a function before start. Registration copies method/path.
+        pub fn route(self: *Self, method: []const u8, path: []const u8, comptime handler: Handler) !void {
+            const Adapter = struct {
+                fn call(_: ?*anyopaque, context: *Context) anyerror!void {
+                    return handler(context);
+                }
+            };
+            try self.addRoute(method, path, null, Adapter.call);
+        }
+
+        /// Register a stateful method. The instance is borrowed through deinit.
+        pub fn bind(self: *Self, method: []const u8, path: []const u8, instance: anytype, comptime handler: anytype) !void {
+            const Pointer = @TypeOf(instance);
+            const info = @typeInfo(Pointer);
+            if (info != .pointer or info.pointer.size != .one or info.pointer.is_const)
+                @compileError("a bound endpoint must be a mutable single-item pointer");
+            const Adapter = struct {
+                fn call(opaque_instance: ?*anyopaque, context: *Context) anyerror!void {
+                    const value: Pointer = @ptrCast(@alignCast(opaque_instance.?));
+                    return handler(value, context);
+                }
+            };
+            try self.addRoute(method, path, @ptrCast(instance), Adapter.call);
+        }
+
+        /// Register conventional endpoint methods atomically. No base struct,
+        /// path field or per-endpoint error-policy field is required.
+        pub fn endpoint(self: *Self, path: []const u8, instance: anytype) !void {
+            if (self.phase != .registration) return error.RegistrationClosed;
+            const T = @typeInfo(@TypeOf(instance)).pointer.child;
+            const old_count = self.routes_len;
+            const old_bytes = self.names_len;
+            errdefer {
+                self.routes_len = old_count;
+                self.names_len = old_bytes;
+            }
+            inline for (.{ .{ "GET", "get" }, .{ "POST", "post" }, .{ "PUT", "put" }, .{ "DELETE", "delete" }, .{ "PATCH", "patch" }, .{ "HEAD", "head" }, .{ "OPTIONS", "options" } }) |method| {
+                if (@hasDecl(T, method[1])) try self.bind(method[0], path, instance, @field(T, method[1]));
+            }
+            if (self.routes_len == old_count) return error.NoEndpointMethods;
+        }
+
+        fn addRoute(self: *Self, method: []const u8, path: []const u8, instance: ?*anyopaque, call: BoundHandler) !void {
+            if (self.phase != .registration) return error.RegistrationClosed;
+            if (!routing.validMethod(method)) return error.InvalidMethod;
+            const rank = try routing.validate(path);
+            for (self.routes[0..self.routes_len]) |other| {
+                if (std.mem.eql(u8, method, other.method) and routing.equivalent(path, other.pattern))
+                    return error.DuplicateRoute;
+            }
+            if (self.routes_len == self.routes.len) return error.TooManyRoutes;
+            const needed = try std.math.add(usize, method.len, path.len);
+            if (needed > self.names.len - self.names_len) return error.RouteStorageFull;
+            const method_copy = self.names[self.names_len..][0..method.len];
+            @memcpy(method_copy, method);
+            self.names_len += method.len;
+            const path_copy = self.names[self.names_len..][0..path.len];
+            @memcpy(path_copy, path);
+            self.names_len += path.len;
+            self.routes[self.routes_len] = .{ .method = method_copy, .pattern = path_copy, .rank = rank, .instance = instance, .call = call };
+            self.routes_len += 1;
+        }
+
+        fn methodSeen(self: *const Self, before: usize, pattern: ?[]const u8, method: []const u8) bool {
+            for (self.routes[0..before]) |entry| {
+                if (pattern) |p| if (!routing.equivalent(p, entry.pattern)) continue;
+                if (std.mem.eql(u8, entry.method, method)) return true;
+            }
+            return false;
+        }
+
+        fn makeAllow(self: *Self, pattern: ?[]const u8) ![]const u8 {
+            var writer: std.Io.Writer = .fixed(self.names[self.names_len..]);
+            for (self.routes[0..self.routes_len], 0..) |entry, index| {
+                if (pattern) |p| if (!routing.equivalent(p, entry.pattern)) continue;
+                if (self.methodSeen(index, pattern, entry.method)) continue;
+                if (writer.end != 0) try writer.writeAll(", ");
+                try writer.writeAll(entry.method);
+            }
+            if (self.methodSeen(self.routes_len, pattern, "GET") and !self.methodSeen(self.routes_len, pattern, "HEAD")) {
+                if (writer.end != 0) try writer.writeAll(", ");
+                try writer.writeAll("HEAD");
+            }
+            if (!self.methodSeen(self.routes_len, pattern, "OPTIONS")) {
+                if (writer.end != 0) try writer.writeAll(", ");
+                try writer.writeAll("OPTIONS");
+            }
+            if (writer.end + "Allow: \r\n".len > self.response_limits.header_bytes) return error.HeaderLimitExceeded;
+            const result = writer.buffer[0..writer.end];
+            self.names_len += writer.end;
+            return result;
+        }
+
+        pub fn start(self: *Self) !void {
+            if (self.phase != .registration) return error.InvalidState;
+            self.phase = .starting;
+            errdefer self.phase = .failed;
+            for (self.routes[0..self.routes_len], 0..) |*entry, index| {
+                for (self.routes[0..index]) |other| {
+                    if (routing.equivalent(entry.pattern, other.pattern)) {
+                        entry.allow = other.allow;
+                        break;
+                    }
+                } else entry.allow = try self.makeAllow(entry.pattern);
+            }
+            self.global_allow = try self.makeAllow(null);
+            const cluster = try engine.Cluster.init(self.budget.allocator(), self.config, dispatch, self);
+            errdefer cluster.deinit();
+            try cluster.start();
+            self.cluster = cluster;
+            self.budget.sealed.store(true, .release);
+            self.phase = .started;
+        }
+
+        pub fn port(self: *const Self) u16 {
+            return self.cluster.?.port();
+        }
+
+        pub fn requestStop(self: *Self) void {
+            if (self.cluster) |cluster| cluster.requestStop();
+        }
+
+        /// Only atomic stop flags, matching the maintained POSIX demo. Install
+        /// signal handling in main, after start, and keep App alive through it.
+        pub fn requestStopFromSignal(self: *Self) void {
+            if (self.cluster) |cluster| for (cluster.shards) |shard| shard.stop_requested.store(true, .release);
+        }
+
+        /// On an error, ownership may remain outstanding: terminate the process
+        /// or retain the entire App. Do not unwind into deinit on that path.
+        pub fn run(self: *Self) !void {
+            if (self.phase != .started) return error.InvalidState;
+            self.phase = .running;
+            self.cluster.?.run() catch |err| {
+                self.phase = .unsafe;
+                return err;
+            };
+            self.phase = .stopped;
+        }
+
+        /// Stats are a snapshot only before run or after terminal shutdown.
+        pub fn stats(self: *const Self) engine.Stats {
+            std.debug.assert(self.phase == .started or self.phase == .stopped);
+            var result = self.cluster.?.stats();
+            result.allocation_calls_after_start = self.budget.late_calls.load(.acquire);
+            result.framework_heap_peak_bytes = self.budget.peak_bytes;
+            result.framework_heap_limit_bytes = self.budget.limit_bytes;
+            return result;
+        }
+
+        pub fn deinit(self: *Self) void {
+            if (self.phase == .started) {
+                self.requestStop();
+                self.run() catch std.c._exit(70);
+            }
+            std.debug.assert(self.phase == .registration or self.phase == .failed or self.phase == .stopped);
+            if (self.cluster) |cluster| cluster.deinit();
+            const allocator = self.budget.allocator();
+            allocator.free(self.names);
+            allocator.free(self.routes);
+            std.debug.assert(self.budget.live_bytes == @sizeOf(Self));
+            allocator.destroy(self);
+        }
+
+        fn dispatch(raw: *engine.api.Context) engine.api.Action {
+            const self: *Self = @ptrCast(@alignCast(raw.application.?));
+            // The one-shot API never yields. Resumable raw handlers remain
+            // available separately through engine.api.Handler.
+            std.debug.assert(raw.event == .request);
+            var response = responses.Response.init(raw.writer, self.response_limits) catch return .close;
+            var context: Context = .{ .shared = self.shared, .request = .init(raw.request), .response = &response, .captures = .{}, .app = self, .cancelled = raw.cancelled };
+            self.handle(&context) catch |err| return self.handleError(&context, err);
+            return response.finish() catch |err| self.handleError(&context, err);
+        }
+
+        fn handleError(self: *Self, context: *Context, err: anyerror) engine.api.Action {
+            if (self.on_error) |handler| {
+                context.response.discard() catch return .close;
+                handler(context, err) catch return context.response.errorResponse(500) catch .close;
+                return context.response.finish() catch context.response.errorResponse(500) catch .close;
+            }
+            const status: u16 = switch (err) {
+                error.InvalidEscape, error.InvalidMetadata, error.DuplicateMetadataParameter, error.InvalidBoundary, error.InvalidMultipart, error.MissingBoundary, error.InvalidQuotedPair, error.AmbiguousContentType => 400,
+                error.ParamsTooLarge, error.TooManyParams, error.NameTooLarge, error.ValueTooLarge, error.MultipartTooLarge, error.TooManyParts, error.PartTooLarge, error.PartHeadersTooLarge, error.MetadataTooLarge, error.TooManyMetadataParameters => 413,
+                error.MissingContentType, error.UnsupportedMediaType, error.UnsupportedContentEncoding, error.UnsupportedMultipartEncoding => 415,
+                else => 500,
+            };
+            return context.response.errorResponse(status) catch .close;
+        }
+
+        fn handle(self: *Self, context: *Context) !void {
+            const method = context.request.method();
+            if (std.mem.eql(u8, method, "CONNECT")) return context.response.text(501, "Not Implemented");
+            const target = context.request.target();
+            if (std.mem.eql(u8, target.raw, "*")) {
+                if (!std.mem.eql(u8, method, "OPTIONS")) return context.response.text(400, "Bad Request");
+                try context.response.header("Allow", self.global_allow);
+                return context.response.bytes(204, "text/plain", "");
+            }
+            const raw_path = target.path orelse "/";
+            const path = if (raw_path.len == 0) "/" else raw_path;
+            var best: ?*const Route = null;
+            for (self.routes[0..self.routes_len]) |*entry| {
+                if (routing.matches(entry.pattern, path) and (best == null or entry.rank > best.?.rank)) best = entry;
+            }
+            const path_route = best orelse {
+                if (self.not_found) |handler| return handler(context);
+                return context.response.text(404, "Not Found");
+            };
+            var get: ?*const Route = null;
+            for (self.routes[0..self.routes_len]) |*entry| {
+                if (!routing.equivalent(entry.pattern, path_route.pattern)) continue;
+                if (std.mem.eql(u8, entry.method, method)) {
+                    context.captures = routing.capture(entry.pattern, path);
+                    return entry.call(entry.instance, context);
+                }
+                if (std.mem.eql(u8, entry.method, "GET")) get = entry;
+            }
+            if (std.mem.eql(u8, method, "HEAD")) if (get) |entry| {
+                context.captures = routing.capture(entry.pattern, path);
+                return entry.call(entry.instance, context);
+            };
+            try context.response.header("Allow", path_route.allow);
+            if (std.mem.eql(u8, method, "OPTIONS")) return context.response.bytes(204, "text/plain", "");
+            return context.response.text(405, "Method Not Allowed");
+        }
+    };
+}
+
+test "App registration is instance-owned, copies paths and rolls back endpoints" {
+    const Shared = struct { count: usize = 0 };
+    const Application = App(Shared);
+    const Endpoint = struct {
+        fn get(_: *@This(), _: *Application.Context) !void {}
+        fn post(_: *@This(), _: *Application.Context) !void {}
+    };
+    var shared: Shared = .{};
+    const app = try Application.init(.{ .allocator = std.testing.allocator, .io = std.testing.io, .shared = &shared, .server = .{ .connections = 1, .shards = 1 }, .max_routes = 2 });
+    defer app.deinit();
+    var path = "/first".*;
+    const H = struct {
+        fn get(_: *Application.Context) !void {}
+    };
+    try app.route("GET", &path, H.get);
+    path[1] = 'z';
+    try std.testing.expectEqualStrings("/first", app.routes[0].pattern);
+    var endpoint: Endpoint = .{};
+    try std.testing.expectError(error.TooManyRoutes, app.endpoint("/second", &endpoint));
+    try std.testing.expectEqual(@as(usize, 1), app.routes_len);
+    try app.route("GET", "/:id", H.get);
+    try std.testing.expectError(error.DuplicateRoute, app.route("GET", "/:name", H.get));
+    const other = try Application.init(.{ .allocator = std.testing.allocator, .io = std.testing.io, .shared = &shared, .server = .{ .connections = 1, .shards = 1 } });
+    defer other.deinit();
+    try std.testing.expectEqual(@as(usize, 0), other.routes_len);
+}
+
+test "App startup budget covers application storage before sockets exist" {
+    const Shared = struct {};
+    var shared: Shared = .{};
+    try std.testing.expectError(error.MemoryBudgetExceeded, App(Shared).init(.{
+        .allocator = std.testing.allocator,
+        .io = std.testing.io,
+        .shared = &shared,
+        .server = .{ .connections = 1, .shards = 1, .memory_budget_bytes = 1024 },
+    }));
+}
+
+test "two Apps of the same type dispatch their own shared state" {
+    const Shared = struct { text: []const u8 };
+    const Application = App(Shared);
+    const H = struct {
+        fn get(ctx: *Application.Context) !void {
+            try ctx.response.text(200, ctx.shared.text);
+        }
+    };
+    var first_shared: Shared = .{ .text = "first application" };
+    var second_shared: Shared = .{ .text = "second application" };
+    const first = try Application.init(.{ .allocator = std.testing.allocator, .io = std.testing.io, .shared = &first_shared, .server = .{ .connections = 1, .shards = 1 }, .response = .{ .header_bytes = 128, .body_bytes = 64 } });
+    defer first.deinit();
+    const second = try Application.init(.{ .allocator = std.testing.allocator, .io = std.testing.io, .shared = &second_shared, .server = .{ .connections = 1, .shards = 1 }, .response = .{ .header_bytes = 128, .body_bytes = 64 } });
+    defer second.deinit();
+    try first.route("GET", "/", H.get);
+    try second.route("GET", "/", H.get);
+    var parser = engine.api.http.Parser.init(.{});
+    var request = (try parser.parse("GET / HTTP/1.1\r\nHost: localhost\r\n\r\n")).?;
+    var arena: [2048]u8 = undefined;
+    var cache: engine.api.HeaderCache = .{};
+    cache.refresh("Sun, 06 Sep 2026 12:00:00 GMT");
+    var writer = engine.api.Writer.init(&arena, &cache, 0);
+    var state: [8]usize = @splat(0);
+    const cancelled: std.atomic.Value(bool) = .init(false);
+    for ([_]*Application{ first, second, first }) |app| {
+        writer.open(0, true, false);
+        var ctx: engine.api.Context = .{ .request = &request, .writer = &writer, .event = .request, .state = &state, .application = app, .cancelled = &cancelled };
+        try std.testing.expectEqual(engine.api.Action.finish, Application.dispatch(&ctx));
+        try std.testing.expectEqualStrings(app.shared.text, writer.committed());
+        writer.release();
+    }
+}
+
+test "two prepared Apps have independent ports and stop ownership" {
+    const Shared = struct {};
+    const Application = App(Shared);
+    const H = struct {
+        fn get(ctx: *Application.Context) !void {
+            try ctx.response.text(200, "ok");
+        }
+    };
+    var shared: Shared = .{};
+    const options: Application.Options = .{ .allocator = std.testing.allocator, .io = std.testing.io, .shared = &shared, .server = .{ .port = 0, .connections = 1, .shards = 1, .duration_ms = 1 } };
+    const first = try Application.init(options);
+    defer first.deinit();
+    const second = try Application.init(options);
+    defer second.deinit();
+    try first.route("GET", "/", H.get);
+    try second.route("GET", "/", H.get);
+    try first.start();
+    try second.start();
+    try std.testing.expect(first.port() != second.port());
+    try std.testing.expectError(error.RegistrationClosed, first.route("GET", "/late", H.get));
+    try std.testing.expectEqual(@as(u64, 0), first.stats().accepted);
+    try std.testing.expectEqual(@as(u64, 0), second.stats().accepted);
+    first.requestStop();
+    try std.testing.expect(!second.cluster.?.shards[0].stop_requested.load(.acquire));
+    first.run() catch std.c._exit(70);
+    second.run() catch std.c._exit(70);
+    try std.testing.expectEqual(@as(usize, 0), first.budget.late_calls.load(.acquire));
+    try std.testing.expectEqual(@as(usize, 0), second.budget.late_calls.load(.acquire));
+}

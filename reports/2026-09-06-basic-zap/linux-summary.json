@@ -1,0 +1,307 @@
+{
+  "app": "public one-shot Response.bytes; one inline shard, zero application workers; other normal defaults",
+  "binary_sha256": {
+    "app": "6dc437485fad3225a131cc589ac799011209441195b61277bd30730b19caa76d",
+    "zap": "a520d61dc47d7167b0a0c1b3459870da368be12cd8b4bf31a63e9469d5ec9796"
+  },
+  "body": "Hello, World!",
+  "body_bytes": 13,
+  "build": "exact Zig 0.16.0, ReleaseSafe, verify 7/7 passed",
+  "cleanup": "The pre-release workspace child scan was empty. Later read-only killpg(pgid, 0) and process-table audit found all 14 original server process groups absent; see linux/cleanup-verified.json. Own measurement lock released at 2026-09-06T13:05:23.083053+00:00",
+  "complete": true,
+  "connections_capacity_each": 128,
+  "content_type": "text/plain",
+  "cpu": "Intel Core Ultra 7 258V, 8 cores / 8 threads",
+  "finished_utc": "2026-09-06T13:03:28.055991+00:00",
+  "fixture_archive_sha256": "28768e20a43e6c602775053e149c3030b8cab8c5705582fe7e9c6263af86213c",
+  "framework_commit": "db8d7ce4e2324825fd5655265d6cb81df7202e82",
+  "framework_input": "streamed working tree; all 63 frozen source manifest entries verified; full relevant comparison source manifest captured before build and unchanged after all trials",
+  "frozen_framework_manifest_sha256": "29b376f3b2c79e4e1d5e92a3399a37aeb410933af070e60ccd736120df35ac4f",
+  "host": "omarx1",
+  "limitation": "Basic indicative same-host loopback throughput; client shares host and can constrain result; no bottleneck cause, latency, SLO, capacity or production claim",
+  "linux": "Omarchy 4.0.2 (Arch derived), kernel 7.1.9-arch1-2, x86_64",
+  "medians": [
+    {
+      "app_over_zap_ratio_of_medians": 1.0249472858789814,
+      "connections": 1,
+      "median_rps": {
+        "app": 74385.99,
+        "zap": 72575.43
+      },
+      "rates": {
+        "app": [
+          83801.24,
+          68864.46,
+          74385.99
+        ],
+        "zap": [
+          78006.46,
+          72575.43,
+          65800.96
+        ]
+      }
+    },
+    {
+      "app_over_zap_ratio_of_medians": 1.770949064625867,
+      "connections": 32,
+      "median_rps": {
+        "app": 363594.19,
+        "zap": 205310.36
+      },
+      "rates": {
+        "app": [
+          354068.84,
+          375149.17,
+          363594.19
+        ],
+        "zap": [
+          208804.71,
+          194245.49,
+          205310.36
+        ]
+      }
+    }
+  ],
+  "native_verification": {
+    "App": 14,
+    "Debug_tests": 194,
+    "ReleaseSafe_tests": 194,
+    "batch": 29,
+    "comparator": 8,
+    "examples": 20,
+    "gather": 11,
+    "inline": 10,
+    "lifecycle": 8,
+    "skipped": 0,
+    "smoke_responses_per_workload": 10000,
+    "smoke_workloads": 3,
+    "wire": 26
+  },
+  "native_verification_log": "../2026-09-06-app-api/linux-native.log",
+  "native_verification_log_sha256": "2999d0bb69c9653f69fa531a1b10b0848ff353fc94b614098f43360bf848c43c",
+  "native_verification_note": "The canonical App API Linux native log preserves the first cold ReleaseSafe build reaching its 180-second watchdog after successful Debug verification, followed by successful verification and all native suites with a 600-second Zig build watchdog on identical source",
+  "observed_layout": {
+    "app": "one process / one thread",
+    "zap": "one process / one thread"
+  },
+  "path": "GET /plaintext",
+  "platform": "Linux-7.1.9-arch1-2-x86_64-with-glibc2.44",
+  "power": "ACPI platform_profile=performance; scaling_governor=powersave on all 8 CPUs at capture; no policy change or CPU pinning by runner",
+  "preserved_failed_attempt": "linux-build-option-failure: optimize-option guard rejected build graph before any fixture or wrk; corrected standardOptimizeOption usage in final package",
+  "protocol": "c1/t1 and c32/t2, three paired repetitions each, alternating first contender; one-second warmup and three-second measurement; fresh server each trial",
+  "source_manifest_sha256": "497f6685715fcbb13e2bbebee6a493bfd3ec02a1448960177a5a7b38b06d9bd2",
+  "started_utc": "2026-09-06T13:02:24.634398+00:00",
+  "timed_response_validation": "wrk reported zero socket errors and zero non-2xx/3xx responses for each warmup and timed trial; timed response bodies were not individually validated, and this wrk status counter does not distinguish 2xx from 3xx",
+  "trials": [
+    {
+      "client_threads": 1,
+      "connections": 1,
+      "contender": "app",
+      "non_2xx_or_3xx": 0,
+      "pair": 1,
+      "reported_seconds": 3.1,
+      "requests": 259767,
+      "requests_per_second": 83801.24,
+      "sequence": 1,
+      "socket_errors": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "client_threads": 1,
+      "connections": 1,
+      "contender": "zap",
+      "non_2xx_or_3xx": 0,
+      "pair": 1,
+      "reported_seconds": 3.1,
+      "requests": 241829,
+      "requests_per_second": 78006.46,
+      "sequence": 2,
+      "socket_errors": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "client_threads": 1,
+      "connections": 1,
+      "contender": "zap",
+      "non_2xx_or_3xx": 0,
+      "pair": 2,
+      "reported_seconds": 3.1,
+      "requests": 224923,
+      "requests_per_second": 72575.43,
+      "sequence": 3,
+      "socket_errors": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "client_threads": 1,
+      "connections": 1,
+      "contender": "app",
+      "non_2xx_or_3xx": 0,
+      "pair": 2,
+      "reported_seconds": 3.1,
+      "requests": 213446,
+      "requests_per_second": 68864.46,
+      "sequence": 4,
+      "socket_errors": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "client_threads": 1,
+      "connections": 1,
+      "contender": "app",
+      "non_2xx_or_3xx": 0,
+      "pair": 3,
+      "reported_seconds": 3.1,
+      "requests": 230537,
+      "requests_per_second": 74385.99,
+      "sequence": 5,
+      "socket_errors": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "client_threads": 1,
+      "connections": 1,
+      "contender": "zap",
+      "non_2xx_or_3xx": 0,
+      "pair": 3,
+      "reported_seconds": 3.0,
+      "requests": 197425,
+      "requests_per_second": 65800.96,
+      "sequence": 6,
+      "socket_errors": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "client_threads": 2,
+      "connections": 32,
+      "contender": "zap",
+      "non_2xx_or_3xx": 0,
+      "pair": 1,
+      "reported_seconds": 3.1,
+      "requests": 647399,
+      "requests_per_second": 208804.71,
+      "sequence": 7,
+      "socket_errors": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "client_threads": 2,
+      "connections": 32,
+      "contender": "app",
+      "non_2xx_or_3xx": 0,
+      "pair": 1,
+      "reported_seconds": 3.0,
+      "requests": 1062636,
+      "requests_per_second": 354068.84,
+      "sequence": 8,
+      "socket_errors": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "client_threads": 2,
+      "connections": 32,
+      "contender": "app",
+      "non_2xx_or_3xx": 0,
+      "pair": 2,
+      "reported_seconds": 3.1,
+      "requests": 1162869,
+      "requests_per_second": 375149.17,
+      "sequence": 9,
+      "socket_errors": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "client_threads": 2,
+      "connections": 32,
+      "contender": "zap",
+      "non_2xx_or_3xx": 0,
+      "pair": 2,
+      "reported_seconds": 3.1,
+      "requests": 602054,
+      "requests_per_second": 194245.49,
+      "sequence": 10,
+      "socket_errors": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "client_threads": 2,
+      "connections": 32,
+      "contender": "zap",
+      "non_2xx_or_3xx": 0,
+      "pair": 3,
+      "reported_seconds": 3.1,
+      "requests": 636434,
+      "requests_per_second": 205310.36,
+      "sequence": 11,
+      "socket_errors": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "client_threads": 2,
+      "connections": 32,
+      "contender": "app",
+      "non_2xx_or_3xx": 0,
+      "pair": 3,
+      "reported_seconds": 3.1,
+      "requests": 1127010,
+      "requests_per_second": 363594.19,
+      "sequence": 12,
+      "socket_errors": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "validation": "Both mode/exact-body/status/header/404/405 preflights passed before first wrk; every trial repeated preflight and successful postflight; all server exits were zero; sources unchanged",
+  "wrk": "a211dd5 [epoll]",
+  "wrk_binary_sha256": "c8000cec3cb25e87292c983828ecfcfd4108ce39d2bb01b9cd313f17dcf290af",
+  "wrk_commit": "a211dd5a7050b1f9e8a9870b95513060e72ac4a0",
+  "wrk_cross_host_note": "Linux and macOS used different wrk revisions; each host used one identical client binary for its App and Zap trials",
+  "zap": "simple Request method/path check, setContentType(.TEXT), sendBody; threads=1, workers=1; original no-TLS facil.io C flags"
+}

@@ -1,10 +1,10 @@
 # A modern application framework on zig-http
 
-Status: design proposal, 2026-09-06. No successor API is implemented by this
-document. The implementation sequence and session ledger are in
+Status: design reference, 2026-09-06. The first implementation is described in
+[APP-API.md](APP-API.md); sketches below also include future features. The implementation sequence and session ledger are in
 [APP-API-ROADMAP.md](APP-API-ROADMAP.md).
 
-Build a modern successor to Zap, with a different name, using exact Zig 0.16.0
+Build a modern successor to [Zap](https://github.com/zigzap/zap), with a different name, using exact Zig 0.16.0
 and zig-http. Keep Zap's pleasant application model: typed shared context,
 stateful endpoint structs, named HTTP methods, composable authentication and
 short response calls. Use Zig's explicit capabilities and ordinary byte slices
@@ -68,8 +68,10 @@ retained input and reserved output <-> std.Io.Reader / std.Io.Writer
 
 Implement the framework as modules in this repository first, with a distinct
 public root and the existing `bounded_http` module still usable directly.
-Extracting a separate package can follow a useful vertical slice. Do not make
-package extraction, branding or a transport replacement prerequisites for API work.
+User direction now selects a separate framework repository after the useful
+vertical slice, importing a pinned zig-http package. Keep zig-http independently
+usable as the engine/case study. Current development still uses relative engine
+imports within this worktree; the roadmap records the extraction steps.
 
 `std.process.Init` belongs in executable examples. Libraries receive the narrow
 capabilities they need: an allocator for startup, the caller's `std.Io` where
@@ -404,8 +406,8 @@ The current engine's implementation and measured scope are in
 pins those receipts. They establish neither this proposed framework nor a
 performance cost for its future conveniences.
 
-Defer dynamic leases/offload, request-body streaming, sendfile/spooling,
-TLS, WebSockets, HTTP/2, general static-file hosting, compression, automatic
+TLS is out of scope by user decision. Defer dynamic leases/offload,
+request-body streaming, sendfile/spooling, WebSockets, HTTP/2, general static-file hosting, compression, automatic
 session storage and Windows HTTP to separately scoped work. Public bind-address
 configuration and deployment documentation need their own transport-facing
 gate; the initial successor inherits loopback-only plain HTTP/1.1. Existing

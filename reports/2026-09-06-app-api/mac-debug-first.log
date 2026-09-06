@@ -1,0 +1,10 @@
+build.zig:19:14: error: member function expected 3 argument(s), found 2
+    b.modules.put(b.dupe("http_app"), module) catch @panic("out of memory");
+    ~~~~~~~~~^~~~
+/Users/rs/renerocksai.stow/nvim/.local/share/zigup/0.16.0/files/lib/std/array_hash_map.zig:469:13: note: function declared here
+        pub fn put(self: *Self, gpa: Allocator, key: K, value: V) Oom!void {
+        ~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+referenced by:
+    runBuild__anon_28533: /Users/rs/renerocksai.stow/nvim/.local/share/zigup/0.16.0/files/lib/std/Build.zig:2264:33
+    main: /Users/rs/renerocksai.stow/nvim/.local/share/zigup/0.16.0/files/lib/compiler/build_runner.zig:463:29
+    4 reference(s) hidden; use '-freference-trace=6' to see all references

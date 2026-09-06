@@ -1,0 +1,6 @@
+{
+  "kernel": "Darwin renerocksai-M3-Max-6.local 25.6.0 Darwin Kernel Version 25.6.0: Fri Jul 31 19:18:53 PDT 2026; root:xnu-12377.161.14~5/RELEASE_ARM64_T6031 arm64",
+  "os": "ProductName:\t\tmacOS\nProductVersion:\t\t26.6.2\nBuildVersion:\t\t25G83",
+  "hardware": "Apple M3 Max",
+  "zig": "0.16.0"
+}

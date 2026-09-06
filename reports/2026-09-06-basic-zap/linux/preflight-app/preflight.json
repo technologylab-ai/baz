@@ -1,0 +1,95 @@
+{
+  "build_mode": "ReleaseSafe",
+  "command": [
+    "/tmp/zig-http.bench.mrpm97tq/basic-zap/zig-out/bin/basic-app",
+    "--port",
+    "48797"
+  ],
+  "contender": "app",
+  "method": {
+    "body_bytes": 18,
+    "body_hex": "4d6574686f64204e6f7420416c6c6f776564",
+    "headers": {
+      "allow": [
+        "GET, HEAD, OPTIONS"
+      ],
+      "connection": [
+        "close"
+      ],
+      "content-length": [
+        "18"
+      ],
+      "content-type": [
+        "text/plain; charset=utf-8"
+      ],
+      "date": [
+        "Sun, 06 Sep 2026 13:02:37 GMT"
+      ],
+      "server": [
+        "zig-http"
+      ]
+    },
+    "raw_head": "HTTP/1.1 405 Method Not Allowed\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:02:37 GMT\r\nContent-Type: text/plain; charset=utf-8\r\nContent-Length: 18\r\nConnection: close\r\nAllow: GET, HEAD, OPTIONS",
+    "status": 405
+  },
+  "not_found": {
+    "body_bytes": 9,
+    "body_hex": "4e6f7420466f756e64",
+    "headers": {
+      "connection": [
+        "close"
+      ],
+      "content-length": [
+        "9"
+      ],
+      "content-type": [
+        "text/plain; charset=utf-8"
+      ],
+      "date": [
+        "Sun, 06 Sep 2026 13:02:37 GMT"
+      ],
+      "server": [
+        "zig-http"
+      ]
+    },
+    "raw_head": "HTTP/1.1 404 Not Found\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:02:37 GMT\r\nContent-Type: text/plain; charset=utf-8\r\nContent-Length: 9\r\nConnection: close",
+    "status": 404
+  },
+  "plaintext": {
+    "body_bytes": 13,
+    "body_hex": "48656c6c6f2c20576f726c6421",
+    "headers": {
+      "connection": [
+        "close"
+      ],
+      "content-length": [
+        "13"
+      ],
+      "content-type": [
+        "text/plain"
+      ],
+      "date": [
+        "Sun, 06 Sep 2026 13:02:37 GMT"
+      ],
+      "server": [
+        "zig-http"
+      ]
+    },
+    "raw_head": "HTTP/1.1 200 OK\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:02:37 GMT\r\nContent-Type: text/plain\r\nContent-Length: 13\r\nConnection: close",
+    "status": 200
+  },
+  "process_layout": [
+    {
+      "command": "/tmp/zig-http.bench.mrpm97tq/basic-zap/zig-out/bin/basic-app --port 48797",
+      "pgid": 1608465,
+      "pid": 1608465,
+      "ppid": 1608286,
+      "status_raw": "Name:\tbasic-app\nUmask:\t0022\nState:\tS (sleeping)\nTgid:\t1608465\nNgid:\t0\nPid:\t1608465\nPPid:\t1608286\nTracerPid:\t0\nUid:\t1000\t1000\t1000\t1000\nGid:\t1000\t1000\t1000\t1000\nFDSize:\t64\nGroups:\t967 998 1000 \nNStgid:\t1608465\nNSpid:\t1608465\nNSpgid:\t1608465\nNSsid:\t1608465\nKthread:\t0\nVmPeak:\t   32928 kB\nVmSize:\t   32928 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t   31588 kB\nVmRSS:\t   31588 kB\nRssAnon:\t   29344 kB\nRssFile:\t    1636 kB\nRssShmem:\t     608 kB\nVmData:\t   29460 kB\nVmStk:\t     132 kB\nVmExe:\t     504 kB\nVmLib:\t    1704 kB\nVmPTE:\t     100 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffffff\nThreads:\t1\nSigQ:\t1/126119\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000000000\nSigCgt:\t00000000100054ca\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t000001ffffffffff\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t0\nSeccomp_filters:\t0\nSpeculation_Store_Bypass:\tthread vulnerable\nSpeculationIndirectBranch:\tconditional enabled\nCpus_allowed:\tff\nCpus_allowed_list:\t0-7\nMems_allowed:\t00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000001\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t6\nnonvoluntary_ctxt_switches:\t3\nx86_Thread_features:\t\nx86_Thread_features_locked:\t\n",
+      "thread_count": 1,
+      "thread_ids": [
+        1608465
+      ]
+    }
+  ],
+  "server_exit_code": 0
+}

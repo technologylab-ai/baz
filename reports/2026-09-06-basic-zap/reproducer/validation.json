@@ -1,0 +1,23 @@
+{
+  "command": [
+    "python3",
+    "-B",
+    "/tmp/zig-http-reproducer-hardened-20260906/test_cleanup.py"
+  ],
+  "initial_failure": "EPERM observed during process-group exit; retained as uncertain existence in final revision. Initial failed log preserved.",
+  "matching_synthetic_processes_after_suite": [],
+  "measured_archive_sha256_unchanged": "28768e20a43e6c602775053e149c3030b8cab8c5705582fe7e9c6263af86213c",
+  "no_zig_build_http_or_wrk": true,
+  "platform": "macOS 26.6.2 (25G83), arm64, Apple M3 Max",
+  "python": "3.9.6 (default, May 22 2026, 11:13:45) \n[Clang 21.0.0 (clang-2100.1.1.101)]",
+  "recorded_utc": "2026-09-06T13:20:29.267872+00:00",
+  "reported_suite_seconds": 0.5,
+  "returncode": 0,
+  "revision": "Unmeasured cleanup-hardened reproducer; no throughput runs performed",
+  "source_sha256": {
+    "runner.py": "434e854ece41747e2ab76b52adea62e0c77f091b667f1512ea8756c9393bbfba",
+    "test_cleanup.py": "67244cc82c1b9609907b7f4b84bcf4d1b50ca5eb97a07de6802c2456b9119218"
+  },
+  "suite_watchdog_seconds": 30,
+  "tests_passed": 10
+}

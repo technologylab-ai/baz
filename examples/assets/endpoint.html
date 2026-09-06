@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bounded user example</title>
+<style>
+body{font:16px system-ui;max-width:850px;margin:3rem auto;padding:0 1rem;background:#101820;color:#eef3f7}
+input,button{font:inherit;padding:.5rem;margin:.25rem}table{border-collapse:collapse;width:100%}td,th{padding:.6rem;text-align:left}a{color:#8bd8f7}#status{min-height:1.5em}
+</style>
+<h1>Users</h1>
+<p>This example stores 16 users in memory. Each name can contain 64 UTF-8 bytes.</p>
+<form id="create"><input name="first_name" placeholder="First name" required><input name="last_name" placeholder="Last name"><button>Add user</button></form>
+<p id="status" role="status"></p>
+<table><thead><tr><th>ID</th><th>First name</th><th>Last name</th><th>Actions</th></tr></thead><tbody id="users"></tbody></table>
+<p><a href="/users">View JSON</a></p>
+<script>
+const status=document.querySelector('#status');
+async function request(path,method='GET',value){const response=await fetch(path,{method,headers:value?{'Content-Type':'application/json'}:{},body:value?JSON.stringify(value):undefined});const data=await response.json();if(!response.ok)throw Error(data.message||response.status);return data}
+function report(error){status.textContent=error.message}
+async function load(){try{const users=await request('/users');const body=document.querySelector('#users');body.replaceChildren();for(const user of users){const row=body.insertRow();row.insertCell().textContent=user.id;const first=document.createElement('input');first.value=user.first_name;row.insertCell().append(first);const last=document.createElement('input');last.value=user.last_name;row.insertCell().append(last);const actions=row.insertCell();for(const [label,method] of [['Save','PATCH'],['Delete','DELETE']]){const button=document.createElement('button');button.textContent=label;button.onclick=async()=>{try{await request('/users/'+user.id,method,method==='PATCH'?{first_name:first.value,last_name:last.value}:undefined);status.textContent='User '+user.id+' updated';await load()}catch(error){report(error)}};actions.append(button)}}}catch(error){report(error)}}
+document.querySelector('#create').onsubmit=async(event)=>{event.preventDefault();const values=new FormData(event.currentTarget);try{const data=await request('/users','POST',{first_name:values.get('first_name'),last_name:values.get('last_name')});status.textContent='Created user '+data.id;event.target.reset();await load()}catch(error){report(error)}};
+load();
+</script>
+</html>

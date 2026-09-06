@@ -1,0 +1,16 @@
+thread 12918596 panic: basic comparison requires ReleaseSafe
+/private/tmp/zig-http-basic-zap-20260906/build.zig:7:35: 0x104998e1b in build (build)
+    if (optimize != .ReleaseSafe) @panic("basic comparison requires ReleaseSafe");
+                                  ^
+/Users/rs/renerocksai.stow/nvim/.local/share/zigup/0.16.0/files/lib/std/Build.zig:2265:44: 0x104999cbb in runBuild__anon_28533 (build)
+        .error_union => try build_zig.build(b),
+                                           ^
+/Users/rs/renerocksai.stow/nvim/.local/share/zigup/0.16.0/files/lib/compiler/build_runner.zig:463:29: 0x104803f3f in main (build)
+        try builder.runBuild(root);
+                            ^
+/Users/rs/renerocksai.stow/nvim/.local/share/zigup/0.16.0/files/lib/std/start.zig:699:88: 0x1048061db in callMain (build)
+    if (fn_info.params[0].type.? == std.process.Init.Minimal) return wrapMain(root.main(.{
+                                                                                       ^
+???:?:?: 0x1895cc4e3 in start (/usr/lib/dyld)
+error: the following build command terminated with signal ABRT:
+.zig-cache/o/c4ab808a3c128b3451a1a5a39eac11c0/build /Users/rs/renerocksai.stow/nvim/.local/share/zigup/0.16.0/files/zig /Users/rs/renerocksai.stow/nvim/.local/share/zigup/0.16.0/files/lib /private/tmp/zig-http-basic-zap-20260906 .zig-cache /Users/rs/.cache/zig --seed 0xce7fce1c -Za428cc9f26e8555d verify -Doptimize=ReleaseSafe -Dframework-root=/Users/rs/code/github.com/technologylab.ai/zig-http-app-api --summary all

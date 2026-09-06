@@ -1,0 +1,101 @@
+{
+  "build_mode": "ReleaseSafe",
+  "command": [
+    "/private/tmp/zig-http-basic-zap-20260906/zig-out/bin/basic-app",
+    "--port",
+    "59138"
+  ],
+  "contender": "app",
+  "method": {
+    "body_bytes": 18,
+    "body_hex": "4d6574686f64204e6f7420416c6c6f776564",
+    "headers": {
+      "allow": [
+        "GET, HEAD, OPTIONS"
+      ],
+      "connection": [
+        "close"
+      ],
+      "content-length": [
+        "18"
+      ],
+      "content-type": [
+        "text/plain; charset=utf-8"
+      ],
+      "date": [
+        "Sun, 06 Sep 2026 13:02:05 GMT"
+      ],
+      "server": [
+        "zig-http"
+      ]
+    },
+    "raw_head": "HTTP/1.1 405 Method Not Allowed\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:02:05 GMT\r\nContent-Type: text/plain; charset=utf-8\r\nContent-Length: 18\r\nConnection: close\r\nAllow: GET, HEAD, OPTIONS",
+    "status": 405
+  },
+  "not_found": {
+    "body_bytes": 9,
+    "body_hex": "4e6f7420466f756e64",
+    "headers": {
+      "connection": [
+        "close"
+      ],
+      "content-length": [
+        "9"
+      ],
+      "content-type": [
+        "text/plain; charset=utf-8"
+      ],
+      "date": [
+        "Sun, 06 Sep 2026 13:02:05 GMT"
+      ],
+      "server": [
+        "zig-http"
+      ]
+    },
+    "raw_head": "HTTP/1.1 404 Not Found\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:02:05 GMT\r\nContent-Type: text/plain; charset=utf-8\r\nContent-Length: 9\r\nConnection: close",
+    "status": 404
+  },
+  "plaintext": {
+    "body_bytes": 13,
+    "body_hex": "48656c6c6f2c20576f726c6421",
+    "headers": {
+      "connection": [
+        "close"
+      ],
+      "content-length": [
+        "13"
+      ],
+      "content-type": [
+        "text/plain"
+      ],
+      "date": [
+        "Sun, 06 Sep 2026 13:02:05 GMT"
+      ],
+      "server": [
+        "zig-http"
+      ]
+    },
+    "raw_head": "HTTP/1.1 200 OK\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:02:05 GMT\r\nContent-Type: text/plain\r\nContent-Length: 13\r\nConnection: close",
+    "status": 200
+  },
+  "process_layout": [
+    {
+      "command": "/private/tmp/zig-http-basic-zap-20260906/zig-out/bin/basic-app --port 59138",
+      "pgid": 21285,
+      "pid": 21285,
+      "ppid": 20967,
+      "thread_count": 1,
+      "threads_raw": {
+        "command": [
+          "ps",
+          "-M",
+          "-p",
+          "21285"
+        ],
+        "output": "USER   PID   TT   %CPU STAT PRI     STIME     UTIME COMMAND\nrs   21285   ??    0.0 S    31T   0:00.01   0:00.00 /private/tmp/zig-http-basic-zap-20260906/zig-out/bin/basic-app --port 59138\n",
+        "returncode": 0
+      }
+    }
+  ],
+  "server_exit_code": 0
+}

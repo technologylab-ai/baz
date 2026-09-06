@@ -1,0 +1,172 @@
+{
+  "build_mode": "ReleaseSafe",
+  "client_threads": 2,
+  "connections": 32,
+  "contender": "zap",
+  "finished_utc": "2026-09-06T13:02:36.588015+00:00",
+  "measurement": {
+    "non_2xx_or_3xx": 0,
+    "reported_seconds": 3.1,
+    "requests": 759623,
+    "requests_per_second": 245053.75,
+    "socket_errors": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "measurement_command": [
+    "/opt/homebrew/bin/wrk",
+    "-c",
+    "32",
+    "-t",
+    "2",
+    "-d",
+    "3s",
+    "http://127.0.0.1:59213/plaintext"
+  ],
+  "method_preflight": {
+    "body_bytes": 18,
+    "body_hex": "4d6574686f64204e6f7420416c6c6f776564",
+    "headers": {
+      "connection": [
+        "close"
+      ],
+      "content-length": [
+        "18"
+      ],
+      "content-type": [
+        "text/plain"
+      ],
+      "date": [
+        "Sun, 06 Sep 2026 13:02:32 GMT"
+      ],
+      "last-modified": [
+        "Sun, 06 Sep 2026 13:02:32 GMT"
+      ]
+    },
+    "raw_head": "HTTP/1.1 405 Method Not Allowed\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:18\r\ndate:Sun, 06 Sep 2026 13:02:32 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:02:32 GMT",
+    "status": 405
+  },
+  "name": "07-c32-t2-pair1-zap",
+  "not_found_preflight": {
+    "body_bytes": 9,
+    "body_hex": "4e6f7420466f756e64",
+    "headers": {
+      "connection": [
+        "close"
+      ],
+      "content-length": [
+        "9"
+      ],
+      "content-type": [
+        "text/plain"
+      ],
+      "date": [
+        "Sun, 06 Sep 2026 13:02:32 GMT"
+      ],
+      "last-modified": [
+        "Sun, 06 Sep 2026 13:02:32 GMT"
+      ]
+    },
+    "raw_head": "HTTP/1.1 404 Not Found\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:9\r\ndate:Sun, 06 Sep 2026 13:02:32 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:02:32 GMT",
+    "status": 404
+  },
+  "pair": 1,
+  "plaintext_preflight": {
+    "body_bytes": 13,
+    "body_hex": "48656c6c6f2c20576f726c6421",
+    "headers": {
+      "connection": [
+        "close"
+      ],
+      "content-length": [
+        "13"
+      ],
+      "content-type": [
+        "text/plain"
+      ],
+      "date": [
+        "Sun, 06 Sep 2026 13:02:32 GMT"
+      ],
+      "last-modified": [
+        "Sun, 06 Sep 2026 13:02:32 GMT"
+      ]
+    },
+    "raw_head": "HTTP/1.1 200 OK\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:13\r\ndate:Sun, 06 Sep 2026 13:02:32 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:02:32 GMT",
+    "status": 200
+  },
+  "postflight": {
+    "body_bytes": 13,
+    "body_hex": "48656c6c6f2c20576f726c6421",
+    "headers": {
+      "connection": [
+        "close"
+      ],
+      "content-length": [
+        "13"
+      ],
+      "content-type": [
+        "text/plain"
+      ],
+      "date": [
+        "Sun, 06 Sep 2026 13:02:36 GMT"
+      ],
+      "last-modified": [
+        "Sun, 06 Sep 2026 13:02:36 GMT"
+      ]
+    },
+    "raw_head": "HTTP/1.1 200 OK\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:13\r\ndate:Sun, 06 Sep 2026 13:02:36 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:02:36 GMT",
+    "status": 200
+  },
+  "process_layout": [
+    {
+      "command": "/private/tmp/zig-http-basic-zap-20260906/zig-out/bin/basic-zap --port 59213",
+      "pgid": 21462,
+      "pid": 21462,
+      "ppid": 20967,
+      "thread_count": 1,
+      "threads_raw": {
+        "command": [
+          "ps",
+          "-M",
+          "-p",
+          "21462"
+        ],
+        "output": "USER   PID   TT   %CPU STAT PRI     STIME     UTIME COMMAND\nrs   21462   ??    0.0 S    31T   0:00.00   0:00.00 /private/tmp/zig-http-basic-zap-20260906/zig-out/bin/basic-zap --port 59213\n",
+        "returncode": 0
+      }
+    }
+  ],
+  "sequence": 7,
+  "server_command": [
+    "/private/tmp/zig-http-basic-zap-20260906/zig-out/bin/basic-zap",
+    "--port",
+    "59213"
+  ],
+  "server_exit_code": 0,
+  "started_utc": "2026-09-06T13:02:32.271299+00:00",
+  "warmup": {
+    "non_2xx_or_3xx": 0,
+    "reported_seconds": 1.1,
+    "requests": 273903,
+    "requests_per_second": 248988.24,
+    "socket_errors": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "warmup_command": [
+    "/opt/homebrew/bin/wrk",
+    "-c",
+    "32",
+    "-t",
+    "2",
+    "-d",
+    "1s",
+    "http://127.0.0.1:59213/plaintext"
+  ]
+}

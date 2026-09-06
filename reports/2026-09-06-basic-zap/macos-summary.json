@@ -1,0 +1,284 @@
+{
+  "app": "public one-shot Response.bytes; one inline shard, zero application workers; other normal defaults",
+  "binary_sha256": {
+    "app": "b58bee483f87b2196a7fdf224ead0fcfd380e442119c98bb4eb9e96cba56f4aa",
+    "zap": "ba608dc541093367c0233adc40c6df0ac07f1513eaa52d0fa69d570b1ffd0cf0"
+  },
+  "body": "Hello, World!",
+  "body_bytes": 13,
+  "build": "exact Zig 0.16.0, ReleaseSafe, verify 7/7 passed",
+  "cleanup": "all owned process groups stopped; own measurement lock released",
+  "complete": true,
+  "connections_capacity_each": 128,
+  "content_type": "text/plain",
+  "cpu": "Apple M3 Max, 16 cores, 128 GiB RAM",
+  "finished_utc": "2026-09-06T13:02:58.333257+00:00",
+  "fixture_archive_sha256": "28768e20a43e6c602775053e149c3030b8cab8c5705582fe7e9c6263af86213c",
+  "framework_commit": "db8d7ce4e2324825fd5655265d6cb81df7202e82",
+  "framework_input": "working tree; full relevant source manifest captured before build and unchanged after all trials",
+  "limitation": "Basic indicative same-host loopback throughput; client shares host and can constrain result; no bottleneck cause, latency, SLO, capacity or production claim",
+  "macos": "26.6.2 (25G83)",
+  "medians": [
+    {
+      "app_over_zap_ratio_of_medians": 0.6286683064195587,
+      "connections": 1,
+      "median_rps": {
+        "app": 33199.2,
+        "zap": 52808.77
+      },
+      "rates": {
+        "app": [
+          32975.42,
+          33225.42,
+          33199.2
+        ],
+        "zap": [
+          53544.36,
+          51338.33,
+          52808.77
+        ]
+      }
+    },
+    {
+      "app_over_zap_ratio_of_medians": 1.037572940630372,
+      "connections": 32,
+      "median_rps": {
+        "app": 254261.14,
+        "zap": 245053.75
+      },
+      "rates": {
+        "app": [
+          251895.21,
+          254261.14,
+          255807.45
+        ],
+        "zap": [
+          245053.75,
+          245550.26,
+          218679.65
+        ]
+      }
+    }
+  ],
+  "observed_layout": {
+    "app": "one process / one thread",
+    "zap": "one process / one thread"
+  },
+  "path": "GET /plaintext",
+  "platform": "macOS-26.6.2-arm64-arm-64bit",
+  "power": "AC attached, pmset AC powermode=2; no policy change by runner",
+  "preserved_failed_attempt": "macos-build-option-failure: optimize-option guard rejected build graph before any fixture or wrk; corrected standardOptimizeOption usage in final package",
+  "protocol": "c1/t1 and c32/t2, three paired repetitions each, alternating first contender; one-second warmup and three-second measurement; fresh server each trial",
+  "source_manifest_sha256": "497f6685715fcbb13e2bbebee6a493bfd3ec02a1448960177a5a7b38b06d9bd2",
+  "started_utc": "2026-09-06T13:01:55.525238+00:00",
+  "trials": [
+    {
+      "client_threads": 1,
+      "connections": 1,
+      "contender": "app",
+      "non_2xx_or_3xx": 0,
+      "pair": 1,
+      "reported_seconds": 3.1,
+      "requests": 102208,
+      "requests_per_second": 32975.42,
+      "sequence": 1,
+      "socket_errors": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "client_threads": 1,
+      "connections": 1,
+      "contender": "zap",
+      "non_2xx_or_3xx": 0,
+      "pair": 1,
+      "reported_seconds": 3.1,
+      "requests": 165958,
+      "requests_per_second": 53544.36,
+      "sequence": 2,
+      "socket_errors": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "client_threads": 1,
+      "connections": 1,
+      "contender": "zap",
+      "non_2xx_or_3xx": 0,
+      "pair": 2,
+      "reported_seconds": 3.1,
+      "requests": 159131,
+      "requests_per_second": 51338.33,
+      "sequence": 3,
+      "socket_errors": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "client_threads": 1,
+      "connections": 1,
+      "contender": "app",
+      "non_2xx_or_3xx": 0,
+      "pair": 2,
+      "reported_seconds": 3.1,
+      "requests": 102988,
+      "requests_per_second": 33225.42,
+      "sequence": 4,
+      "socket_errors": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "client_threads": 1,
+      "connections": 1,
+      "contender": "app",
+      "non_2xx_or_3xx": 0,
+      "pair": 3,
+      "reported_seconds": 3.1,
+      "requests": 102919,
+      "requests_per_second": 33199.2,
+      "sequence": 5,
+      "socket_errors": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "client_threads": 1,
+      "connections": 1,
+      "contender": "zap",
+      "non_2xx_or_3xx": 0,
+      "pair": 3,
+      "reported_seconds": 3.1,
+      "requests": 163663,
+      "requests_per_second": 52808.77,
+      "sequence": 6,
+      "socket_errors": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "client_threads": 2,
+      "connections": 32,
+      "contender": "zap",
+      "non_2xx_or_3xx": 0,
+      "pair": 1,
+      "reported_seconds": 3.1,
+      "requests": 759623,
+      "requests_per_second": 245053.75,
+      "sequence": 7,
+      "socket_errors": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "client_threads": 2,
+      "connections": 32,
+      "contender": "app",
+      "non_2xx_or_3xx": 0,
+      "pair": 1,
+      "reported_seconds": 3.1,
+      "requests": 780788,
+      "requests_per_second": 251895.21,
+      "sequence": 8,
+      "socket_errors": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "client_threads": 2,
+      "connections": 32,
+      "contender": "app",
+      "non_2xx_or_3xx": 0,
+      "pair": 2,
+      "reported_seconds": 3.1,
+      "requests": 788058,
+      "requests_per_second": 254261.14,
+      "sequence": 9,
+      "socket_errors": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "client_threads": 2,
+      "connections": 32,
+      "contender": "zap",
+      "non_2xx_or_3xx": 0,
+      "pair": 2,
+      "reported_seconds": 3.1,
+      "requests": 761084,
+      "requests_per_second": 245550.26,
+      "sequence": 10,
+      "socket_errors": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "client_threads": 2,
+      "connections": 32,
+      "contender": "zap",
+      "non_2xx_or_3xx": 0,
+      "pair": 3,
+      "reported_seconds": 3.1,
+      "requests": 678135,
+      "requests_per_second": 218679.65,
+      "sequence": 11,
+      "socket_errors": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "client_threads": 2,
+      "connections": 32,
+      "contender": "app",
+      "non_2xx_or_3xx": 0,
+      "pair": 3,
+      "reported_seconds": 3.1,
+      "requests": 792999,
+      "requests_per_second": 255807.45,
+      "sequence": 12,
+      "socket_errors": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "validation": "Both mode/exact-body/status/header/404/405 preflights passed before first wrk; every trial repeated preflight, zero reported socket/non-success errors, successful postflight, zero server exit; sources unchanged",
+  "wrk": "4.2.0 [kqueue]",
+  "wrk_binary_sha256": "422f8912ad069168cbcb3d3f831b15456d0d1663fc5c7a4f6492193d7bc172ed",
+  "zap": "simple Request method/path check, setContentType(.TEXT), sendBody; threads=1, workers=1; original no-TLS facil.io C flags"
+}

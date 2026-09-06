@@ -1,0 +1,15 @@
+test_cleanup_failure_clears_success_and_retains_lock (__main__.CleanupTests) ... ok
+test_exited_leader_does_not_discharge_live_descendant (__main__.CleanupTests) ... ok
+test_external_reservation_is_never_released (__main__.CleanupTests) ... ok
+test_failed_workload_stays_failed_after_clean_shutdown (__main__.CleanupTests) ... ok
+test_foreign_lock_blocks_success_without_modifying_owner (__main__.CleanupTests) ... ok
+test_graceful_group_reaped_and_idempotent (__main__.CleanupTests) ... ok
+test_group_watchdog_retains_uncertain_ownership (__main__.CleanupTests) ... ok
+test_success_is_published_only_after_cleanup_and_lock_release (__main__.CleanupTests) ... ok
+test_term_ignoring_leader_requires_kill (__main__.CleanupTests) ... ok
+test_unrelated_group_is_not_signaled (__main__.CleanupTests) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.500s
+
+OK

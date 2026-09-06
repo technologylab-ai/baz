@@ -25,6 +25,32 @@ pub const chunk_size_field_bytes: usize = 10;
 const chunk_slack_bytes: usize = 7;
 pub const max_content_type_bytes: usize = 128;
 
+/// Ordinary response construction errors, including untrusted header values.
+pub fn validateHeader(name: []const u8, value: []const u8) !void {
+    if (name.len == 0) return error.InvalidHeader;
+    for (name) |byte| switch (byte) {
+        'a'...'z', 'A'...'Z', '0'...'9', '!', '#', '$', '%', '&', '\'', '*', '+', '-', '.', '^', '_', '`', '|', '~' => {},
+        else => return error.InvalidHeader,
+    };
+    for (value) |byte| {
+        if ((byte < 32 and byte != '\t') or byte == 127) return error.InvalidHeader;
+    }
+    inline for (.{ "Content-Length", "Transfer-Encoding", "Connection", "Content-Type", "Trailer", "Upgrade", "Keep-Alive", "Proxy-Connection", "TE", "Server", "Date" }) |reserved| {
+        if (std.ascii.eqlIgnoreCase(name, reserved)) return error.ReservedHeader;
+    }
+}
+
+fn validateHeaderBlock(bytes: []const u8) !void {
+    var offset: usize = 0;
+    while (offset < bytes.len) {
+        const end = std.mem.findPosLinear(u8, bytes, offset, "\r\n") orelse return error.InvalidHeader;
+        const line = bytes[offset..end];
+        const colon = std.mem.findScalar(u8, line, ':') orelse return error.InvalidHeader;
+        try validateHeader(line[0..colon], line[colon + 1 ..]);
+        offset = end + 2;
+    }
+}
+
 /// Date/status prefix rebuilt by one I/O owner once per second. Inline begin()
 /// reads that owner's cache; worker begin() reads an exclusive slot snapshot
 /// published before dispatch. begin() copies the prefix instead of formatting.
@@ -51,13 +77,25 @@ pub const HeaderCache = struct {
 pub fn reason(status: u16) []const u8 {
     return switch (status) {
         200 => "OK",
+        201 => "Created",
+        202 => "Accepted",
         204 => "No Content",
+        205 => "Reset Content",
+        301 => "Moved Permanently",
+        302 => "Found",
+        303 => "See Other",
         304 => "Not Modified",
+        307 => "Temporary Redirect",
+        308 => "Permanent Redirect",
         400 => "Bad Request",
+        401 => "Unauthorized",
+        403 => "Forbidden",
         404 => "Not Found",
         405 => "Method Not Allowed",
+        409 => "Conflict",
         413 => "Content Too Large",
         414 => "URI Too Long",
+        415 => "Unsupported Media Type",
         417 => "Expectation Failed",
         431 => "Request Header Fields Too Large",
         500 => "Internal Server Error",
@@ -142,6 +180,8 @@ pub const Writer = struct {
     frozen: bool = false,
     headers_committed: bool = false,
     copied_borrow: bool = false,
+    /// Payload bytes compacted from an unpublished one-shot draft.
+    draft_copy_bytes: usize = 0,
 
     pub fn init(arena: []u8, header_cache: *const HeaderCache, copy_threshold: usize) Writer {
         return .{ .arena = arena, .header_cache = header_cache, .copy_threshold = copy_threshold };
@@ -166,6 +206,7 @@ pub const Writer = struct {
         self.frozen = false;
         self.headers_committed = false;
         self.copied_borrow = false;
+        self.draft_copy_bytes = 0;
     }
 
     /// Continue the same response after a flush drained the arena. The head is
@@ -179,6 +220,7 @@ pub const Writer = struct {
         self.borrowed = null;
         self.chunk_size_at = null;
         self.copied_borrow = false;
+        self.draft_copy_bytes = 0;
         if (self.chunked()) {
             self.chunk_size_at = at;
             self.buffered += chunk_size_field_bytes;
@@ -201,9 +243,20 @@ pub const Writer = struct {
     }
 
     pub fn begin(self: *Writer, status: u16, content_type: []const u8, length: ?usize) !void {
+        return self.beginWithHeaders(status, content_type, length, "");
+    }
+
+    /// Extra fields are complete name/value lines ending in CRLF. Their
+    /// framing is validated before mutating the writer. Callers reserve the
+    /// additional head space before execution; ordinary begin keeps its old
+    /// fixed reserve. Extra fields may reside later in this writer's arena.
+    pub fn beginWithHeaders(self: *Writer, status: u16, content_type: []const u8, length: ?usize, extra_headers: []const u8) !void {
         if (self.frozen or self.began or self.headers_committed) return error.InvalidState;
         if (status < 200 or status > 599 or content_type.len > max_content_type_bytes) return error.InvalidResponse;
         for (content_type) |byte| if (byte < 32 or byte > 126) return error.InvalidResponse;
+        try validateHeaderBlock(extra_headers);
+        const head_bound = std.math.add(usize, header_reserve_bytes, extra_headers.len) catch return error.InvalidResponse;
+        if (head_bound > self.arena.len - self.buffered) return error.WouldBlock;
         self.status = status;
         self.content_type = content_type;
         self.content_length = length;
@@ -240,6 +293,7 @@ pub const Writer = struct {
         @memcpy(out[n..][0..14], "Content-Type: ");
         n += 14;
         copyShort(out[n..], content_type);
+        self.content_type = out[n..][0..content_type.len];
         n += content_type.len;
         @memcpy(out[n..][0..2], "\r\n");
         n += 2;
@@ -261,13 +315,15 @@ pub const Writer = struct {
             @memcpy(out[n..][0..close.len], close);
             n += close.len;
         }
+        std.mem.copyForwards(u8, out[n..][0..extra_headers.len], extra_headers);
+        n += extra_headers.len;
         @memcpy(out[n..][0..2], "\r\n");
         n += 2;
         if (self.chunked()) {
             self.chunk_size_at = n;
             n += chunk_size_field_bytes;
         }
-        assert(n - self.buffered <= header_reserve_bytes);
+        assert(n - self.buffered <= head_bound);
         self.buffered = n;
         self.body_start = n;
     }
@@ -437,4 +493,24 @@ test "reservation capacity errors are recoverable and leave slack for chunk fram
     try std.testing.expectEqual(@as(usize, 0), writer.chunk_size_at.?);
     try std.testing.expectEqual(chunk_size_field_bytes, writer.body_start);
     try std.testing.expectError(error.InvalidState, writer.begin(200, "text/plain", null));
+}
+
+test "extra header validation is transactional and bounded before begin" {
+    var arena: [1024]u8 = undefined;
+    const cache = testCache();
+    var writer = Writer.init(&arena, &cache, 0);
+    writer.open(0, true, false);
+    try std.testing.expectError(error.InvalidHeader, writer.beginWithHeaders(200, "text/plain", 0, "Bad Name: x\r\n"));
+    try std.testing.expectError(error.InvalidHeader, writer.beginWithHeaders(200, "text/plain", 0, "X: missing terminator"));
+    try std.testing.expectError(error.ReservedHeader, writer.beginWithHeaders(200, "text/plain", 0, "Connection: close\r\n"));
+    try std.testing.expect(!writer.began and writer.buffered == 0);
+    try writer.beginWithHeaders(303, "text/plain", 0, "Location: /next\r\nSet-Cookie: a=1\r\nSet-Cookie: b=2\r\n");
+    _ = writer.finish();
+    try std.testing.expect(std.mem.indexOf(u8, arena[0..writer.buffered], "HTTP/1.1 303 See Other\r\n") != null);
+    try std.testing.expect(std.mem.endsWith(u8, arena[0..writer.buffered], "Location: /next\r\nSet-Cookie: a=1\r\nSet-Cookie: b=2\r\n\r\n"));
+    writer.release();
+    writer.open(arena.len - header_reserve_bytes, true, false);
+    try std.testing.expectError(error.WouldBlock, writer.beginWithHeaders(200, "text/plain", 0, "X: y\r\n"));
+    try std.testing.expect(!writer.began and writer.buffered == writer.base);
+    try writer.begin(200, "text/plain", 0);
 }

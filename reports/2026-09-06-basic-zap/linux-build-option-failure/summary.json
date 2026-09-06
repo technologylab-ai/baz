@@ -1,0 +1,18 @@
+{
+  "build_command": [
+    "zig",
+    "build",
+    "verify",
+    "-Doptimize=ReleaseSafe",
+    "-Dframework-root=/tmp/zig-http.bench.mrpm97tq/framework",
+    "--summary",
+    "all"
+  ],
+  "complete": false,
+  "error": "RuntimeError(\"Command failed (1), see /tmp/zig-http.bench.mrpm97tq/linux-receipts/build-verify.log: ['zig', 'build', 'verify', '-Doptimize=ReleaseSafe', '-Dframework-root=/tmp/zig-http.bench.mrpm97tq/framework', '--summary', 'all']\")",
+  "finished_utc": "2026-09-06T13:01:53.452622+00:00",
+  "interpretation": "Basic indicative same-host loopback throughput only; no latency/SLO/capacity claims",
+  "owned_process_groups_remaining": [],
+  "started_utc": "2026-09-06T13:01:52.342422+00:00",
+  "trials": []
+}

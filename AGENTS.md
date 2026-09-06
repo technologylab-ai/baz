@@ -12,7 +12,9 @@ Use explicit bounds, checked arithmetic and assertions of ownership invariants.
 Malformed HTTP is an ordinary error, never an internal assertion failure.
 
 Compile/test every Zig file with `zig build verify`. Use Debug/ReleaseSafe;
-do not disable assertions for benchmarks. Run Python integration tests for
+do not disable assertions for benchmarks. Performance tests, including warmups,
+must use ReleaseSafe, never Debug (user decision, 2026-09-06). Debug builds are
+for correctness checks only. Run Python integration tests for
 wire framing, partial progress, overload, deadlines and shutdown. Record exact
 platforms; cross compilation is not runtime evidence. All code is experimental
 until the named gate passes; do not claim arbitrary application isolation.

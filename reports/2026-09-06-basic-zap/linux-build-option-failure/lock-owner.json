@@ -1,0 +1,12 @@
+{
+  "benchmark_preparation_utc": "2026-09-06T13:00:42.397508+00:00",
+  "host": "omarx1",
+  "owner": "/root/parser_api_review",
+  "owner_pid": 1586730,
+  "process_start_ticks": "54256460",
+  "purpose": "native Linux App verification completed; basic ReleaseSafe Zap/App comparison",
+  "source_manifest_sha256": "29b376f3b2c79e4e1d5e92a3399a37aeb410933af070e60ccd736120df35ac4f",
+  "started_utc": "2026-09-06T12:43:51.632255+00:00",
+  "token": "9f0fb179-d099-4a1d-a3f0-dd638c4c16c6",
+  "working_directory": "/tmp/zig-http.bench.mrpm97tq"
+}

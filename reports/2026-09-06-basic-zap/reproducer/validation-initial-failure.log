@@ -1,0 +1,69 @@
+test_cleanup_failure_clears_success_and_retains_lock (__main__.CleanupTests) ... ok
+test_exited_leader_does_not_discharge_live_descendant (__main__.CleanupTests) ... ok
+test_external_reservation_is_never_released (__main__.CleanupTests) ... ok
+test_failed_workload_stays_failed_after_clean_shutdown (__main__.CleanupTests) ... ok
+test_foreign_lock_blocks_success_without_modifying_owner (__main__.CleanupTests) ... ok
+test_graceful_group_reaped_and_idempotent (__main__.CleanupTests) ... ERROR
+ERROR
+test_group_watchdog_retains_uncertain_ownership (__main__.CleanupTests) ... ok
+test_success_is_published_only_after_cleanup_and_lock_release (__main__.CleanupTests) ... ok
+test_term_ignoring_leader_requires_kill (__main__.CleanupTests) ... ok
+test_unrelated_group_is_not_signaled (__main__.CleanupTests) ... ERROR
+ERROR
+
+======================================================================
+ERROR: test_graceful_group_reaped_and_idempotent (__main__.CleanupTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/zig-http-reproducer-hardened-20260906/test_cleanup.py", line 78, in test_graceful_group_reaped_and_idempotent
+    self.assertEqual(runner.stop_group(child, 0.5, 1), -signal.SIGTERM)
+  File "/tmp/zig-http-reproducer-hardened-20260906/runner.py", line 147, in stop_group
+    if not wait_gone(term_timeout):
+  File "/tmp/zig-http-reproducer-hardened-20260906/runner.py", line 137, in wait_gone
+    if not group_exists(child.pid) and child.returncode is not None:
+  File "/tmp/zig-http-reproducer-hardened-20260906/runner.py", line 111, in group_exists
+    os.killpg(pgid, 0)
+PermissionError: [Errno 1] Operation not permitted
+
+======================================================================
+ERROR: test_graceful_group_reaped_and_idempotent (__main__.CleanupTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/zig-http-reproducer-hardened-20260906/test_cleanup.py", line 45, in tearDown
+    runner.stop_group(child, term_timeout=0.1, kill_timeout=2)
+  File "/tmp/zig-http-reproducer-hardened-20260906/runner.py", line 145, in stop_group
+    if group_exists(child.pid):
+  File "/tmp/zig-http-reproducer-hardened-20260906/runner.py", line 111, in group_exists
+    os.killpg(pgid, 0)
+PermissionError: [Errno 1] Operation not permitted
+
+======================================================================
+ERROR: test_unrelated_group_is_not_signaled (__main__.CleanupTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/zig-http-reproducer-hardened-20260906/test_cleanup.py", line 112, in test_unrelated_group_is_not_signaled
+    runner.stop_group(child, 0.5, 1)
+  File "/tmp/zig-http-reproducer-hardened-20260906/runner.py", line 147, in stop_group
+    if not wait_gone(term_timeout):
+  File "/tmp/zig-http-reproducer-hardened-20260906/runner.py", line 137, in wait_gone
+    if not group_exists(child.pid) and child.returncode is not None:
+  File "/tmp/zig-http-reproducer-hardened-20260906/runner.py", line 111, in group_exists
+    os.killpg(pgid, 0)
+PermissionError: [Errno 1] Operation not permitted
+
+======================================================================
+ERROR: test_unrelated_group_is_not_signaled (__main__.CleanupTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/zig-http-reproducer-hardened-20260906/test_cleanup.py", line 45, in tearDown
+    runner.stop_group(child, term_timeout=0.1, kill_timeout=2)
+  File "/tmp/zig-http-reproducer-hardened-20260906/runner.py", line 145, in stop_group
+    if group_exists(child.pid):
+  File "/tmp/zig-http-reproducer-hardened-20260906/runner.py", line 111, in group_exists
+    os.killpg(pgid, 0)
+PermissionError: [Errno 1] Operation not permitted
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.408s
+
+FAILED (errors=4)

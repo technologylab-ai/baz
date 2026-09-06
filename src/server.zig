@@ -28,6 +28,10 @@ pub const Config = struct {
     /// Contiguous output arena per connection: response heads, generated
     /// bodies, chunk framing and copied small borrows of one batch.
     output_bytes: u32 = 65536,
+    /// Free output required before initial callback dispatch. The low-level
+    /// default reserves a head; one-shot applications reserve their full draft
+    /// so earlier batched output drains before application side effects run.
+    callback_output_reserve: u32 = api.header_reserve_bytes,
     /// Borrowed spans up to this size are copied into the arena; 0 disables.
     borrow_copy_threshold: u32 = 256,
     /// Inline callbacks per event-loop turn; 0 selects connections × batch
@@ -108,6 +112,7 @@ pub const Config = struct {
             self.workers > 64 or self.workers > self.connections or self.max_header < 128 or
             self.max_header > 65536 or self.max_body > 16 * 1024 * 1024 or
             self.output_bytes < 1024 or self.output_bytes > 1024 * 1024 or self.timeout_ms == 0 or
+            self.callback_output_reserve < api.header_reserve_bytes or self.callback_output_reserve > self.output_bytes or
             self.shutdown_ms == 0 or self.send_chunk == 0 or self.socket_send_buffer_bytes == 0 or
             self.socket_send_buffer_bytes > 16 * 1024 * 1024 or self.max_headers == 0 or
             self.max_headers > 1024 or self.worker_stack_bytes < 65536 or
@@ -137,6 +142,7 @@ pub const Stats = struct {
     /// Gather-mode operations whose batch formed one contiguous span.
     single_span_send_operations: u64 = 0,
     borrow_copies: u64 = 0,
+    response_draft_copy_bytes: u64 = 0,
     send_completions: u64 = 0,
     short_send_completions: u64 = 0,
     gather_cancel_requests: u64 = 0,
@@ -876,6 +882,10 @@ pub const Server = struct {
         const slot = &self.slots[index];
         assert(!slot.request_active and !slot.send_pending and slot.input_cursor <= slot.received);
         assert(slot.batch_count < slot.cells.len);
+        if (slot.arena.len - slot.arena_used < self.config.callback_output_reserve) {
+            assert(slot.batch_count != 0);
+            return self.drainBatch(index, .parse);
+        }
         const parsed = slot.parser.parseInto(slot.input[slot.input_cursor..slot.received], &slot.request) catch |err| {
             // Earlier successful responses retain wire order before this error.
             // Drain them, compact safely, then parse/reject the unchanged suffix.
@@ -892,7 +902,7 @@ pub const Server = struct {
         };
         if (parsed) {
             slot.request_active = true;
-            assert(slot.arena.len - slot.arena_used >= api.header_reserve_bytes);
+            assert(slot.arena.len - slot.arena_used >= self.config.callback_output_reserve);
             slot.writer.open(slot.arena_used, slot.request.keep_alive, slot.request.head_only);
             slot.state = @splat(0);
             slot.event = .request;
@@ -1042,6 +1052,7 @@ pub const Server = struct {
         const writer = &slot.writer;
         assert(writer.frozen and slot.request_active and slot.batch_count < slot.cells.len);
         if (writer.copied_borrow) self.stats.borrow_copies += 1;
+        self.stats.response_draft_copy_bytes += writer.draft_copy_bytes;
         const body_bytes = writer.bodyBytes();
         const total = std.math.add(usize, slot.logical_written, body_bytes) catch {
             return self.beginClose(slot);
@@ -1112,7 +1123,7 @@ pub const Server = struct {
         // extend ownership of bytes that are already waiting for the transport.
         if (self.config.execution == .inline_event_loop and continue_turn and
             self.inline_budget > 0 and slot.batch_count < slot.cells.len and
-            slot.arena.len - slot.arena_used >= api.header_reserve_bytes and
+            slot.arena.len - slot.arena_used >= self.config.callback_output_reserve and
             slot.input_cursor < slot.received)
             return self.parseRequest(index);
         return self.drainBatch(index, .parse);
@@ -1848,6 +1859,9 @@ test "configuration rejects combined resource overcommit and impossible worker l
     try std.testing.expectError(error.InvalidConfiguration, (Config{ .connections = 1, .workers = 2 }).validate());
     try std.testing.expectError(error.MemoryBudgetExceeded, (Config{ .connections = 4096, .max_body = 1024 * 1024 }).validate());
     try std.testing.expectError(error.InvalidConfiguration, (Config{ .output_bytes = 512 }).validate());
+    try std.testing.expectError(error.InvalidConfiguration, (Config{ .callback_output_reserve = api.header_reserve_bytes - 1 }).validate());
+    try std.testing.expectError(error.InvalidConfiguration, (Config{ .output_bytes = 1024, .callback_output_reserve = 1025 }).validate());
+    try (Config{ .output_bytes = 1024, .callback_output_reserve = 1024 }).validate();
     try std.testing.expectError(error.InvalidConfiguration, (Config{ .response_batch_limit = 512 }).validate());
     try std.testing.expectEqual(@as(usize, 16 * 16), (Config{ .connections = 16, .response_batch_limit = 16 }).effectiveCallbacksPerTurn());
     try std.testing.expectEqual(Config.max_callbacks_per_turn_auto, (Config{ .connections = 4096 }).effectiveCallbacksPerTurn());

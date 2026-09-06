@@ -1,0 +1,2263 @@
+{
+  "binary_sha256": {
+    "app": "6dc437485fad3225a131cc589ac799011209441195b61277bd30730b19caa76d",
+    "zap": "a520d61dc47d7167b0a0c1b3459870da368be12cd8b4bf31a63e9469d5ec9796"
+  },
+  "build_command": [
+    "zig",
+    "build",
+    "verify",
+    "-Doptimize=ReleaseSafe",
+    "-Dframework-root=/tmp/zig-http.bench.mrpm97tq/framework",
+    "--summary",
+    "all"
+  ],
+  "complete": true,
+  "finished_utc": "2026-09-06T13:03:28.055991+00:00",
+  "fixture_preflights": [
+    {
+      "build_mode": "ReleaseSafe",
+      "command": [
+        "/tmp/zig-http.bench.mrpm97tq/basic-zap/zig-out/bin/basic-app",
+        "--port",
+        "48797"
+      ],
+      "contender": "app",
+      "method": {
+        "body_bytes": 18,
+        "body_hex": "4d6574686f64204e6f7420416c6c6f776564",
+        "headers": {
+          "allow": [
+            "GET, HEAD, OPTIONS"
+          ],
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "18"
+          ],
+          "content-type": [
+            "text/plain; charset=utf-8"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:37 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 405 Method Not Allowed\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:02:37 GMT\r\nContent-Type: text/plain; charset=utf-8\r\nContent-Length: 18\r\nConnection: close\r\nAllow: GET, HEAD, OPTIONS",
+        "status": 405
+      },
+      "not_found": {
+        "body_bytes": 9,
+        "body_hex": "4e6f7420466f756e64",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "9"
+          ],
+          "content-type": [
+            "text/plain; charset=utf-8"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:37 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 404 Not Found\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:02:37 GMT\r\nContent-Type: text/plain; charset=utf-8\r\nContent-Length: 9\r\nConnection: close",
+        "status": 404
+      },
+      "plaintext": {
+        "body_bytes": 13,
+        "body_hex": "48656c6c6f2c20576f726c6421",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "13"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:37 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 200 OK\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:02:37 GMT\r\nContent-Type: text/plain\r\nContent-Length: 13\r\nConnection: close",
+        "status": 200
+      },
+      "process_layout": [
+        {
+          "command": "/tmp/zig-http.bench.mrpm97tq/basic-zap/zig-out/bin/basic-app --port 48797",
+          "pgid": 1608465,
+          "pid": 1608465,
+          "ppid": 1608286,
+          "status_raw": "Name:\tbasic-app\nUmask:\t0022\nState:\tS (sleeping)\nTgid:\t1608465\nNgid:\t0\nPid:\t1608465\nPPid:\t1608286\nTracerPid:\t0\nUid:\t1000\t1000\t1000\t1000\nGid:\t1000\t1000\t1000\t1000\nFDSize:\t64\nGroups:\t967 998 1000 \nNStgid:\t1608465\nNSpid:\t1608465\nNSpgid:\t1608465\nNSsid:\t1608465\nKthread:\t0\nVmPeak:\t   32928 kB\nVmSize:\t   32928 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t   31588 kB\nVmRSS:\t   31588 kB\nRssAnon:\t   29344 kB\nRssFile:\t    1636 kB\nRssShmem:\t     608 kB\nVmData:\t   29460 kB\nVmStk:\t     132 kB\nVmExe:\t     504 kB\nVmLib:\t    1704 kB\nVmPTE:\t     100 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffffff\nThreads:\t1\nSigQ:\t1/126119\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000000000\nSigCgt:\t00000000100054ca\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t000001ffffffffff\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t0\nSeccomp_filters:\t0\nSpeculation_Store_Bypass:\tthread vulnerable\nSpeculationIndirectBranch:\tconditional enabled\nCpus_allowed:\tff\nCpus_allowed_list:\t0-7\nMems_allowed:\t00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000001\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t6\nnonvoluntary_ctxt_switches:\t3\nx86_Thread_features:\t\nx86_Thread_features_locked:\t\n",
+          "thread_count": 1,
+          "thread_ids": [
+            1608465
+          ]
+        }
+      ],
+      "server_exit_code": 0
+    },
+    {
+      "build_mode": "ReleaseSafe",
+      "command": [
+        "/tmp/zig-http.bench.mrpm97tq/basic-zap/zig-out/bin/basic-zap",
+        "--port",
+        "55263"
+      ],
+      "contender": "zap",
+      "method": {
+        "body_bytes": 18,
+        "body_hex": "4d6574686f64204e6f7420416c6c6f776564",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "18"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:37 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:02:37 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 405 Method Not Allowed\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:18\r\ndate:Sun, 06 Sep 2026 13:02:37 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:02:37 GMT",
+        "status": 405
+      },
+      "not_found": {
+        "body_bytes": 9,
+        "body_hex": "4e6f7420466f756e64",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "9"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:37 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:02:37 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 404 Not Found\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:9\r\ndate:Sun, 06 Sep 2026 13:02:37 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:02:37 GMT",
+        "status": 404
+      },
+      "plaintext": {
+        "body_bytes": 13,
+        "body_hex": "48656c6c6f2c20576f726c6421",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "13"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:37 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:02:37 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 200 OK\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:13\r\ndate:Sun, 06 Sep 2026 13:02:37 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:02:37 GMT",
+        "status": 200
+      },
+      "process_layout": [
+        {
+          "command": "/tmp/zig-http.bench.mrpm97tq/basic-zap/zig-out/bin/basic-zap --port 55263",
+          "pgid": 1608467,
+          "pid": 1608467,
+          "ppid": 1608286,
+          "status_raw": "Name:\tbasic-zap\nUmask:\t0022\nState:\tS (sleeping)\nTgid:\t1608467\nNgid:\t0\nPid:\t1608467\nPPid:\t1608286\nTracerPid:\t0\nUid:\t1000\t1000\t1000\t1000\nGid:\t1000\t1000\t1000\t1000\nFDSize:\t64\nGroups:\t967 998 1000 \nNStgid:\t1608467\nNSpid:\t1608467\nNSpgid:\t1608467\nNSsid:\t1608467\nKthread:\t0\nVmPeak:\t   33804 kB\nVmSize:\t   33804 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t   31164 kB\nVmRSS:\t   31164 kB\nRssAnon:\t   28400 kB\nRssFile:\t    2016 kB\nRssShmem:\t     748 kB\nVmData:\t   30188 kB\nVmStk:\t     132 kB\nVmExe:\t     668 kB\nVmLib:\t    1704 kB\nVmPTE:\t     120 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffffff\nThreads:\t1\nSigQ:\t1/126119\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000001000\nSigCgt:\t00000000100046ca\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t000001ffffffffff\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t0\nSeccomp_filters:\t0\nSpeculation_Store_Bypass:\tthread vulnerable\nSpeculationIndirectBranch:\tconditional enabled\nCpus_allowed:\tff\nCpus_allowed_list:\t0-7\nMems_allowed:\t00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000001\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t5\nnonvoluntary_ctxt_switches:\t1\nx86_Thread_features:\t\nx86_Thread_features_locked:\t\n",
+          "thread_count": 1,
+          "thread_ids": [
+            1608467
+          ]
+        }
+      ],
+      "server_exit_code": 0
+    }
+  ],
+  "interpretation": "Basic indicative same-host loopback throughput only; no latency/SLO/capacity claims",
+  "medians": [
+    {
+      "app_over_zap_ratio_of_medians": 1.0249472858789814,
+      "connections": 1,
+      "median_rps": {
+        "app": 74385.99,
+        "zap": 72575.43
+      },
+      "rates": {
+        "app": [
+          83801.24,
+          68864.46,
+          74385.99
+        ],
+        "zap": [
+          78006.46,
+          72575.43,
+          65800.96
+        ]
+      }
+    },
+    {
+      "app_over_zap_ratio_of_medians": 1.770949064625867,
+      "connections": 32,
+      "median_rps": {
+        "app": 363594.19,
+        "zap": 205310.36
+      },
+      "rates": {
+        "app": [
+          354068.84,
+          375149.17,
+          363594.19
+        ],
+        "zap": [
+          208804.71,
+          194245.49,
+          205310.36
+        ]
+      }
+    }
+  ],
+  "owned_process_groups_remaining": [],
+  "started_utc": "2026-09-06T13:02:24.634398+00:00",
+  "trials": [
+    {
+      "build_mode": "ReleaseSafe",
+      "client_threads": 1,
+      "connections": 1,
+      "contender": "app",
+      "finished_utc": "2026-09-06T13:02:41.647244+00:00",
+      "measurement": {
+        "non_2xx_or_3xx": 0,
+        "reported_seconds": 3.1,
+        "requests": 259767,
+        "requests_per_second": 83801.24,
+        "socket_errors": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "measurement_command": [
+        "/tmp/zig-http-compare.PIwh35/wrk-build/wrk/wrk",
+        "-c",
+        "1",
+        "-t",
+        "1",
+        "-d",
+        "3s",
+        "http://127.0.0.1:57987/plaintext"
+      ],
+      "method_preflight": {
+        "body_bytes": 18,
+        "body_hex": "4d6574686f64204e6f7420416c6c6f776564",
+        "headers": {
+          "allow": [
+            "GET, HEAD, OPTIONS"
+          ],
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "18"
+          ],
+          "content-type": [
+            "text/plain; charset=utf-8"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:37 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 405 Method Not Allowed\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:02:37 GMT\r\nContent-Type: text/plain; charset=utf-8\r\nContent-Length: 18\r\nConnection: close\r\nAllow: GET, HEAD, OPTIONS",
+        "status": 405
+      },
+      "name": "01-c1-t1-pair1-app",
+      "not_found_preflight": {
+        "body_bytes": 9,
+        "body_hex": "4e6f7420466f756e64",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "9"
+          ],
+          "content-type": [
+            "text/plain; charset=utf-8"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:37 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 404 Not Found\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:02:37 GMT\r\nContent-Type: text/plain; charset=utf-8\r\nContent-Length: 9\r\nConnection: close",
+        "status": 404
+      },
+      "pair": 1,
+      "plaintext_preflight": {
+        "body_bytes": 13,
+        "body_hex": "48656c6c6f2c20576f726c6421",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "13"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:37 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 200 OK\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:02:37 GMT\r\nContent-Type: text/plain\r\nContent-Length: 13\r\nConnection: close",
+        "status": 200
+      },
+      "postflight": {
+        "body_bytes": 13,
+        "body_hex": "48656c6c6f2c20576f726c6421",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "13"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:41 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 200 OK\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:02:41 GMT\r\nContent-Type: text/plain\r\nContent-Length: 13\r\nConnection: close",
+        "status": 200
+      },
+      "process_layout": [
+        {
+          "command": "/tmp/zig-http.bench.mrpm97tq/basic-zap/zig-out/bin/basic-app --port 57987",
+          "pgid": 1608469,
+          "pid": 1608469,
+          "ppid": 1608286,
+          "status_raw": "Name:\tbasic-app\nUmask:\t0022\nState:\tS (sleeping)\nTgid:\t1608469\nNgid:\t0\nPid:\t1608469\nPPid:\t1608286\nTracerPid:\t0\nUid:\t1000\t1000\t1000\t1000\nGid:\t1000\t1000\t1000\t1000\nFDSize:\t64\nGroups:\t967 998 1000 \nNStgid:\t1608469\nNSpid:\t1608469\nNSpgid:\t1608469\nNSsid:\t1608469\nKthread:\t0\nVmPeak:\t   32928 kB\nVmSize:\t   32928 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t   31588 kB\nVmRSS:\t   31588 kB\nRssAnon:\t   29344 kB\nRssFile:\t    1636 kB\nRssShmem:\t     608 kB\nVmData:\t   29460 kB\nVmStk:\t     132 kB\nVmExe:\t     504 kB\nVmLib:\t    1704 kB\nVmPTE:\t     100 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffffff\nThreads:\t1\nSigQ:\t1/126119\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000000000\nSigCgt:\t00000000100054ca\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t000001ffffffffff\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t0\nSeccomp_filters:\t0\nSpeculation_Store_Bypass:\tthread vulnerable\nSpeculationIndirectBranch:\tconditional enabled\nCpus_allowed:\tff\nCpus_allowed_list:\t0-7\nMems_allowed:\t00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000001\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t6\nnonvoluntary_ctxt_switches:\t0\nx86_Thread_features:\t\nx86_Thread_features_locked:\t\n",
+          "thread_count": 1,
+          "thread_ids": [
+            1608469
+          ]
+        }
+      ],
+      "sequence": 1,
+      "server_command": [
+        "/tmp/zig-http.bench.mrpm97tq/basic-zap/zig-out/bin/basic-app",
+        "--port",
+        "57987"
+      ],
+      "server_exit_code": 0,
+      "started_utc": "2026-09-06T13:02:37.370916+00:00",
+      "warmup": {
+        "non_2xx_or_3xx": 0,
+        "reported_seconds": 1.1,
+        "requests": 98975,
+        "requests_per_second": 90042.51,
+        "socket_errors": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "warmup_command": [
+        "/tmp/zig-http-compare.PIwh35/wrk-build/wrk/wrk",
+        "-c",
+        "1",
+        "-t",
+        "1",
+        "-d",
+        "1s",
+        "http://127.0.0.1:57987/plaintext"
+      ]
+    },
+    {
+      "build_mode": "ReleaseSafe",
+      "client_threads": 1,
+      "connections": 1,
+      "contender": "zap",
+      "finished_utc": "2026-09-06T13:02:45.919668+00:00",
+      "measurement": {
+        "non_2xx_or_3xx": 0,
+        "reported_seconds": 3.1,
+        "requests": 241829,
+        "requests_per_second": 78006.46,
+        "socket_errors": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "measurement_command": [
+        "/tmp/zig-http-compare.PIwh35/wrk-build/wrk/wrk",
+        "-c",
+        "1",
+        "-t",
+        "1",
+        "-d",
+        "3s",
+        "http://127.0.0.1:57671/plaintext"
+      ],
+      "method_preflight": {
+        "body_bytes": 18,
+        "body_hex": "4d6574686f64204e6f7420416c6c6f776564",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "18"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:41 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:02:41 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 405 Method Not Allowed\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:18\r\ndate:Sun, 06 Sep 2026 13:02:41 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:02:41 GMT",
+        "status": 405
+      },
+      "name": "02-c1-t1-pair1-zap",
+      "not_found_preflight": {
+        "body_bytes": 9,
+        "body_hex": "4e6f7420466f756e64",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "9"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:41 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:02:41 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 404 Not Found\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:9\r\ndate:Sun, 06 Sep 2026 13:02:41 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:02:41 GMT",
+        "status": 404
+      },
+      "pair": 1,
+      "plaintext_preflight": {
+        "body_bytes": 13,
+        "body_hex": "48656c6c6f2c20576f726c6421",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "13"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:41 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:02:41 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 200 OK\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:13\r\ndate:Sun, 06 Sep 2026 13:02:41 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:02:41 GMT",
+        "status": 200
+      },
+      "postflight": {
+        "body_bytes": 13,
+        "body_hex": "48656c6c6f2c20576f726c6421",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "13"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:45 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:02:45 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 200 OK\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:13\r\ndate:Sun, 06 Sep 2026 13:02:45 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:02:45 GMT",
+        "status": 200
+      },
+      "process_layout": [
+        {
+          "command": "/tmp/zig-http.bench.mrpm97tq/basic-zap/zig-out/bin/basic-zap --port 57671",
+          "pgid": 1608481,
+          "pid": 1608481,
+          "ppid": 1608286,
+          "status_raw": "Name:\tbasic-zap\nUmask:\t0022\nState:\tS (sleeping)\nTgid:\t1608481\nNgid:\t0\nPid:\t1608481\nPPid:\t1608286\nTracerPid:\t0\nUid:\t1000\t1000\t1000\t1000\nGid:\t1000\t1000\t1000\t1000\nFDSize:\t64\nGroups:\t967 998 1000 \nNStgid:\t1608481\nNSpid:\t1608481\nNSpgid:\t1608481\nNSsid:\t1608481\nKthread:\t0\nVmPeak:\t   33804 kB\nVmSize:\t   33804 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t   31192 kB\nVmRSS:\t   31192 kB\nRssAnon:\t   28400 kB\nRssFile:\t    2044 kB\nRssShmem:\t     748 kB\nVmData:\t   30188 kB\nVmStk:\t     132 kB\nVmExe:\t     668 kB\nVmLib:\t    1704 kB\nVmPTE:\t     112 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffffff\nThreads:\t1\nSigQ:\t1/126119\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000001000\nSigCgt:\t00000000100046ca\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t000001ffffffffff\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t0\nSeccomp_filters:\t0\nSpeculation_Store_Bypass:\tthread vulnerable\nSpeculationIndirectBranch:\tconditional enabled\nCpus_allowed:\tff\nCpus_allowed_list:\t0-7\nMems_allowed:\t00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000001\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t4\nnonvoluntary_ctxt_switches:\t1\nx86_Thread_features:\t\nx86_Thread_features_locked:\t\n",
+          "thread_count": 1,
+          "thread_ids": [
+            1608481
+          ]
+        }
+      ],
+      "sequence": 2,
+      "server_command": [
+        "/tmp/zig-http.bench.mrpm97tq/basic-zap/zig-out/bin/basic-zap",
+        "--port",
+        "57671"
+      ],
+      "server_exit_code": 0,
+      "started_utc": "2026-09-06T13:02:41.647524+00:00",
+      "warmup": {
+        "non_2xx_or_3xx": 0,
+        "reported_seconds": 1.1,
+        "requests": 91605,
+        "requests_per_second": 83338.41,
+        "socket_errors": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "warmup_command": [
+        "/tmp/zig-http-compare.PIwh35/wrk-build/wrk/wrk",
+        "-c",
+        "1",
+        "-t",
+        "1",
+        "-d",
+        "1s",
+        "http://127.0.0.1:57671/plaintext"
+      ]
+    },
+    {
+      "build_mode": "ReleaseSafe",
+      "client_threads": 1,
+      "connections": 1,
+      "contender": "zap",
+      "finished_utc": "2026-09-06T13:02:50.200909+00:00",
+      "measurement": {
+        "non_2xx_or_3xx": 0,
+        "reported_seconds": 3.1,
+        "requests": 224923,
+        "requests_per_second": 72575.43,
+        "socket_errors": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "measurement_command": [
+        "/tmp/zig-http-compare.PIwh35/wrk-build/wrk/wrk",
+        "-c",
+        "1",
+        "-t",
+        "1",
+        "-d",
+        "3s",
+        "http://127.0.0.1:55657/plaintext"
+      ],
+      "method_preflight": {
+        "body_bytes": 18,
+        "body_hex": "4d6574686f64204e6f7420416c6c6f776564",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "18"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:45 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:02:45 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 405 Method Not Allowed\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:18\r\ndate:Sun, 06 Sep 2026 13:02:45 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:02:45 GMT",
+        "status": 405
+      },
+      "name": "03-c1-t1-pair2-zap",
+      "not_found_preflight": {
+        "body_bytes": 9,
+        "body_hex": "4e6f7420466f756e64",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "9"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:45 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:02:45 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 404 Not Found\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:9\r\ndate:Sun, 06 Sep 2026 13:02:45 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:02:45 GMT",
+        "status": 404
+      },
+      "pair": 2,
+      "plaintext_preflight": {
+        "body_bytes": 13,
+        "body_hex": "48656c6c6f2c20576f726c6421",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "13"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:45 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:02:45 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 200 OK\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:13\r\ndate:Sun, 06 Sep 2026 13:02:45 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:02:45 GMT",
+        "status": 200
+      },
+      "postflight": {
+        "body_bytes": 13,
+        "body_hex": "48656c6c6f2c20576f726c6421",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "13"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:50 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:02:50 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 200 OK\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:13\r\ndate:Sun, 06 Sep 2026 13:02:50 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:02:50 GMT",
+        "status": 200
+      },
+      "process_layout": [
+        {
+          "command": "/tmp/zig-http.bench.mrpm97tq/basic-zap/zig-out/bin/basic-zap --port 55657",
+          "pgid": 1608519,
+          "pid": 1608519,
+          "ppid": 1608286,
+          "status_raw": "Name:\tbasic-zap\nUmask:\t0022\nState:\tS (sleeping)\nTgid:\t1608519\nNgid:\t0\nPid:\t1608519\nPPid:\t1608286\nTracerPid:\t0\nUid:\t1000\t1000\t1000\t1000\nGid:\t1000\t1000\t1000\t1000\nFDSize:\t64\nGroups:\t967 998 1000 \nNStgid:\t1608519\nNSpid:\t1608519\nNSpgid:\t1608519\nNSsid:\t1608519\nKthread:\t0\nVmPeak:\t   33804 kB\nVmSize:\t   33804 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t   31176 kB\nVmRSS:\t   31176 kB\nRssAnon:\t   28404 kB\nRssFile:\t    2024 kB\nRssShmem:\t     748 kB\nVmData:\t   30188 kB\nVmStk:\t     132 kB\nVmExe:\t     668 kB\nVmLib:\t    1704 kB\nVmPTE:\t     124 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffffff\nThreads:\t1\nSigQ:\t1/126119\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000001000\nSigCgt:\t00000000100046ca\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t000001ffffffffff\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t0\nSeccomp_filters:\t0\nSpeculation_Store_Bypass:\tthread vulnerable\nSpeculationIndirectBranch:\tconditional enabled\nCpus_allowed:\tff\nCpus_allowed_list:\t0-7\nMems_allowed:\t00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000001\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t4\nnonvoluntary_ctxt_switches:\t0\nx86_Thread_features:\t\nx86_Thread_features_locked:\t\n",
+          "thread_count": 1,
+          "thread_ids": [
+            1608519
+          ]
+        }
+      ],
+      "sequence": 3,
+      "server_command": [
+        "/tmp/zig-http.bench.mrpm97tq/basic-zap/zig-out/bin/basic-zap",
+        "--port",
+        "55657"
+      ],
+      "server_exit_code": 0,
+      "started_utc": "2026-09-06T13:02:45.920000+00:00",
+      "warmup": {
+        "non_2xx_or_3xx": 0,
+        "reported_seconds": 1.1,
+        "requests": 87745,
+        "requests_per_second": 79771.37,
+        "socket_errors": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "warmup_command": [
+        "/tmp/zig-http-compare.PIwh35/wrk-build/wrk/wrk",
+        "-c",
+        "1",
+        "-t",
+        "1",
+        "-d",
+        "1s",
+        "http://127.0.0.1:55657/plaintext"
+      ]
+    },
+    {
+      "build_mode": "ReleaseSafe",
+      "client_threads": 1,
+      "connections": 1,
+      "contender": "app",
+      "finished_utc": "2026-09-06T13:02:54.484124+00:00",
+      "measurement": {
+        "non_2xx_or_3xx": 0,
+        "reported_seconds": 3.1,
+        "requests": 213446,
+        "requests_per_second": 68864.46,
+        "socket_errors": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "measurement_command": [
+        "/tmp/zig-http-compare.PIwh35/wrk-build/wrk/wrk",
+        "-c",
+        "1",
+        "-t",
+        "1",
+        "-d",
+        "3s",
+        "http://127.0.0.1:49859/plaintext"
+      ],
+      "method_preflight": {
+        "body_bytes": 18,
+        "body_hex": "4d6574686f64204e6f7420416c6c6f776564",
+        "headers": {
+          "allow": [
+            "GET, HEAD, OPTIONS"
+          ],
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "18"
+          ],
+          "content-type": [
+            "text/plain; charset=utf-8"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:50 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 405 Method Not Allowed\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:02:50 GMT\r\nContent-Type: text/plain; charset=utf-8\r\nContent-Length: 18\r\nConnection: close\r\nAllow: GET, HEAD, OPTIONS",
+        "status": 405
+      },
+      "name": "04-c1-t1-pair2-app",
+      "not_found_preflight": {
+        "body_bytes": 9,
+        "body_hex": "4e6f7420466f756e64",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "9"
+          ],
+          "content-type": [
+            "text/plain; charset=utf-8"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:50 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 404 Not Found\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:02:50 GMT\r\nContent-Type: text/plain; charset=utf-8\r\nContent-Length: 9\r\nConnection: close",
+        "status": 404
+      },
+      "pair": 2,
+      "plaintext_preflight": {
+        "body_bytes": 13,
+        "body_hex": "48656c6c6f2c20576f726c6421",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "13"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:50 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 200 OK\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:02:50 GMT\r\nContent-Type: text/plain\r\nContent-Length: 13\r\nConnection: close",
+        "status": 200
+      },
+      "postflight": {
+        "body_bytes": 13,
+        "body_hex": "48656c6c6f2c20576f726c6421",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "13"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:54 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 200 OK\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:02:54 GMT\r\nContent-Type: text/plain\r\nContent-Length: 13\r\nConnection: close",
+        "status": 200
+      },
+      "process_layout": [
+        {
+          "command": "/tmp/zig-http.bench.mrpm97tq/basic-zap/zig-out/bin/basic-app --port 49859",
+          "pgid": 1608602,
+          "pid": 1608602,
+          "ppid": 1608286,
+          "status_raw": "Name:\tbasic-app\nUmask:\t0022\nState:\tS (sleeping)\nTgid:\t1608602\nNgid:\t0\nPid:\t1608602\nPPid:\t1608286\nTracerPid:\t0\nUid:\t1000\t1000\t1000\t1000\nGid:\t1000\t1000\t1000\t1000\nFDSize:\t64\nGroups:\t967 998 1000 \nNStgid:\t1608602\nNSpid:\t1608602\nNSpgid:\t1608602\nNSsid:\t1608602\nKthread:\t0\nVmPeak:\t   32928 kB\nVmSize:\t   32928 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t   31556 kB\nVmRSS:\t   31556 kB\nRssAnon:\t   29344 kB\nRssFile:\t    1604 kB\nRssShmem:\t     608 kB\nVmData:\t   29460 kB\nVmStk:\t     132 kB\nVmExe:\t     504 kB\nVmLib:\t    1704 kB\nVmPTE:\t     104 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffffff\nThreads:\t1\nSigQ:\t1/126119\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000000000\nSigCgt:\t00000000100054ca\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t000001ffffffffff\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t0\nSeccomp_filters:\t0\nSpeculation_Store_Bypass:\tthread vulnerable\nSpeculationIndirectBranch:\tconditional enabled\nCpus_allowed:\tff\nCpus_allowed_list:\t0-7\nMems_allowed:\t00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000001\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t6\nnonvoluntary_ctxt_switches:\t0\nx86_Thread_features:\t\nx86_Thread_features_locked:\t\n",
+          "thread_count": 1,
+          "thread_ids": [
+            1608602
+          ]
+        }
+      ],
+      "sequence": 4,
+      "server_command": [
+        "/tmp/zig-http.bench.mrpm97tq/basic-zap/zig-out/bin/basic-app",
+        "--port",
+        "49859"
+      ],
+      "server_exit_code": 0,
+      "started_utc": "2026-09-06T13:02:50.201462+00:00",
+      "warmup": {
+        "non_2xx_or_3xx": 0,
+        "reported_seconds": 1.1,
+        "requests": 67888,
+        "requests_per_second": 61739.21,
+        "socket_errors": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "warmup_command": [
+        "/tmp/zig-http-compare.PIwh35/wrk-build/wrk/wrk",
+        "-c",
+        "1",
+        "-t",
+        "1",
+        "-d",
+        "1s",
+        "http://127.0.0.1:49859/plaintext"
+      ]
+    },
+    {
+      "build_mode": "ReleaseSafe",
+      "client_threads": 1,
+      "connections": 1,
+      "contender": "app",
+      "finished_utc": "2026-09-06T13:02:58.766989+00:00",
+      "measurement": {
+        "non_2xx_or_3xx": 0,
+        "reported_seconds": 3.1,
+        "requests": 230537,
+        "requests_per_second": 74385.99,
+        "socket_errors": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "measurement_command": [
+        "/tmp/zig-http-compare.PIwh35/wrk-build/wrk/wrk",
+        "-c",
+        "1",
+        "-t",
+        "1",
+        "-d",
+        "3s",
+        "http://127.0.0.1:49399/plaintext"
+      ],
+      "method_preflight": {
+        "body_bytes": 18,
+        "body_hex": "4d6574686f64204e6f7420416c6c6f776564",
+        "headers": {
+          "allow": [
+            "GET, HEAD, OPTIONS"
+          ],
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "18"
+          ],
+          "content-type": [
+            "text/plain; charset=utf-8"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:54 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 405 Method Not Allowed\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:02:54 GMT\r\nContent-Type: text/plain; charset=utf-8\r\nContent-Length: 18\r\nConnection: close\r\nAllow: GET, HEAD, OPTIONS",
+        "status": 405
+      },
+      "name": "05-c1-t1-pair3-app",
+      "not_found_preflight": {
+        "body_bytes": 9,
+        "body_hex": "4e6f7420466f756e64",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "9"
+          ],
+          "content-type": [
+            "text/plain; charset=utf-8"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:54 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 404 Not Found\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:02:54 GMT\r\nContent-Type: text/plain; charset=utf-8\r\nContent-Length: 9\r\nConnection: close",
+        "status": 404
+      },
+      "pair": 3,
+      "plaintext_preflight": {
+        "body_bytes": 13,
+        "body_hex": "48656c6c6f2c20576f726c6421",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "13"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:54 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 200 OK\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:02:54 GMT\r\nContent-Type: text/plain\r\nContent-Length: 13\r\nConnection: close",
+        "status": 200
+      },
+      "postflight": {
+        "body_bytes": 13,
+        "body_hex": "48656c6c6f2c20576f726c6421",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "13"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:58 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 200 OK\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:02:58 GMT\r\nContent-Type: text/plain\r\nContent-Length: 13\r\nConnection: close",
+        "status": 200
+      },
+      "process_layout": [
+        {
+          "command": "/tmp/zig-http.bench.mrpm97tq/basic-zap/zig-out/bin/basic-app --port 49399",
+          "pgid": 1608838,
+          "pid": 1608838,
+          "ppid": 1608286,
+          "status_raw": "Name:\tbasic-app\nUmask:\t0022\nState:\tS (sleeping)\nTgid:\t1608838\nNgid:\t0\nPid:\t1608838\nPPid:\t1608286\nTracerPid:\t0\nUid:\t1000\t1000\t1000\t1000\nGid:\t1000\t1000\t1000\t1000\nFDSize:\t64\nGroups:\t967 998 1000 \nNStgid:\t1608838\nNSpid:\t1608838\nNSpgid:\t1608838\nNSsid:\t1608838\nKthread:\t0\nVmPeak:\t   32928 kB\nVmSize:\t   32928 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t   31576 kB\nVmRSS:\t   31576 kB\nRssAnon:\t   29348 kB\nRssFile:\t    1620 kB\nRssShmem:\t     608 kB\nVmData:\t   29460 kB\nVmStk:\t     132 kB\nVmExe:\t     504 kB\nVmLib:\t    1704 kB\nVmPTE:\t     104 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffffff\nThreads:\t1\nSigQ:\t1/126119\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000000000\nSigCgt:\t00000000100054ca\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t000001ffffffffff\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t0\nSeccomp_filters:\t0\nSpeculation_Store_Bypass:\tthread vulnerable\nSpeculationIndirectBranch:\tconditional enabled\nCpus_allowed:\tff\nCpus_allowed_list:\t0-7\nMems_allowed:\t00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000001\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t6\nnonvoluntary_ctxt_switches:\t0\nx86_Thread_features:\t\nx86_Thread_features_locked:\t\n",
+          "thread_count": 1,
+          "thread_ids": [
+            1608838
+          ]
+        }
+      ],
+      "sequence": 5,
+      "server_command": [
+        "/tmp/zig-http.bench.mrpm97tq/basic-zap/zig-out/bin/basic-app",
+        "--port",
+        "49399"
+      ],
+      "server_exit_code": 0,
+      "started_utc": "2026-09-06T13:02:54.484827+00:00",
+      "warmup": {
+        "non_2xx_or_3xx": 0,
+        "reported_seconds": 1.1,
+        "requests": 79928,
+        "requests_per_second": 72677.68,
+        "socket_errors": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "warmup_command": [
+        "/tmp/zig-http-compare.PIwh35/wrk-build/wrk/wrk",
+        "-c",
+        "1",
+        "-t",
+        "1",
+        "-d",
+        "1s",
+        "http://127.0.0.1:49399/plaintext"
+      ]
+    },
+    {
+      "build_mode": "ReleaseSafe",
+      "client_threads": 1,
+      "connections": 1,
+      "contender": "zap",
+      "finished_utc": "2026-09-06T13:03:02.849485+00:00",
+      "measurement": {
+        "non_2xx_or_3xx": 0,
+        "reported_seconds": 3.0,
+        "requests": 197425,
+        "requests_per_second": 65800.96,
+        "socket_errors": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "measurement_command": [
+        "/tmp/zig-http-compare.PIwh35/wrk-build/wrk/wrk",
+        "-c",
+        "1",
+        "-t",
+        "1",
+        "-d",
+        "3s",
+        "http://127.0.0.1:40033/plaintext"
+      ],
+      "method_preflight": {
+        "body_bytes": 18,
+        "body_hex": "4d6574686f64204e6f7420416c6c6f776564",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "18"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:58 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:02:58 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 405 Method Not Allowed\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:18\r\ndate:Sun, 06 Sep 2026 13:02:58 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:02:58 GMT",
+        "status": 405
+      },
+      "name": "06-c1-t1-pair3-zap",
+      "not_found_preflight": {
+        "body_bytes": 9,
+        "body_hex": "4e6f7420466f756e64",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "9"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:58 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:02:58 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 404 Not Found\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:9\r\ndate:Sun, 06 Sep 2026 13:02:58 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:02:58 GMT",
+        "status": 404
+      },
+      "pair": 3,
+      "plaintext_preflight": {
+        "body_bytes": 13,
+        "body_hex": "48656c6c6f2c20576f726c6421",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "13"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:02:58 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:02:58 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 200 OK\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:13\r\ndate:Sun, 06 Sep 2026 13:02:58 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:02:58 GMT",
+        "status": 200
+      },
+      "postflight": {
+        "body_bytes": 13,
+        "body_hex": "48656c6c6f2c20576f726c6421",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "13"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:03:02 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:03:02 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 200 OK\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:13\r\ndate:Sun, 06 Sep 2026 13:03:02 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:03:02 GMT",
+        "status": 200
+      },
+      "process_layout": [
+        {
+          "command": "/tmp/zig-http.bench.mrpm97tq/basic-zap/zig-out/bin/basic-zap --port 40033",
+          "pgid": 1609025,
+          "pid": 1609025,
+          "ppid": 1608286,
+          "status_raw": "Name:\tbasic-zap\nUmask:\t0022\nState:\tS (sleeping)\nTgid:\t1609025\nNgid:\t0\nPid:\t1609025\nPPid:\t1608286\nTracerPid:\t0\nUid:\t1000\t1000\t1000\t1000\nGid:\t1000\t1000\t1000\t1000\nFDSize:\t64\nGroups:\t967 998 1000 \nNStgid:\t1609025\nNSpid:\t1609025\nNSpgid:\t1609025\nNSsid:\t1609025\nKthread:\t0\nVmPeak:\t   33804 kB\nVmSize:\t   33804 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t   31184 kB\nVmRSS:\t   31184 kB\nRssAnon:\t   28404 kB\nRssFile:\t    2032 kB\nRssShmem:\t     748 kB\nVmData:\t   30188 kB\nVmStk:\t     132 kB\nVmExe:\t     668 kB\nVmLib:\t    1704 kB\nVmPTE:\t     112 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffffff\nThreads:\t1\nSigQ:\t1/126119\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000001000\nSigCgt:\t00000000100046ca\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t000001ffffffffff\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t0\nSeccomp_filters:\t0\nSpeculation_Store_Bypass:\tthread vulnerable\nSpeculationIndirectBranch:\tconditional enabled\nCpus_allowed:\tff\nCpus_allowed_list:\t0-7\nMems_allowed:\t00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000001\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t4\nnonvoluntary_ctxt_switches:\t1\nx86_Thread_features:\t\nx86_Thread_features_locked:\t\n",
+          "thread_count": 1,
+          "thread_ids": [
+            1609025
+          ]
+        }
+      ],
+      "sequence": 6,
+      "server_command": [
+        "/tmp/zig-http.bench.mrpm97tq/basic-zap/zig-out/bin/basic-zap",
+        "--port",
+        "40033"
+      ],
+      "server_exit_code": 0,
+      "started_utc": "2026-09-06T13:02:58.767466+00:00",
+      "warmup": {
+        "non_2xx_or_3xx": 0,
+        "reported_seconds": 1.0,
+        "requests": 71925,
+        "requests_per_second": 71916.8,
+        "socket_errors": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "warmup_command": [
+        "/tmp/zig-http-compare.PIwh35/wrk-build/wrk/wrk",
+        "-c",
+        "1",
+        "-t",
+        "1",
+        "-d",
+        "1s",
+        "http://127.0.0.1:40033/plaintext"
+      ]
+    },
+    {
+      "build_mode": "ReleaseSafe",
+      "client_threads": 2,
+      "connections": 32,
+      "contender": "zap",
+      "finished_utc": "2026-09-06T13:03:07.025092+00:00",
+      "measurement": {
+        "non_2xx_or_3xx": 0,
+        "reported_seconds": 3.1,
+        "requests": 647399,
+        "requests_per_second": 208804.71,
+        "socket_errors": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "measurement_command": [
+        "/tmp/zig-http-compare.PIwh35/wrk-build/wrk/wrk",
+        "-c",
+        "32",
+        "-t",
+        "2",
+        "-d",
+        "3s",
+        "http://127.0.0.1:42535/plaintext"
+      ],
+      "method_preflight": {
+        "body_bytes": 18,
+        "body_hex": "4d6574686f64204e6f7420416c6c6f776564",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "18"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:03:02 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:03:02 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 405 Method Not Allowed\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:18\r\ndate:Sun, 06 Sep 2026 13:03:02 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:03:02 GMT",
+        "status": 405
+      },
+      "name": "07-c32-t2-pair1-zap",
+      "not_found_preflight": {
+        "body_bytes": 9,
+        "body_hex": "4e6f7420466f756e64",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "9"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:03:02 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:03:02 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 404 Not Found\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:9\r\ndate:Sun, 06 Sep 2026 13:03:02 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:03:02 GMT",
+        "status": 404
+      },
+      "pair": 1,
+      "plaintext_preflight": {
+        "body_bytes": 13,
+        "body_hex": "48656c6c6f2c20576f726c6421",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "13"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:03:02 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:03:02 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 200 OK\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:13\r\ndate:Sun, 06 Sep 2026 13:03:02 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:03:02 GMT",
+        "status": 200
+      },
+      "postflight": {
+        "body_bytes": 13,
+        "body_hex": "48656c6c6f2c20576f726c6421",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "13"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:03:07 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:03:07 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 200 OK\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:13\r\ndate:Sun, 06 Sep 2026 13:03:07 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:03:07 GMT",
+        "status": 200
+      },
+      "process_layout": [
+        {
+          "command": "/tmp/zig-http.bench.mrpm97tq/basic-zap/zig-out/bin/basic-zap --port 42535",
+          "pgid": 1609646,
+          "pid": 1609646,
+          "ppid": 1608286,
+          "status_raw": "Name:\tbasic-zap\nUmask:\t0022\nState:\tS (sleeping)\nTgid:\t1609646\nNgid:\t0\nPid:\t1609646\nPPid:\t1608286\nTracerPid:\t0\nUid:\t1000\t1000\t1000\t1000\nGid:\t1000\t1000\t1000\t1000\nFDSize:\t64\nGroups:\t967 998 1000 \nNStgid:\t1609646\nNSpid:\t1609646\nNSpgid:\t1609646\nNSsid:\t1609646\nKthread:\t0\nVmPeak:\t   33804 kB\nVmSize:\t   33804 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t   31176 kB\nVmRSS:\t   31176 kB\nRssAnon:\t   28400 kB\nRssFile:\t    2028 kB\nRssShmem:\t     748 kB\nVmData:\t   30188 kB\nVmStk:\t     132 kB\nVmExe:\t     668 kB\nVmLib:\t    1704 kB\nVmPTE:\t     116 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffffff\nThreads:\t1\nSigQ:\t1/126119\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000001000\nSigCgt:\t00000000100046ca\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t000001ffffffffff\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t0\nSeccomp_filters:\t0\nSpeculation_Store_Bypass:\tthread vulnerable\nSpeculationIndirectBranch:\tconditional enabled\nCpus_allowed:\tff\nCpus_allowed_list:\t0-7\nMems_allowed:\t00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000001\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t4\nnonvoluntary_ctxt_switches:\t1\nx86_Thread_features:\t\nx86_Thread_features_locked:\t\n",
+          "thread_count": 1,
+          "thread_ids": [
+            1609646
+          ]
+        }
+      ],
+      "sequence": 7,
+      "server_command": [
+        "/tmp/zig-http.bench.mrpm97tq/basic-zap/zig-out/bin/basic-zap",
+        "--port",
+        "42535"
+      ],
+      "server_exit_code": 0,
+      "started_utc": "2026-09-06T13:03:02.850175+00:00",
+      "warmup": {
+        "non_2xx_or_3xx": 0,
+        "reported_seconds": 1.0,
+        "requests": 192625,
+        "requests_per_second": 192584.17,
+        "socket_errors": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "warmup_command": [
+        "/tmp/zig-http-compare.PIwh35/wrk-build/wrk/wrk",
+        "-c",
+        "32",
+        "-t",
+        "2",
+        "-d",
+        "1s",
+        "http://127.0.0.1:42535/plaintext"
+      ]
+    },
+    {
+      "build_mode": "ReleaseSafe",
+      "client_threads": 2,
+      "connections": 32,
+      "contender": "app",
+      "finished_utc": "2026-09-06T13:03:11.109622+00:00",
+      "measurement": {
+        "non_2xx_or_3xx": 0,
+        "reported_seconds": 3.0,
+        "requests": 1062636,
+        "requests_per_second": 354068.84,
+        "socket_errors": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "measurement_command": [
+        "/tmp/zig-http-compare.PIwh35/wrk-build/wrk/wrk",
+        "-c",
+        "32",
+        "-t",
+        "2",
+        "-d",
+        "3s",
+        "http://127.0.0.1:57819/plaintext"
+      ],
+      "method_preflight": {
+        "body_bytes": 18,
+        "body_hex": "4d6574686f64204e6f7420416c6c6f776564",
+        "headers": {
+          "allow": [
+            "GET, HEAD, OPTIONS"
+          ],
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "18"
+          ],
+          "content-type": [
+            "text/plain; charset=utf-8"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:03:07 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 405 Method Not Allowed\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:03:07 GMT\r\nContent-Type: text/plain; charset=utf-8\r\nContent-Length: 18\r\nConnection: close\r\nAllow: GET, HEAD, OPTIONS",
+        "status": 405
+      },
+      "name": "08-c32-t2-pair1-app",
+      "not_found_preflight": {
+        "body_bytes": 9,
+        "body_hex": "4e6f7420466f756e64",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "9"
+          ],
+          "content-type": [
+            "text/plain; charset=utf-8"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:03:07 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 404 Not Found\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:03:07 GMT\r\nContent-Type: text/plain; charset=utf-8\r\nContent-Length: 9\r\nConnection: close",
+        "status": 404
+      },
+      "pair": 1,
+      "plaintext_preflight": {
+        "body_bytes": 13,
+        "body_hex": "48656c6c6f2c20576f726c6421",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "13"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:03:07 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 200 OK\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:03:07 GMT\r\nContent-Type: text/plain\r\nContent-Length: 13\r\nConnection: close",
+        "status": 200
+      },
+      "postflight": {
+        "body_bytes": 13,
+        "body_hex": "48656c6c6f2c20576f726c6421",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "13"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:03:11 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 200 OK\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:03:11 GMT\r\nContent-Type: text/plain\r\nContent-Length: 13\r\nConnection: close",
+        "status": 200
+      },
+      "process_layout": [
+        {
+          "command": "/tmp/zig-http.bench.mrpm97tq/basic-zap/zig-out/bin/basic-app --port 57819",
+          "pgid": 1609811,
+          "pid": 1609811,
+          "ppid": 1608286,
+          "status_raw": "Name:\tbasic-app\nUmask:\t0022\nState:\tS (sleeping)\nTgid:\t1609811\nNgid:\t0\nPid:\t1609811\nPPid:\t1608286\nTracerPid:\t0\nUid:\t1000\t1000\t1000\t1000\nGid:\t1000\t1000\t1000\t1000\nFDSize:\t64\nGroups:\t967 998 1000 \nNStgid:\t1609811\nNSpid:\t1609811\nNSpgid:\t1609811\nNSsid:\t1609811\nKthread:\t0\nVmPeak:\t   32928 kB\nVmSize:\t   32928 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t   31552 kB\nVmRSS:\t   31552 kB\nRssAnon:\t   29340 kB\nRssFile:\t    1604 kB\nRssShmem:\t     608 kB\nVmData:\t   29460 kB\nVmStk:\t     132 kB\nVmExe:\t     504 kB\nVmLib:\t    1704 kB\nVmPTE:\t     104 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffffff\nThreads:\t1\nSigQ:\t1/126119\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000000000\nSigCgt:\t00000000100054ca\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t000001ffffffffff\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t0\nSeccomp_filters:\t0\nSpeculation_Store_Bypass:\tthread vulnerable\nSpeculationIndirectBranch:\tconditional enabled\nCpus_allowed:\tff\nCpus_allowed_list:\t0-7\nMems_allowed:\t00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000001\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t5\nnonvoluntary_ctxt_switches:\t1\nx86_Thread_features:\t\nx86_Thread_features_locked:\t\n",
+          "thread_count": 1,
+          "thread_ids": [
+            1609811
+          ]
+        }
+      ],
+      "sequence": 8,
+      "server_command": [
+        "/tmp/zig-http.bench.mrpm97tq/basic-zap/zig-out/bin/basic-app",
+        "--port",
+        "57819"
+      ],
+      "server_exit_code": 0,
+      "started_utc": "2026-09-06T13:03:07.025908+00:00",
+      "warmup": {
+        "non_2xx_or_3xx": 0,
+        "reported_seconds": 1.0,
+        "requests": 348340,
+        "requests_per_second": 348219.52,
+        "socket_errors": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "warmup_command": [
+        "/tmp/zig-http-compare.PIwh35/wrk-build/wrk/wrk",
+        "-c",
+        "32",
+        "-t",
+        "2",
+        "-d",
+        "1s",
+        "http://127.0.0.1:57819/plaintext"
+      ]
+    },
+    {
+      "build_mode": "ReleaseSafe",
+      "client_threads": 2,
+      "connections": 32,
+      "contender": "app",
+      "finished_utc": "2026-09-06T13:03:15.294111+00:00",
+      "measurement": {
+        "non_2xx_or_3xx": 0,
+        "reported_seconds": 3.1,
+        "requests": 1162869,
+        "requests_per_second": 375149.17,
+        "socket_errors": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "measurement_command": [
+        "/tmp/zig-http-compare.PIwh35/wrk-build/wrk/wrk",
+        "-c",
+        "32",
+        "-t",
+        "2",
+        "-d",
+        "3s",
+        "http://127.0.0.1:35399/plaintext"
+      ],
+      "method_preflight": {
+        "body_bytes": 18,
+        "body_hex": "4d6574686f64204e6f7420416c6c6f776564",
+        "headers": {
+          "allow": [
+            "GET, HEAD, OPTIONS"
+          ],
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "18"
+          ],
+          "content-type": [
+            "text/plain; charset=utf-8"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:03:11 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 405 Method Not Allowed\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:03:11 GMT\r\nContent-Type: text/plain; charset=utf-8\r\nContent-Length: 18\r\nConnection: close\r\nAllow: GET, HEAD, OPTIONS",
+        "status": 405
+      },
+      "name": "09-c32-t2-pair2-app",
+      "not_found_preflight": {
+        "body_bytes": 9,
+        "body_hex": "4e6f7420466f756e64",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "9"
+          ],
+          "content-type": [
+            "text/plain; charset=utf-8"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:03:11 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 404 Not Found\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:03:11 GMT\r\nContent-Type: text/plain; charset=utf-8\r\nContent-Length: 9\r\nConnection: close",
+        "status": 404
+      },
+      "pair": 2,
+      "plaintext_preflight": {
+        "body_bytes": 13,
+        "body_hex": "48656c6c6f2c20576f726c6421",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "13"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:03:11 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 200 OK\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:03:11 GMT\r\nContent-Type: text/plain\r\nContent-Length: 13\r\nConnection: close",
+        "status": 200
+      },
+      "postflight": {
+        "body_bytes": 13,
+        "body_hex": "48656c6c6f2c20576f726c6421",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "13"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:03:15 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 200 OK\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:03:15 GMT\r\nContent-Type: text/plain\r\nContent-Length: 13\r\nConnection: close",
+        "status": 200
+      },
+      "process_layout": [
+        {
+          "command": "/tmp/zig-http.bench.mrpm97tq/basic-zap/zig-out/bin/basic-app --port 35399",
+          "pgid": 1609923,
+          "pid": 1609923,
+          "ppid": 1608286,
+          "status_raw": "Name:\tbasic-app\nUmask:\t0022\nState:\tS (sleeping)\nTgid:\t1609923\nNgid:\t0\nPid:\t1609923\nPPid:\t1608286\nTracerPid:\t0\nUid:\t1000\t1000\t1000\t1000\nGid:\t1000\t1000\t1000\t1000\nFDSize:\t64\nGroups:\t967 998 1000 \nNStgid:\t1609923\nNSpid:\t1609923\nNSpgid:\t1609923\nNSsid:\t1609923\nKthread:\t0\nVmPeak:\t   32928 kB\nVmSize:\t   32928 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t   31584 kB\nVmRSS:\t   31584 kB\nRssAnon:\t   29340 kB\nRssFile:\t    1636 kB\nRssShmem:\t     608 kB\nVmData:\t   29460 kB\nVmStk:\t     132 kB\nVmExe:\t     504 kB\nVmLib:\t    1704 kB\nVmPTE:\t     104 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffffff\nThreads:\t1\nSigQ:\t1/126119\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000000000\nSigCgt:\t00000000100054ca\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t000001ffffffffff\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t0\nSeccomp_filters:\t0\nSpeculation_Store_Bypass:\tthread vulnerable\nSpeculationIndirectBranch:\tconditional enabled\nCpus_allowed:\tff\nCpus_allowed_list:\t0-7\nMems_allowed:\t00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000001\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t6\nnonvoluntary_ctxt_switches:\t0\nx86_Thread_features:\t\nx86_Thread_features_locked:\t\n",
+          "thread_count": 1,
+          "thread_ids": [
+            1609923
+          ]
+        }
+      ],
+      "sequence": 9,
+      "server_command": [
+        "/tmp/zig-http.bench.mrpm97tq/basic-zap/zig-out/bin/basic-app",
+        "--port",
+        "35399"
+      ],
+      "server_exit_code": 0,
+      "started_utc": "2026-09-06T13:03:11.110526+00:00",
+      "warmup": {
+        "non_2xx_or_3xx": 0,
+        "reported_seconds": 1.0,
+        "requests": 353583,
+        "requests_per_second": 353501.34,
+        "socket_errors": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "warmup_command": [
+        "/tmp/zig-http-compare.PIwh35/wrk-build/wrk/wrk",
+        "-c",
+        "32",
+        "-t",
+        "2",
+        "-d",
+        "1s",
+        "http://127.0.0.1:35399/plaintext"
+      ]
+    },
+    {
+      "build_mode": "ReleaseSafe",
+      "client_threads": 2,
+      "connections": 32,
+      "contender": "zap",
+      "finished_utc": "2026-09-06T13:03:19.477228+00:00",
+      "measurement": {
+        "non_2xx_or_3xx": 0,
+        "reported_seconds": 3.1,
+        "requests": 602054,
+        "requests_per_second": 194245.49,
+        "socket_errors": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "measurement_command": [
+        "/tmp/zig-http-compare.PIwh35/wrk-build/wrk/wrk",
+        "-c",
+        "32",
+        "-t",
+        "2",
+        "-d",
+        "3s",
+        "http://127.0.0.1:58065/plaintext"
+      ],
+      "method_preflight": {
+        "body_bytes": 18,
+        "body_hex": "4d6574686f64204e6f7420416c6c6f776564",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "18"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:03:15 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:03:15 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 405 Method Not Allowed\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:18\r\ndate:Sun, 06 Sep 2026 13:03:15 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:03:15 GMT",
+        "status": 405
+      },
+      "name": "10-c32-t2-pair2-zap",
+      "not_found_preflight": {
+        "body_bytes": 9,
+        "body_hex": "4e6f7420466f756e64",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "9"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:03:15 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:03:15 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 404 Not Found\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:9\r\ndate:Sun, 06 Sep 2026 13:03:15 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:03:15 GMT",
+        "status": 404
+      },
+      "pair": 2,
+      "plaintext_preflight": {
+        "body_bytes": 13,
+        "body_hex": "48656c6c6f2c20576f726c6421",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "13"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:03:15 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:03:15 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 200 OK\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:13\r\ndate:Sun, 06 Sep 2026 13:03:15 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:03:15 GMT",
+        "status": 200
+      },
+      "postflight": {
+        "body_bytes": 13,
+        "body_hex": "48656c6c6f2c20576f726c6421",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "13"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:03:19 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:03:19 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 200 OK\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:13\r\ndate:Sun, 06 Sep 2026 13:03:19 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:03:19 GMT",
+        "status": 200
+      },
+      "process_layout": [
+        {
+          "command": "/tmp/zig-http.bench.mrpm97tq/basic-zap/zig-out/bin/basic-zap --port 58065",
+          "pgid": 1610090,
+          "pid": 1610090,
+          "ppid": 1608286,
+          "status_raw": "Name:\tbasic-zap\nUmask:\t0022\nState:\tS (sleeping)\nTgid:\t1610090\nNgid:\t0\nPid:\t1610090\nPPid:\t1608286\nTracerPid:\t0\nUid:\t1000\t1000\t1000\t1000\nGid:\t1000\t1000\t1000\t1000\nFDSize:\t64\nGroups:\t967 998 1000 \nNStgid:\t1610090\nNSpid:\t1610090\nNSpgid:\t1610090\nNSsid:\t1610090\nKthread:\t0\nVmPeak:\t   33804 kB\nVmSize:\t   33804 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t   31172 kB\nVmRSS:\t   31172 kB\nRssAnon:\t   28400 kB\nRssFile:\t    2024 kB\nRssShmem:\t     748 kB\nVmData:\t   30188 kB\nVmStk:\t     132 kB\nVmExe:\t     668 kB\nVmLib:\t    1704 kB\nVmPTE:\t     112 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffffff\nThreads:\t1\nSigQ:\t1/126119\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000001000\nSigCgt:\t00000000100046ca\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t000001ffffffffff\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t0\nSeccomp_filters:\t0\nSpeculation_Store_Bypass:\tthread vulnerable\nSpeculationIndirectBranch:\tconditional enabled\nCpus_allowed:\tff\nCpus_allowed_list:\t0-7\nMems_allowed:\t00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000001\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t4\nnonvoluntary_ctxt_switches:\t0\nx86_Thread_features:\t\nx86_Thread_features_locked:\t\n",
+          "thread_count": 1,
+          "thread_ids": [
+            1610090
+          ]
+        }
+      ],
+      "sequence": 10,
+      "server_command": [
+        "/tmp/zig-http.bench.mrpm97tq/basic-zap/zig-out/bin/basic-zap",
+        "--port",
+        "58065"
+      ],
+      "server_exit_code": 0,
+      "started_utc": "2026-09-06T13:03:15.294765+00:00",
+      "warmup": {
+        "non_2xx_or_3xx": 0,
+        "reported_seconds": 1.0,
+        "requests": 185440,
+        "requests_per_second": 185298.62,
+        "socket_errors": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "warmup_command": [
+        "/tmp/zig-http-compare.PIwh35/wrk-build/wrk/wrk",
+        "-c",
+        "32",
+        "-t",
+        "2",
+        "-d",
+        "1s",
+        "http://127.0.0.1:58065/plaintext"
+      ]
+    },
+    {
+      "build_mode": "ReleaseSafe",
+      "client_threads": 2,
+      "connections": 32,
+      "contender": "zap",
+      "finished_utc": "2026-09-06T13:03:23.759547+00:00",
+      "measurement": {
+        "non_2xx_or_3xx": 0,
+        "reported_seconds": 3.1,
+        "requests": 636434,
+        "requests_per_second": 205310.36,
+        "socket_errors": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "measurement_command": [
+        "/tmp/zig-http-compare.PIwh35/wrk-build/wrk/wrk",
+        "-c",
+        "32",
+        "-t",
+        "2",
+        "-d",
+        "3s",
+        "http://127.0.0.1:58755/plaintext"
+      ],
+      "method_preflight": {
+        "body_bytes": 18,
+        "body_hex": "4d6574686f64204e6f7420416c6c6f776564",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "18"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:03:19 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:03:19 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 405 Method Not Allowed\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:18\r\ndate:Sun, 06 Sep 2026 13:03:19 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:03:19 GMT",
+        "status": 405
+      },
+      "name": "11-c32-t2-pair3-zap",
+      "not_found_preflight": {
+        "body_bytes": 9,
+        "body_hex": "4e6f7420466f756e64",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "9"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:03:19 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:03:19 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 404 Not Found\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:9\r\ndate:Sun, 06 Sep 2026 13:03:19 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:03:19 GMT",
+        "status": 404
+      },
+      "pair": 3,
+      "plaintext_preflight": {
+        "body_bytes": 13,
+        "body_hex": "48656c6c6f2c20576f726c6421",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "13"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:03:19 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:03:19 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 200 OK\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:13\r\ndate:Sun, 06 Sep 2026 13:03:19 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:03:19 GMT",
+        "status": 200
+      },
+      "postflight": {
+        "body_bytes": 13,
+        "body_hex": "48656c6c6f2c20576f726c6421",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "13"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:03:23 GMT"
+          ],
+          "last-modified": [
+            "Sun, 06 Sep 2026 13:03:23 GMT"
+          ]
+        },
+        "raw_head": "HTTP/1.1 200 OK\r\nconnection:close\r\ncontent-type:text/plain\r\ncontent-length:13\r\ndate:Sun, 06 Sep 2026 13:03:23 GMT\r\nlast-modified:Sun, 06 Sep 2026 13:03:23 GMT",
+        "status": 200
+      },
+      "process_layout": [
+        {
+          "command": "/tmp/zig-http.bench.mrpm97tq/basic-zap/zig-out/bin/basic-zap --port 58755",
+          "pgid": 1610499,
+          "pid": 1610499,
+          "ppid": 1608286,
+          "status_raw": "Name:\tbasic-zap\nUmask:\t0022\nState:\tS (sleeping)\nTgid:\t1610499\nNgid:\t0\nPid:\t1610499\nPPid:\t1608286\nTracerPid:\t0\nUid:\t1000\t1000\t1000\t1000\nGid:\t1000\t1000\t1000\t1000\nFDSize:\t64\nGroups:\t967 998 1000 \nNStgid:\t1610499\nNSpid:\t1610499\nNSpgid:\t1610499\nNSsid:\t1610499\nKthread:\t0\nVmPeak:\t   33804 kB\nVmSize:\t   33804 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t   31188 kB\nVmRSS:\t   31188 kB\nRssAnon:\t   28400 kB\nRssFile:\t    2040 kB\nRssShmem:\t     748 kB\nVmData:\t   30188 kB\nVmStk:\t     132 kB\nVmExe:\t     668 kB\nVmLib:\t    1704 kB\nVmPTE:\t     124 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffffff\nThreads:\t1\nSigQ:\t1/126119\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000001000\nSigCgt:\t00000000100046ca\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t000001ffffffffff\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t0\nSeccomp_filters:\t0\nSpeculation_Store_Bypass:\tthread vulnerable\nSpeculationIndirectBranch:\tconditional enabled\nCpus_allowed:\tff\nCpus_allowed_list:\t0-7\nMems_allowed:\t00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000001\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t4\nnonvoluntary_ctxt_switches:\t0\nx86_Thread_features:\t\nx86_Thread_features_locked:\t\n",
+          "thread_count": 1,
+          "thread_ids": [
+            1610499
+          ]
+        }
+      ],
+      "sequence": 11,
+      "server_command": [
+        "/tmp/zig-http.bench.mrpm97tq/basic-zap/zig-out/bin/basic-zap",
+        "--port",
+        "58755"
+      ],
+      "server_exit_code": 0,
+      "started_utc": "2026-09-06T13:03:19.478004+00:00",
+      "warmup": {
+        "non_2xx_or_3xx": 0,
+        "reported_seconds": 1.1,
+        "requests": 229076,
+        "requests_per_second": 208299.2,
+        "socket_errors": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "warmup_command": [
+        "/tmp/zig-http-compare.PIwh35/wrk-build/wrk/wrk",
+        "-c",
+        "32",
+        "-t",
+        "2",
+        "-d",
+        "1s",
+        "http://127.0.0.1:58755/plaintext"
+      ]
+    },
+    {
+      "build_mode": "ReleaseSafe",
+      "client_threads": 2,
+      "connections": 32,
+      "contender": "app",
+      "finished_utc": "2026-09-06T13:03:28.046356+00:00",
+      "measurement": {
+        "non_2xx_or_3xx": 0,
+        "reported_seconds": 3.1,
+        "requests": 1127010,
+        "requests_per_second": 363594.19,
+        "socket_errors": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "measurement_command": [
+        "/tmp/zig-http-compare.PIwh35/wrk-build/wrk/wrk",
+        "-c",
+        "32",
+        "-t",
+        "2",
+        "-d",
+        "3s",
+        "http://127.0.0.1:43583/plaintext"
+      ],
+      "method_preflight": {
+        "body_bytes": 18,
+        "body_hex": "4d6574686f64204e6f7420416c6c6f776564",
+        "headers": {
+          "allow": [
+            "GET, HEAD, OPTIONS"
+          ],
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "18"
+          ],
+          "content-type": [
+            "text/plain; charset=utf-8"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:03:23 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 405 Method Not Allowed\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:03:23 GMT\r\nContent-Type: text/plain; charset=utf-8\r\nContent-Length: 18\r\nConnection: close\r\nAllow: GET, HEAD, OPTIONS",
+        "status": 405
+      },
+      "name": "12-c32-t2-pair3-app",
+      "not_found_preflight": {
+        "body_bytes": 9,
+        "body_hex": "4e6f7420466f756e64",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "9"
+          ],
+          "content-type": [
+            "text/plain; charset=utf-8"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:03:23 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 404 Not Found\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:03:23 GMT\r\nContent-Type: text/plain; charset=utf-8\r\nContent-Length: 9\r\nConnection: close",
+        "status": 404
+      },
+      "pair": 3,
+      "plaintext_preflight": {
+        "body_bytes": 13,
+        "body_hex": "48656c6c6f2c20576f726c6421",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "13"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:03:23 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 200 OK\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:03:23 GMT\r\nContent-Type: text/plain\r\nContent-Length: 13\r\nConnection: close",
+        "status": 200
+      },
+      "postflight": {
+        "body_bytes": 13,
+        "body_hex": "48656c6c6f2c20576f726c6421",
+        "headers": {
+          "connection": [
+            "close"
+          ],
+          "content-length": [
+            "13"
+          ],
+          "content-type": [
+            "text/plain"
+          ],
+          "date": [
+            "Sun, 06 Sep 2026 13:03:28 GMT"
+          ],
+          "server": [
+            "zig-http"
+          ]
+        },
+        "raw_head": "HTTP/1.1 200 OK\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:03:28 GMT\r\nContent-Type: text/plain\r\nContent-Length: 13\r\nConnection: close",
+        "status": 200
+      },
+      "process_layout": [
+        {
+          "command": "/tmp/zig-http.bench.mrpm97tq/basic-zap/zig-out/bin/basic-app --port 43583",
+          "pgid": 1610993,
+          "pid": 1610993,
+          "ppid": 1608286,
+          "status_raw": "Name:\tbasic-app\nUmask:\t0022\nState:\tS (sleeping)\nTgid:\t1610993\nNgid:\t0\nPid:\t1610993\nPPid:\t1608286\nTracerPid:\t0\nUid:\t1000\t1000\t1000\t1000\nGid:\t1000\t1000\t1000\t1000\nFDSize:\t64\nGroups:\t967 998 1000 \nNStgid:\t1610993\nNSpid:\t1610993\nNSpgid:\t1610993\nNSsid:\t1610993\nKthread:\t0\nVmPeak:\t   32928 kB\nVmSize:\t   32928 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t   31592 kB\nVmRSS:\t   31592 kB\nRssAnon:\t   29348 kB\nRssFile:\t    1636 kB\nRssShmem:\t     608 kB\nVmData:\t   29460 kB\nVmStk:\t     132 kB\nVmExe:\t     504 kB\nVmLib:\t    1704 kB\nVmPTE:\t     100 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffffff\nThreads:\t1\nSigQ:\t3/126119\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000000000\nSigCgt:\t00000000100054ca\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t000001ffffffffff\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t0\nSeccomp_filters:\t0\nSpeculation_Store_Bypass:\tthread vulnerable\nSpeculationIndirectBranch:\tconditional enabled\nCpus_allowed:\tff\nCpus_allowed_list:\t0-7\nMems_allowed:\t00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000001\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t6\nnonvoluntary_ctxt_switches:\t1\nx86_Thread_features:\t\nx86_Thread_features_locked:\t\n",
+          "thread_count": 1,
+          "thread_ids": [
+            1610993
+          ]
+        }
+      ],
+      "sequence": 12,
+      "server_command": [
+        "/tmp/zig-http.bench.mrpm97tq/basic-zap/zig-out/bin/basic-app",
+        "--port",
+        "43583"
+      ],
+      "server_exit_code": 0,
+      "started_utc": "2026-09-06T13:03:23.760305+00:00",
+      "warmup": {
+        "non_2xx_or_3xx": 0,
+        "reported_seconds": 1.1,
+        "requests": 428694,
+        "requests_per_second": 389926.71,
+        "socket_errors": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "warmup_command": [
+        "/tmp/zig-http-compare.PIwh35/wrk-build/wrk/wrk",
+        "-c",
+        "32",
+        "-t",
+        "2",
+        "-d",
+        "1s",
+        "http://127.0.0.1:43583/plaintext"
+      ]
+    }
+  ]
+}

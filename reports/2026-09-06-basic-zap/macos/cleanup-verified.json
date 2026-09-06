@@ -1,0 +1,63 @@
+{
+  "matching_fixture_build_client_processes": [],
+  "measurement_lock_exists": false,
+  "scope": "Post-run read-only existence check for every recorded original server process group and current fixture/build/wrk command lines; no workloads or signals sent",
+  "server_groups": [
+    {
+      "exists": false,
+      "original_server_pgid": 21285
+    },
+    {
+      "exists": false,
+      "original_server_pgid": 21289
+    },
+    {
+      "exists": false,
+      "original_server_pgid": 21295
+    },
+    {
+      "exists": false,
+      "original_server_pgid": 21320
+    },
+    {
+      "exists": false,
+      "original_server_pgid": 21353
+    },
+    {
+      "exists": false,
+      "original_server_pgid": 21392
+    },
+    {
+      "exists": false,
+      "original_server_pgid": 21414
+    },
+    {
+      "exists": false,
+      "original_server_pgid": 21438
+    },
+    {
+      "exists": false,
+      "original_server_pgid": 21462
+    },
+    {
+      "exists": false,
+      "original_server_pgid": 21499
+    },
+    {
+      "exists": false,
+      "original_server_pgid": 21592
+    },
+    {
+      "exists": false,
+      "original_server_pgid": 21854
+    },
+    {
+      "exists": false,
+      "original_server_pgid": 21876
+    },
+    {
+      "exists": false,
+      "original_server_pgid": 21960
+    }
+  ]
+}

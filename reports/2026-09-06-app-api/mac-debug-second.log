@@ -1,0 +1,97 @@
+verify
++- compile exe zig-http Debug native 1 errors
+src/response.zig:94:15: error: local constant shadows declaration of 'bytes'
+        const bytes = std.math.add(usize, std.math.add(usize, name.len, value.len) catch return error.ResponseLimit, 4) catch return error.ResponseLimit;
+              ^~~~~
+src/response.zig:107:9: note: declared here
+    pub fn bytes(self: *Response, status: u16, content_type: []const u8, body: []const u8) !void {
+    ~~~~^~
+error: 1 compilation errors
+failed command: /Users/rs/renerocksai.stow/nvim/.local/share/zigup/0.16.0/files/zig build-exe -ODebug --dep bounded_http -Mroot=/Users/rs/code/github.com/technologylab.ai/zig-http-app-api/src/main.zig -ODebug -Mbounded_http=/Users/rs/code/github.com/technologylab.ai/zig-http-app-api/src/web.zig -lc --cache-dir .zig-cache --global-cache-dir /Users/rs/.cache/zig --name zig-http --zig-lib-dir /Users/rs/renerocksai.stow/nvim/.local/share/zigup/0.16.0/files/lib/ --listen=-
+
+verify
++- run test
+   +- compile test Debug native 1 errors
+src/response.zig:94:15: error: local constant shadows declaration of 'bytes'
+        const bytes = std.math.add(usize, std.math.add(usize, name.len, value.len) catch return error.ResponseLimit, 4) catch return error.ResponseLimit;
+              ^~~~~
+src/response.zig:107:9: note: declared here
+    pub fn bytes(self: *Response, status: u16, content_type: []const u8, body: []const u8) !void {
+    ~~~~^~
+error: 1 compilation errors
+failed command: /Users/rs/renerocksai.stow/nvim/.local/share/zigup/0.16.0/files/zig test -ODebug -Mroot=/Users/rs/code/github.com/technologylab.ai/zig-http-app-api/src/response.zig -lc --cache-dir .zig-cache --global-cache-dir /Users/rs/.cache/zig --name test --zig-lib-dir /Users/rs/renerocksai.stow/nvim/.local/share/zigup/0.16.0/files/lib/ --listen=-
+
+verify
++- run test
+   +- compile test Debug native 2 errors
+src/response.zig:94:15: error: local constant shadows declaration of 'bytes'
+        const bytes = std.math.add(usize, std.math.add(usize, name.len, value.len) catch return error.ResponseLimit, 4) catch return error.ResponseLimit;
+              ^~~~~
+src/response.zig:107:9: note: declared here
+    pub fn bytes(self: *Response, status: u16, content_type: []const u8, body: []const u8) !void {
+    ~~~~^~
+src/App.zig:403:11: error: unable to resolve comptime value
+    for (.{ first, second, first }) |app| {
+         ~^~~~~~~~~~~~~~~~~~~~~~~~
+src/App.zig:403:11: note: tuple field index must be comptime-known
+error: 2 compilation errors
+failed command: /Users/rs/renerocksai.stow/nvim/.local/share/zigup/0.16.0/files/zig test -ODebug -Mroot=/Users/rs/code/github.com/technologylab.ai/zig-http-app-api/src/App.zig -lc --cache-dir .zig-cache --global-cache-dir /Users/rs/.cache/zig --name test --zig-lib-dir /Users/rs/renerocksai.stow/nvim/.local/share/zigup/0.16.0/files/lib/ --listen=-
+
+verify
++- run test
+   +- compile test Debug native 1 errors
+src/response.zig:94:15: error: local constant shadows declaration of 'bytes'
+        const bytes = std.math.add(usize, std.math.add(usize, name.len, value.len) catch return error.ResponseLimit, 4) catch return error.ResponseLimit;
+              ^~~~~
+src/response.zig:107:9: note: declared here
+    pub fn bytes(self: *Response, status: u16, content_type: []const u8, body: []const u8) !void {
+    ~~~~^~
+error: 1 compilation errors
+failed command: /Users/rs/renerocksai.stow/nvim/.local/share/zigup/0.16.0/files/zig test -ODebug -Mroot=/Users/rs/code/github.com/technologylab.ai/zig-http-app-api/src/web.zig -lc --cache-dir .zig-cache --global-cache-dir /Users/rs/.cache/zig --name test --zig-lib-dir /Users/rs/renerocksai.stow/nvim/.local/share/zigup/0.16.0/files/lib/ --listen=-
+
+verify
++- compile exe http-app Debug native 1 errors
+src/response.zig:94:15: error: local constant shadows declaration of 'bytes'
+        const bytes = std.math.add(usize, std.math.add(usize, name.len, value.len) catch return error.ResponseLimit, 4) catch return error.ResponseLimit;
+              ^~~~~
+src/response.zig:107:9: note: declared here
+    pub fn bytes(self: *Response, status: u16, content_type: []const u8, body: []const u8) !void {
+    ~~~~^~
+error: 1 compilation errors
+failed command: /Users/rs/renerocksai.stow/nvim/.local/share/zigup/0.16.0/files/zig build-exe -ODebug --dep http_app -Mroot=/Users/rs/code/github.com/technologylab.ai/zig-http-app-api/src/app_demo.zig -ODebug -Mhttp_app=/Users/rs/code/github.com/technologylab.ai/zig-http-app-api/src/web.zig -lc --cache-dir .zig-cache --global-cache-dir /Users/rs/.cache/zig --name http-app --zig-lib-dir /Users/rs/renerocksai.stow/nvim/.local/share/zigup/0.16.0/files/lib/ --listen=-
+
+Build Summary: 22/31 steps succeeded (5 failed); 114/116 tests passed (2 skipped)
+verify transitive failure
++- compile exe zig-http Debug native 1 errors
++- compile exe http-app Debug native 1 errors
++- zig fmt --check success
++- run python3 success 62ms
++- run test 15 pass (15 total) 819ms MaxRSS:2M
+|  +- compile test Debug native success 1s MaxRSS:286M
++- run test 5 pass (5 total) 272ms MaxRSS:2M
+|  +- compile test Debug native success 1s MaxRSS:277M
++- run test 1 pass (1 total) 331ms MaxRSS:2M
+|  +- compile test Debug native success 1s MaxRSS:270M
++- run test 7 pass (7 total) 540ms MaxRSS:2M
+|  +- compile test Debug native success 1s MaxRSS:280M
++- run test 41 pass, 2 skip (43 total) 594ms MaxRSS:3M
+|  +- compile test Debug native success 1s MaxRSS:313M
++- run test 3 pass (3 total) 323ms MaxRSS:2M
+|  +- compile test Debug native success 1s MaxRSS:274M
++- run test 5 pass (5 total) 568ms MaxRSS:2M
+|  +- compile test Debug native success 1s MaxRSS:280M
++- run test 27 pass (27 total) 333ms MaxRSS:2M
+|  +- compile test Debug native success 1s MaxRSS:301M
++- run test 8 pass (8 total) 621ms MaxRSS:2M
+|  +- compile test Debug native success 1s MaxRSS:290M
++- run test transitive failure
+|  +- compile test Debug native 1 errors
++- run test 2 pass (2 total) 646ms MaxRSS:2M
+|  +- compile test Debug native success 1s MaxRSS:275M
++- run test transitive failure
+|  +- compile test Debug native 2 errors
++- run test transitive failure
+   +- compile test Debug native 1 errors
+
+error: the following build command failed with exit code 1:
+.zig-cache/o/2227ae07ef2c4bb8fc526c6920049ebd/build /Users/rs/renerocksai.stow/nvim/.local/share/zigup/0.16.0/files/zig /Users/rs/renerocksai.stow/nvim/.local/share/zigup/0.16.0/files/lib /Users/rs/code/github.com/technologylab.ai/zig-http-app-api .zig-cache /Users/rs/.cache/zig --seed 0xe5e9cc94 -Z424b37a168c90429 verify -Doptimize=Debug -j2 --summary all

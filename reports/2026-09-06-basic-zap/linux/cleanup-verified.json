@@ -1,0 +1,179 @@
+{
+  "all_original_server_groups_absent": true,
+  "checked_utc": "2026-09-06T13:10:51.151625+00:00",
+  "current_matching_fixture_commands": [],
+  "host": "omarx1",
+  "limitation": "This later audit covers the original server process groups recorded for both preflights and all 12 trials; it supplements the runner and pre-release workspace child scan without changing original receipts.",
+  "measurement_lock_currently_present": false,
+  "method": "Read-only os.killpg(original_server_pgid, 0) plus ps -axo pid,ppid,pgid,command; no signals other than signal 0, builds, workload or lock acquisition",
+  "original_server_process_groups": [
+    {
+      "current_process_table_members": [],
+      "killpg_signal_0": "absent (ESRCH)",
+      "pgid": 1608465,
+      "recorded_sources": [
+        {
+          "recorded_command": "/tmp/zig-http.bench.mrpm97tq/basic-zap/zig-out/bin/basic-app --port 48797",
+          "recorded_pid": 1608465,
+          "source": "preflight app"
+        }
+      ]
+    },
+    {
+      "current_process_table_members": [],
+      "killpg_signal_0": "absent (ESRCH)",
+      "pgid": 1608467,
+      "recorded_sources": [
+        {
+          "recorded_command": "/tmp/zig-http.bench.mrpm97tq/basic-zap/zig-out/bin/basic-zap --port 55263",
+          "recorded_pid": 1608467,
+          "source": "preflight zap"
+        }
+      ]
+    },
+    {
+      "current_process_table_members": [],
+      "killpg_signal_0": "absent (ESRCH)",
+      "pgid": 1608469,
+      "recorded_sources": [
+        {
+          "recorded_command": "/tmp/zig-http.bench.mrpm97tq/basic-zap/zig-out/bin/basic-app --port 57987",
+          "recorded_pid": 1608469,
+          "source": "trial 1 app"
+        }
+      ]
+    },
+    {
+      "current_process_table_members": [],
+      "killpg_signal_0": "absent (ESRCH)",
+      "pgid": 1608481,
+      "recorded_sources": [
+        {
+          "recorded_command": "/tmp/zig-http.bench.mrpm97tq/basic-zap/zig-out/bin/basic-zap --port 57671",
+          "recorded_pid": 1608481,
+          "source": "trial 2 zap"
+        }
+      ]
+    },
+    {
+      "current_process_table_members": [],
+      "killpg_signal_0": "absent (ESRCH)",
+      "pgid": 1608519,
+      "recorded_sources": [
+        {
+          "recorded_command": "/tmp/zig-http.bench.mrpm97tq/basic-zap/zig-out/bin/basic-zap --port 55657",
+          "recorded_pid": 1608519,
+          "source": "trial 3 zap"
+        }
+      ]
+    },
+    {
+      "current_process_table_members": [],
+      "killpg_signal_0": "absent (ESRCH)",
+      "pgid": 1608602,
+      "recorded_sources": [
+        {
+          "recorded_command": "/tmp/zig-http.bench.mrpm97tq/basic-zap/zig-out/bin/basic-app --port 49859",
+          "recorded_pid": 1608602,
+          "source": "trial 4 app"
+        }
+      ]
+    },
+    {
+      "current_process_table_members": [],
+      "killpg_signal_0": "absent (ESRCH)",
+      "pgid": 1608838,
+      "recorded_sources": [
+        {
+          "recorded_command": "/tmp/zig-http.bench.mrpm97tq/basic-zap/zig-out/bin/basic-app --port 49399",
+          "recorded_pid": 1608838,
+          "source": "trial 5 app"
+        }
+      ]
+    },
+    {
+      "current_process_table_members": [],
+      "killpg_signal_0": "absent (ESRCH)",
+      "pgid": 1609025,
+      "recorded_sources": [
+        {
+          "recorded_command": "/tmp/zig-http.bench.mrpm97tq/basic-zap/zig-out/bin/basic-zap --port 40033",
+          "recorded_pid": 1609025,
+          "source": "trial 6 zap"
+        }
+      ]
+    },
+    {
+      "current_process_table_members": [],
+      "killpg_signal_0": "absent (ESRCH)",
+      "pgid": 1609646,
+      "recorded_sources": [
+        {
+          "recorded_command": "/tmp/zig-http.bench.mrpm97tq/basic-zap/zig-out/bin/basic-zap --port 42535",
+          "recorded_pid": 1609646,
+          "source": "trial 7 zap"
+        }
+      ]
+    },
+    {
+      "current_process_table_members": [],
+      "killpg_signal_0": "absent (ESRCH)",
+      "pgid": 1609811,
+      "recorded_sources": [
+        {
+          "recorded_command": "/tmp/zig-http.bench.mrpm97tq/basic-zap/zig-out/bin/basic-app --port 57819",
+          "recorded_pid": 1609811,
+          "source": "trial 8 app"
+        }
+      ]
+    },
+    {
+      "current_process_table_members": [],
+      "killpg_signal_0": "absent (ESRCH)",
+      "pgid": 1609923,
+      "recorded_sources": [
+        {
+          "recorded_command": "/tmp/zig-http.bench.mrpm97tq/basic-zap/zig-out/bin/basic-app --port 35399",
+          "recorded_pid": 1609923,
+          "source": "trial 9 app"
+        }
+      ]
+    },
+    {
+      "current_process_table_members": [],
+      "killpg_signal_0": "absent (ESRCH)",
+      "pgid": 1610090,
+      "recorded_sources": [
+        {
+          "recorded_command": "/tmp/zig-http.bench.mrpm97tq/basic-zap/zig-out/bin/basic-zap --port 58065",
+          "recorded_pid": 1610090,
+          "source": "trial 10 zap"
+        }
+      ]
+    },
+    {
+      "current_process_table_members": [],
+      "killpg_signal_0": "absent (ESRCH)",
+      "pgid": 1610499,
+      "recorded_sources": [
+        {
+          "recorded_command": "/tmp/zig-http.bench.mrpm97tq/basic-zap/zig-out/bin/basic-zap --port 58755",
+          "recorded_pid": 1610499,
+          "source": "trial 11 zap"
+        }
+      ]
+    },
+    {
+      "current_process_table_members": [],
+      "killpg_signal_0": "absent (ESRCH)",
+      "pgid": 1610993,
+      "recorded_sources": [
+        {
+          "recorded_command": "/tmp/zig-http.bench.mrpm97tq/basic-zap/zig-out/bin/basic-app --port 43583",
+          "recorded_pid": 1610993,
+          "source": "trial 12 app"
+        }
+      ]
+    }
+  ]
+}

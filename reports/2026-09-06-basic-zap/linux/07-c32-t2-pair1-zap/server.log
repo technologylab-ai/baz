@@ -1,0 +1,2 @@
+READY port=42535 backend=facil.io threads=1 workers=1 optimize=ReleaseSafe
+

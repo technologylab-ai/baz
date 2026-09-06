@@ -1,1 +1,6 @@
 * text=auto eol=lf
+
+# Preserve verbatim compiler/client receipts, including their whitespace.
+reports/2026-09-06-app-api/*.log -text -whitespace
+reports/2026-09-06-basic-zap/**/*.log -text -whitespace
+reports/2026-09-06-basic-zap/**/*.txt -text -whitespace

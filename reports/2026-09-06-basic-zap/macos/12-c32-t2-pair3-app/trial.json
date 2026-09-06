@@ -1,0 +1,175 @@
+{
+  "build_mode": "ReleaseSafe",
+  "client_threads": 2,
+  "connections": 32,
+  "contender": "app",
+  "finished_utc": "2026-09-06T13:02:58.318026+00:00",
+  "measurement": {
+    "non_2xx_or_3xx": 0,
+    "reported_seconds": 3.1,
+    "requests": 792999,
+    "requests_per_second": 255807.45,
+    "socket_errors": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "measurement_command": [
+    "/opt/homebrew/bin/wrk",
+    "-c",
+    "32",
+    "-t",
+    "2",
+    "-d",
+    "3s",
+    "http://127.0.0.1:59643/plaintext"
+  ],
+  "method_preflight": {
+    "body_bytes": 18,
+    "body_hex": "4d6574686f64204e6f7420416c6c6f776564",
+    "headers": {
+      "allow": [
+        "GET, HEAD, OPTIONS"
+      ],
+      "connection": [
+        "close"
+      ],
+      "content-length": [
+        "18"
+      ],
+      "content-type": [
+        "text/plain; charset=utf-8"
+      ],
+      "date": [
+        "Sun, 06 Sep 2026 13:02:53 GMT"
+      ],
+      "server": [
+        "zig-http"
+      ]
+    },
+    "raw_head": "HTTP/1.1 405 Method Not Allowed\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:02:53 GMT\r\nContent-Type: text/plain; charset=utf-8\r\nContent-Length: 18\r\nConnection: close\r\nAllow: GET, HEAD, OPTIONS",
+    "status": 405
+  },
+  "name": "12-c32-t2-pair3-app",
+  "not_found_preflight": {
+    "body_bytes": 9,
+    "body_hex": "4e6f7420466f756e64",
+    "headers": {
+      "connection": [
+        "close"
+      ],
+      "content-length": [
+        "9"
+      ],
+      "content-type": [
+        "text/plain; charset=utf-8"
+      ],
+      "date": [
+        "Sun, 06 Sep 2026 13:02:53 GMT"
+      ],
+      "server": [
+        "zig-http"
+      ]
+    },
+    "raw_head": "HTTP/1.1 404 Not Found\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:02:53 GMT\r\nContent-Type: text/plain; charset=utf-8\r\nContent-Length: 9\r\nConnection: close",
+    "status": 404
+  },
+  "pair": 3,
+  "plaintext_preflight": {
+    "body_bytes": 13,
+    "body_hex": "48656c6c6f2c20576f726c6421",
+    "headers": {
+      "connection": [
+        "close"
+      ],
+      "content-length": [
+        "13"
+      ],
+      "content-type": [
+        "text/plain"
+      ],
+      "date": [
+        "Sun, 06 Sep 2026 13:02:53 GMT"
+      ],
+      "server": [
+        "zig-http"
+      ]
+    },
+    "raw_head": "HTTP/1.1 200 OK\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:02:53 GMT\r\nContent-Type: text/plain\r\nContent-Length: 13\r\nConnection: close",
+    "status": 200
+  },
+  "postflight": {
+    "body_bytes": 13,
+    "body_hex": "48656c6c6f2c20576f726c6421",
+    "headers": {
+      "connection": [
+        "close"
+      ],
+      "content-length": [
+        "13"
+      ],
+      "content-type": [
+        "text/plain"
+      ],
+      "date": [
+        "Sun, 06 Sep 2026 13:02:58 GMT"
+      ],
+      "server": [
+        "zig-http"
+      ]
+    },
+    "raw_head": "HTTP/1.1 200 OK\r\nServer: zig-http\r\nDate: Sun, 06 Sep 2026 13:02:58 GMT\r\nContent-Type: text/plain\r\nContent-Length: 13\r\nConnection: close",
+    "status": 200
+  },
+  "process_layout": [
+    {
+      "command": "/private/tmp/zig-http-basic-zap-20260906/zig-out/bin/basic-app --port 59643",
+      "pgid": 21960,
+      "pid": 21960,
+      "ppid": 20967,
+      "thread_count": 1,
+      "threads_raw": {
+        "command": [
+          "ps",
+          "-M",
+          "-p",
+          "21960"
+        ],
+        "output": "USER   PID   TT   %CPU STAT PRI     STIME     UTIME COMMAND\nrs   21960   ??    1.0 S    31T   0:00.00   0:00.00 /private/tmp/zig-http-basic-zap-20260906/zig-out/bin/basic-app --port 59643\n",
+        "returncode": 0
+      }
+    }
+  ],
+  "sequence": 12,
+  "server_command": [
+    "/private/tmp/zig-http-basic-zap-20260906/zig-out/bin/basic-app",
+    "--port",
+    "59643"
+  ],
+  "server_exit_code": 0,
+  "started_utc": "2026-09-06T13:02:53.966173+00:00",
+  "warmup": {
+    "non_2xx_or_3xx": 0,
+    "reported_seconds": 1.1,
+    "requests": 256597,
+    "requests_per_second": 233280.39,
+    "socket_errors": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "warmup_command": [
+    "/opt/homebrew/bin/wrk",
+    "-c",
+    "32",
+    "-t",
+    "2",
+    "-d",
+    "1s",
+    "http://127.0.0.1:59643/plaintext"
+  ]
+}

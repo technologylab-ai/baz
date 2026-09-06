@@ -1,19 +1,46 @@
-# App API planning handoff — 2026-09-06
+# App API implementation handoff — 2026-09-06
 
-The modern Zap-successor API is planned in worktree `../zig-http-app-api`,
-branch `roadmap/app-api`, based on engine commit
-`4b3cd5551d80b422ec6ef763627d019e6f1dfb83`. Start with the
-[App API roadmap](docs/APP-API-ROADMAP.md),
-[public API design](docs/APP-API-DESIGN.md), and
-[owned std.Io exploration](docs/STD-IO-DECISION.md).
+Worktree `../zig-http-app-api`, branch `roadmap/app-api`, based on engine
+`4b3cd5551d80b422ec6ef763627d019e6f1dfb83` and planning `db8d7ce`.
+The working public module is `http_app`. API-01–05 now provide typed App
+instances/endpoints, raw query/form views, explicit decoding/copying, flat
+multipart parts and reserved one-shot responses. All 20 supported Zap example
+targets have ports/adaptations; no facade over facil.io was introduced.
 
-This session inspected the local Zig 0.16 Zap port and the Zig wiki and
-prepared documentation only. No framework implementation or new runtime
-evidence is claimed. Next: API-01 raw request/query helpers, independently
-API-02 response reservation design and IO-01 compatibility/resource audit.
-Reconcile incoming architecture docs before implementation. No measurement
-lock or runner is left active by this planning session. Historical engine
-handoffs and their evidence remain below.
+Start with the [implemented API guide](docs/APP-API.md),
+[example coverage and commands](examples/README.md),
+[roadmap/session ledger](docs/APP-API-ROADMAP.md), and
+[native receipt](reports/2026-09-06-app-api.md).
+The [source manifest](reports/2026-09-06-app-api-source.sha256) pins the 63
+implementation/build/test/tool/asset inputs separately from evolving docs.
+The [basic Zap comparison](reports/2026-09-06-basic-zap.md) is separate:
+at 32 connections the App/Zap ratios of median request rates were 1.038 on
+macOS and 1.771 on Linux. One-connection baselines and all raw trials remain in
+the report. These short loopback observations do not establish capacity.
+
+Next bounded implementation: API-06 public middleware/locals/cookie composition,
+informed by the example-local typed wrappers. Then API-07 typed resumable
+endpoints and API-08 packaging/native qualification. App-specific broader fault
+and multi-shard coverage remain explicit follow-ups. Historical engine evidence
+does not qualify arbitrary application isolation.
+
+User decisions: use caller std.Io plus the existing io_uring/kqueue engine now;
+owned std.Io is deferred until after the first API MVP. TLS is out of scope.
+Mustache is postponed; [pure Zig library candidates](docs/MUSTACHE-CANDIDATES.md)
+prioritize controlled memory. WebSockets requires an upgrade lifecycle first.
+Windows compilation/CI waits for the other session's engine support on main;
+no Windows changes were made here.
+Eventually extract the framework to its own named repository with a pinned
+zig-http dependency, leaving zig-http independently usable as the original case
+study. Current imports still share engine sources inside this worktree; land
+the small generic response-reservation/header extension independently before
+extraction, rather than maintaining a copied engine fork.
+
+Reconcile incoming architecture docs before the next session. All native and
+timed workloads are finished, original server process groups are gone, and
+owned Mac/Linux measurement reservations were released. No queued item means
+an active runner. This session did not modify original main or unrelated
+worktrees. Historical engine handoffs and evidence follow.
 
 # HTTP experiment handoff — 2026-09-05
 

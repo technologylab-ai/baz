@@ -1,0 +1,27 @@
+{
+  "host": "omarx1",
+  "owner": "/root/parser_api_review",
+  "owner_pid": 1586730,
+  "process_start_ticks": "54256460",
+  "token": "9f0fb179-d099-4a1d-a3f0-dd638c4c16c6",
+  "acquired_utc": "2026-09-06T12:43:51.632255+00:00",
+  "released_utc": "2026-09-06T13:05:23.083053+00:00",
+  "source_manifest_sha256": "29b376f3b2c79e4e1d5e92a3399a37aeb410933af070e60ccd736120df35ac4f",
+  "native_attempts": [
+    {"started_utc": "2026-09-06T12:44:45.112269+00:00", "finished_utc": "2026-09-06T12:48:20.448483+00:00", "exit_code": 124, "result": "Debug 51/51 steps and 194/194 tests passed; first cold ReleaseSafe verify reached its 180-second build watchdog before native suites ran; child cleanup verified"},
+    {"started_utc": "2026-09-06T12:51:14.376306+00:00", "finished_utc": "2026-09-06T12:55:10.292494+00:00", "exit_code": 0, "result": "Same source manifest; successful ReleaseSafe verify and all native suites using 600-second Zig build watchdog; child cleanup verified"}
+  ],
+  "native_counts": {"Debug_tests": 194, "ReleaseSafe_tests": 194, "skipped": 0, "comparator": 8, "lifecycle": 8, "batch": 29, "gather": 11, "inline": 10, "wire": 26, "App": 14, "examples": 20, "smoke_workloads": 3, "smoke_responses_per_workload": 10000},
+  "benchmark_root": "/tmp/zig-http.bench.mrpm97tq",
+  "benchmark_receipts": "linux-receipts-v2",
+  "benchmark_started_utc": "2026-09-06T13:02:24.634398+00:00",
+  "benchmark_finished_utc": "2026-09-06T13:03:28.055991+00:00",
+  "benchmark_bundle_sha256": "28768e20a43e6c602775053e149c3030b8cab8c5705582fe7e9c6263af86213c",
+  "benchmark_build_mode": "ReleaseSafe",
+  "initial_fixture_attempt": "Preserved linux-receipts: build graph guard stopped wrong optimize-mode selection before any fixture started or load ran; shared fixture build option corrected before the successful attempt",
+  "owned_children_remaining_before_release": [],
+  "owner_checked_release": true,
+  "lock_absent_after_release": true,
+  "keeper_exited_after_release": true,
+  "previous_benchkit_untouched": "/tmp/zig-http-compare.PIwh35"
+}

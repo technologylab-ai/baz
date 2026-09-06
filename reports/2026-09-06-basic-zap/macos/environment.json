@@ -1,0 +1,106 @@
+{
+  "build_mode": "ReleaseSafe",
+  "client_location": "same-host IPv4 loopback",
+  "cpu": {
+    "command": [
+      "sysctl",
+      "machdep.cpu.brand_string",
+      "hw.model",
+      "hw.physicalcpu",
+      "hw.logicalcpu",
+      "hw.memsize"
+    ],
+    "output": "machdep.cpu.brand_string: Apple M3 Max\nhw.model: Mac15,9\nhw.physicalcpu: 16\nhw.logicalcpu: 16\nhw.memsize: 137438953472\n",
+    "returncode": 0
+  },
+  "cpu_affinity": "No CPU pinning applied by runner",
+  "fixture_root": "/private/tmp/zig-http-basic-zap-20260906",
+  "framework_git_head": {
+    "command": [
+      "git",
+      "-C",
+      "/Users/rs/code/github.com/technologylab.ai/zig-http-app-api",
+      "rev-parse",
+      "HEAD"
+    ],
+    "output": "db8d7ce4e2324825fd5655265d6cb81df7202e82\n",
+    "returncode": 0
+  },
+  "framework_git_status": {
+    "command": [
+      "git",
+      "-C",
+      "/Users/rs/code/github.com/technologylab.ai/zig-http-app-api",
+      "status",
+      "--short"
+    ],
+    "output": " M AGENTS.md\n M HANDOFF.md\n M README.md\n M ROADMAP.md\n M build.zig\n M build.zig.zon\n M docs/APP-API-DESIGN.md\n M docs/APP-API-ROADMAP.md\n M docs/STD-IO-DECISION.md\n M src/api.zig\n M src/server.zig\n M tools/verify_linux_ssh.sh\n?? docs/APP-API.md\n?? docs/MUSTACHE-CANDIDATES.md\n?? examples/\n?? reports/2026-09-06-app-api-source.sha256\n?? reports/2026-09-06-app-api.md\n?? reports/2026-09-06-app-api/\n?? src/App.zig\n?? src/app_demo.zig\n?? src/form.zig\n?? src/multipart.zig\n?? src/params.zig\n?? src/request.zig\n?? src/response.zig\n?? src/router.zig\n?? src/web.zig\n?? tests/app_integration.py\n?? tests/examples_integration.py\n",
+    "returncode": 0
+  },
+  "framework_root": "/Users/rs/code/github.com/technologylab.ai/zig-http-app-api",
+  "http_pipeline_depth": 1,
+  "inherited_c_flags": [
+    "-Os",
+    "-Wno-return-type-c-linkage",
+    "-fno-sanitize=undefined",
+    "-DFIO_HTTP_EXACT_LOGGING"
+  ],
+  "latency_claim": false,
+  "logical_cpus": 16,
+  "os_version": {
+    "command": [
+      "sw_vers"
+    ],
+    "output": "ProductName:\t\tmacOS\nProductVersion:\t\t26.6.2\nBuildVersion:\t\t25G83\n",
+    "returncode": 0
+  },
+  "platform": "macOS-26.6.2-arm64-arm-64bit",
+  "power_policy": {
+    "command": [
+      "pmset",
+      "-g",
+      "custom"
+    ],
+    "output": "Battery Power:\n Sleep On Power Button 1\n powermode            1\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n displaysleep         180\n womp                 1\n networkoversleep     0\n sleep                1\n lessbright           0\n tcpkeepalive         1\n disksleep            10\nAC Power:\n Sleep On Power Button 1\n powermode            2\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n displaysleep         180\n womp                 1\n networkoversleep     0\n sleep                0\n tcpkeepalive         1\n disksleep            10\n",
+    "returncode": 0
+  },
+  "power_source": {
+    "command": [
+      "pmset",
+      "-g",
+      "batt"
+    ],
+    "output": "Now drawing from 'AC Power'\n -InternalBattery-0 (id=37093475)\t80%; AC attached; not charging present: true\n",
+    "returncode": 0
+  },
+  "python": "3.9.6 (default, May 22 2026, 11:13:45) \n[Clang 21.0.0 (clang-2100.1.1.101)]",
+  "recorded_utc": "2026-09-06T13:01:55.562768+00:00",
+  "tls": false,
+  "uname": [
+    "Darwin",
+    "renerocksai-M3-Max-6.local",
+    "25.6.0",
+    "Darwin Kernel Version 25.6.0: Fri Jul 31 19:18:53 PDT 2026; root:xnu-12377.161.14~5/RELEASE_ARM64_T6031",
+    "arm64",
+    "arm"
+  ],
+  "wrk": {
+    "command": [
+      "/opt/homebrew/bin/wrk",
+      "--version"
+    ],
+    "output": "wrk 4.2.0 [kqueue] Copyright (C) 2012 Will Glozer\nUsage: wrk <options> <url>                            \n  Options:                                            \n    -c, --connections <N>  Connections to keep open   \n    -d, --duration    <T>  Duration of test           \n    -t, --threads     <N>  Number of threads to use   \n                                                      \n    -s, --script      <S>  Load Lua script file       \n    -H, --header      <H>  Add header to request      \n        --latency          Print latency statistics   \n        --timeout     <T>  Socket/request timeout     \n    -v, --version          Print version details      \n                                                      \n  Numeric arguments may include a SI unit (1k, 1M, 1G)\n  Time arguments may include a time unit (2s, 2m, 2h)\n",
+    "returncode": 1
+  },
+  "wrk_path": "/opt/homebrew/Cellar/wrk/4.2.0_1/bin/wrk",
+  "wrk_sha256": "422f8912ad069168cbcb3d3f831b15456d0d1663fc5c7a4f6492193d7bc172ed",
+  "zap_commit": "f6099ecec496c7ec623c5913baa5b6b5da2e883d",
+  "zig": {
+    "command": [
+      "zig",
+      "version"
+    ],
+    "output": "0.16.0\n",
+    "returncode": 0
+  }
+}

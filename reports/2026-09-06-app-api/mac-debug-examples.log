@@ -1,0 +1,53 @@
+Build Summary: 51/51 steps succeeded; 190/194 tests passed (4 skipped)
+verify success
++- compile exe zig-http Debug native cached 58ms MaxRSS:31M
++- compile exe http-app Debug native cached 107ms MaxRSS:31M
++- compile exe hello Debug native success 1s MaxRSS:297M
++- compile exe hello2 Debug native success 1s MaxRSS:298M
++- compile exe hello_json Debug native success 1s MaxRSS:307M
++- compile exe simple_router Debug native success 1s MaxRSS:306M
++- compile exe routes Debug native success 1s MaxRSS:296M
++- compile exe serve Debug native success 1s MaxRSS:305M
++- compile exe sendfile Debug native success 1s MaxRSS:301M
++- compile exe senderror Debug native success 1s MaxRSS:299M
++- compile exe accept Debug native success 1s MaxRSS:299M
++- compile exe app_basic Debug native success 1s MaxRSS:307M
++- compile exe app_auth Debug native success 1s MaxRSS:304M
++- compile exe app_errors Debug native success 1s MaxRSS:308M
++- compile exe endpoint Debug native success 1s MaxRSS:321M
++- compile exe endpoint_auth Debug native success 1s MaxRSS:299M
++- compile exe middleware Debug native success 1s MaxRSS:302M
++- compile exe middleware_with_endpoint Debug native success 1s MaxRSS:301M
++- compile exe userpass_session Debug native success 1s MaxRSS:301M
++- compile exe cookies Debug native success 1s MaxRSS:298M
++- compile exe http_params Debug native success 1s MaxRSS:300M
++- compile exe bindataformpost Debug native success 1s MaxRSS:308M
++- zig fmt --check success
++- run python3 success 72ms
++- run test 15 pass (15 total) 49ms MaxRSS:2M
+|  +- compile test Debug native cached 58ms MaxRSS:31M
++- run test 5 pass (5 total) 4ms MaxRSS:2M
+|  +- compile test Debug native cached 114ms MaxRSS:31M
++- run test 1 pass (1 total) 15ms MaxRSS:2M
+|  +- compile test Debug native cached 114ms MaxRSS:31M
++- run test 7 pass (7 total) 29ms MaxRSS:2M
+|  +- compile test Debug native cached 64ms MaxRSS:31M
++- run test 41 pass, 2 skip (43 total) 87ms MaxRSS:3M
+|  +- compile test Debug native cached 57ms MaxRSS:31M
++- run test 3 pass (3 total) 3ms MaxRSS:2M
+|  +- compile test Debug native cached 75ms MaxRSS:31M
++- run test 5 pass (5 total) 3ms MaxRSS:2M
+|  +- compile test Debug native cached 61ms MaxRSS:31M
++- run test 27 pass (27 total) 29ms MaxRSS:2M
+|  +- compile test Debug native cached 69ms MaxRSS:31M
++- run test 8 pass (8 total) 3ms MaxRSS:2M
+|  +- compile test Debug native cached 64ms MaxRSS:31M
++- run test 11 pass (11 total) 4ms MaxRSS:2M
+|  +- compile test Debug native cached 70ms MaxRSS:31M
++- run test 2 pass (2 total) 3ms MaxRSS:2M
+|  +- compile test Debug native cached 55ms MaxRSS:31M
++- run test 65 pass, 2 skip (67 total) 107ms MaxRSS:4M
+|  +- compile test Debug native cached 100ms MaxRSS:31M
++- run test success 3ms MaxRSS:2M
+   +- compile test Debug native cached 100ms MaxRSS:31M
+

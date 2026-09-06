@@ -24,14 +24,17 @@ COPYFILE_DISABLE=1 tar --no-xattrs --exclude=.git --exclude=.zig-cache \
             "$(uname -n)" "$(uname -m)" "$(uname -r)" "$(zig version)" \
             "$(cat /proc/sys/kernel/io_uring_disabled)"
         cat /etc/os-release
-        timeout 180 zig build verify --summary all
-        timeout 180 zig build verify -Doptimize=ReleaseSafe --summary all
-        timeout 180 zig build -Doptimize=ReleaseSafe
-        PYTHONDONTWRITEBYTECODE=1 python3 tests/test_compare.py -v
-        PYTHONDONTWRITEBYTECODE=1 python3 tests/arena_lifecycle_integration.py
-        PYTHONDONTWRITEBYTECODE=1 python3 tests/batch_integration.py
-        PYTHONDONTWRITEBYTECODE=1 python3 tests/gather_integration.py
-        PYTHONDONTWRITEBYTECODE=1 python3 tests/inline_integration.py
-        PYTHONDONTWRITEBYTECODE=1 python3 tests/integration.py
-        PYTHONDONTWRITEBYTECODE=1 python3 tools/smoke.py
+        timeout 180 zig build verify -Doptimize=Debug -j2 --summary all
+        timeout 180 zig build verify -Doptimize=ReleaseSafe -j2 --summary all
+        timeout 180 zig build -Doptimize=ReleaseSafe -j2
+        timeout 180 zig build examples -Doptimize=ReleaseSafe -j2
+        PYTHONDONTWRITEBYTECODE=1 timeout 180 python3 tests/test_compare.py -v
+        PYTHONDONTWRITEBYTECODE=1 timeout 180 python3 tests/arena_lifecycle_integration.py
+        PYTHONDONTWRITEBYTECODE=1 timeout 180 python3 tests/batch_integration.py
+        PYTHONDONTWRITEBYTECODE=1 timeout 180 python3 tests/gather_integration.py
+        PYTHONDONTWRITEBYTECODE=1 timeout 180 python3 tests/inline_integration.py
+        PYTHONDONTWRITEBYTECODE=1 timeout 180 python3 tests/integration.py
+        PYTHONDONTWRITEBYTECODE=1 timeout 120 python3 tests/app_integration.py
+        PYTHONDONTWRITEBYTECODE=1 timeout 120 python3 tests/examples_integration.py
+        PYTHONDONTWRITEBYTECODE=1 timeout 180 python3 tools/smoke.py
     '

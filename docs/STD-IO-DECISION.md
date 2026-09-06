@@ -1,18 +1,23 @@
 # Should the framework provide its own std.Io?
 
-Status: source-based exploration and proposed decision, 2026-09-06, exact
+Status: source-based exploration and accepted sequencing decision, 2026-09-06, exact
 Zig 0.16.0. No custom std.Io implementation or prototype is added here.
 This accompanies the [framework design](APP-API-DESIGN.md) and
 [implementation roadmap](APP-API-ROADMAP.md).
 
-Recommendation: make a bounded, framework-owned `std.Io` provider an explicit
+User decision: ship the first App/API MVP using caller-supplied standard
+`std.Io`, bounded memory Reader/Writer integration, and the existing custom
+io_uring/kqueue HTTP engine. Defer our own std.Io implementation and its research
+track until after that API work. See the implemented [App guide](APP-API.md).
+
+A bounded, framework-owned `std.Io` provider remains an explicit
 research track. It could make ordinary Zig service libraries usable with
 cooperative I/O on the framework's owners. First ship the App API using the
 existing engine and standard memory readers/writers, and run a small runtime
 prototype before making an owned provider a release dependency or a default.
 Keep the public API open to either caller-provided or framework-owned I/O.
 
-This is a sequencing recommendation, not a decision that a custom provider is
+This is an accepted sequencing decision, not a decision that a custom provider is
 unnecessary. If the prototype establishes the benefits and ownership gates,
 an opt-in managed execution mode is a useful target for this successor to Zap.
 
@@ -149,6 +154,10 @@ HTTP owner. A capability profile is useful documentation, but ordinary std.Io
 types do not statically prevent callers from reaching other vtable methods.
 
 ## Research sequence and decision gates
+
+The entire IO-01–04 sequence below is deferred until after the first API MVP,
+by the user's 2026-09-06 decision. The queued dependencies describe that later
+sequence; none is active work in this implementation session.
 
 | Item | State | Deliverable and acceptance gate |
 | --- | --- | --- |

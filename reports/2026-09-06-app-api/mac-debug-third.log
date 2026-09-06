@@ -1,0 +1,33 @@
+Build Summary: 31/31 steps succeeded; 190/194 tests passed (4 skipped)
+verify success
++- compile exe zig-http Debug native success 1s MaxRSS:297M
++- compile exe http-app Debug native success 1s MaxRSS:305M
++- zig fmt --check success
++- run python3 success 65ms
++- run test 15 pass (15 total) 29ms MaxRSS:2M
+|  +- compile test Debug native cached 76ms MaxRSS:31M
++- run test 5 pass (5 total) 3ms MaxRSS:2M
+|  +- compile test Debug native cached 58ms MaxRSS:31M
++- run test 1 pass (1 total) 3ms MaxRSS:2M
+|  +- compile test Debug native cached 100ms MaxRSS:31M
++- run test 7 pass (7 total) 30ms MaxRSS:2M
+|  +- compile test Debug native cached 83ms MaxRSS:31M
++- run test 41 pass, 2 skip (43 total) 82ms MaxRSS:3M
+|  +- compile test Debug native cached 57ms MaxRSS:31M
++- run test 3 pass (3 total) 3ms MaxRSS:2M
+|  +- compile test Debug native cached 62ms MaxRSS:31M
++- run test 5 pass (5 total) 3ms MaxRSS:2M
+|  +- compile test Debug native cached 84ms MaxRSS:31M
++- run test 27 pass (27 total) 29ms MaxRSS:2M
+|  +- compile test Debug native cached 59ms MaxRSS:31M
++- run test 8 pass (8 total) 3ms MaxRSS:2M
+|  +- compile test Debug native cached 63ms MaxRSS:31M
++- run test 11 pass (11 total) 305ms MaxRSS:2M
+|  +- compile test Debug native success 1s MaxRSS:290M
++- run test 2 pass (2 total) 3ms MaxRSS:2M
+|  +- compile test Debug native cached 58ms MaxRSS:31M
++- run test 65 pass, 2 skip (67 total) 413ms MaxRSS:4M
+|  +- compile test Debug native success 1s MaxRSS:384M
++- run test success 292ms MaxRSS:2M
+   +- compile test Debug native success 1s MaxRSS:275M
+

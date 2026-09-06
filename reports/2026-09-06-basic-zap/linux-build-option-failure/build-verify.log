@@ -1,0 +1,18 @@
+thread 1607336 panic: basic comparison requires ReleaseSafe
+/tmp/zig-http.bench.mrpm97tq/basic-zap/build.zig:7:35: 0x15144c3 in build (build.zig)
+    if (optimize != .ReleaseSafe) @panic("basic comparison requires ReleaseSafe");
+                                  ^
+/home/rs/.local/share/mise/installs/zig/0.16.0/lib/std/Build.zig:2265:44: 0x151640a in runBuild__anon_34223 (std.zig)
+        .error_union => try build_zig.build(b),
+                                           ^
+/home/rs/.local/share/mise/installs/zig/0.16.0/lib/compiler/build_runner.zig:463:29: 0x1232524 in main (build_runner.zig)
+        try builder.runBuild(root);
+                            ^
+/home/rs/.local/share/mise/installs/zig/0.16.0/lib/std/start.zig:699:88: 0x1238040 in callMain (std.zig)
+    if (fn_info.params[0].type.? == std.process.Init.Minimal) return wrapMain(root.main(.{
+                                                                                       ^
+/home/rs/.local/share/mise/installs/zig/0.16.0/lib/std/start.zig:190:5: 0x121c201 in _start (std.zig)
+    asm volatile (switch (native_arch) {
+    ^
+error: the following build command terminated with signal ABRT:
+.zig-cache/o/b242a41782610e98ce1f1d9834e419e1/build /home/rs/.local/share/mise/installs/zig/0.16.0/zig /home/rs/.local/share/mise/installs/zig/0.16.0/lib /tmp/zig-http.bench.mrpm97tq/basic-zap .zig-cache /home/rs/.cache/zig --seed 0xb58ef2cd -Zb11bf40170dc1fa1 verify -Doptimize=ReleaseSafe -Dframework-root=/tmp/zig-http.bench.mrpm97tq/framework --summary all

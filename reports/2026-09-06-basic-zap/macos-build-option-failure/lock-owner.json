@@ -1,0 +1,9 @@
+{
+  "agent": "/root/lifecycle_api_review",
+  "host": "renerocksai-M3-Max-6.local",
+  "owner_pid": 20274,
+  "purpose": "Basic ReleaseSafe Zap/App comparison",
+  "started_utc": "2026-09-06T13:01:15.109014+00:00",
+  "token": "d2f9df3b-676e-47b4-9a77-d76916b76207",
+  "working_directory": "/private/tmp/zig-http-basic-zap-20260906"
+}

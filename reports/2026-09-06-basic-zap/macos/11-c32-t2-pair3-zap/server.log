@@ -1,0 +1,11 @@
+INFO: Listening on port 59513
+READY port=59513 backend=facil.io threads=1 workers=1 optimize=ReleaseSafe
+INFO: Server is running 1 worker X 1 thread with facil.io 0.7.4 (kqueue)
+* Detected capacity: 131056 open file limit
+* Root pid: 21876
+* Press ^C to stop
+
+INFO: (21876) detected exit signal.
+INFO:    ---  Shutdown Complete  ---
+
+

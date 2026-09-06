@@ -1,7 +1,9 @@
 # Modern Zap successor: implementation roadmap
 
-Status: planned, 2026-09-06. Research/design is complete for this session;
-implementation and the gates below are not yet run. Exact target: Zig 0.16.0.
+Status: first implementation and supported example ports, 2026-09-06.
+Exact target: Zig 0.16.0. See the [implemented API](APP-API.md),
+[20 example ports](../examples/README.md), and
+[native receipt](../reports/2026-09-06-app-api.md) for exact evidence and limits.
 
 Build a framework with a new name, Zap's typed App/endpoint ergonomics, sane
 borrowed-byte request APIs, modern Zig capabilities, and zig-http underneath.
@@ -17,12 +19,19 @@ the engine's unfinished reliability, performance or platform work.
 - Starting engine commit: `4b3cd5551d80b422ec6ef763627d019e6f1dfb83`.
 - Reviewed Zap port: `../fi/deps/zap` at
   `f6099ecec496c7ec623c5913baa5b6b5da2e883d` (its own Git repository).
-- First implementation session: API-01; independently prepare API-02's response
-  reservation contract and IO-01's std.Io compatibility/resource matrix.
-- No implementation agents, benchmark runners or measurement locks are left
-  active by this planning session. No runtime performance claims are added.
+- API-01–05 are implemented as the first bounded one-shot slice. Twenty of the
+  23 original example targets are ported/adapted, with explicit differences.
+  TLS is out of scope; WebSockets needs upgrade support; Mustache is postponed
+  pending a [pure Zig library evaluation](MUSTACHE-CANDIDATES.md).
+- Next bounded work: finish API-06's public composition/locals/cookie contract,
+  using the example-local wrappers as real use cases; then API-07 and extraction.
+  IO-01–04 remains deferred until after the first API MVP by user decision.
+- Consult the receipt/session ledger for native gates and cleanup state. The
+  separate [basic Zap comparison](../reports/2026-09-06-basic-zap.md) records
+  native ReleaseSafe results at 1 and 32 connections; it does not isolate API
+  overhead or establish capacity.
 - Other agents are writing architecture documentation in separate worktrees.
-  Reconcile their landed docs/current engine contracts before implementation;
+  Reconcile their landed docs/current engine contracts before the next session;
   preserve this plan's baseline and re-evaluate changed ownership assumptions.
 
 Use `git worktree list` to locate the branch if the local directory changes.
@@ -33,15 +42,16 @@ Inspect Git state before editing; do not overwrite another session's work.
 
 | Topic | Working decision |
 | --- | --- |
-| Product | New name and public module; modern successor, no Zap source-compatibility layer. Develop in this repo first. |
-| Platform/version | Exact Zig 0.16.0; initial plain HTTP/1.1 on the existing Linux/macOS engine. Public bind addresses and TLS require later gates. |
+| Product | New name and public module; modern successor, no Zap source-compatibility layer. Prototype here, then extract into its own repository with a pinned zig-http dependency. zig-http remains a standalone engine/case study (user direction, 2026-09-06). |
+| Platform/version | Exact Zig 0.16.0; initial plain HTTP/1.1 on the existing Linux/macOS engine. Public bind addresses need later qualification. TLS is out of scope. |
+| Windows | Await the other session's engine support on main before adding framework compilation/CI checks; no Windows work in this checkpoint (user correction, 2026-09-06). |
 | App | Real instances; typed Shared; borrowed endpoint instances; startup-only registration; one routing/context model. |
 | Input | Raw immutable slices, ordered duplicates, no coercion, no bracket-array syntax, no merged query/body/JSON bag. |
 | Decoding | Explicit caller destination; percent and form-plus decoding are separately named; raw bytes remain available. |
 | Bodies/forms | Contiguous form parsers; explicit logical-body copy for segmented input. Flat multipart Part iterator. No implicit disk writes or receive streaming. |
 | Responses | Easy one-shot handlers with capacity secured before execution; explicit advanced resumable handlers. Never replay application side effects. |
 | std.Io now | Inject caller capabilities; standard bounded Reader/Writer interoperability; explicit workers for blocking services. |
-| std.Io provider | Dedicated research track IO-01–04; an optional bounded cooperative provider is a candidate, not an established runtime capability. |
+| std.Io provider | IO-01–04 deferred until after the first API MVP by user decision (2026-09-06); an optional bounded cooperative provider remains a candidate. |
 | Memory | Framework storage reserved at startup; fixed buffers/reservations and optional bounded locals/scratch, no growable request arena or hidden heap fallback. |
 | Ownership | Input/output/task borrows survive until their real terminal transitions; scratch cannot become a dynamic output borrow without a later lease protocol. |
 
@@ -57,20 +67,20 @@ Split implementation across sessions at its named gate and record exact state.
 | ID | State | Deliverable | Depends on | Acceptance gate |
 | --- | --- | --- | --- | --- |
 | API-00 | complete: inspection/design only | Public Zap analysis, framework design, this roadmap, std.Io exploration. | — | Documentation/source review; no runtime qualification. |
-| API-01 | queued | Public raw target/request/query views and explicit codecs. | API-00 | APP-TEXT-OWNERSHIP |
-| API-02 | queued | Bounded response drafts, pre-dispatch reservation, custom headers and standard writer integration. | API-00 | APP-RESPONSE, APP-STDIO-WRITER |
-| API-03 | queued | App instances, one router, endpoint methods, typed Shared and startup/stop lifecycle. | API-01, API-02 | APP-COMPOSITION |
-| API-04 | queued | Body adapters and explicit URL-encoded form API. | API-01, API-03 | APP-FORM, APP-STDIO-READER |
-| API-05 | queued | Flat multipart fields/files over retained input. | API-04 | APP-MULTIPART |
+| API-01 | implemented; scoped receipt | Public raw target/request/query views and explicit codecs. | API-00 | APP-TEXT-OWNERSHIP |
+| API-02 | implemented; scoped receipt | Bounded response drafts, pre-dispatch reservation, custom headers and standard writer integration. | API-00 | APP-RESPONSE, APP-STDIO-WRITER |
+| API-03 | implemented; scoped receipt | App instances, one router, endpoint methods, typed Shared and startup/stop lifecycle. | API-01, API-02 | APP-COMPOSITION |
+| API-04 | implemented; scoped receipt | Body adapters and explicit URL-encoded form API. | API-01, API-03 | APP-FORM, APP-STDIO-READER |
+| API-05 | implemented; scoped receipt | Flat multipart fields/files over retained input. | API-04 | APP-MULTIPART |
 | API-06 | queued | Typed locals, middleware, authentication composition, cookies and redirects. | API-02, API-03 | APP-MIDDLEWARE |
 | API-07 | queued | Typed explicit resumable endpoints and retention rules. | API-03, API-06 | APP-RESUME |
-| API-08 | queued | Complete migration examples, package naming and native successor MVP qualification. | API-01–07 | APP-NATIVE |
-| IO-01–04 | queued | Owned std.Io feasibility, isolated prototype, HTTP integration and adoption decision. | See STD-IO-DECISION; integration after API-07 | STDIO-PROTOTYPE, STDIO-HTTP-OWNERSHIP, STDIO-ADOPTION |
+| API-08 | partial: 20 examples ported | Finish public migration examples, package naming/extraction and native successor MVP qualification. | API-01–07 | APP-NATIVE |
+| IO-01–04 | deferred | Owned std.Io feasibility, isolated prototype, HTTP integration and adoption decision. | First API MVP; see STD-IO-DECISION | STDIO-PROTOTYPE, STDIO-HTTP-OWNERSHIP, STDIO-ADOPTION |
 
 API-01 and API-02 can proceed independently after agreeing on module exports.
-API-04 and API-06 can proceed independently after API-03. Start the std.Io
-compatibility/design work early; an unfinished general runtime must not prevent
-using the ordinary App API. If the owned runtime becomes a product requirement,
+API-04 and API-06 can proceed independently after API-03. The user selected the
+ordinary App API first; owned std.Io compatibility/design work resumes after
+the API MVP. If the owned runtime becomes a product requirement,
 add its adoption gate to the relevant release milestone explicitly.
 
 The first useful vertical slice is API-01–03: one runnable App with typed Shared,
@@ -261,9 +271,22 @@ new completion paths are introduced.
 
 ### API-08 — migration examples and successor MVP qualification
 
-Choose the project/module name, document installation/imports, and decide whether
-to keep both layers in this package or extract the framework with a pinned
-zig-http dependency. Keep the low-level library independently usable.
+Choose the project/module name and extract the framework into its own repository
+with a pinned zig-http dependency. The user wants zig-http to remain the first
+standalone case study; this framework takes the next step. Current development
+imports engine sources inside this worktree, and `http_app` / `bounded_http`
+temporarily share one module identity. This is not yet an external dependency.
+
+Land the independently useful engine changes (pre-dispatch output reservation,
+transactional custom headers and copy accounting) in zig-http with their core
+tests. Move App, routing, request/form/multipart conveniences, Response, examples
+and their tests to the new repository. Replace relative engine source imports
+with the exported `bounded_http` package surface, make any signal/ownership seam
+explicit, and pin the qualified engine commit in `build.zig.zon`. Do not copy
+and maintain a private fork of the engine. Verify both repositories independently
+on native Linux/macOS; exercise importing the raw engine and framework together
+without duplicate type identities. Record license/source attribution for the
+ported examples and keep the case-study history intact.
 
 Provide compiled examples for App + Shared + endpoint state, exact/captured
 routes, raw query + explicit decoding, URL-encoded forms, one/many file uploads,
@@ -290,8 +313,8 @@ without measurements or use old engine receipts as new App evidence.
 Planning-only edits need source/link review and `git diff --check`; they do not
 establish new Zig/runtime evidence. Every implementation step registers all new
 Zig modules and examples in `zig build verify`, including instantiated generic
-APIs. Add example paths to formatting/verification explicitly; the current build
-only formats its existing `src` tree and named build files.
+APIs. The current build formats `src`, `examples` and named build files, and
+compiles all 20 port executables through `verify`.
 
 Before heavy builds or runtime suites on maxross/omarx1, inspect existing
 measurement processes and acquire `/tmp/zig-http-measurement.lock` atomically
@@ -315,14 +338,21 @@ python3 tests/inline_integration.py
 python3 tests/gather_integration.py
 python3 tests/batch_integration.py
 python3 tests/arena_lifecycle_integration.py
+zig build examples -Doptimize=ReleaseSafe
+python3 tests/app_integration.py
+python3 tests/examples_integration.py
 ```
 
-Add a maintained App integration suite/example executable as API-03 lands and
-put its exact invocation here. The required coverage includes wire framing,
+The maintained App integration suite and all supported example ports now have
+the invocations above. The required coverage includes wire framing,
 fragmented progress, overload/recovery, deadlines, shutdown and changed ownership
 paths. Use finite process watchdogs. Retain existing comparator/smoke gates for
 native publication where required by the current engine runbook; do not run
 performance load merely to validate a documentation edit.
+
+Performance comparisons and their warmups must use ReleaseSafe, never Debug,
+by explicit user decision on 2026-09-06. Keep assertions enabled and verify the
+binary's build mode before timing; Debug is for correctness checks only.
 
 Record compiler version, commit/source hash, architecture, OS/kernel, backend,
 execution/shard configuration, assertions mode, command, results and skipped or
@@ -338,6 +368,8 @@ the conversation.
 | Date / session | Work completed | Validation | Next step |
 | --- | --- | --- | --- |
 | 2026-09-06: API planning | New `roadmap/app-api` worktree; inspected current engine and local Zap public API; used zig-wiki; specified modern framework, raw forms/uploads, response reservation and std.Io provider research. | Source review and document checks only; no Zig code added, builds/runtime suites/benchmarks not run. | API-01; independently design API-02 reservation and IO-01 compatibility matrix. |
+| 2026-09-06: first implementation | API-01–05: typed App/router, raw request/form/multipart views, explicit codecs, reserved one-shot Response and standard memory I/O adapters. Core changes confined to response headers/reservation/copy accounting. Added 20 supported example ports and maintained wire harnesses. Parent owned integration/build/docs; parser, lifecycle and composition work had explicit agent file ownership. | [Native receipt](../reports/2026-09-06-app-api.md): Debug and ReleaseSafe, 51/51 steps on each host; Linux 194/194 test executions, Mac 190/194 with four Linux-only skips. Each host passed 14 App, 20 example, 84 core, 8 comparator checks and 30,000 exact smoke bodies. [63-file source identity](../reports/2026-09-06-app-api-source.sha256). | API-06 public middleware/locals/cookies; then API-07 resumable endpoints and API-08 extraction/remaining qualification. Caller std.Io remains; own provider deferred. |
+| 2026-09-06: basic comparison | Isolated fixture using the public App API versus pinned Zig 0.16 Zap; ReleaseSafe only, c1/t1 and c32/t2, three alternating pairs per profile on each host. TLS excluded; Mustache postponed with a pure Zig shortlist; Windows waits for the engine session. | [Raw trials, results and cleanup](../reports/2026-09-06-basic-zap.md). All 24 measured trials completed with zero wrk socket/non-2xx-or-3xx errors. Owned server groups are gone and both host reservations released. Benchmark fixture remains separate from framework dependencies. | No benchmark is left running. Continue the API roadmap; reconcile incoming engine/docs changes before extraction. |
 
 For each implementation session add: commit(s), owned/changed files, decisions,
 named gates passed/pending and exact receipts, remaining blocker (if any), and

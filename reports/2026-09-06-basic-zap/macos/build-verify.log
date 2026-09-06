@@ -1,0 +1,10 @@
+Build Summary: 7/7 steps succeeded
+verify success
++- install basic-app success
+|  +- compile exe basic-app ReleaseSafe native success 6s MaxRSS:399M
++- install basic-zap success
+   +- compile exe basic-zap ReleaseSafe native success 5s MaxRSS:351M
+      +- WriteFile success
+      +- compile lib facil.io ReleaseSafe native success 1s MaxRSS:127M
+      +- compile lib facil.io ReleaseSafe native (reused)
+
