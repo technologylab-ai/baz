@@ -33,18 +33,19 @@
   <div class="rail-note">ZIG 0.16.0 · MIT<br>EXPERIMENTAL FRAMEWORK<br><a href="docs/read.html?file=docs/APP-API.md">API guide ↗</a><br><a href="https://github.com/technologylab-ai/baz">View on GitHub ↗</a></div>
 </aside>
 <main class="page" id="main" tabindex="-1">
-  <header class="topline" id="top"><span class="lab">TECHNOLOGY LAB <span class="desktop-label">· SYSTEMS ENGINEERING</span></span><a href="https://github.com/technologylab-ai/baz">OPEN SOURCE ↗</a></header>
+  <header class="topline" id="top"><span class="lab">TECHNOLOGY LAB <span class="desktop-label">· SYSTEMS ENGINEERING</span></span><div class="project-links"><a href="https://technologylab-ai.github.io/bounded-http/">BOUNDED/HTTP ↗</a><a href="https://github.com/technologylab-ai/baz">GITHUB ↗</a></div></header>
   <section class="hero" aria-labelledby="headline">
     <p class="eyebrow">A modern successor to Zap</p>
     <h1 id="headline">Familiar to write.<br><em>Explicit by design.</em></h1>
-    <p class="lede">Meet <strong>Baz — Bounded Async Zap.</strong> Typed Zig applications on bounded/http. Ordinary endpoints, borrowed request data, and memory boundaries you can reason about.</p>
+    <p class="lede">Meet <strong>Baz — Bounded Async Zap.</strong> A pure Zig web framework on <a href="https://technologylab-ai.github.io/bounded-http/">bounded/http</a>. Typed applications, borrowed request data, and memory boundaries you can reason about.</p>
     <div class="actions"><a class="button primary" href="#start">Build your first App <span aria-hidden="true">↗</span></a><a class="button" href="docs/read.html?file=docs/APP-API.md">Read the API guide <span aria-hidden="true">→</span></a></div>
-    <div class="tags"><span>EXACT ZIG 0.16.0</span><span>CALLER-SUPPLIED std.Io</span><span>MIT LICENSE</span></div>
+    <div class="tags"><span>PURE ZIG · EXACT 0.16.0</span><span>CALLER-SUPPLIED std.Io</span><span>MIT LICENSE</span></div>
     <div class="facts"><div class="fact"><strong>Typed.</strong><p>App state and endpoint methods.<br>Ordinary Zig composition.</p></div><div class="fact"><strong>Explicit.</strong><p>Borrowed bytes in.<br>Decoding when you ask.</p></div><div class="fact"><strong>Bounded.</strong><p>Framework capacity at startup.<br>Output reserved before dispatch.</p></div></div>
   </section>
   <section class="chapter" id="idea">
     <p class="eyebrow">01 / The idea</p><h2>The good parts of Zap.<br>A fresh foundation.</h2>
     <p class="intro"><a href="https://github.com/zigzap/zap">Zap</a> made building Zig web applications approachable. Baz carries forward its App and endpoint ergonomics, with a new API and a separate, bounded HTTP engine underneath.</p>
+    <p class="intro">The framework and its HTTP engine are written in Zig. Baz replaces Zap’s facil.io C foundation with <a href="https://technologylab-ai.github.io/bounded-http/">bounded/http</a>.</p>
     <div class="principles">
       <div><span class="number">01 — COMPOSITION</span><h3>Your types, your App.</h3><p>Use <code>App(Shared)</code>, ordinary structs, and one router. Each App owns its lifecycle; your shared state remains explicit.</p></div>
       <div><span class="number">02 — REQUEST DATA</span><h3>Keep the original bytes.</h3><p><code>001</code> is text. So is <code>false</code>. Duplicate fields keep their order, and <code>files[]</code> is simply a name.</p></div>
