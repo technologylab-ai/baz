@@ -168,6 +168,8 @@ first, preserving the request and running application side effects once.
 
 | Method | Behavior |
 | --- | --- |
+| `setCookie(name, value, options)` / `deleteCookie(name, scope)` | Validated cookie fields in reserved headers, explicit lifetimes and scope. [Guide](COOKIES.md). |
+| `redirect(status, location)` | Selects an empty 301/302/303/307/308 response with copied Location. |
 | `header(name, value)` | Validates and copies a header immediately; ordered repeats remain separate. |
 | `text(status, bytes)` / `bytes(status, content_type, bytes)` | Copies caller data immediately, including stack data. |
 | `jsonBytes(status, encoded)` | Copies pre-encoded JSON. |
@@ -205,8 +207,9 @@ for each path, asset lifetimes, and how to serve a large retained asset with a
 small output arena.
 
 Content-Length, Transfer-Encoding and other canonical framing fields belong to
-the engine. Use repeated `header("Set-Cookie", ...)` or a validated Location
-header for now; cookie parsing/builders and a redirect helper belong to API-06.
+the engine. Public `setCookie`, `deleteCookie` and `redirect` helpers use the same
+reserved header space. Request `cookies()` preserves borrowed pairs and
+`cookie(name)` rejects duplicates; see [cookies and redirects](COOKIES.md).
 Use [streaming responses](STREAMING.md) to write, flush, sleep, and write again
 inside the same fixed worker callback. The returned handle exposes `writer()`,
 `flush()`, and `finish()`. Headers become immutable after the first flush.

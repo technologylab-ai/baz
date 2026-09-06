@@ -45,3 +45,24 @@ test "consumer parses Mustache partials and publishes an escaped HTML response" 
     try std.testing.expectEqualStrings("<h1>&lt;Hello&gt;</h1><p>Rene / Baz</p><p>Caro / Baz</p>", writer.committed());
     try std.testing.expect(std.mem.indexOf(u8, arena[0..writer.body_start], "Content-Type: text/html; charset=utf-8\r\n") != null);
 }
+
+test "consumer can borrow cookie tokens and publish cookies with an empty redirect" {
+    var parser = engine.api.http.Parser.init(.{});
+    const raw = (try parser.parse("GET / HTTP/1.1\r\nHost: localhost\r\nCookie: sid=opaque.jwt.bytes\r\n\r\n")).?;
+    const request = web.Request.init(&raw);
+    try std.testing.expectEqualStrings("opaque.jwt.bytes", (try request.cookie("sid")).?);
+    const options: web.cookies.Options = .{ .max_age = 3600, .same_site = .strict };
+    var arena: [1024]u8 = undefined;
+    var cache: engine.api.HeaderCache = .{};
+    cache.refresh("Sun, 06 Sep 2026 12:00:00 GMT");
+    var writer = engine.api.Writer.init(&arena, &cache, 0);
+    writer.open(0, true, false);
+    var response = try web.Response.init(&writer, .{ .header_bytes = 256, .body_bytes = 0 });
+    try response.setCookie("sid", "replacement", options);
+    try response.deleteCookie("old", .{});
+    try response.redirect(303, "/account");
+    _ = try response.finish();
+    try std.testing.expectEqual(@as(u16, 303), writer.status);
+    try std.testing.expectEqualStrings("", writer.committed());
+    try std.testing.expect(std.mem.indexOf(u8, arena[0..writer.body_start], "Max-Age=3600") != null);
+}

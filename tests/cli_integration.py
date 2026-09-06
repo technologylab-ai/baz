@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Native CLI correctness checks for the 22 examples and three Baz fixtures.
+"""Native CLI correctness checks for the 22 examples and four Baz fixtures.
 
 Build and install ReleaseSafe binaries first. The caller holds the shared host
 reservation and supplies an overall process-tree watchdog. Help/error processes
@@ -29,7 +29,7 @@ EXAMPLES = (
     "endpoint", "endpoint_auth", "middleware", "middleware_with_endpoint",
     "userpass_session", "cookies", "http_params", "bindataformpost", "streaming", "mustache",
 )
-FIXTURES = ("baz", "baz-streaming", "baz-borrow")
+FIXTURES = ("baz", "baz-streaming", "baz-borrow", "baz-cookies")
 WORKER_EXAMPLES = frozenset(("endpoint", "streaming"))
 EXIT_TIMEOUT = 5
 MAX_TRANSCRIPT = 65536
@@ -156,7 +156,7 @@ def run(directory):
             exit_case(name, label, arguments, diagnostic=detail)
         print("PASS " + name + ": help and argument rejection before READY", flush=True)
 
-    # These four binaries cover the shared example options and all three
+    # These representative binaries cover the shared example options and all
     # fixture-specific option structs, including optional integer parsing.
     for name in ("hello",) + FIXTURES:
         for label, arguments, detail in (
@@ -204,7 +204,7 @@ def run(directory):
 
     base = ["--port=0", "--connections=4", "--shards=1", "--duration-ms=15000"]
     for name in FIXTURES:
-        workers = 0 if name == "baz" else 2
+        workers = 0 if name in ("baz", "baz-cookies") else 2
         startup(name, "fixture execution default", base, workers,
                 "workers" if workers else "inline_event_loop")
 

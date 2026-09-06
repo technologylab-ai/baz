@@ -34,7 +34,7 @@ for earlier borrows before App destruction. A failed drain terminates through
 ## Request access
 
 Context and request access last only for the active callback.
-Targets, captures, headers, query fields, and contiguous form fields borrow input bytes.
+Targets, captures, headers, cookies, query fields, and contiguous form fields borrow input bytes.
 Multipart parts borrow the original body or an explicit caller copy.
 Decoding writes into caller-provided storage.
 

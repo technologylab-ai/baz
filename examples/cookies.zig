@@ -2,19 +2,23 @@
 const std = @import("std");
 const web = @import("baz");
 const support = @import("example_support");
-const auth = @import("endpoint/auth_helpers.zig");
 
 const Shared = struct {};
 const Application = web.App(Shared);
 
 fn handle(ctx: *Application.Context) !void {
-    const parsed = auth.cookies(ctx.request) catch |err| switch (err) {
-        error.TooManyCookies => return ctx.response.text(431, "Too many cookies"),
+    const parsed = ctx.request.cookiesWithLimits(.{ .max_pairs = 16 }) catch |err| switch (err) {
         error.MalformedCookie => return ctx.response.text(400, "Malformed Cookie header"),
+        else => return ctx.response.text(431, "Cookie limits exceeded"),
     };
-    const selected = parsed.unique("ZIG_ZAP") catch return ctx.response.text(400, "Duplicate ZIG_ZAP cookie");
-    try ctx.response.header("Set-Cookie", "rene=rocksai; Path=/xxx; Max-Age=60; HttpOnly; SameSite=Lax");
-    return ctx.response.jsonValue(200, .{ .message = "Hello", .count = parsed.len, .cookies = parsed.items[0..parsed.len], .zig_zap = selected });
+    const selected = parsed.uniqueRaw("ZIG_ZAP") catch return ctx.response.text(400, "Duplicate ZIG_ZAP cookie");
+    // Only JSON descriptors use this stack array. Names and values still borrow the request.
+    var items: [16]web.cookies.Cookie = undefined;
+    var pairs = parsed.iterator();
+    var count: usize = 0;
+    while (pairs.next()) |cookie| : (count += 1) items[count] = cookie;
+    try ctx.response.setCookie("rene", "rocksai", .{ .path = "/xxx", .max_age = 60 });
+    return ctx.response.jsonValue(200, .{ .message = "Hello", .count = count, .cookies = items[0..count], .zig_zap = selected });
 }
 
 pub fn main(init: std.process.Init) !void {

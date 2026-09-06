@@ -6,6 +6,7 @@ pub const http = @import("bounded_http").api.http;
 pub const params = @import("params.zig");
 pub const form = @import("form.zig");
 pub const multipart = @import("multipart.zig");
+const cookie_codec = @import("cookies.zig");
 
 pub const ContentError = form.MetadataError || error{
     MissingContentType,
@@ -85,6 +86,20 @@ pub const Request = struct {
 
     pub fn headers(self: Request) HeaderIterator {
         return .{ .raw = self.raw.headers };
+    }
+
+    /// Borrow validated pairs across every Cookie field, without decoding.
+    pub fn cookies(self: Request) cookie_codec.Error!cookie_codec.Cookies {
+        return self.cookiesWithLimits(.{});
+    }
+
+    pub fn cookiesWithLimits(self: Request, limits: cookie_codec.Limits) cookie_codec.Error!cookie_codec.Cookies {
+        return cookie_codec.parseHeaders(self.raw.headers, limits);
+    }
+
+    /// Exact name match. Reject ambiguity instead of choosing a session token.
+    pub fn cookie(self: Request, name: []const u8) (cookie_codec.Error || error{DuplicateCookie})!?[]const u8 {
+        return (try self.cookies()).uniqueRaw(name);
     }
 
     pub fn body(self: Request) Body {
@@ -318,4 +333,23 @@ test "multipart request helper validates and owns small boundary metadata" {
     var boundary: [3]u8 = undefined;
     try std.testing.expectEqualStrings("A:B", try request.multipartBoundaryInto(&boundary));
     try std.testing.expectError(error.NoSpaceLeft, request.multipartBoundaryInto(boundary[0..2]));
+}
+
+test "request cookie helpers validate every field and borrow exact raw token bytes" {
+    const wire = "GET / HTTP/1.1\r\nHost: x\r\nCookie: sid=001%20+==; q=\"raw\"\r\ncookie: sid=two; flag=false\r\n\r\n";
+    var parser = http.Parser.init(.{});
+    const raw = (try parser.parse(wire)).?;
+    const request = Request.init(&raw);
+    const view = try request.cookies();
+    try std.testing.expectEqual(@as(usize, 4), view.count);
+    try std.testing.expectError(error.DuplicateCookie, request.cookie("sid"));
+    try std.testing.expectEqualStrings("false", (try request.cookie("flag")).?);
+    try std.testing.expectEqual(null, try request.cookie("missing"));
+    const offset = std.mem.indexOf(u8, wire, "001%20+==").?;
+    try std.testing.expectEqual(wire[offset..].ptr, view.firstRaw("sid").?.value_raw.ptr);
+    try std.testing.expectEqualStrings("raw", view.firstRaw("q").?.value_raw);
+    try std.testing.expectError(error.TooManyCookies, request.cookiesWithLimits(.{ .max_pairs = 3 }));
+    var invalid_parser = http.Parser.init(.{});
+    const invalid = (try invalid_parser.parse("GET / HTTP/1.1\r\nHost: x\r\nCookie: sid=ok\r\nCookie: broken\r\n\r\n")).?;
+    try std.testing.expectError(error.MalformedCookie, Request.init(&invalid).cookie("sid"));
 }

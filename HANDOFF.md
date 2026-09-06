@@ -6,6 +6,14 @@ GitHub Pages: <https://technologylab-ai.github.io/baz/>.
 Baz and its [bounded/http](https://technologylab-ai.github.io/bounded-http/) engine are implemented in Zig. Baz is MIT licensed.
 The website, reader, diagrams, and publishing workflow belong to this repository.
 
+## Cookie and redirect conveniences
+
+The public API now includes borrowed request cookie views, duplicate-rejecting
+`cookie(name)`, `setCookie`, `deleteCookie` and `redirect`. See [COOKIES.md](docs/COOKIES.md).
+Session/persistent lifetimes are explicit; JWT interpretation remains application
+work. Cookie and login examples use these APIs and separate styled page assets.
+CI includes the cookie wire/session suite. Public middleware/locals remain next.
+
 ## Integrated Mustache templates
 
 [Baz PR #3](https://github.com/technologylab-ai/baz/pull/3) merged as `9b15b141`.
@@ -87,8 +95,8 @@ App basics and Streaming response as adjacent tabs; `#streaming` opens the latte
 
 Read the [API guide](docs/APP-API.md), [ownership contract](docs/OWNERSHIP.md), and
 [multi-session roadmap](docs/APP-API-ROADMAP.md). API-01–05 and 21 example ports
-are implemented. API-06 adds public middleware, typed locals, and cookie
-composition; API-07 adds typed resumable endpoints and their ownership gates.
+are implemented. API-06 has public cookie/redirect helpers; public middleware
+and typed locals remain; API-07 adds typed resumable endpoints and their ownership gates.
 
 The [response copy review](docs/OWNERSHIP.md#response-copies-and-borrowing)
 records current copying paths. The large-borrow change separates the total
