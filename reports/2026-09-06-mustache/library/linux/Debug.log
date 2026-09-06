@@ -1,0 +1,13 @@
+Build Summary: 9/9 steps succeeded; 356/385 tests passed (29 skipped)
+verify success
++- zig fmt --check success
++- run test spec 6 pass (6 total) 25ms MaxRSS:6M
+|  +- compile test spec Debug native-native success 701ms MaxRSS:152M
+|     +- options success
++- run test zap 4 pass (4 total) 6ms MaxRSS:5M
+|  +- compile test zap Debug native-native success 691ms MaxRSS:153M
+|     +- options (reused)
++- run test tests 346 pass, 29 skip (375 total) 6s MaxRSS:28M
+   +- compile test tests Debug native-native success 5s MaxRSS:488M
+      +- options (reused)
+

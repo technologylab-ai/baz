@@ -1,0 +1,89 @@
+Build Summary: 4/4 steps succeeded; 2/2 tests passed
+test success
++- run test 2 pass (2 total) 5ms MaxRSS:2M
+   +- compile test ReleaseSafe native success 12s MaxRSS:402M
+      +- options cached
+
+Build Summary: 48/48 steps succeeded; 90/90 tests passed
+verify success
++- compile exe baz-streaming ReleaseSafe native success 8s MaxRSS:406M
+|  +- options cached
++- compile exe baz ReleaseSafe native success 9s MaxRSS:409M
+|  +- options (reused)
++- compile exe baz-borrow ReleaseSafe native success 11s MaxRSS:425M
+|  +- options (reused)
++- compile exe hello ReleaseSafe native success 8s MaxRSS:396M
+|  +- options (reused)
++- compile exe hello2 ReleaseSafe native success 10s MaxRSS:400M
+|  +- options (reused)
++- compile exe hello_json ReleaseSafe native success 7s MaxRSS:397M
+|  +- options (reused)
++- compile exe simple_router ReleaseSafe native success 12s MaxRSS:397M
+|  +- options (reused)
++- compile exe routes ReleaseSafe native success 12s MaxRSS:399M
+|  +- options (reused)
++- compile exe serve ReleaseSafe native success 11s MaxRSS:397M
+|  +- options (reused)
++- compile exe sendfile ReleaseSafe native success 9s MaxRSS:397M
+|  +- options (reused)
++- compile exe senderror ReleaseSafe native success 8s MaxRSS:399M
+|  +- options (reused)
++- compile exe accept ReleaseSafe native success 8s MaxRSS:400M
+|  +- options (reused)
++- compile exe app_basic ReleaseSafe native success 8s MaxRSS:398M
+|  +- options (reused)
++- compile exe app_auth ReleaseSafe native success 7s MaxRSS:397M
+|  +- options (reused)
++- compile exe app_errors ReleaseSafe native success 8s MaxRSS:399M
+|  +- options (reused)
++- compile exe endpoint ReleaseSafe native success 9s MaxRSS:416M
+|  +- options (reused)
++- compile exe endpoint_auth ReleaseSafe native success 7s MaxRSS:397M
+|  +- options (reused)
++- compile exe middleware ReleaseSafe native success 8s MaxRSS:398M
+|  +- options (reused)
++- compile exe middleware_with_endpoint ReleaseSafe native success 8s MaxRSS:398M
+|  +- options (reused)
++- compile exe userpass_session ReleaseSafe native success 10s MaxRSS:402M
+|  +- options (reused)
++- compile exe cookies ReleaseSafe native success 8s MaxRSS:397M
+|  +- options (reused)
++- compile exe http_params ReleaseSafe native success 11s MaxRSS:403M
+|  +- options (reused)
++- compile exe bindataformpost ReleaseSafe native success 9s MaxRSS:403M
+|  +- options (reused)
++- compile exe streaming ReleaseSafe native success 8s MaxRSS:398M
+|  +- options (reused)
++- compile exe mustache ReleaseSafe native success 9s MaxRSS:436M
+|  +- options (reused)
++- zig fmt --check success
++- run python3 success 206ms
++- run /Users/runner/work/_temp/baz-zig/zig-aarch64-macos-0.16.0/zig success 12s
++- run test 3 pass (3 total) 10ms MaxRSS:1M
+|  +- compile test ReleaseSafe native success 7s MaxRSS:346M
+|     +- options (reused)
++- run test 5 pass (5 total) 4ms MaxRSS:1M
+|  +- compile test ReleaseSafe native success 7s MaxRSS:346M
+|     +- options (reused)
++- run test 12 pass (12 total) 3ms MaxRSS:1M
+|  +- compile test ReleaseSafe native success 6s MaxRSS:373M
+|     +- options (reused)
++- run test 8 pass (8 total) 3ms MaxRSS:1M
+|  +- compile test ReleaseSafe native success 9s MaxRSS:354M
+|     +- options (reused)
++- run test 18 pass (18 total) 4ms MaxRSS:2M
+|  +- compile test ReleaseSafe native success 8s MaxRSS:492M
+|     +- options (reused)
++- run test 2 pass (2 total) 6ms MaxRSS:1M
+|  +- compile test ReleaseSafe native success 8s MaxRSS:342M
+|     +- options (reused)
++- run test 6 pass (6 total) 4ms MaxRSS:2M
+|  +- compile test ReleaseSafe native success 7s MaxRSS:381M
+|     +- options (reused)
++- run test 36 pass (36 total) 22ms MaxRSS:2M
+|  +- compile test ReleaseSafe native success 11s MaxRSS:550M
+|     +- options (reused)
++- run test success 4ms MaxRSS:1M
+   +- compile test ReleaseSafe native success 6s MaxRSS:338M
+      +- options (reused)
+

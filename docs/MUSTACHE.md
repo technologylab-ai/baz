@@ -5,7 +5,12 @@ ported to exact Zig 0.16.0 and extended with explicit rendering limits.
 Parse templates once at startup. Pass ordinary typed Zig data to a handler;
 render directly into its reserved response storage.
 
-Run the [complete example](../examples/mustache.zig):
+## Rendered example
+
+![The Mustache example: a greeting form and two user cards](assets/mustache-preview.png)
+
+This is a preview of the rendered page. Run the [complete example](../examples/mustache.zig)
+locally to use the greeting form:
 
 ```sh
 zig build run-mustache -Doptimize=ReleaseSafe -- --port 8080
@@ -84,7 +89,9 @@ Data is borrowed only until rendering returns.
 
 The parser also checks a hard recursion limit before descending. Startup
 allocation exhaustion and invalid/excessive templates return ordinary errors.
-Rendering has no allocator or filesystem access. Empty-output loops and partial
+Cached template evaluation performs no allocations or implicit file lookups;
+I/O and storage inside a caller-selected writer remain that writer's responsibility.
+Empty-output loops and partial
 cycles still spend work, so output capacity alone is not the only bound.
 Lambdas, inheritance/blocks, and dynamic partial names are outside this bounded
 API. The work limit is an implementation budget, not a wall-clock deadline or
@@ -121,4 +128,6 @@ ReleaseSafe. After `zig build install examples -Doptimize=ReleaseSafe`, run
 workers, HTML/HEAD, explicit decoding and escaping, partials, malformed raw targets
 with connection close, application input errors with keep-alive recovery,
 overflow rollback, connection recovery, and concurrent immutable-template use.
-CI runs those checks natively on Linux, macOS, and Windows x64.
+Those checks passed natively on Linux, macOS, and Windows x64. The
+[verification report](../reports/2026-09-06-mustache.md) records exact source pins,
+platforms, test counts, browser checks, and ownership limits.

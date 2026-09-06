@@ -236,6 +236,16 @@ try {
     assert(fragment>=0 && fragment<200);
     await screenshot('baz-reader'); await noOverflow(); return {fragmentTop:fragment};
   });
+  await check('mustache-preview-and-source', async () => {
+    await navigate('docs/read.html?file=docs/MUSTACHE.md#rendered-example','reader');
+    await until(() => evaluate('Array.from(document.querySelectorAll("#document img")).some(img => img.complete && img.naturalWidth > 0 && img.src.endsWith("/docs/assets/mustache-preview.png"))'), 'Mustache preview did not load');
+    assert(await evaluate('Array.from(document.querySelectorAll("#document a")).some(a => new URL(a.href).searchParams.get("file") === "examples/mustache.zig")'));
+    await noOverflow(); await screenshot('baz-mustache-guide');
+    await send('Emulation.setDeviceMetricsOverride',{width:320,height:844,deviceScaleFactor:1,mobile:false});
+    await noOverflow(); await screenshot('baz-mustache-guide-mobile');
+    await send('Emulation.setDeviceMetricsOverride',{width:1440,height:1040,deviceScaleFactor:1,mobile:false});
+    return {previewLoaded:true, sourceLinked:true, narrowWidth:320};
+  });
   await check('reader-source-and-links', async () => {
     await navigate('docs/read.html?file=examples/app_basic.zig','reader');
     assert.equal(await evaluate('document.querySelector("h1").textContent'),'app_basic.zig');

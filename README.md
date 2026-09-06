@@ -35,6 +35,7 @@ The first implementation provides:
 - **Mustache templates:** parse once at startup, render typed data directly into
   reserved HTML response storage. See the [guide](docs/MUSTACHE.md) and
   [greeting form and user-card example](examples/mustache.zig).
+  [Verified natively on Linux, macOS, and Windows](reports/2026-09-06-mustache.md).
 - Real `App(Shared)` instances, plain endpoint structs and one router.
 - Borrowed query and form text, ordered duplicates and explicit decoding into
   caller buffers. Values such as `001` and `false`, and names such as `a[]`,

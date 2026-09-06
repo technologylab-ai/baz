@@ -1,0 +1,141 @@
+Build Summary: 4/4 steps succeeded; 2/2 tests passed
+test success
++- run test 2 pass (2 total) 395ms MaxRSS:2M
+   +- compile test ReleaseSafe native success 5s MaxRSS:410M
+      +- options cached
+
+Build Summary: 75/75 steps succeeded; 90/90 tests passed
+verify success
++- compile exe baz-streaming ReleaseSafe native success 6s MaxRSS:415M
+|  +- options cached
++- compile exe baz ReleaseSafe native success 6s MaxRSS:420M
+|  +- options (reused)
++- compile exe baz-borrow ReleaseSafe native success 6s MaxRSS:438M
+|  +- options (reused)
++- compile exe hello ReleaseSafe native success 6s MaxRSS:404M
+|  +- options (reused)
++- compile exe hello2 ReleaseSafe native success 6s MaxRSS:414M
+|  +- options (reused)
++- compile exe hello_json ReleaseSafe native success 6s MaxRSS:408M
+|  +- options (reused)
++- compile exe simple_router ReleaseSafe native success 6s MaxRSS:408M
+|  +- options (reused)
++- compile exe routes ReleaseSafe native success 5s MaxRSS:406M
+|  +- options (reused)
++- compile exe serve ReleaseSafe native success 6s MaxRSS:407M
+|  +- options (reused)
++- compile exe sendfile ReleaseSafe native success 6s MaxRSS:409M
+|  +- options (reused)
++- compile exe senderror ReleaseSafe native success 6s MaxRSS:407M
+|  +- options (reused)
++- compile exe accept ReleaseSafe native success 6s MaxRSS:409M
+|  +- options (reused)
++- compile exe app_basic ReleaseSafe native success 6s MaxRSS:409M
+|  +- options (reused)
++- compile exe app_auth ReleaseSafe native success 6s MaxRSS:406M
+|  +- options (reused)
++- compile exe app_errors ReleaseSafe native success 6s MaxRSS:406M
+|  +- options (reused)
++- compile exe endpoint ReleaseSafe native success 6s MaxRSS:427M
+|  +- options (reused)
++- compile exe endpoint_auth ReleaseSafe native success 6s MaxRSS:408M
+|  +- options (reused)
++- compile exe middleware ReleaseSafe native success 6s MaxRSS:412M
+|  +- options (reused)
++- compile exe middleware_with_endpoint ReleaseSafe native success 6s MaxRSS:410M
+|  +- options (reused)
++- compile exe userpass_session ReleaseSafe native success 6s MaxRSS:411M
+|  +- options (reused)
++- compile exe cookies ReleaseSafe native success 6s MaxRSS:408M
+|  +- options (reused)
++- compile exe http_params ReleaseSafe native success 6s MaxRSS:416M
+|  +- options (reused)
++- compile exe bindataformpost ReleaseSafe native success 5s MaxRSS:415M
+|  +- options (reused)
++- compile exe streaming ReleaseSafe native success 5s MaxRSS:405M
+|  +- options (reused)
++- compile exe mustache ReleaseSafe native success 6s MaxRSS:451M
+|  +- options (reused)
++- zig fmt --check success
++- run python3 success 66ms
++- run /Users/rs/renerocksai.stow/nvim/.local/share/zigup/0.16.0/files/zig success 6s
++- run test 3 pass (3 total) 288ms MaxRSS:1M
+|  +- compile test ReleaseSafe native success 4s MaxRSS:356M
+|     +- options (reused)
++- run test 5 pass (5 total) 296ms MaxRSS:1M
+|  +- compile test ReleaseSafe native success 4s MaxRSS:356M
+|     +- options (reused)
++- run test 12 pass (12 total) 293ms MaxRSS:1M
+|  +- compile test ReleaseSafe native success 5s MaxRSS:381M
+|     +- options (reused)
++- run test 8 pass (8 total) 291ms MaxRSS:2M
+|  +- compile test ReleaseSafe native success 4s MaxRSS:357M
+|     +- options (reused)
++- run test 18 pass (18 total) 432ms MaxRSS:2M
+|  +- compile test ReleaseSafe native success 6s MaxRSS:502M
+|     +- options (reused)
++- run test 2 pass (2 total) 332ms MaxRSS:1M
+|  +- compile test ReleaseSafe native success 4s MaxRSS:352M
+|     +- options (reused)
++- run test 6 pass (6 total) 291ms MaxRSS:2M
+|  +- compile test ReleaseSafe native success 5s MaxRSS:382M
+|     +- options (reused)
++- run test 36 pass (36 total) 446ms MaxRSS:2M
+|  +- compile test ReleaseSafe native success 8s MaxRSS:561M
+|     +- options (reused)
++- run test success 302ms MaxRSS:1M
+   +- compile test ReleaseSafe native success 4s MaxRSS:345M
+      +- options (reused)
+install success
++- install baz success
+|  +- compile exe baz ReleaseSafe native (+1 more reused dependencies)
++- install baz-streaming success
+|  +- compile exe baz-streaming ReleaseSafe native (+1 more reused dependencies)
++- install baz-borrow success
+   +- compile exe baz-borrow ReleaseSafe native (+1 more reused dependencies)
+examples success
++- install hello success
+|  +- compile exe hello ReleaseSafe native (+1 more reused dependencies)
++- install hello2 success
+|  +- compile exe hello2 ReleaseSafe native (+1 more reused dependencies)
++- install hello_json success
+|  +- compile exe hello_json ReleaseSafe native (+1 more reused dependencies)
++- install simple_router success
+|  +- compile exe simple_router ReleaseSafe native (+1 more reused dependencies)
++- install routes success
+|  +- compile exe routes ReleaseSafe native (+1 more reused dependencies)
++- install serve success
+|  +- compile exe serve ReleaseSafe native (+1 more reused dependencies)
++- install sendfile success
+|  +- compile exe sendfile ReleaseSafe native (+1 more reused dependencies)
++- install senderror success
+|  +- compile exe senderror ReleaseSafe native (+1 more reused dependencies)
++- install accept success
+|  +- compile exe accept ReleaseSafe native (+1 more reused dependencies)
++- install app_basic success
+|  +- compile exe app_basic ReleaseSafe native (+1 more reused dependencies)
++- install app_auth success
+|  +- compile exe app_auth ReleaseSafe native (+1 more reused dependencies)
++- install app_errors success
+|  +- compile exe app_errors ReleaseSafe native (+1 more reused dependencies)
++- install endpoint success
+|  +- compile exe endpoint ReleaseSafe native (+1 more reused dependencies)
++- install endpoint_auth success
+|  +- compile exe endpoint_auth ReleaseSafe native (+1 more reused dependencies)
++- install middleware success
+|  +- compile exe middleware ReleaseSafe native (+1 more reused dependencies)
++- install middleware_with_endpoint success
+|  +- compile exe middleware_with_endpoint ReleaseSafe native (+1 more reused dependencies)
++- install userpass_session success
+|  +- compile exe userpass_session ReleaseSafe native (+1 more reused dependencies)
++- install cookies success
+|  +- compile exe cookies ReleaseSafe native (+1 more reused dependencies)
++- install http_params success
+|  +- compile exe http_params ReleaseSafe native (+1 more reused dependencies)
++- install bindataformpost success
+|  +- compile exe bindataformpost ReleaseSafe native (+1 more reused dependencies)
++- install streaming success
+|  +- compile exe streaming ReleaseSafe native (+1 more reused dependencies)
++- install mustache success
+   +- compile exe mustache ReleaseSafe native (+1 more reused dependencies)
+

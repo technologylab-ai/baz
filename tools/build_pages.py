@@ -48,6 +48,7 @@ def documents():
              'reports/2026-09-06-basic-zap.md', 'reports/2026-09-06-app-api.md',
              'reports/2026-09-06-baz-extraction.md', 'reports/2026-09-06-windows-baz.md',
              'reports/2026-09-06-streaming.md', 'reports/2026-09-06-large-borrow.md',
+             'reports/2026-09-06-mustache.md',
              'reports/2026-09-06-basic-zap/PROTOCOL.md',
              'reports/2026-09-06-basic-zap/reproducer/README.md'}
     for pattern in ('docs/*.md', 'src/*.zig', 'examples/*.zig'):
@@ -99,6 +100,7 @@ def build():
         raise ValueError('Expected a full Git revision.')
     docs = documents()
     assets = ['docs/' + name for name in ('read.html', 'site.css', 'site.js', 'reader.css', 'reader.js', 'highlight-zig.js', 'favicon.svg')]
+    assets.append('docs/assets/mustache-preview.png')
     assets += [str(path.relative_to(ROOT)) for path in sorted((ROOT / 'docs/diagrams').glob('*.svg'))]
     vendor = json.loads((ROOT / 'docs/vendor/manifest.json').read_text())
     assets.append('docs/vendor/manifest.json')

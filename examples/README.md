@@ -131,6 +131,9 @@ Two original targets are deliberately absent:
 | `https` | TLS is out of scope by user decision. |
 | `websockets` | Requires HTTP upgrade and WebSocket connection/message ownership, absent from the current engine; queued separately. |
 
+Mustache also passed its [native three-platform gate](../reports/2026-09-06-mustache.md),
+with a dedicated 12-group HTTP suite and the external package consumer.
+
 The [Mustache selection record](../docs/MUSTACHE-CANDIDATES.md) records provenance,
 pure Zig alternatives, and the independent original-Zap and official-core tests.
 

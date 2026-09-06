@@ -6,13 +6,19 @@ GitHub Pages: <https://technologylab-ai.github.io/baz/>.
 Baz and its [bounded/http](https://technologylab-ai.github.io/bounded-http/) engine are implemented in Zig. Baz is MIT licensed.
 The website, reader, diagrams, and publishing workflow belong to this repository.
 
-## Mustache integration candidate
+## Integrated Mustache templates
 
-`feat/mustache` adds startup-owned `web.mustache.Template`, bounded cached rendering,
+[Baz PR #3](https://github.com/technologylab-ai/baz/pull/3) merged as `9b15b141`.
+It adds startup-owned `web.mustache.Template`, bounded cached rendering,
 `Response.mustache`, and a concise greeting-page example with separate HTML partials.
 The dependency is a pure Zig MIT fork of diogok/mustache-zig at exact Zig 0.16.0.
-Read [MUSTACHE.md](docs/MUSTACHE.md) and its selection record. Native verification
-is pending; do not treat the earlier framework receipts as Mustache evidence.
+Read [MUSTACHE.md](docs/MUSTACHE.md) and the [native receipt](reports/2026-09-06-mustache.md).
+All three platforms passed Debug/ReleaseSafe (90 root tests and two consumers
+per mode), 12 Mustache groups, 280 CLI checks across 25 executables, and the
+existing App/port/streaming/borrow gates; Windows also passed three shard cases.
+The dependency PR merged first; its tested head `22487e4082537aa5b707dd902def866d990fdea1`
+remains pinned by immutable URL/hash. This is our Baz-specific fork; no upstream
+PR is planned for these changes. The site includes source and a rendered preview.
 
 ## Integrated CLI options
 
@@ -31,7 +37,7 @@ ReleaseSafe startup/shutdown cases. Native CI includes that suite alongside all
 existing wire gates. The merged CLI candidate passed all native CI gates with 271 CLI checks on the
 previous 24 executables. The Mustache addition extends those inputs and gates.
 
-## Verified framework baseline
+## Earlier framework baseline
 
 **Native Windows x64, Linux, and macOS are supported, including streaming.**
 Runtime/test source `86249ad4ea6a85407dd9463b43311c0c2be1e293` passed all three
@@ -99,7 +105,7 @@ remains the default for text/bytes/stream helpers; borrowing is always explicit.
 Ordinary stream writes still copy. Do not claim minimum copies.
 
 Caller std.Io remains the MVP capability; an owned provider is deferred.
-TLS is out of scope. Mustache is the current integration priority. WebSockets needs
+TLS is out of scope. The first Mustache integration is complete. WebSockets needs
 an engine upgrade lifecycle. The [Zap comparison](reports/2026-09-06-basic-zap.md)
 measures prototype `c152e59`, before package extraction. Its raw inputs and
 statistics are unchanged. Never benchmark or warm up a Debug build.

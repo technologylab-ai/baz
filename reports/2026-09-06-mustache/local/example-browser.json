@@ -1,0 +1,104 @@
+{
+  "base": "http://127.0.0.1:59955/",
+  "browser": {
+    "protocolVersion": "1.3",
+    "product": "Chrome/152.0.7977.76",
+    "revision": "@0d89dfa2dd7c1ec4b8a14b9f303f887bb63b6174",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36",
+    "jsVersion": "15.2.124.19"
+  },
+  "cases": [
+    {
+      "name": "desktop-page-and-footer",
+      "ok": true,
+      "evidence": {
+        "title": "A little company. — Baz",
+        "greeting": "Hello, friend!",
+        "cards": [
+          {
+            "id": "1",
+            "name": "Rene",
+            "community": "The Baz community"
+          },
+          {
+            "id": "6",
+            "name": "Caro",
+            "community": "The Baz community"
+          }
+        ],
+        "engine": [
+          "https://technologylab-ai.github.io/bounded-http/"
+        ],
+        "layout": {
+          "viewport": 1440,
+          "content": 1440
+        }
+      }
+    },
+    {
+      "name": "mobile-390",
+      "ok": true,
+      "evidence": {
+        "layout": {
+          "viewport": 390,
+          "content": 390
+        },
+        "cards": [
+          {
+            "x": 24,
+            "width": 342
+          },
+          {
+            "x": 24,
+            "width": 342
+          }
+        ]
+      }
+    },
+    {
+      "name": "mobile-320",
+      "ok": true,
+      "evidence": {
+        "layout": {
+          "viewport": 320,
+          "content": 320
+        },
+        "cards": [
+          {
+            "x": 24,
+            "width": 272
+          },
+          {
+            "x": 24,
+            "width": 272
+          }
+        ]
+      }
+    },
+    {
+      "name": "native-form-submission-and-escaping",
+      "ok": true,
+      "evidence": {
+        "greeting": "Hello, <img src=x onerror=\"window.mustacheInjected=true\"> & René + Caro!",
+        "value": "<img src=x onerror=\"window.mustacheInjected=true\"> & René + Caro",
+        "unsafe": 0,
+        "injected": false,
+        "cards": 2,
+        "layout": {
+          "viewport": 390,
+          "content": 390
+        }
+      }
+    },
+    {
+      "name": "no-page-exceptions-or-external-resources",
+      "ok": true,
+      "evidence": {
+        "exceptions": 0,
+        "external": 0,
+        "requests": 6
+      }
+    }
+  ],
+  "exceptions": []
+}

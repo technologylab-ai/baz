@@ -27,8 +27,9 @@ tracks transport reliability, performance, and platform work. Its
   TLS is out of scope; WebSockets needs upgrade support.
 - Worker streaming is implemented and passed native gates on all three platforms;
   see [STREAMING.md](STREAMING.md). Typed inline continuations remain API-07.
-- Current priority: qualify API-09 Mustache on all three native platforms;
-  the user prioritized real application templating ahead of composition work.
+- API-09 Mustache passed all three native gates; see the
+  [verification report](../reports/2026-09-06-mustache.md). The user prioritized
+  real application templating ahead of composition work.
 - Next bounded work: finish API-06's public composition/locals/cookie contract,
   using the example-local wrappers as real use cases; then API-07.
   Baz now consumes an external engine package; repository and Pages publication are complete.
@@ -81,7 +82,7 @@ Split implementation across sessions at its named gate and record exact state.
 | API-06 | queued | Typed locals, middleware, authentication composition, cookies and redirects. | API-02, API-03 | APP-MIDDLEWARE |
 | API-07 | worker streaming implemented; typed inline continuations queued | Typed explicit resumable endpoints and retention rules. | API-03, API-06 | APP-RESUME |
 | API-08 | partial: 21 ports, streaming example and external package | Finish remaining migration examples and successor MVP qualification; repository and Pages publication are integrated. | API-01–07 | APP-NATIVE |
-| API-09 | implemented; native gates pending | Pure Zig Mustache: startup template/partial ownership, bounded typed rendering into reserved HTML, original Zap compatibility and official core fixtures. | API-02, API-03 | APP-MUSTACHE |
+| API-09 | implemented; native gates passed | Pure Zig Mustache: startup template/partial ownership, bounded typed rendering into reserved HTML, original Zap compatibility and official core fixtures. | API-02, API-03 | APP-MUSTACHE |
 | IO-01–04 | deferred | Owned std.Io feasibility, isolated prototype, HTTP integration and adoption decision. | First API MVP; see STD-IO-DECISION | STDIO-PROTOTYPE, STDIO-HTTP-OWNERSHIP, STDIO-ADOPTION |
 
 API-01 and API-02 can proceed independently after agreeing on module exports.
@@ -421,3 +422,8 @@ concurrent template reuse, terminal ownership, and no framework allocation after
 startup are separate checks. Template startup storage is an explicit application
 allocation outside the engine's heap statistics. Lambdas, inheritance, dynamic
 partials and implicit filesystem lookup remain outside this slice.
+
+
+| Session | Completed work | Evidence | Next |
+| --- | --- | --- | --- |
+| 2026-09-06: Mustache pages | API-09: pure Zig fork, bounded cached rendering, startup owners, reserved HTML response helper, concise real page and partial, documentation/preview. Dependency PR #1 and Baz PR #3 merged in order. | [Native receipt](../reports/2026-09-06-mustache.md): 136 core cases at two capacities, four Zap cases, 346 library tests; Baz 90 root/two consumer tests per mode, 12 Mustache groups and existing suites on Linux/macOS/Windows. Five example-browser and 17 site-browser groups. | API-06 composition; retain fork ownership and explicit template limits. |

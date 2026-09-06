@@ -1,0 +1,89 @@
+Build Summary: 4/4 steps succeeded; 2/2 tests passed
+test success
++- run test 2 pass (2 total) 18ms MaxRSS:5M
+   +- compile test Debug native success 1m MaxRSS:322M
+      +- options success
+
+Build Summary: 48/48 steps succeeded; 90/90 tests passed
+verify success
++- compile exe baz-streaming Debug native success 5s MaxRSS:296M
+|  +- options success
++- compile exe baz Debug native success 4s MaxRSS:302M
+|  +- options (reused)
++- compile exe baz-borrow Debug native success 5s MaxRSS:323M
+|  +- options (reused)
++- compile exe hello Debug native success 1m MaxRSS:304M
+|  +- options (reused)
++- compile exe hello2 Debug native success 4s MaxRSS:294M
+|  +- options (reused)
++- compile exe hello_json Debug native success 5s MaxRSS:294M
+|  +- options (reused)
++- compile exe simple_router Debug native success 4s MaxRSS:289M
+|  +- options (reused)
++- compile exe routes Debug native success 4s MaxRSS:292M
+|  +- options (reused)
++- compile exe serve Debug native success 4s MaxRSS:293M
+|  +- options (reused)
++- compile exe sendfile Debug native success 4s MaxRSS:289M
+|  +- options (reused)
++- compile exe senderror Debug native success 6s MaxRSS:294M
+|  +- options (reused)
++- compile exe accept Debug native success 5s MaxRSS:290M
+|  +- options (reused)
++- compile exe app_basic Debug native success 4s MaxRSS:289M
+|  +- options (reused)
++- compile exe app_auth Debug native success 4s MaxRSS:289M
+|  +- options (reused)
++- compile exe app_errors Debug native success 4s MaxRSS:295M
+|  +- options (reused)
++- compile exe endpoint Debug native success 4s MaxRSS:304M
+|  +- options (reused)
++- compile exe endpoint_auth Debug native success 4s MaxRSS:294M
+|  +- options (reused)
++- compile exe middleware Debug native success 5s MaxRSS:290M
+|  +- options (reused)
++- compile exe middleware_with_endpoint Debug native success 4s MaxRSS:294M
+|  +- options (reused)
++- compile exe userpass_session Debug native success 4s MaxRSS:293M
+|  +- options (reused)
++- compile exe cookies Debug native success 8s MaxRSS:292M
+|  +- options (reused)
++- compile exe http_params Debug native success 4s MaxRSS:294M
+|  +- options (reused)
++- compile exe bindataformpost Debug native success 4s MaxRSS:298M
+|  +- options (reused)
++- compile exe streaming Debug native success 4s MaxRSS:293M
+|  +- options (reused)
++- compile exe mustache Debug native success 5s MaxRSS:322M
+|  +- options (reused)
++- zig fmt --check success
++- run python3 success 1s
++- run D:\a\_temp\baz-zig\zig-x86_64-windows-0.16.0\zig.exe success 1m
++- run test 3 pass (3 total) 11ms MaxRSS:4M
+|  +- compile test Debug native success 4s MaxRSS:265M
+|     +- options (reused)
++- run test 5 pass (5 total) 11ms MaxRSS:4M
+|  +- compile test Debug native success 4s MaxRSS:271M
+|     +- options (reused)
++- run test 12 pass (12 total) 12ms MaxRSS:5M
+|  +- compile test Debug native success 4s MaxRSS:291M
+|     +- options (reused)
++- run test 8 pass (8 total) 11ms MaxRSS:4M
+|  +- compile test Debug native success 4s MaxRSS:274M
+|     +- options (reused)
++- run test 18 pass (18 total) 23ms MaxRSS:5M
+|  +- compile test Debug native success 6s MaxRSS:354M
+|     +- options (reused)
++- run test 2 pass (2 total) 11ms MaxRSS:4M
+|  +- compile test Debug native success 5s MaxRSS:265M
+|     +- options (reused)
++- run test 6 pass (6 total) 22ms MaxRSS:5M
+|  +- compile test Debug native success 5s MaxRSS:294M
+|     +- options (reused)
++- run test 36 pass (36 total) 44ms MaxRSS:6M
+|  +- compile test Debug native success 8s MaxRSS:432M
+|     +- options (reused)
++- run test success 11ms MaxRSS:4M
+   +- compile test Debug native success 4s MaxRSS:268M
+      +- options (reused)
+

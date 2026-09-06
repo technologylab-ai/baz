@@ -1,0 +1,60 @@
+{
+  "baz_source": "88efc94e1cbb663c5014303320a4107135d900dd",
+  "mustache_source": "22487e4082537aa5b707dd902def866d990fdea1",
+  "mustache_merge": "09088a8c1e042933fc890b72435613fddc9614c0",
+  "zig": "0.16.0",
+  "hosts": {
+    "linux": {
+      "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+      "backend": "io_uring",
+      "root_tests_per_mode": 90,
+      "consumer_tests_per_mode": 2,
+      "mustache_groups": 12,
+      "cli_checks": 280,
+      "cli_executables": 25,
+      "other_groups": {
+        "app": 14,
+        "examples": 20,
+        "streaming": 14,
+        "borrow": 9
+      },
+      "terminal_owners_zero": true,
+      "framework_allocations_after_start_zero": true
+    },
+    "macos": {
+      "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+      "backend": "kqueue",
+      "root_tests_per_mode": 90,
+      "consumer_tests_per_mode": 2,
+      "mustache_groups": 12,
+      "cli_checks": 280,
+      "cli_executables": 25,
+      "other_groups": {
+        "app": 14,
+        "examples": 20,
+        "streaming": 14,
+        "borrow": 9
+      },
+      "terminal_owners_zero": true,
+      "framework_allocations_after_start_zero": true
+    },
+    "windows": {
+      "platform": "Windows-2025Server-10.0.26100-SP0",
+      "backend": "iocp",
+      "root_tests_per_mode": 90,
+      "consumer_tests_per_mode": 2,
+      "mustache_groups": 12,
+      "cli_checks": 280,
+      "cli_executables": 25,
+      "other_groups": {
+        "app": 14,
+        "examples": 20,
+        "streaming": 14,
+        "borrow": 9,
+        "windows_shards": 3
+      },
+      "terminal_owners_zero": true,
+      "framework_allocations_after_start_zero": true
+    }
+  }
+}

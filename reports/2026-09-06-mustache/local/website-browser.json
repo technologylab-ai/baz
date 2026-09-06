@@ -1,0 +1,168 @@
+{
+  "base": "http://127.0.0.1:64022/baz/",
+  "browser": "Chrome/152.0.7977.76",
+  "cases": [
+    {
+      "name": "desktop-landing",
+      "ok": true,
+      "evidence": {
+        "title": "Baz — Bounded Async Zap",
+        "headline": "Familiar to write.Explicit by design.",
+        "diagrams": 4,
+        "examples": 22,
+        "highlight": true
+      }
+    },
+    {
+      "name": "maintained-source-excerpt",
+      "ok": true,
+      "evidence": {
+        "exactSource": true
+      }
+    },
+    {
+      "name": "streaming-example-source-tabs-and-deep-link",
+      "ok": true,
+      "evidence": {
+        "exactSource": true,
+        "keyboard": true,
+        "deepLink": true,
+        "mobileWidths": [
+          390,
+          320
+        ]
+      }
+    },
+    {
+      "name": "borrowed-example-source-tabs-and-deep-link",
+      "ok": true,
+      "evidence": {
+        "exactSource": true,
+        "keyboard": true,
+        "deepLink": true,
+        "repeatedDeepLink": true,
+        "mobileWidths": [
+          390,
+          320
+        ]
+      }
+    },
+    {
+      "name": "keyboard-skip-link",
+      "ok": true,
+      "evidence": {
+        "skipFocus": "main"
+      }
+    },
+    {
+      "name": "example-filters",
+      "ok": true,
+      "evidence": {
+        "groups": 6,
+        "total": 22
+      }
+    },
+    {
+      "name": "desktop-diagrams-and-benchmark",
+      "ok": true,
+      "evidence": {
+        "rows": [
+          "macOS · M3 Max\t32 / 2\t254,261\t245,054\t1.038×",
+          "Linux · Core Ultra 7\t32 / 2\t363,594\t205,310\t1.771×",
+          "macOS · M3 Max\t1 / 1\t33,199\t52,809\t0.629×",
+          "Linux · Core Ultra 7\t1 / 1\t74,386\t72,575\t1.025×"
+        ]
+      }
+    },
+    {
+      "name": "mobile-navigation-and-layout",
+      "ok": true,
+      "evidence": {
+        "widths": [
+          320,
+          390,
+          760,
+          820,
+          1024,
+          1440
+        ],
+        "menu": "open / Escape / section link"
+      }
+    },
+    {
+      "name": "reader-guide-and-fragment",
+      "ok": true,
+      "evidence": {
+        "fragmentTop": 52.40625
+      }
+    },
+    {
+      "name": "mustache-preview-and-source",
+      "ok": true,
+      "evidence": {
+        "previewLoaded": true,
+        "sourceLinked": true,
+        "narrowWidth": 320
+      }
+    },
+    {
+      "name": "reader-source-and-links",
+      "ok": true,
+      "evidence": {
+        "raw": "http://127.0.0.1:64022/baz/examples/app_basic.zig",
+        "source": "https://github.com/technologylab-ai/baz/blob/88efc94e1cbb663c5014303320a4107135d900dd/examples/app_basic.zig"
+      }
+    },
+    {
+      "name": "reader-mobile",
+      "ok": true,
+      "evidence": {
+        "width": 390
+      }
+    },
+    {
+      "name": "reader-rejects-unpublished-paths",
+      "ok": true,
+      "evidence": {
+        "rejected": 6
+      }
+    },
+    {
+      "name": "reader-sanitizes-markdown-before-insertion",
+      "ok": true,
+      "evidence": {
+        "injected": false,
+        "unsafe": 0,
+        "heading": "safe-heading",
+        "local": "http://127.0.0.1:64022/baz/docs/read.html?file=docs%2FOWNERSHIP.md",
+        "expectedStyleBlocks": 1
+      }
+    },
+    {
+      "name": "all-published-documents-render",
+      "ok": true,
+      "evidence": {
+        "documents": 71
+      }
+    },
+    {
+      "name": "print-and-no-javascript",
+      "ok": true,
+      "evidence": {
+        "printBytes": 947987,
+        "noJsExamples": 22
+      }
+    },
+    {
+      "name": "no-unexpected-network-or-errors",
+      "ok": true,
+      "evidence": {
+        "requests": 957,
+        "exceptions": 0,
+        "external": 0,
+        "expectedCspBlocks": 1
+      }
+    }
+  ],
+  "exceptions": []
+}
