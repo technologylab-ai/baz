@@ -77,7 +77,7 @@
     if (!/^[A-Za-z0-9_./-]+$/.test(file) || file.startsWith('/') || file.split('/').some(x => x === '.' || x === '..') || !documents.has(file)) {
       throw new Error('Choose a published guide or example from the navigation.');
     }
-    const source = new URL(file, root);
+    const source = new URL(config.documentUrls[file] || file, root);
     const controller = new AbortController(); const timer = setTimeout(() => controller.abort(), 10000);
     let body;
     try {
@@ -95,7 +95,7 @@
         USE_PROFILES: {html: true}, FORBID_TAGS: ['style', 'form', 'input', 'button', 'textarea', 'select', 'video', 'audio', 'source'],
         FORBID_ATTR: ['style', 'id', 'name', 'srcset'], ALLOW_DATA_ATTR: false, RETURN_DOM_FRAGMENT: true
       });
-      links(source, fragment); article.replaceChildren(fragment); contents();
+      links(new URL(file, root), fragment); article.replaceChildren(fragment); contents();
     } else {
       const title = document.createElement('h1'); title.textContent = file.split('/').pop();
       const pre = document.createElement('pre'); const code = document.createElement('code');

@@ -12,6 +12,8 @@ import subprocess
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / '.zig-cache/github-pages'
 REPOSITORY = 'https://github.com/technologylab-ai/baz'
+# Pages does not serve dot-prefixed paths. Keep the reader's canonical file name.
+DOCUMENT_URLS = {'.zig-version': 'docs/zig-version.txt'}
 EXAMPLES = [
     ('hello', 'routing', 'A minimal HTML response and an explicit route.'),
     ('hello2', 'routing', 'Inspect methods, raw queries, headers, and bounded bodies.'),
@@ -131,13 +133,14 @@ def build():
         raise ValueError('Unfilled template slot.')
     tracked = subprocess.check_output(['git', 'ls-files', '--cached', '--others', '--exclude-standard'], cwd=ROOT, text=True).splitlines()
     directories = sorted({str(parent) for file in tracked for parent in Path(file).parents if str(parent) != '.'})
-    config = {'documents': docs, 'assets': assets + ['index.html'], 'directories': directories,
+    config = {'documents': docs, 'documentUrls': DOCUMENT_URLS,
+              'assets': assets + ['index.html'], 'directories': directories,
               'repository': REPOSITORY + '/blob/' + revision + '/'}
     if OUTPUT.exists():
         shutil.rmtree(OUTPUT)
     OUTPUT.mkdir(parents=True)
     for name in docs + assets:
-        destination = OUTPUT / name
+        destination = OUTPUT / DOCUMENT_URLS.get(name, name)
         destination.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(ROOT / name, destination)
     (OUTPUT / 'docs/site-config.js').write_text('window.DOC_SITE = ' + json.dumps(config) + ';\n')
@@ -147,7 +150,7 @@ def build():
               for p in sorted(OUTPUT.rglob('*')) if p.is_file()}
     (OUTPUT / 'publication.json').write_text(json.dumps({'revision': revision, 'files_sha256': hashes}, indent=2) + '\n')
     from check_site import check
-    check(OUTPUT, docs)
+    check(OUTPUT, docs, DOCUMENT_URLS)
     print('Pages artifact: {} files, {} documents, revision {}\n{}'.format(len(hashes) + 1, len(docs), revision, OUTPUT))
 
 
