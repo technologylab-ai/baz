@@ -96,4 +96,4 @@ host, acquire the cooperative measurement reservation described in [AGENTS.md](.
 before browser suites. Apply a finite external watchdog, retain the reservation
 through browser and server cleanup, and remove only your own lock.
 Cross-width browser checks qualify the website layout; they are not Baz HTTP
-runtime or performance evidence. The separate Windows dependency update remains paused.
+runtime or performance evidence. Windows platform claims are backed by [Baz’s native receipt](../reports/2026-09-06-windows-baz.md).

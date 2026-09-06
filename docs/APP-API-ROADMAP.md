@@ -1,6 +1,6 @@
 # Baz implementation roadmap
 
-Status: first implementation, example ports, external engine package, and independent local repository, 2026-09-06.
+Status: first implementation, 20 example ports, published pure Zig package/site, and native Windows x64/Linux/macOS support, 2026-09-06.
 Exact target: Zig 0.16.0. See the [implemented API](APP-API.md),
 [20 example ports](../examples/README.md), and
 [native receipt](../reports/2026-09-06-app-api.md) for exact evidence and limits.
@@ -16,7 +16,7 @@ tracks transport reliability, performance, and platform work. Its
 ## Resume here
 
 - Repository: standalone `baz` checkout; main branch `main`.
-- Paused Windows draft: `work/windows-update`.
+- Windows support integrated from `work/windows-update`; [native three-platform receipt](../reports/2026-09-06-windows-baz.md).
 - See [repository preparation](REPOSITORY.md) and [handoff](../HANDOFF.md) for current state.
 - Starting engine commit: `4b3cd5551d80b422ec6ef763627d019e6f1dfb83`.
 - Reviewed Zap port: `../fi/deps/zap` at
@@ -27,7 +27,7 @@ tracks transport reliability, performance, and platform work. Its
   pending a [pure Zig library evaluation](MUSTACHE-CANDIDATES.md).
 - Next bounded work: finish API-06's public composition/locals/cookie contract,
   using the example-local wrappers as real use cases; then API-07.
-  Baz now consumes an external engine package; repository publication remains separate.
+  Baz now consumes an external engine package; repository and Pages publication are complete.
   IO-01–04 remains deferred until after the first API MVP by user decision.
 - Consult the receipt/session ledger for native gates and cleanup state. The
   separate [basic Zap comparison](../reports/2026-09-06-basic-zap.md) records
@@ -37,7 +37,7 @@ tracks transport reliability, performance, and platform work. Its
   Reconcile their landed docs/current engine contracts before the next session;
   preserve this plan's baseline and re-evaluate changed ownership assumptions.
 
-Use `git branch --list` to find the local draft branch.
+Use `git branch --list` to inspect the local integration branches.
 Read AGENTS.md, the current ownership contract and the two design documents.
 Inspect Git state before editing; do not overwrite another session's work.
 
@@ -46,8 +46,8 @@ Inspect Git state before editing; do not overwrite another session's work.
 | Topic | Working decision |
 | --- | --- |
 | Product | Baz (Bounded Async Zap), package/import `baz`, external dependency/import `bounded_http`. Repository: [technologylab-ai/baz](https://github.com/technologylab-ai/baz), with its [Pages documentation](https://technologylab-ai.github.io/baz/). bounded/http stays independently usable. No Zap source-compatibility layer. |
-| Platform/version | Exact Zig 0.16.0; initial plain HTTP/1.1 on the existing Linux/macOS engine. Public bind addresses need later qualification. TLS is out of scope. |
-| Windows | Initial engine support is merged. Baz portability/CI work is paused on `work/windows-update` while another session prepares bounded handoff to Windows shards. |
+| Platform/version | Exact Zig 0.16.0; plain HTTP/1.1 on Linux, macOS, and native Windows x64. Public bind addresses need later qualification. TLS is out of scope. |
+| Windows | Supported natively on x64 with CI: Debug/ReleaseSafe verification, 14 App groups, 20 example groups, and three shard/shutdown cases. Windows performance remains deferred; Baz remains experimental. |
 | App | Real instances; typed Shared; borrowed endpoint instances; startup-only registration; one routing/context model. |
 | Input | Raw immutable slices, ordered duplicates, no coercion, no bracket-array syntax, no merged query/body/JSON bag. |
 | Decoding | Explicit caller destination; percent and form-plus decoding are separately named; raw bytes remain available. |
@@ -282,7 +282,7 @@ The independent consumer imports both packages using one engine module identity.
 The user selected the product name and package name on 2026-09-06.
 Publishing Baz as its own repository remains a separate step.
 Keep the original case-study history and port attribution available.
-Future dependency updates require native Linux/macOS verification of the selected revision.
+Future dependency updates require native Linux/macOS/Windows x64 verification of the selected revision.
 
 Provide compiled examples for App + Shared + endpoint state, exact/captured
 routes, raw query + explicit decoding, URL-encoded forms, one/many file uploads,
@@ -319,8 +319,8 @@ on the execution host. Follow the wiki's
 Hold off if busy, including incomplete/stale-looking metadata; never steal by
 age. Record ownership, retain the reservation through child cleanup, and remove
 only the owner's metadata/directory. Other agents' Mac measurements take
-precedence while reserved. No Windows performance/publication runs during the
-current Linux/macOS tuning loop.
+precedence while reserved. Windows performance remains deferred. Native Windows
+correctness and publication gates are active following the merged engine sharding PR.
 
 Baseline commands once the host is reserved and exact compiler is selected:
 
@@ -365,6 +365,7 @@ the conversation.
 
 | 2026-09-06: standalone repository preparation | Created an independent local Baz repository with full reachable history, MIT license, public source links, and Linux/macOS CI. Moved engine-only working-tree material back to upstream references. Preserved the paused Windows changes on `work/windows-update`. | Git integrity and object independence, unchanged runtime/evidence bytes on `main`, local Markdown links, manifest formatting, actionlint, and CI installer syntax. No runtime gates restarted while the Windows update is paused. | Await the engine sharding PR for the draft branch. Publish Baz's GitHub repository when requested; continue API-06 independently. |
 | 2026-09-06: Baz website and publication | Integrated the website worktree into Baz: landing page, ownership diagrams, source-backed App excerpt, 20 example links, prototype performance comparison, Markdown/source reader, and GitHub Pages workflow. User authorized publication in `technologylab-ai/baz`. | [Website receipt](../reports/2026-09-06-website.md): static checks, 14 browser groups, 58 documents, desktop/mobile/keyboard/print, and malicious-input checks. Runtime source, engine pin, and benchmark receipts unchanged. | Continue API-06. Windows dependency work still awaits the engine sharding PR and resumed Baz gates. |
+| 2026-09-06: native Windows support | Integrated bounded/http PR #2 through pin `7c240039`, portable exits and counted console borrows, native Windows harness control, and three finite App shard cases. Promoted pure Zig implementation and native Windows support in README/site alongside a prominent engine-site link. | [Native receipt](../reports/2026-09-06-windows-baz.md): candidate `6dcbf2d`, all three native hosts passed Debug/ReleaseSafe 41/41 root steps, 60/60 tests plus the consumer; 14 App and 20 example groups each, plus three Windows shard/shutdown cases. Original benchmark evidence unchanged. | API-06 public composition, then API-07. Windows x64 is supported; production/performance claims remain outside these correctness gates. |
 
 For each implementation session add: commit(s), owned/changed files, decisions,
 named gates passed/pending and exact receipts, remaining blocker (if any), and

@@ -43,21 +43,22 @@ The callback-progress and external-watchdog limits still apply.
 
 These generic extensions landed through [bounded/http PR #1](https://github.com/technologylab-ai/bounded-http/pull/1).
 PR #1 merged on 2026-09-06 as `c90281b600deb699a667e2bcc115da32862c794f`.
-The verified `main` baseline retains its exact tested pin, `e52f09f723388685263d14a9bfa265f2456a3744`.
-Its Zig package hash is `zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv`.
-The hash prefix reflects that revision's package metadata; Baz's dependency key and source import are `bounded_http`.
-The [engine receipt](https://github.com/technologylab-ai/bounded-http/blob/e52f09f723388685263d14a9bfa265f2456a3744/reports/2026-09-06-app-response-reservation.md) records its native gates.
-The local `work/windows-update` branch contains a paused update to `bb14d98756152936fadb6e8353852a686e8d315d`.
-That revision includes the engine rename and initial single-shard Windows IOCP support.
-Wait for the forthcoming Windows sharding PR before choosing the final update.
-The [repository record](REPOSITORY.md) describes the branch and verification boundary.
+The current engine pin is `7c24003924bcc76b2a3808cc2fae194082a40105`, with Zig package hash
+`bounded_http-0.1.0-N3A1uJjOEAD4Yg0JPgeoRomLUpBJeFlfujb4gpSUDcgc`.
+It includes the package rename and [Windows shard handoff from PR #2](https://github.com/technologylab-ai/bounded-http/pull/2).
+Baz passed its own native Windows x64, Linux, and macOS gates on this pin,
+including all supported examples. The [native receipt](../reports/2026-09-06-windows-baz.md)
+records exact source identity, environments, and Windows handoff/shutdown behavior.
+The older tested `e52f09f` pin and provisional `bb14d987` draft remain in history.
+The [repository record](REPOSITORY.md) describes branches and publication.
 
 ## Future updates
 
 Update the engine URL, commit, and package hash together in `build.zig.zon`.
 Keep the `bounded_http` source import stable when the engine repository name changes.
 Read the selected engine revision's contracts before changing the pin.
-Verify Baz on native Linux and macOS, including the independent consumer fixture.
+Verify Baz on native Linux, macOS, and Windows x64, including the independent
+consumer, App/example wire suites, and Windows handoff/shutdown checks.
 Run engine gates upstream when the engine changes.
 
 The original App/Zap throughput receipt measured `c152e59` before package extraction.

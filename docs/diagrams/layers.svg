@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 360" class="diagram diagram-wide" role="img" aria-labelledby="layers-title layers-desc">
-<title id="layers-title">Baz and bounded/http are separate packages</title><desc id="layers-desc">Your application supplies shared state, endpoint instances, and a caller I/O capability. Baz provides the typed App API. bounded/http supplies parsing, scheduling, response reservations, and Linux io_uring or macOS kqueue transport. Finite blocking services use explicit fixed application workers.</desc>
+<title id="layers-title">Baz and bounded/http are separate packages</title><desc id="layers-desc">Your application supplies shared state, endpoint instances, and a caller I/O capability. Baz provides the typed App API. bounded/http supplies parsing, scheduling, response reservations, and Linux io_uring, macOS kqueue, or Windows IOCP transport. Finite blocking services use explicit fixed application workers.</desc>
 <g font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" fill="#172f3e">
 <g stroke="#cdd3d0" fill="#efeee6"><rect x="1" y="1" width="604" height="73"/><rect x="635" y="1" width="264" height="73"/><rect x="635" y="103" width="264" height="166"/></g>
 <text x="25" y="32" font-size="19">Your application</text><text x="25" y="55" font-size="13" fill="#4e6370">Shared state · endpoint structs · explicit application scratch</text>
@@ -12,8 +12,8 @@
 <path d="M605 140h30M303 176v20" stroke="#9caaa9"/>
 <rect x="1" y="196" width="604" height="73" fill="#f8f7f1" stroke="#bc3c20"/>
 <text x="25" y="227" font-size="22">bounded/http</text><text x="25" y="251" font-size="13" fill="#4e6370">HTTP parser · scheduler · reservations · connection ownership</text>
-<path d="M153 269v25m300-25v25" stroke="#9caaa9"/>
-<g stroke="#cdd3d0" fill="#efeee6"><rect x="1" y="294" width="292" height="45"/><rect x="313" y="294" width="292" height="45"/></g>
-<g font-size="13" text-anchor="middle"><text x="147" y="322">Linux · io_uring</text><text x="459" y="322">macOS · kqueue</text></g>
+<path d="M99 269v25m204-25v25m204-25v25" stroke="#9caaa9"/>
+<g stroke="#cdd3d0" fill="#efeee6"><rect x="1" y="294" width="196" height="45"/><rect x="205" y="294" width="196" height="45"/><rect x="409" y="294" width="196" height="45"/></g>
+<g font-size="13" text-anchor="middle"><text x="99" y="322">Linux · io_uring</text><text x="303" y="322">macOS · kqueue</text><text x="507" y="322">Windows · IOCP</text></g>
 <text x="900" y="356" text-anchor="end" font-size="10" fill="#4e6370" font-family="ui-monospace, monospace">CURRENT VERIFIED BAZ BASELINE</text>
 </g></svg>

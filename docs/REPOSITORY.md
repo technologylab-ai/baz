@@ -27,13 +27,12 @@ Historical third-party archives retain their original notices and terms.
 
 | Branch | Contents | Evidence |
 | --- | --- | --- |
-| `main` | Verified Baz source from `b3d4d8a`, repository preparation, MIT license, POSIX CI, and the Pages website | Existing native macOS/Linux package receipt; preparation adds no new runtime claim. |
-| `work/windows-update` | Paused Windows portability, compile-only checks, Windows CI, and a newer engine pin | Windows x64 Debug cross-compilation passed before the pause; remaining gates await the engine sharding PR. |
+| `main` | Pure Zig Baz framework, native Linux/macOS/Windows support, MIT license, and the Pages website | [Native three-platform receipt](../reports/2026-09-06-windows-baz.md), including Baz’s Windows App/example/shard checks. |
+| `work/windows-update` | Integration branch for the completed engine update and Windows support | Executed runtime/test source `6dcbf2d`; its earlier paused draft receipts remain in history. |
+| `docs/website` | Original website implementation branch | Integrated into `main`; subsequent site updates live in Baz. |
 
-The draft branch preserves the paused work as a commit.
-Its dependency revision is provisional; do not treat the draft as Windows runtime qualification.
-Select the sharding PR revision and finish native verification when the user resumes that update.
-See [HANDOFF.md](../HANDOFF.md) for exact state.
+The Windows integration replaces the provisional engine pin with the merged
+sharding revision. Read [HANDOFF.md](../HANDOFF.md) for the next API work.
 
 ## CI and publication
 
@@ -41,7 +40,9 @@ See [HANDOFF.md](../HANDOFF.md) for exact state.
 It runs Debug and ReleaseSafe verification on GitHub-hosted Linux and macOS runners.
 It also builds and exercises all supported examples with ReleaseSafe binaries.
 Hosted logs are retained for 14 days; preserve material runtime evidence in dated reports.
-The draft branch additionally contains native x64 Windows build/unit CI.
+The [native Windows workflow](../.github/workflows/windows-build.yml) verifies
+both build modes, the consumer, all App/example suites, and three handoff/shutdown
+cases. Windows x64 is supported; production qualification remains outside these gates.
 Hosted runs provide separate evidence from the existing local receipts.
 Check [Actions](https://github.com/technologylab-ai/baz/actions) for their results.
 

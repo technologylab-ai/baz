@@ -1,51 +1,56 @@
-# Baz standalone repository handoff — 2026-09-06
+# Baz handoff — 2026-09-06
 
-Work from the independent `baz` repository now. The primary branch is `main`.
-The original `zig-http-app-api` worktree is preserved, including its uncommitted Windows draft.
-Read [repository preparation](docs/REPOSITORY.md), the [API guide](docs/APP-API.md),
-and the [roadmap](docs/APP-API-ROADMAP.md).
+Work from the independent `baz` repository, primary branch `main`.
+Public repository: <https://github.com/technologylab-ai/baz>.
+GitHub Pages: <https://technologylab-ai.github.io/baz/>.
+Baz and its bounded/http engine are implemented in Zig. Baz is MIT licensed.
+The website, reader, diagrams, and publishing workflow belong to this repository.
 
-Baz is MIT licensed. Git history, Zap attribution, benchmark inputs, and Baz's native receipts remain intact.
-Baz’s public repository is [technologylab-ai/baz](https://github.com/technologylab-ai/baz),
-with [GitHub Pages documentation](https://technologylab-ai.github.io/baz/).
-Website source, its build/check scripts, and Pages workflow belong to Baz’s main branch.
-See [website maintenance](docs/WEBSITE.md) and [Actions](https://github.com/technologylab-ai/baz/actions)
-for publishing and hosted verification. The separate Windows draft remains paused.
+## Verified current baseline
 
-## Verified baseline
+**Native Windows x64, Linux, and macOS are supported.** Candidate runtime/test
+source `6dcbf2d8f5e1cb73b6dadd5acb0e3380af7b0ad9` passed all three hosted gates:
+Debug/ReleaseSafe verification, independent consumer, 14 App groups, and all 20
+example groups. Windows additionally passed three native shard-handoff and
+console-shutdown cases. The [native receipt](reports/2026-09-06-windows-baz.md)
+retains source identity, environments, logs, and statistics. Later website/docs
+edits preserve those runtime/test inputs.
 
-Main retains the runtime source and engine pin from `b3d4d8a`.
-[The package receipt](reports/2026-09-06-baz-extraction.md) records native macOS/Linux Debug and ReleaseSafe verification,
-independent consumers, 14 App groups, and 20 example groups.
-[bounded/http PR #1](https://github.com/technologylab-ai/bounded-http/pull/1) is merged.
-Main keeps its tested immutable engine pin until the paused dependency update is qualified.
-Repository preparation changes documentation and package contents, not runtime behavior.
-
-## Windows integration candidate
-
-The user resumed this update after [bounded/http PR #2](https://github.com/technologylab-ai/bounded-http/pull/2)
-merged. Candidate branch `work/windows-update` pins engine main
-`7c24003924bcc76b2a3808cc2fae194082a40105`, with package hash
+The engine pin is `7c24003924bcc76b2a3808cc2fae194082a40105`, package hash
 `bounded_http-0.1.0-N3A1uJjOEAD4Yg0JPgeoRomLUpBJeFlfujb4gpSUDcgc`.
-The engine’s native Windows gate ran at `419de5445901a87ea6973020df5b13a420917483`;
-its tree matches merge `1c74a4e379c365ec0a201e6fe3df1a5a9718d504`.
-The later main commit changes documentation only.
+Engine PRs #1 and #2 are merged. Baz consumes its public module as an external
+dependency. The engine’s own gate remains separate from Baz’s evidence.
+The [dependency guide](docs/DEPENDENCY.md) records the boundary and update rules.
 
-This candidate retains the original portable exits, counted console-handler
-borrows, target-aware compile checks, and Windows CI. It adds Windows process
-group/control-console handling to the wire harness and three finite native
-multi-shard App checks. Existing App and example suites remain shared across
-platforms. New native Windows, Linux, and macOS gates must pass before merging.
-No cross-compilation or engine receipt alone qualifies Baz runtime behavior.
+Windows uses counted console-handler borrows and portable fail-fast exits.
+The shared Python harness supports process groups and Ctrl-Break. `zig build check`
+compiles without running target binaries; cross-compilation is not native evidence.
+Windows performance remains deferred. Baz as a whole remains experimental.
 
-The old paused draft’s [partial receipts](reports/2026-09-06-windows-draft/README.md)
-remain intact. Its earlier x64 Debug cross-compilation passed; the stopped
-ReleaseSafe run was not a pass. No timing experiment is part of this update.
+## Repository and website
+
+The `baz-website` directory is a linked worktree for the original `docs/website`
+branch. Its website is integrated into Baz’s `main`; it is not another repository.
+The `baz-windows` worktree holds the completed `work/windows-update` integration.
+The original `zig-http-app-api` worktree and old paused draft receipts remain
+preserved for history. Continue new work from current Baz, not those checkpoints.
+
+[Website maintenance](docs/WEBSITE.md) describes local preview and deployment.
+[Website evidence](reports/2026-09-06-website.md) records desktop/mobile/keyboard/print,
+reader, sanitization, and live file-hash checks. The `.zig-version` reader entry
+uses a public alias because Pages hides dot-prefixed paths.
+The README and site explicitly identify pure Zig implementation, Windows support,
+and both the bounded/http website and source repository.
 
 ## Next API sessions
 
-API-06 adds public middleware, typed locals, and cookie composition.
-API-07 adds typed resumable endpoints and their ownership gates.
-Caller `std.Io` remains the MVP capability; an owned provider is deferred.
-TLS is out of scope. Mustache awaits a pure Zig library choice.
-The [Zap comparison](reports/2026-09-06-basic-zap.md) measures prototype `c152e59`, before package extraction.
+Read the [API guide](docs/APP-API.md), [ownership contract](docs/OWNERSHIP.md), and
+[multi-session roadmap](docs/APP-API-ROADMAP.md). API-01–05 and 20 example ports
+are implemented. API-06 adds public middleware, typed locals, and cookie
+composition; API-07 adds typed resumable endpoints and their ownership gates.
+
+Caller std.Io remains the MVP capability; an owned provider is deferred.
+TLS is out of scope. Mustache awaits a pure Zig library choice. WebSockets needs
+an engine upgrade lifecycle. The [Zap comparison](reports/2026-09-06-basic-zap.md)
+measures prototype `c152e59`, before package extraction. Its raw inputs and
+statistics are unchanged. Never benchmark or warm up a Debug build.

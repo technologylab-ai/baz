@@ -26,6 +26,11 @@ Keep the entire App alive or terminate the process; do not free its storage on t
 Signal handlers must not log, allocate, or call ordinary shutdown methods.
 Neither method promises delivery of the stopping request's response.
 
+Windows console control handlers run on separate threads. The executables count
+their App-pointer borrows, unregister the handler, clear publication, and wait
+for earlier borrows before App destruction. A failed drain terminates through
+`engine.failFast` without freeing still-borrowed storage.
+
 ## Request access
 
 Context and request access last only for the active callback.

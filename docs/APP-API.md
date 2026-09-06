@@ -8,8 +8,8 @@ The engine's [GitHub Pages documentation](https://technologylab-ai.github.io/bou
 covers architecture, embedding, and ownership.
 Baz consumes a pinned external engine package; it does not contain engine sources.
 See the [dependency boundary](DEPENDENCY.md) and [extraction plan](APP-API-ROADMAP.md#api-08--migration-examples-and-successor-mvp-qualification).
-This experimental API uses exact Zig **0.16.0**, the existing Linux io_uring /
-macOS kqueue HTTP engine, caller-supplied `std.Io`, and bounded standard memory
+This experimental API uses exact Zig **0.16.0**, the Linux io_uring /
+macOS kqueue / Windows IOCP HTTP engine, caller-supplied `std.Io`, and bounded standard memory
 readers/writers. An owned `std.Io` provider is deferred until after the API MVP.
 
 Run the maintained, compiled [example](../src/app_demo.zig):
@@ -22,6 +22,8 @@ curl 'http://127.0.0.1:8080/users/a%2Fb'
 curl --data 'value=x+y%2Bz' http://127.0.0.1:8080/form
 curl -F 'files[]=first' -F 'files[]=@.zig-version' http://127.0.0.1:8080/upload
 ```
+
+On Windows, use `zig-out/bin/baz.exe` and `curl.exe`.
 
 The upload example has an 8 KiB body limit; choose a smaller file if needed.
 It returns part metadata, lengths and byte sums, and does not save files.
@@ -71,7 +73,7 @@ engine behind its startup gate and seals the framework allocator; `run` begins
 admission. Registration is closed after `start`. `requestStop` requests a drain;
 the signal-specific helper only sets atomic stop flags. Signal installation
 belongs in the executable. A failed `run` may leave application/kernel owners
-outstanding: the example terminates with `_exit(70)` and does not free borrowed
+outstanding: the example terminates with `engine.failFast(70)` and does not free borrowed
 storage. The normal `deinit` path waits for clean terminal ownership.
 
 Use `ctx.param("id")` for a raw capture from `/users/:id`. Matching preserves
@@ -222,9 +224,12 @@ internals and kernel buffers are outside the framework's requested-byte ledger.
 
 The predecessor is [Zap](https://github.com/zigzap/zap). The public API review
 and ports use the local Zig 0.16 revision recorded in the design and receipts.
+Baz and bounded/http are implemented in Zig, replacing the facil.io C foundation.
+Baz additionally supports native Windows x64, with [its own native gate](../reports/2026-09-06-windows-baz.md).
 
 | Old API concept | Current replacement |
 | --- | --- |
+| facil.io C HTTP foundation; no native Windows | Zig framework and HTTP engine; native Windows x64, Linux, and macOS support. |
 | `App.Create(...)`, registration globals | Instance `web.App(Shared)`, borrowed typed Shared and endpoints. |
 | Embedded endpoint base/path/error fields | Plain endpoint struct; `app.endpoint(path, &instance)`; App error hook. |
 | `parseQuery`, `getParamSlice`, typed param variants | `query`, raw pair iterators, explicit decode and caller interpretation. |
@@ -238,7 +243,8 @@ and ports use the local Zig 0.16 revision recorded in the design and receipts.
 Use the [roadmap](APP-API-ROADMAP.md) for the next session and named verification
 gates. The [20 supported Zap example ports](../examples/README.md) are implemented.
 This remains an experimental checkpoint before complete successor-MVP
-qualification, public middleware/resumable APIs and publication in its own repository.
+qualification and public middleware/resumable APIs. Baz’s independent repository
+and GitHub Pages site are published.
 
 ## Basic performance comparison
 

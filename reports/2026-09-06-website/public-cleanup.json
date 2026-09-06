@@ -1,0 +1,16 @@
+{
+  "owner": {
+    "agent": "baz-website /root",
+    "purpose": "finite static website browser checks only; no HTTP engine workload",
+    "host": "renerocksai-M3-Max-6.local",
+    "started_utc": "2026-09-06T16:38:42.199891+00:00",
+    "owner_pid": 76402,
+    "token": "8ad04aa7-c6a7-4364-ac10-0eea1000f649",
+    "cwd": "/Users/rs/code/github.com/technologylab.ai/baz"
+  },
+  "owned_groups_absent": [
+    76414,
+    76415
+  ],
+  "finished_utc": "2026-09-06T16:39:29.864908+00:00"
+}

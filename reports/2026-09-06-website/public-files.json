@@ -1,0 +1,476 @@
+{
+  "base": "https://technologylab-ai.github.io/baz/",
+  "revision": "fab1c36b46ab5f51a14d5f04a9a016ca5840e718",
+  "checked_utc": "2026-09-06T16:39:47.185447+00:00",
+  "files": [
+    {
+      "file": "LICENSE",
+      "status": 200,
+      "type": "application/octet-stream",
+      "sha256": "66b1f7bbef29008678caf5b8c227af9f6eec555e2a8b0e6a51287200f15b8bcc"
+    },
+    {
+      "file": "README.md",
+      "status": 200,
+      "type": "text/markdown; charset=utf-8",
+      "sha256": "40c8fb9c227b0877b6ed635218f7413869152143e255d77fb137b4cfe80bc706"
+    },
+    {
+      "file": "ROADMAP.md",
+      "status": 200,
+      "type": "text/markdown; charset=utf-8",
+      "sha256": "d018e7cc6de23dc44127a75c61e7fc7182fa1d373899157b3e8ad9faa0a3e02c"
+    },
+    {
+      "file": "build.zig",
+      "status": 200,
+      "type": "application/octet-stream",
+      "sha256": "aa180eba1adaeaf6b4b0cb5f61674fa8df79748ca8c22be867f5f843e4fed2f6"
+    },
+    {
+      "file": "build.zig.zon",
+      "status": 200,
+      "type": "application/octet-stream",
+      "sha256": "6841add71bfa0c37d726f5ba6957007ec887056c3a985c3dfe0b32d4309e06e4"
+    },
+    {
+      "file": "docs/APP-API-DESIGN.md",
+      "status": 200,
+      "type": "text/markdown; charset=utf-8",
+      "sha256": "12f27f2e5a133e473456bcbf51d84a257b862c05692a67bbf062445c07e3a303"
+    },
+    {
+      "file": "docs/APP-API-ROADMAP.md",
+      "status": 200,
+      "type": "text/markdown; charset=utf-8",
+      "sha256": "097f3e713436fc1a5f74989309e85ac4fdda568e2864307a2675ea701ac2a013"
+    },
+    {
+      "file": "docs/APP-API.md",
+      "status": 200,
+      "type": "text/markdown; charset=utf-8",
+      "sha256": "143f12fad7f746c65f4d15dddbc27cb43d6ed2e7556a2af4bce534beea73fb2d"
+    },
+    {
+      "file": "docs/DEPENDENCY.md",
+      "status": 200,
+      "type": "text/markdown; charset=utf-8",
+      "sha256": "532d7608916e55aae8c72659de9a54c58bb9ab004206a9da57566368652c15f6"
+    },
+    {
+      "file": "docs/ENGINE-REFERENCE.md",
+      "status": 200,
+      "type": "text/markdown; charset=utf-8",
+      "sha256": "f9f0614c3f7103580756e9d21cbe93d9658c2bc333fb86210d09237d99e79ac8"
+    },
+    {
+      "file": "docs/EVIDENCE.md",
+      "status": 200,
+      "type": "text/markdown; charset=utf-8",
+      "sha256": "6e8544637ee582334244bd7a7f051d1e15b04ee785d3f7c7575b0a98f43fdf4e"
+    },
+    {
+      "file": "docs/INTERFACES.md",
+      "status": 200,
+      "type": "text/markdown; charset=utf-8",
+      "sha256": "a33f55a67859a03c9bae7573e3ac42085f7f7c73908d5c3ed3a077bbdac4267b"
+    },
+    {
+      "file": "docs/MUSTACHE-CANDIDATES.md",
+      "status": 200,
+      "type": "text/markdown; charset=utf-8",
+      "sha256": "fb358dffd9097b46c17a634a1b0301a44951b805f7077c306f89c06ad77aefce"
+    },
+    {
+      "file": "docs/OWNERSHIP.md",
+      "status": 200,
+      "type": "text/markdown; charset=utf-8",
+      "sha256": "09839aab4a06fe5994bb1172ff92e4cc69ef751b31e652812363f75580b20d10"
+    },
+    {
+      "file": "docs/REPOSITORY.md",
+      "status": 200,
+      "type": "text/markdown; charset=utf-8",
+      "sha256": "2c98358049db29cf66c924e6bdd45c644f9ad3a80d13d6b4dc417aa6e3499168"
+    },
+    {
+      "file": "docs/STD-IO-DECISION.md",
+      "status": 200,
+      "type": "text/markdown; charset=utf-8",
+      "sha256": "ab482f67042d06a136c80b963f788638324c12931dd8ce9ea7dd030788bfd432"
+    },
+    {
+      "file": "docs/WEBSITE.md",
+      "status": 200,
+      "type": "text/markdown; charset=utf-8",
+      "sha256": "8b997562dc3fbbf5d313edd29a99dad29c202b61f06b408e60b8085c000917fc"
+    },
+    {
+      "file": "docs/diagrams/layers.svg",
+      "status": 200,
+      "type": "image/svg+xml",
+      "sha256": "9d9a42715d250275d58fbdd31b95e4bbe25f609346003528b15ce9fbe0296815"
+    },
+    {
+      "file": "docs/diagrams/lifetime.svg",
+      "status": 200,
+      "type": "image/svg+xml",
+      "sha256": "973a238d734822a90d5f81f3bc1db4ef37cb394962cd40918d3d4697d686aac6"
+    },
+    {
+      "file": "docs/diagrams/parameters.svg",
+      "status": 200,
+      "type": "image/svg+xml",
+      "sha256": "03fd774fad44e208967b1534765da08e9ee4168a88d6b8b30959987b669e9e28"
+    },
+    {
+      "file": "docs/favicon.svg",
+      "status": 200,
+      "type": "image/svg+xml",
+      "sha256": "62567dc1850a2d56e1f5901f55e3c9e149025110ba8ae973f691fb5b790a2901"
+    },
+    {
+      "file": "docs/highlight-zig.js",
+      "status": 200,
+      "type": "application/javascript; charset=utf-8",
+      "sha256": "5bc0a5406878b7e9d29074a9172e903e035c4bd9228be55d52bec838fc476d0c"
+    },
+    {
+      "file": "docs/read.html",
+      "status": 200,
+      "type": "text/html; charset=utf-8",
+      "sha256": "7d9a0e940a756e559e3be814b17e2ca98b3c4a4ab061e37e48e10ee29c0190c9"
+    },
+    {
+      "file": "docs/reader.css",
+      "status": 200,
+      "type": "text/css; charset=utf-8",
+      "sha256": "092e58fbeccf4d2ebf32628ecdd321eb1df8a93a731665b830980368bc0ace17"
+    },
+    {
+      "file": "docs/reader.js",
+      "status": 200,
+      "type": "application/javascript; charset=utf-8",
+      "sha256": "94660b755c9242ef5d39ebd257c4f4a5c86f7bd326c6b6210825d8ddb4343308"
+    },
+    {
+      "file": "docs/site-config.js",
+      "status": 200,
+      "type": "application/javascript; charset=utf-8",
+      "sha256": "0a763d5508ef8d9c10ed69f8d23434b00e238bec59e02eced103ed613e545ccd"
+    },
+    {
+      "file": "docs/site.css",
+      "status": 200,
+      "type": "text/css; charset=utf-8",
+      "sha256": "555c19f96f26aefcd5f386622c638715ef8914edb429473d837b0165db229be9"
+    },
+    {
+      "file": "docs/site.js",
+      "status": 200,
+      "type": "application/javascript; charset=utf-8",
+      "sha256": "f7aa6803f271c7972ece9f79169a504ff8f6b296be74f75c8d3edff08f6b6aff"
+    },
+    {
+      "file": "docs/vendor/highlight-LICENSE",
+      "status": 200,
+      "type": "application/octet-stream",
+      "sha256": "6c081431591d9df696c82dc598fe1423765b8a299b200ed00b281afd0f64c490"
+    },
+    {
+      "file": "docs/vendor/highlight.js",
+      "status": 200,
+      "type": "application/javascript; charset=utf-8",
+      "sha256": "8ab71eb09c51f501e5e25157d9cff100e46cc29bcbfc744d0b746d451fca7f53"
+    },
+    {
+      "file": "docs/vendor/manifest.json",
+      "status": 200,
+      "type": "application/json; charset=utf-8",
+      "sha256": "f7860a3ba7c560cb00378249097e37be873eb4a1f4294c02044d41d949d99f2c"
+    },
+    {
+      "file": "docs/vendor/marked-LICENSE",
+      "status": 200,
+      "type": "application/octet-stream",
+      "sha256": "8e3a3f82f59a60958f56ca08f445647c32a4733dc7ca6c2c46f6eb898471ab9c"
+    },
+    {
+      "file": "docs/vendor/marked.js",
+      "status": 200,
+      "type": "application/javascript; charset=utf-8",
+      "sha256": "69451c8541c9c1e7a4bf3ffc6f73c4d89633de92bfbe3e484dfe182ef8091f88"
+    },
+    {
+      "file": "docs/vendor/purify-LICENSE",
+      "status": 200,
+      "type": "application/octet-stream",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    {
+      "file": "docs/vendor/purify-LICENSE-MPL",
+      "status": 200,
+      "type": "application/octet-stream",
+      "sha256": "fab3dd6bdab226f1c08630b1dd917e11fcb4ec5e1e020e2c16f83a0a13863e85"
+    },
+    {
+      "file": "docs/vendor/purify.js",
+      "status": 200,
+      "type": "application/javascript; charset=utf-8",
+      "sha256": "f263b05369e050fa175d4ecb9c9358eb4253602d510297adfb31df48b2f1c4d5"
+    },
+    {
+      "file": "docs/zig-version.txt",
+      "status": 200,
+      "type": "text/plain; charset=utf-8",
+      "sha256": "aa037454b5e8320521a32b278a3f4aff05fc79009ab5503f5d4a1b9a33b38c47"
+    },
+    {
+      "file": "examples/LICENSE-ZAP",
+      "status": 200,
+      "type": "application/octet-stream",
+      "sha256": "6c6f172ad167347dd865bf07628f7bef8254c9a5aac0a846913d451848ea98c4"
+    },
+    {
+      "file": "examples/README.md",
+      "status": 200,
+      "type": "text/markdown; charset=utf-8",
+      "sha256": "830484d916c1f310201505e03c83af508220425c68777c347e21e62d82493e5d"
+    },
+    {
+      "file": "examples/accept.zig",
+      "status": 200,
+      "type": "application/octet-stream",
+      "sha256": "2d2a3732b569d2487dc30b3108f0adedd15022dd86b04143445f44f062dbba4f"
+    },
+    {
+      "file": "examples/app_auth.zig",
+      "status": 200,
+      "type": "application/octet-stream",
+      "sha256": "5c1613a9c5264344f182ed9ea830655625c61aff45d6a1fa25f6bccccc9c8681"
+    },
+    {
+      "file": "examples/app_basic.zig",
+      "status": 200,
+      "type": "application/octet-stream",
+      "sha256": "4f711675e478828bdb78a0b37acc235f2fbf17c0c297c62dca8b8e705fc3f2fb"
+    },
+    {
+      "file": "examples/app_errors.zig",
+      "status": 200,
+      "type": "application/octet-stream",
+      "sha256": "1b273f40b87ba6c96e4deb28ae39599be51bf8889d6d82aea51688ce7814bac9"
+    },
+    {
+      "file": "examples/bindataformpost.zig",
+      "status": 200,
+      "type": "application/octet-stream",
+      "sha256": "197460662b52f484adb89dc5cb09beab8fbc0c88b31bc6fa6a5693ffe76cebde"
+    },
+    {
+      "file": "examples/cookies.zig",
+      "status": 200,
+      "type": "application/octet-stream",
+      "sha256": "9a4900411e8e6ca6c15b47ade4fbdaa86c7172bba53040147b5ae4aea70fe55d"
+    },
+    {
+      "file": "examples/embedding/build.zig",
+      "status": 200,
+      "type": "application/octet-stream",
+      "sha256": "5cd5990ace400365b500fc5802f668a656ceaf33d45033934f5d63a9f32fd30c"
+    },
+    {
+      "file": "examples/embedding/build.zig.zon",
+      "status": 200,
+      "type": "application/octet-stream",
+      "sha256": "fb575a41bdc9bc98b3769233828fe05d2b68ed93019422742d3384881b53ca8b"
+    },
+    {
+      "file": "examples/embedding/src/main.zig",
+      "status": 200,
+      "type": "application/octet-stream",
+      "sha256": "f2a266eac407e26a1897f5406ee5cfce5b0e45dff5487fe87b047e1d12708a3c"
+    },
+    {
+      "file": "examples/endpoint.zig",
+      "status": 200,
+      "type": "application/octet-stream",
+      "sha256": "86e350edacfa3d87fc97cf8260d1e0d391b5c3fdd0e79d0a4d3b2d3480958da4"
+    },
+    {
+      "file": "examples/endpoint_auth.zig",
+      "status": 200,
+      "type": "application/octet-stream",
+      "sha256": "3c78bb02abc680e39323aec249939ba7489dc84c16a105bdc5e60cd328fdd44f"
+    },
+    {
+      "file": "examples/hello.zig",
+      "status": 200,
+      "type": "application/octet-stream",
+      "sha256": "4d746ac15310bc18e75d48295fd1ff3fd5aabb837b5a40f3eedc7dbcbb487068"
+    },
+    {
+      "file": "examples/hello2.zig",
+      "status": 200,
+      "type": "application/octet-stream",
+      "sha256": "5feb15678603bbd4b0a5be3f4bdfd1fe34fd4142624a4a7de3172eb903a51f1b"
+    },
+    {
+      "file": "examples/hello_json.zig",
+      "status": 200,
+      "type": "application/octet-stream",
+      "sha256": "326bf38257f6669b2ee0ff7114c4cc0a03797ac724b8d42177623ccba3a70c91"
+    },
+    {
+      "file": "examples/http_params.zig",
+      "status": 200,
+      "type": "application/octet-stream",
+      "sha256": "8e6f574e4c3bf7364fa825443705ee8f802ad723461c3a50bf0edfc6bddd1544"
+    },
+    {
+      "file": "examples/middleware.zig",
+      "status": 200,
+      "type": "application/octet-stream",
+      "sha256": "cd47cb8977eca63c7d2858f02742f0349afc8f48489592cbcfc7659b913b2ee2"
+    },
+    {
+      "file": "examples/middleware_with_endpoint.zig",
+      "status": 200,
+      "type": "application/octet-stream",
+      "sha256": "fc101f13eb14c3304d9821028503fa882b8d4355782e386c5fc2cc737800ece6"
+    },
+    {
+      "file": "examples/routes.zig",
+      "status": 200,
+      "type": "application/octet-stream",
+      "sha256": "41c1e4f58abc5ee8e900b157d90f5dae4d959d95f5b9c7f8a04fafbe4b829f3d"
+    },
+    {
+      "file": "examples/senderror.zig",
+      "status": 200,
+      "type": "application/octet-stream",
+      "sha256": "17b7295198a8a11ff81a7b9e29de9c9c57a6f4b0b8cebdcd95940679ea1372f0"
+    },
+    {
+      "file": "examples/sendfile.zig",
+      "status": 200,
+      "type": "application/octet-stream",
+      "sha256": "9634cfdd9d4799000b79c45d37a1af76086f5e76b0486789e253cb6567a30653"
+    },
+    {
+      "file": "examples/serve.zig",
+      "status": 200,
+      "type": "application/octet-stream",
+      "sha256": "4524e7ed55a8958725e79bd6f41c39d422b4099f3b9ef0e7e9697d298708cc80"
+    },
+    {
+      "file": "examples/simple_router.zig",
+      "status": 200,
+      "type": "application/octet-stream",
+      "sha256": "2226061d8bc8bef81da28179692289f8c3f2b068b80118ed46f37e6da741fe84"
+    },
+    {
+      "file": "examples/support.zig",
+      "status": 200,
+      "type": "application/octet-stream",
+      "sha256": "e40c81cf8517b1fa1c25b9865dece4a712a607809e999be3342cfe767f82f100"
+    },
+    {
+      "file": "examples/userpass_session.zig",
+      "status": 200,
+      "type": "application/octet-stream",
+      "sha256": "b65dd6b90f0f16efbe97c5626c2d7ec417d50d13919c44984e4ce2d04d7e0e62"
+    },
+    {
+      "file": "index.html",
+      "status": 200,
+      "type": "text/html; charset=utf-8",
+      "sha256": "5ef48eecebb4e6f35d096c876ad95eed2f9393ce7f2ce5d222f8ccf15168681c"
+    },
+    {
+      "file": "reports/2026-09-06-app-api.md",
+      "status": 200,
+      "type": "text/markdown; charset=utf-8",
+      "sha256": "b7d9c696f76897d544cb0b996d88d65c9a45ce549c856fec62e908403a50c49e"
+    },
+    {
+      "file": "reports/2026-09-06-basic-zap/PROTOCOL.md",
+      "status": 200,
+      "type": "text/markdown; charset=utf-8",
+      "sha256": "48039c3d9e7e898feed4229b1efb02a41c97c9710388a56b6e6c95bb84d4b391"
+    },
+    {
+      "file": "reports/2026-09-06-basic-zap/reproducer/README.md",
+      "status": 200,
+      "type": "text/markdown; charset=utf-8",
+      "sha256": "18a4af6db89d0ed21d7c9b3f45d86327e01415d9e22a189631b0a2a5c6f32579"
+    },
+    {
+      "file": "reports/2026-09-06-basic-zap.md",
+      "status": 200,
+      "type": "text/markdown; charset=utf-8",
+      "sha256": "9aa30adef7ad45c07b687b7aedbe6be9b16c7dbd53127012ed76a7fbfe9536e0"
+    },
+    {
+      "file": "reports/2026-09-06-baz-extraction.md",
+      "status": 200,
+      "type": "text/markdown; charset=utf-8",
+      "sha256": "7776782c173862ec70e033c79423802ac341915c8a65a40f743e68ac689a5909"
+    },
+    {
+      "file": "src/App.zig",
+      "status": 200,
+      "type": "application/octet-stream",
+      "sha256": "af60adc94e625163ecdb2eebc99a51cb0b7891fd821846a6d1c46a974879fc17"
+    },
+    {
+      "file": "src/app_demo.zig",
+      "status": 200,
+      "type": "application/octet-stream",
+      "sha256": "5da132f3425d113ff6260ce0635e375e426714fa29dc9332024364a65721231d"
+    },
+    {
+      "file": "src/form.zig",
+      "status": 200,
+      "type": "application/octet-stream",
+      "sha256": "8c1748d671fbb98138a8e3d1a68753aad64538d1d2b7c910d2b30dc5d0ac6547"
+    },
+    {
+      "file": "src/multipart.zig",
+      "status": 200,
+      "type": "application/octet-stream",
+      "sha256": "ebb2e7022335ffe6091100a89b8c064f70277e17d7f70fd6dcac6e12ebdc8115"
+    },
+    {
+      "file": "src/params.zig",
+      "status": 200,
+      "type": "application/octet-stream",
+      "sha256": "f8bf533091cb3086ee53c3267b6d3bbbdf1f8a19d108d7933de6639408b4f87b"
+    },
+    {
+      "file": "src/request.zig",
+      "status": 200,
+      "type": "application/octet-stream",
+      "sha256": "e958db62656ba91848e2e74ce373f46998d4cdf3c718ff5d33f25e87ebe6d67c"
+    },
+    {
+      "file": "src/response.zig",
+      "status": 200,
+      "type": "application/octet-stream",
+      "sha256": "604a4e33cc0aac916b3a276e13302cd8a1622e685a03edacf17cac6d95b2e5d2"
+    },
+    {
+      "file": "src/router.zig",
+      "status": 200,
+      "type": "application/octet-stream",
+      "sha256": "8ce10b41e7558fe9ce88274269604aaeeddcc531c55e98bfc8d874816e1c6401"
+    },
+    {
+      "file": "src/web.zig",
+      "status": 200,
+      "type": "application/octet-stream",
+      "sha256": "a3b6defa3d0251e556fc2d90f6383592ea287b2d374430d2169d5a95d46ee327"
+    }
+  ],
+  "excluded_control_file": ".nojekyll"
+}

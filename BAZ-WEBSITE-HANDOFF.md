@@ -21,6 +21,8 @@ The user explicitly authorized publication in the intended session. Website
 source and the Pages workflow belong to Baz’s `main`; Pages deploys from there.
 The generated artifact records its exact publication revision.
 
-The separate Windows dependency update remains paused. Read [HANDOFF.md](HANDOFF.md)
-before resuming runtime or dependency work. The website changes do not qualify
-Baz on Windows or change its tested engine pin.
+The Windows dependency update subsequently passed Baz’s own native x64 Windows,
+Linux, and macOS gates. Read [HANDOFF.md](HANDOFF.md) and the
+[native receipt](reports/2026-09-06-windows-baz.md) for source identity and scope.
+The site prominently identifies pure Zig implementation, Windows support,
+and the bounded/http website link.

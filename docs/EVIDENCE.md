@@ -48,3 +48,11 @@ TigerStyle experiment, not a claim of complete TigerStyle conformance.
 
 The first source-hashed native result is
 [the MVP receipt](https://github.com/technologylab-ai/bounded-http/blob/4b3cd5551d80b422ec6ef763627d019e6f1dfb83/reports/2026-09-05-mvp.md).
+
+## Native Windows, Linux, and macOS integration
+
+[The Windows integration receipt](../reports/2026-09-06-windows-baz.md) records
+Baz’s own native x64 Windows IOCP gate, including Debug/ReleaseSafe compilation
+and unit tests, all App/example groups, and three finite handoff/shutdown cases.
+Linux and macOS passed fresh regressions on the same runtime/test source.
+Native Windows is supported; cross-compilation alone is not this evidence.

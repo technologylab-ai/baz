@@ -6,7 +6,8 @@ These examples adapt the public behavior of our predecessor
 the external bounded/http engine. Original source: [the pinned Zap examples](https://github.com/zigzap/zap/tree/f6099ecec496c7ec623c5913baa5b6b5da2e883d/examples).
 Zap's copyright/license is preserved in [LICENSE-ZAP](LICENSE-ZAP).
 
-The 20 supported examples are standalone executables. Each uses the public
+The 20 supported examples are standalone executables on Linux, macOS, and native
+Windows x64. All 20 passed the [native three-platform gate](../reports/2026-09-06-windows-baz.md). Each uses the public
 framework import and [shared executable support](support.zig); there is no
 facil.io dependency. Names retain the original build targets for easy comparison.
 
@@ -22,7 +23,9 @@ tests. `zig build NAME` installs just that example; `zig build run-NAME` runs it
 Common flags: `--port`, `--duration-ms`, `--connections`, `--execution`,
 `--workers`, and `--shards`. The CRUD `endpoint` example requires workers and
 one shard. IPv4 loopback/plain HTTP restrictions apply to all.
-Use SIGINT/SIGTERM for a clean drain. READY and final STATS use the same finite
+Use Ctrl-C for a clean drain (SIGINT/SIGTERM on POSIX; Ctrl-C/Ctrl-Break console
+events on Windows). Windows binaries have an `.exe` suffix; use `curl.exe` for
+HTTP examples in PowerShell. READY and final STATS use the same finite
 test harness as the engine. A handler-triggered stop may close its own response
 before delivery; only terminal shutdown establishes released storage.
 

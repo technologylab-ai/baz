@@ -35,6 +35,19 @@ The [package boundary](docs/DEPENDENCY.md) and [roadmap](docs/APP-API-ROADMAP.md
 record the dependency, upstream changes, and remaining work.
 See the [repository record](docs/REPOSITORY.md) for branches, history, CI, and publication status.
 
+## Platform support
+
+**Linux, macOS, and native Windows x64 are supported.** Baz adds native Windows
+support beyond [Zap’s facil.io-based platform support](https://github.com/zigzap/zap/blob/master/README.md).
+Both the framework and its bounded/http engine are written in Zig.
+
+All three platforms passed Debug and ReleaseSafe verification, the independent
+package consumer, all 14 App groups, and all 20 example groups. Windows also
+passed three native shard-handoff and console-shutdown cases. See the
+[native Windows and regression receipt](reports/2026-09-06-windows-baz.md)
+for exact environments and evidence. Windows is supported within Baz’s overall
+experimental status; this is correctness coverage, not production qualification.
+
 ## Try it
 
 Use exact Zig 0.16.0 from [.zig-version](.zig-version), with Python 3 installed:
@@ -43,7 +56,7 @@ Use exact Zig 0.16.0 from [.zig-version](.zig-version), with Python 3 installed:
 zig build run-app -Doptimize=ReleaseSafe -- --port 8080
 ```
 
-In another terminal:
+In another terminal (use `curl.exe` on Windows):
 
 ```sh
 curl 'http://127.0.0.1:8080/hello?name=Hello%20Zig'
@@ -105,9 +118,9 @@ preserves the earlier combined engine/framework gates.
 
 Current deployment is IPv4 loopback, plain HTTP/1.1. TLS is out of scope.
 Mustache is postponed pending a [pure Zig library choice](docs/MUSTACHE-CANDIDATES.md).
-WebSockets needs an engine upgrade lifecycle. The paused `work/windows-update` branch prepares Baz's Windows compilation and CI.
-It awaits the engine's Windows sharding PR and fresh Baz verification. An owned `std.Io` provider
-is deferred until after the first API MVP.
+WebSockets needs an engine upgrade lifecycle. Native Windows x64 now has its own
+[CI gate](.github/workflows/windows-build.yml), alongside Linux and macOS.
+An owned `std.Io` provider is deferred until after the first API MVP.
 
 - [Implemented API and migration from Zap](docs/APP-API.md)
 - [API design and predecessor analysis](docs/APP-API-DESIGN.md)
