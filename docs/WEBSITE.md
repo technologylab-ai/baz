@@ -32,7 +32,7 @@ The website worktree is only a branch of Baz, not another project or repository.
 | Landing-page prose | [index.template.html](index.template.html) |
 | App excerpt | `Hello` in [app_demo.zig](../src/app_demo.zig), extracted at build time |
 | Streaming excerpt | `progress` in [streaming.zig](../examples/streaming.zig), extracted at build time |
-| File-from-memory handler | App types and complete `index` handler in [serve.zig](../examples/serve.zig), extracted from the compiled example; the separate 5 MiB fixture backs the large-body evidence |
+| Avoid-body-copies handler | App types and complete `index` handler in [serve.zig](../examples/serve.zig), extracted from the compiled example; copy avoidance leads the explanation, with the small-body threshold stated beside the example and the separate 5 MiB fixture backing the large-body evidence |
 | Example cards | The catalog in [build_pages.py](../tools/build_pages.py), linked to all 21 compiled examples |
 | Benchmark chart and table | Original [Mac](../reports/2026-09-06-basic-zap/macos-summary.json) and [Linux](../reports/2026-09-06-basic-zap/linux-summary.json) summaries; medians checked against recorded trial rates |
 | Diagrams | [Raw parameters](diagrams/parameters.svg), [package boundary](diagrams/layers.svg), [response lifetime](diagrams/lifetime.svg) |
