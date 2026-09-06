@@ -1,3 +1,20 @@
+# App API planning handoff — 2026-09-06
+
+The modern Zap-successor API is planned in worktree `../zig-http-app-api`,
+branch `roadmap/app-api`, based on engine commit
+`4b3cd5551d80b422ec6ef763627d019e6f1dfb83`. Start with the
+[App API roadmap](docs/APP-API-ROADMAP.md),
+[public API design](docs/APP-API-DESIGN.md), and
+[owned std.Io exploration](docs/STD-IO-DECISION.md).
+
+This session inspected the local Zig 0.16 Zap port and the Zig wiki and
+prepared documentation only. No framework implementation or new runtime
+evidence is claimed. Next: API-01 raw request/query helpers, independently
+API-02 response reservation design and IO-01 compatibility/resource audit.
+Reconcile incoming architecture docs before implementation. No measurement
+lock or runner is left active by this planning session. Historical engine
+handoffs and their evidence remain below.
+
 # HTTP experiment handoff — 2026-09-05
 
 Arena/shard adoption is the current base on `integrate/arena-shards` in
