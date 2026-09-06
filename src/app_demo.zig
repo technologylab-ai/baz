@@ -1,5 +1,6 @@
 //! Runnable first application slice. All request helpers use the public module.
 const std = @import("std");
+const zli = @import("zli");
 const web = @import("baz");
 const builtin = @import("builtin");
 const win32 = struct {
@@ -194,57 +195,55 @@ fn explicitHead(ctx: *Context) !void {
     return ctx.response.text(200, "head");
 }
 
-pub fn main(init: std.process.Init) !void {
-    var args = try std.process.Args.Iterator.initAllocator(init.minimal.args, init.gpa);
-    defer args.deinit();
-    _ = args.next();
-    var shared: Shared = .{};
-    var server: web.Config = .{ .port = 8080, .shards = 1 };
-    var limits: web.ResponseLimits = .{};
-    while (args.next()) |flag| {
-        if (std.mem.eql(u8, flag, "--help")) {
-            std.debug.print("HTTP App example: --port N --execution inline|workers --workers N --shards N\n" ++
-                "--connections N --max-body N --max-header N --output-bytes N --response-body N\n" ++
-                "--timeout-ms N --duration-ms N --send-chunk N --stall-ms N\n", .{});
-            return;
-        }
-        const value = args.next() orelse return error.MissingArgument;
-        if (std.mem.eql(u8, flag, "--port")) {
-            server.port = try std.fmt.parseInt(u16, value, 10);
-        } else if (std.mem.eql(u8, flag, "--execution")) {
-            if (std.mem.eql(u8, value, "inline")) {
-                server.execution = .inline_event_loop;
-                server.workers = 0;
-            } else if (std.mem.eql(u8, value, "workers")) {
-                server.execution = .workers;
-                server.workers = 2;
-            } else return error.InvalidArgument;
-        } else if (std.mem.eql(u8, flag, "--workers")) {
-            server.workers = try std.fmt.parseInt(u16, value, 10);
-        } else if (std.mem.eql(u8, flag, "--shards")) {
-            server.shards = try std.fmt.parseInt(u8, value, 10);
-        } else if (std.mem.eql(u8, flag, "--connections")) {
-            server.connections = try std.fmt.parseInt(u16, value, 10);
-        } else if (std.mem.eql(u8, flag, "--max-body")) {
-            server.max_body = try std.fmt.parseInt(u32, value, 10);
-        } else if (std.mem.eql(u8, flag, "--max-header")) {
-            server.max_header = try std.fmt.parseInt(u32, value, 10);
-        } else if (std.mem.eql(u8, flag, "--output-bytes")) {
-            server.output_bytes = try std.fmt.parseInt(u32, value, 10);
-        } else if (std.mem.eql(u8, flag, "--response-body")) {
-            limits.body_bytes = try std.fmt.parseInt(u32, value, 10);
-        } else if (std.mem.eql(u8, flag, "--timeout-ms")) {
-            server.timeout_ms = try std.fmt.parseInt(u32, value, 10);
-        } else if (std.mem.eql(u8, flag, "--duration-ms")) {
-            server.duration_ms = try std.fmt.parseInt(u32, value, 10);
-        } else if (std.mem.eql(u8, flag, "--send-chunk")) {
-            server.send_chunk = try std.fmt.parseInt(u32, value, 10);
-        } else if (std.mem.eql(u8, flag, "--stall-ms")) {
-            shared.stall_ms = try std.fmt.parseInt(u32, value, 10);
-        } else return error.InvalidArgument;
-    }
-    if (shared.stall_ms > 5000) return error.InvalidArgument;
+const Options = struct {
+    port: u16 = 8080,
+    execution: enum { @"inline", workers } = .@"inline",
+    workers: ?u16 = null,
+    shards: u8 = 1,
+    connections: u16 = 128,
+    max_body: u32 = 64 * 1024,
+    max_header: u32 = 16 * 1024,
+    output_bytes: u32 = 64 * 1024,
+    response_body: u32 = 8192,
+    timeout_ms: u32 = 5000,
+    duration_ms: u32 = 0,
+    send_chunk: u32 = 64 * 1024,
+    stall_ms: u32 = 100,
 
+    pub const help =
+        \\ HTTP App example
+        \\
+        \\ --port N --execution inline|workers --workers N --shards N
+        \\ --connections N --max-body N --max-header N --output-bytes N --response-body N
+        \\ --timeout-ms N --duration-ms N --send-chunk N --stall-ms N
+        \\
+        \\ Values accept --name value and --name=value.
+        \\ Workers default to 2 in workers mode and 0 in inline mode.
+        \\ -h, --help shows this help and exits.
+    ;
+};
+
+pub fn main(init: std.process.Init) !void {
+    const options = try zli.parseInit(init, Options);
+    if (options.stall_ms > 5000) return error.InvalidArgument;
+    var shared: Shared = .{ .stall_ms = options.stall_ms };
+    const server: web.Config = .{
+        .port = options.port,
+        .execution = switch (options.execution) {
+            .@"inline" => .inline_event_loop,
+            .workers => .workers,
+        },
+        .workers = options.workers orelse if (options.execution == .workers) 2 else 0,
+        .shards = options.shards,
+        .connections = options.connections,
+        .max_body = options.max_body,
+        .max_header = options.max_header,
+        .output_bytes = options.output_bytes,
+        .timeout_ms = options.timeout_ms,
+        .duration_ms = options.duration_ms,
+        .send_chunk = options.send_chunk,
+    };
+    const limits: web.ResponseLimits = .{ .body_bytes = options.response_body };
     const app = try Application.init(.{ .allocator = init.gpa, .io = init.io, .shared = &shared, .server = server, .response = limits });
     defer app.deinit();
     var hello: Hello = .{};

@@ -27,7 +27,7 @@ python3 tests/examples_integration.py
 
 `zig build verify` compiles every example in addition to running the framework
 tests. `zig build NAME` installs just that example; `zig build run-NAME` runs it.
-Common flags: `--port`, `--duration-ms`, `--connections`, `--execution`,
+Common flags: `-h`/`--help`, `-p`/`--port`, `--duration-ms`, `--connections`, `--execution`,
 `--workers`, and `--shards`. The CRUD `endpoint` example requires workers and
 one shard. IPv4 loopback/plain HTTP restrictions apply to all.
 Use Ctrl-C for a clean drain (SIGINT/SIGTERM on POSIX; Ctrl-C/Ctrl-Break console
@@ -35,6 +35,44 @@ events on Windows). Windows binaries have an `.exe` suffix; use `curl.exe` for
 HTTP examples in PowerShell. READY and final STATS use the same finite
 test harness as the engine. A handler-triggered stop may close its own response
 before delivery; only terminal shutdown establishes released storage.
+
+## Typed CLI options with process initialization
+
+All 21 public examples use [zli](https://github.com/renerocksai/zli) through
+[shared executable support](support.zig). The main App demonstration and both
+wire fixtures use the same parser with their own typed option structs. Each
+entry point receives Zig 0.16's `std.process.Init`:
+
+```zig
+pub fn main(init: std.process.Init) !void {
+    const options = try zli.parseInit(init, Options);
+    // Use options to configure your application before App.init/start.
+}
+```
+
+`Options` is an ordinary struct with typed fields, defaults, aliases, and a
+`pub const help` string. See [support.Options](support.zig) for the shared
+server flags and [app_demo.zig](../src/app_demo.zig) for a complete direct use.
+`max_body` becomes `--max-body`; integer fields enforce their declared ranges,
+and enum fields reject unknown values.
+
+Both `--port 8080` and `--port=8080` work. Public examples also accept `-p 8080`.
+Use `zig build run-hello -Doptimize=ReleaseSafe -- --help` to see the options
+without starting a server. Help is handwritten in the struct, not generated.
+Unknown, missing, and repeated options are errors. Explicit `--workers N` is
+independent of its position relative to `--execution workers`; when omitted,
+the count defaults to two in worker mode and zero in inline mode.
+
+`parseInit` uses the supplied `init.io` for diagnostics and retains normalized
+arguments in `init.arena` where needed, including on Windows. String options
+borrow that storage until arena reset/deinitialization. CLI work happens at
+startup, before App starts; zli adds no request-loop parsing or allocation.
+The framework module itself does not import zli. The dependency uses Apache-2.0;
+Baz's own code remains MIT.
+
+The finite CLI regression suite is `python3 tests/cli_integration.py` after
+`zig build install examples -Doptimize=ReleaseSafe`. It checks help and invalid
+arguments before startup, both option spellings, worker defaults, and shutdown.
 
 | Original target | Port | Preserved purpose and deliberate adaptation |
 | --- | --- | --- |

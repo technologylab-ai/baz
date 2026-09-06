@@ -4,6 +4,10 @@
     .fingerprint = 0x78240498d30be4ab,
     .minimum_zig_version = "0.16.0",
     .dependencies = .{
+        .zli = .{
+            .url = "https://github.com/renerocksai/zli/archive/4f17b1f1eacda7b87c49461e34b1520c392788b2.tar.gz",
+            .hash = "zli-0.1.1-pechgr4WAQBsw7p7JPU-GHHZ5xsBpEdfCRNpNtnQYnBz",
+        },
         .bounded_http = .{
             .url = "https://github.com/technologylab-ai/bounded-http/archive/2a269ef57301b21df22f1c616d02d6d244e5d6ca.tar.gz",
             .hash = "bounded_http-0.1.0-N3A1uD4IEQBXzMxjafNtPTuGXAGeklCjLXIInMVXvL9e",

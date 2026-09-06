@@ -61,6 +61,7 @@ jobs:
           zig build verify -Doptimize=Debug -j2 --summary all 2>&1 | tee "$packet/debug.log"
           zig build verify -Doptimize=ReleaseSafe -j2 --summary all 2>&1 | tee "$packet/release-safe.log"
           zig build install examples -Doptimize=ReleaseSafe -j2 2>&1 | tee "$packet/install.log"
+          python3 tests/cli_integration.py --json "$packet/cli.json" 2>&1 | tee "$packet/cli.log"
           python3 tests/app_integration.py 2>&1 | tee "$packet/app.log"
           python3 tests/examples_integration.py 2>&1 | tee "$packet/examples.log"
           python3 tests/streaming_integration.py 2>&1 | tee "$packet/streaming.log"

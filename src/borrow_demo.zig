@@ -1,5 +1,6 @@
 //! Large immutable asset fixture. The application owns these bytes before startup.
 const std = @import("std");
+const zli = @import("zli");
 const baz = @import("baz");
 const support = @import("example_support");
 
@@ -39,70 +40,61 @@ fn state(ctx: *Context) !void {
     try ping(ctx);
 }
 
+const Options = struct {
+    port: u16 = 8080,
+    execution: enum { @"inline", workers } = .workers,
+    workers: ?u16 = null,
+    shards: u8 = 1,
+    connections: u16 = 2,
+    max_body: u32 = 64 * 1024,
+    max_header: u32 = 16 * 1024,
+    output_bytes: u32 = 4096,
+    response_body: u32 = 1024,
+    max_response: usize = 6 * 1024 * 1024,
+    timeout_ms: u32 = 5000,
+    shutdown_ms: u32 = 5000,
+    duration_ms: u32 = 0,
+    send_chunk: u32 = 64 * 1024,
+    socket_send_buffer: u32 = 64 * 1024,
+
+    pub const help =
+        \\ Large borrowed body: GET /asset; HEAD /asset
+        \\
+        \\ --port N --execution inline|workers --workers N --connections N --shards N
+        \\ --max-body N --max-header N --output-bytes N --response-body N --max-response N
+        \\ --timeout-ms N --shutdown-ms N --duration-ms N --send-chunk N --socket-send-buffer N
+        \\
+        \\ Values accept --name value and --name=value.
+        \\ Workers default to 2 in workers mode and 0 in inline mode.
+        \\ -h, --help shows this help and exits.
+    ;
+};
+
 pub fn main(init: std.process.Init) !void {
-    var args = try std.process.Args.Iterator.initAllocator(init.minimal.args, init.gpa);
-    defer args.deinit();
-    _ = args.next();
-    var server: baz.Config = .{
-        .port = 8080,
-        .shards = 1,
-        .connections = 2,
-        .execution = .workers,
-        .workers = 2,
-        .output_bytes = 4096,
-        .max_response_bytes = 6 * 1024 * 1024,
+    const options = try zli.parseInit(init, Options);
+    var shared: Shared = .{};
+    const server: baz.Config = .{
+        .port = options.port,
+        .execution = switch (options.execution) {
+            .@"inline" => .inline_event_loop,
+            .workers => .workers,
+        },
+        .workers = options.workers orelse if (options.execution == .workers) 2 else 0,
+        .shards = options.shards,
+        .connections = options.connections,
+        .max_body = options.max_body,
+        .max_header = options.max_header,
+        .output_bytes = options.output_bytes,
+        .max_response_bytes = options.max_response,
+        .timeout_ms = options.timeout_ms,
+        .shutdown_ms = options.shutdown_ms,
+        .duration_ms = options.duration_ms,
+        .send_chunk = options.send_chunk,
+        .socket_send_buffer_bytes = options.socket_send_buffer,
         .response_batch_limit = 1,
         .borrow_copy_threshold = 256,
     };
-    var limits: baz.ResponseLimits = .{ .body_bytes = 1024 };
-    while (args.next()) |flag| {
-        if (std.mem.eql(u8, flag, "--help")) {
-            std.debug.print("Large borrowed body: GET /asset; HEAD /asset\n" ++
-                "--port N --execution inline|workers --workers N --connections N --shards N\n" ++
-                "--max-body N --max-header N --output-bytes N --response-body N --max-response N\n" ++
-                "--timeout-ms N --shutdown-ms N --duration-ms N --send-chunk N --socket-send-buffer N\n", .{});
-            return;
-        }
-        const value = args.next() orelse return error.MissingArgument;
-        if (std.mem.eql(u8, flag, "--port")) {
-            server.port = try std.fmt.parseInt(u16, value, 10);
-        } else if (std.mem.eql(u8, flag, "--execution")) {
-            if (std.mem.eql(u8, value, "inline")) {
-                server.execution = .inline_event_loop;
-                server.workers = 0;
-            } else if (std.mem.eql(u8, value, "workers")) {
-                server.execution = .workers;
-                server.workers = 2;
-            } else return error.InvalidArgument;
-        } else if (std.mem.eql(u8, flag, "--workers")) {
-            server.workers = try std.fmt.parseInt(u16, value, 10);
-        } else if (std.mem.eql(u8, flag, "--connections")) {
-            server.connections = try std.fmt.parseInt(u16, value, 10);
-        } else if (std.mem.eql(u8, flag, "--shards")) {
-            server.shards = try std.fmt.parseInt(u8, value, 10);
-        } else if (std.mem.eql(u8, flag, "--max-body")) {
-            server.max_body = try std.fmt.parseInt(u32, value, 10);
-        } else if (std.mem.eql(u8, flag, "--max-header")) {
-            server.max_header = try std.fmt.parseInt(u32, value, 10);
-        } else if (std.mem.eql(u8, flag, "--output-bytes")) {
-            server.output_bytes = try std.fmt.parseInt(u32, value, 10);
-        } else if (std.mem.eql(u8, flag, "--response-body")) {
-            limits.body_bytes = try std.fmt.parseInt(u32, value, 10);
-        } else if (std.mem.eql(u8, flag, "--max-response")) {
-            server.max_response_bytes = try std.fmt.parseInt(usize, value, 10);
-        } else if (std.mem.eql(u8, flag, "--timeout-ms")) {
-            server.timeout_ms = try std.fmt.parseInt(u32, value, 10);
-        } else if (std.mem.eql(u8, flag, "--shutdown-ms")) {
-            server.shutdown_ms = try std.fmt.parseInt(u32, value, 10);
-        } else if (std.mem.eql(u8, flag, "--duration-ms")) {
-            server.duration_ms = try std.fmt.parseInt(u32, value, 10);
-        } else if (std.mem.eql(u8, flag, "--send-chunk")) {
-            server.send_chunk = try std.fmt.parseInt(u32, value, 10);
-        } else if (std.mem.eql(u8, flag, "--socket-send-buffer")) {
-            server.socket_send_buffer_bytes = try std.fmt.parseInt(u32, value, 10);
-        } else return error.InvalidArgument;
-    }
-    var shared: Shared = .{};
+    const limits: baz.ResponseLimits = .{ .body_bytes = options.response_body };
     const app = try Application.init(.{
         .allocator = init.gpa,
         .io = init.io,
