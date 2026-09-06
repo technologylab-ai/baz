@@ -45,7 +45,7 @@ Inspect Git state before editing; do not overwrite another session's work.
 
 | Topic | Working decision |
 | --- | --- |
-| Product | Baz (Bounded Async Zap), package/import `baz`, external dependency/import `bounded_http`. Repository publication remains pending. bounded/http stays independently usable. No Zap source-compatibility layer. |
+| Product | Baz (Bounded Async Zap), package/import `baz`, external dependency/import `bounded_http`. Repository: [technologylab-ai/baz](https://github.com/technologylab-ai/baz), with its [Pages documentation](https://technologylab-ai.github.io/baz/). bounded/http stays independently usable. No Zap source-compatibility layer. |
 | Platform/version | Exact Zig 0.16.0; initial plain HTTP/1.1 on the existing Linux/macOS engine. Public bind addresses need later qualification. TLS is out of scope. |
 | Windows | Initial engine support is merged. Baz portability/CI work is paused on `work/windows-update` while another session prepares bounded handoff to Windows shards. |
 | App | Real instances; typed Shared; borrowed endpoint instances; startup-only registration; one routing/context model. |
@@ -76,7 +76,7 @@ Split implementation across sessions at its named gate and record exact state.
 | API-05 | implemented; scoped receipt | Flat multipart fields/files over retained input. | API-04 | APP-MULTIPART |
 | API-06 | queued | Typed locals, middleware, authentication composition, cookies and redirects. | API-02, API-03 | APP-MIDDLEWARE |
 | API-07 | queued | Typed explicit resumable endpoints and retention rules. | API-03, API-06 | APP-RESUME |
-| API-08 | partial: 20 examples and external package | Finish remaining migration examples, repository publication, and successor MVP qualification. | API-01–07 | APP-NATIVE |
+| API-08 | partial: 20 examples and external package | Finish remaining migration examples and successor MVP qualification; repository and Pages publication are integrated. | API-01–07 | APP-NATIVE |
 | IO-01–04 | deferred | Owned std.Io feasibility, isolated prototype, HTTP integration and adoption decision. | First API MVP; see STD-IO-DECISION | STDIO-PROTOTYPE, STDIO-HTTP-OWNERSHIP, STDIO-ADOPTION |
 
 API-01 and API-02 can proceed independently after agreeing on module exports.
@@ -364,6 +364,7 @@ the conversation.
 | 2026-09-06: Baz package extraction | Selected Baz (Bounded Async Zap), package/import `baz`. Removed copied engine sources and switched to URL/hash-pinned `bounded_http`. Added a separate consumer fixture and public draft/signal methods through [bounded/http PR #1](https://github.com/technologylab-ai/bounded-http/pull/1). Reconciled current engine contracts and linked its repository/Pages site. | [Package receipt](../reports/2026-09-06-baz-extraction.md): native macOS/Linux, Debug and ReleaseSafe, 41/41 steps and 60/60 root tests per mode, independent consumers, 14 App and 20 example groups. [50-file source manifest](../reports/2026-09-06-baz-extraction-source.sha256.json). Engine gates passed separately. Prototype performance evidence remains unchanged and explicitly predates extraction. | API-06 public composition, then API-07 resumable endpoints. Merge/update the engine pin through the normal upstream process. Publish Baz's repository separately when requested. |
 
 | 2026-09-06: standalone repository preparation | Created an independent local Baz repository with full reachable history, MIT license, public source links, and Linux/macOS CI. Moved engine-only working-tree material back to upstream references. Preserved the paused Windows changes on `work/windows-update`. | Git integrity and object independence, unchanged runtime/evidence bytes on `main`, local Markdown links, manifest formatting, actionlint, and CI installer syntax. No runtime gates restarted while the Windows update is paused. | Await the engine sharding PR for the draft branch. Publish Baz's GitHub repository when requested; continue API-06 independently. |
+| 2026-09-06: Baz website and publication | Integrated the website worktree into Baz: landing page, ownership diagrams, source-backed App excerpt, 20 example links, prototype performance comparison, Markdown/source reader, and GitHub Pages workflow. User authorized publication in `technologylab-ai/baz`. | [Website receipt](../reports/2026-09-06-website.md): static checks, 14 browser groups, 58 documents, desktop/mobile/keyboard/print, and malicious-input checks. Runtime source, engine pin, and benchmark receipts unchanged. | Continue API-06. Windows dependency work still awaits the engine sharding PR and resumed Baz gates. |
 
 For each implementation session add: commit(s), owned/changed files, decisions,
 named gates passed/pending and exact receipts, remaining blocker (if any), and

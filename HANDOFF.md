@@ -6,8 +6,11 @@ Read [repository preparation](docs/REPOSITORY.md), the [API guide](docs/APP-API.
 and the [roadmap](docs/APP-API-ROADMAP.md).
 
 Baz is MIT licensed. Git history, Zap attribution, benchmark inputs, and Baz's native receipts remain intact.
-No GitHub repository or remote has been created by this preparation.
-Linux/macOS CI is prepared; its first hosted execution remains pending publication.
+Baz’s public repository is [technologylab-ai/baz](https://github.com/technologylab-ai/baz),
+with [GitHub Pages documentation](https://technologylab-ai.github.io/baz/).
+Website source, its build/check scripts, and Pages workflow belong to Baz’s main branch.
+See [website maintenance](docs/WEBSITE.md) and [Actions](https://github.com/technologylab-ai/baz/actions)
+for publishing and hosted verification. The separate Windows draft remains paused.
 
 ## Verified baseline
 

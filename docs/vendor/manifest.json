@@ -1,0 +1,36 @@
+[
+  {
+    "package": "marked",
+    "version": "18.0.11",
+    "tarball": "https://registry.npmjs.org/marked/-/marked-18.0.11.tgz",
+    "integrity": "sha512-HnslJfsZkRPBDJRHvVtAaWlZHEpSu7u8LgQuJCELjRKuWR+hpq4A7sLq3p8HaI9ypVoXDXxV34CsQJEe1+J5Aw==",
+    "git_head": "53cb13f13fc13d433269248c5caa255ffa1361ee",
+    "files_sha256": {
+      "marked.js": "69451c8541c9c1e7a4bf3ffc6f73c4d89633de92bfbe3e484dfe182ef8091f88",
+      "marked-LICENSE": "8e3a3f82f59a60958f56ca08f445647c32a4733dc7ca6c2c46f6eb898471ab9c"
+    }
+  },
+  {
+    "package": "@highlightjs/cdn-assets",
+    "version": "11.12.0",
+    "tarball": "https://registry.npmjs.org/@highlightjs/cdn-assets/-/cdn-assets-11.12.0.tgz",
+    "integrity": "sha512-KvOKXODaiFmId9xaq3xc5xCL66wVLUuOngDbO9B/kewbFTqdGbn2nJxNhN3H5R1cgDTVj6R8vH0zgiNDEGjpDw==",
+    "git_head": "dce7a3dab8f3fd586138ba6c5f29ecc19c02db9f",
+    "files_sha256": {
+      "highlight.js": "8ab71eb09c51f501e5e25157d9cff100e46cc29bcbfc744d0b746d451fca7f53",
+      "highlight-LICENSE": "6c081431591d9df696c82dc598fe1423765b8a299b200ed00b281afd0f64c490"
+    }
+  },
+  {
+    "package": "dompurify",
+    "version": "3.4.15",
+    "tarball": "https://registry.npmjs.org/dompurify/-/dompurify-3.4.15.tgz",
+    "integrity": "sha512-EUBjM+B+lkDE41iE82DDSCfkoPGfXx8IxFxPMjNzm/Uk4xDet77rTN9wqlxlVg71kK7XGuUMv6wUxJUwwv+Xyw==",
+    "git_head": "1d7460c4f8a27be825c11b1c9d346d79db32c1e5",
+    "files_sha256": {
+      "purify.js": "f263b05369e050fa175d4ecb9c9358eb4253602d510297adfb31df48b2f1c4d5",
+      "purify-LICENSE": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "purify-LICENSE-MPL": "fab3dd6bdab226f1c08630b1dd917e11fcb4ec5e1e020e2c16f83a0a13863e85"
+    }
+  }
+]

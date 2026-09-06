@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 210" class="diagram diagram-wide" role="img" aria-labelledby="life-title life-desc">
+<title id="life-title">A response reservation comes before handler side effects</title><desc id="life-desc">Retain validated input, reserve the full draft capacity, run the handler once, then finalize and send. Input and output storage remain retained until all application and kernel borrows have returned.</desc>
+<g font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" fill="#172f3e">
+<g stroke="#9caaa9" fill="none"><path d="M199 87h33m202 0h32m201 0h33"/><path d="m225 82 7 5-7 5m234-10 7 5-7 5m227-10 7 5-7 5"/></g>
+<g fill="#efeee6" stroke="#cdd3d0"><rect x="1" y="24" width="198" height="120"/><rect x="234" y="24" width="198" height="120"/><rect x="700" y="24" width="199" height="120"/></g>
+<rect x="467" y="24" width="198" height="120" fill="#172f3e"/>
+<g font-family="ui-monospace, monospace" font-size="10" fill="#bc3c20"><text x="19" y="48">01 / INPUT</text><text x="252" y="48">02 / RESERVATION</text><text x="718" y="48">04 / OUTPUT</text></g>
+<text x="485" y="48" font-family="ui-monospace, monospace" font-size="10" fill="#f4ad90">03 / APPLICATION</text>
+<g font-size="18"><text x="19" y="83">Retain the request</text><text x="252" y="83">Secure capacity</text><text x="485" y="83" fill="#f8f7f1">Run the handler</text><text x="718" y="83">Finalize &amp; send</text></g>
+<g font-size="12" fill="#4e6370"><text x="19" y="109">Validated, borrowed bytes</text><text x="252" y="109">Drain older output if needed</text><text x="718" y="109">Retain pending borrows</text></g>
+<text x="485" y="109" font-size="12" fill="#d6dedb">One unpublished draft</text>
+<path d="M1 158v11h898v-11" stroke="#9caaa9" fill="none"/>
+<text x="450" y="198" text-anchor="middle" font-family="ui-monospace, monospace" font-size="11" fill="#4e6370">REUSE ONLY WHEN ALL APPLICATION AND KERNEL BORROWS HAVE RETURNED</text>
+</g></svg>
