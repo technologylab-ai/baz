@@ -12,12 +12,13 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
     }).module("bounded_http");
+    const mustache = b.dependency("mustache", .{ .target = target, .optimize = optimize }).module("mustache");
     const module = b.addModule("baz", .{
         .root_source_file = b.path("src/web.zig"),
         .target = target,
         .optimize = optimize,
         .link_libc = true,
-        .imports = &.{.{ .name = "bounded_http", .module = engine }},
+        .imports = &.{ .{ .name = "bounded_http", .module = engine }, .{ .name = "mustache_engine", .module = mustache } },
     });
     // CLI parsing belongs to executables; the public baz module has no zli import.
     const zli = b.dependency("zli", .{ .target = target, .optimize = optimize }).module("zli");
@@ -84,7 +85,7 @@ pub fn build(b: *std.Build) void {
     check.dependOn(&borrow_fixture.step);
     verify.dependOn(&borrow_fixture.step);
     const examples = b.step("examples", "Build and install all supported Zap example ports");
-    for ([_][]const u8{ "hello", "hello2", "hello_json", "simple_router", "routes", "serve", "sendfile", "senderror", "accept", "app_basic", "app_auth", "app_errors", "endpoint", "endpoint_auth", "middleware", "middleware_with_endpoint", "userpass_session", "cookies", "http_params", "bindataformpost", "streaming" }) |name| {
+    for ([_][]const u8{ "hello", "hello2", "hello_json", "simple_router", "routes", "serve", "sendfile", "senderror", "accept", "app_basic", "app_auth", "app_errors", "endpoint", "endpoint_auth", "middleware", "middleware_with_endpoint", "userpass_session", "cookies", "http_params", "bindataformpost", "streaming", "mustache" }) |name| {
         const example = b.addExecutable(.{
             .name = name,
             .use_llvm = if (target.result.os.tag == .linux and optimize == .Debug) true else null,
@@ -120,13 +121,13 @@ pub fn build(b: *std.Build) void {
         if (std.mem.eql(u8, step, "test")) verify.dependOn(&consumer.step) else check.dependOn(&consumer.step);
     }
     const test_step = b.step("test", "Run framework unit tests");
-    for ([_][]const u8{ "src/params.zig", "src/form.zig", "src/request.zig", "src/multipart.zig", "src/response.zig", "src/router.zig", "src/App.zig", "src/web.zig" }) |path| {
+    for ([_][]const u8{ "src/params.zig", "src/form.zig", "src/request.zig", "src/multipart.zig", "src/response.zig", "src/router.zig", "src/mustache.zig", "src/App.zig", "src/web.zig" }) |path| {
         const tests = b.addTest(.{ .use_llvm = if (target.result.os.tag == .linux and optimize == .Debug) true else null, .use_lld = if (target.result.os.tag == .linux and optimize == .Debug) true else null, .root_module = b.createModule(.{
             .root_source_file = b.path(path),
             .target = target,
             .optimize = optimize,
             .link_libc = true,
-            .imports = &.{.{ .name = "bounded_http", .module = engine }},
+            .imports = &.{ .{ .name = "bounded_http", .module = engine }, .{ .name = "mustache_engine", .module = mustache } },
         }) });
         check.dependOn(&tests.step);
         const run_tests = b.addRunArtifact(tests);

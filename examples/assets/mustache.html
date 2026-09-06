@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{page.title}} — Baz</title>
+  <style>
+    :root{color-scheme:light;--paper:#f6f1e7;--ink:#302f28;--muted:#6c6a5d;--accent:#35624b}
+    *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:17px/1.6 system-ui,sans-serif}
+    main{max-width:850px;margin:auto;padding:64px 24px}a{color:var(--accent);text-underline-offset:4px}
+    header{display:flex;justify-content:space-between;gap:20px;font-size:14px}.brand{font-weight:800;letter-spacing:.12em;text-decoration:none}
+    .intro{margin:74px 0 36px}.eyebrow{text-transform:uppercase;letter-spacing:.14em;font-size:12px;color:var(--accent);font-weight:700}
+    h1{font:normal clamp(38px,7vw,68px)/1.1 Georgia,serif;overflow-wrap:anywhere;margin:14px 0 20px}
+    p{color:var(--muted)}.greeting{max-width:530px}form{display:flex;gap:10px;margin-top:26px;flex-wrap:wrap}
+    label{width:100%;font-size:14px}input,button{font:inherit;border-radius:7px;padding:10px 16px}
+    input{min-width:0;flex:1;border:1px solid #c7c2b6;background:#fffcf6;color:var(--ink)}button{border:0;background:var(--accent);color:white;cursor:pointer}
+    :focus-visible{outline:3px solid #bd7541;outline-offset:4px}.users{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;margin:48px 0}
+    .user{padding:24px;border:1px solid #d8d1c2;border-radius:12px;background:#fffcf6}.number{font-size:13px;color:var(--accent)}h2{font:normal 32px Georgia,serif;margin:12px 0}.user p{margin:0 0 20px}.user small{color:var(--muted)}
+    footer{border-top:1px solid #d8d1c2;padding-top:24px;font-size:14px}@media(max-width:480px){main{padding-top:28px}.intro{margin-top:48px}}
+  </style>
+</head>
+<body>
+<main>
+  <header><a class="brand" href="/">BAZ</a><a href="https://technologylab-ai.github.io/baz/">Meet the framework ↗</a></header>
+  <section class="intro">
+    <div class="eyebrow">A little company. A warm welcome.</div>
+    <h1>Hello, {{name}}!</h1>
+    <p class="greeting">Good things start with good people. Meet a few of ours, and make yourself at home.</p>
+    <form action="/" method="get">
+      <label for="name">What should we call you?</label>
+      <input id="name" name="name" value="{{name}}" placeholder="Your name" autocomplete="given-name">
+      <button type="submit">Say hello</button>
+    </form>
+  </section>
+  <section class="users" aria-label="Our people">
+    {{#users}}
+    {{>user}}
+    {{/users}}
+  </section>
+  <footer>Made with <a href="https://technologylab-ai.github.io/baz/">Baz</a> and <a href="https://technologylab-ai.github.io/bounded-http/">bounded/http</a>. A small page with room for you.</footer>
+</main>
+</body>
+</html>

@@ -2,7 +2,7 @@
 
 **Bounded Async Zap.**
 
-[Website & documentation](https://technologylab-ai.github.io/baz/) · [API guide](docs/APP-API.md) · [21 examples](examples/README.md)
+[Website & documentation](https://technologylab-ai.github.io/baz/) · [API guide](docs/APP-API.md) · [22 examples](examples/README.md)
 
 A **pure Zig** successor to [Zap](https://github.com/zigzap/zap), built in **Zig 0.16.0**
 on [bounded/http](https://technologylab-ai.github.io/bounded-http/). It keeps Zap's typed
@@ -32,6 +32,9 @@ The first implementation provides:
 - **Streaming responses:** write, flush, sleep, and write again inside one handler,
   through a standard `std.Io.Writer`. See the [streaming guide](docs/STREAMING.md)
   and [runnable example](examples/streaming.zig).
+- **Mustache templates:** parse once at startup, render typed data directly into
+  reserved HTML response storage. See the [guide](docs/MUSTACHE.md) and
+  [greeting form and user-card example](examples/mustache.zig).
 - Real `App(Shared)` instances, plain endpoint structs and one router.
 - Borrowed query and form text, ordered duplicates and explicit decoding into
   caller buffers. Values such as `001` and `false`, and names such as `a[]`,
@@ -109,8 +112,8 @@ curl -F 'files[]=@.zig-version' http://127.0.0.1:8080/upload
 ```
 
 Start with the [API guide](docs/APP-API.md) and [compiled App example](src/app_demo.zig).
-There are [20 ports of Zap's examples](examples/README.md), including endpoints,
-authentication, middleware, sessions, JSON, query/form data and uploads:
+There are [21 ports of Zap's examples](examples/README.md), including endpoints,
+authentication, middleware, sessions, Mustache, JSON, query/form data and uploads:
 
 ```sh
 zig build examples -Doptimize=ReleaseSafe
@@ -166,7 +169,7 @@ verification and source identity. The [prototype receipt](reports/2026-09-06-app
 preserves the earlier combined engine/framework gates.
 
 Current deployment is IPv4 loopback, plain HTTP/1.1. TLS is out of scope.
-Mustache is postponed pending a [pure Zig library choice](docs/MUSTACHE-CANDIDATES.md).
+Mustache uses a [pure Zig library with bounded rendering](docs/MUSTACHE.md).
 WebSockets needs an engine upgrade lifecycle. Native Windows x64 now has its own
 [CI gate](.github/workflows/windows-build.yml), alongside Linux and macOS.
 An owned `std.Io` provider is deferred until after the first API MVP.

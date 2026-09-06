@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Native CLI correctness checks for the 21 examples and three Baz fixtures.
+"""Native CLI correctness checks for the 22 examples and three Baz fixtures.
 
 Build and install ReleaseSafe binaries first. The caller holds the shared host
 reservation and supplies an overall process-tree watchdog. Help/error processes
@@ -27,7 +27,7 @@ EXAMPLES = (
     "hello", "hello2", "hello_json", "simple_router", "routes", "serve",
     "sendfile", "senderror", "accept", "app_basic", "app_auth", "app_errors",
     "endpoint", "endpoint_auth", "middleware", "middleware_with_endpoint",
-    "userpass_session", "cookies", "http_params", "bindataformpost", "streaming",
+    "userpass_session", "cookies", "http_params", "bindataformpost", "streaming", "mustache",
 )
 FIXTURES = ("baz", "baz-streaming", "baz-borrow")
 WORKER_EXAMPLES = frozenset(("endpoint", "streaming"))

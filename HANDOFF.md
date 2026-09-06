@@ -6,9 +6,18 @@ GitHub Pages: <https://technologylab-ai.github.io/baz/>.
 Baz and its [bounded/http](https://technologylab-ai.github.io/bounded-http/) engine are implemented in Zig. Baz is MIT licensed.
 The website, reader, diagrams, and publishing workflow belong to this repository.
 
-## CLI integration candidate
+## Mustache integration candidate
 
-The `feat/zli-cli` worktree adds typed startup options to all 21 public examples
+`feat/mustache` adds startup-owned `web.mustache.Template`, bounded cached rendering,
+`Response.mustache`, and a concise greeting-page example with separate HTML partials.
+The dependency is a pure Zig MIT fork of diogok/mustache-zig at exact Zig 0.16.0.
+Read [MUSTACHE.md](docs/MUSTACHE.md) and its selection record. Native verification
+is pending; do not treat the earlier framework receipts as Mustache evidence.
+
+## Integrated CLI options
+
+[Baz PR #2](https://github.com/technologylab-ai/baz/pull/2) merged as `9464d3c`.
+It added typed startup options to the then-current 21 public examples
 and the three App/streaming/borrow executables. It pins the pure Zig zli fork's
 [Init adapter PR](https://github.com/renerocksai/zli/pull/1) and uses
 `try zli.parseInit(init, Options)` with Zig 0.16's supplied I/O and process arena.
@@ -17,10 +26,10 @@ flags remain supported; equals syntax, help, and public-example port aliases
 are available. Repeated options now fail and worker counts are independent of
 argument order. See [examples/README.md](examples/README.md#typed-cli-options-with-process-initialization).
 
-The CLI suite checks 24 executables before startup and exercises finite
+The CLI suite now checks 25 executables, including Mustache, before startup and exercises finite
 ReleaseSafe startup/shutdown cases. Native CI includes that suite alongside all
-existing wire gates. This candidate changes executable/build inputs, so the
-older receipts below document the framework baseline, not new CLI evidence.
+existing wire gates. The merged CLI candidate passed all native CI gates with 271 CLI checks on the
+previous 24 executables. The Mustache addition extends those inputs and gates.
 
 ## Verified framework baseline
 
@@ -71,7 +80,7 @@ pinned by immutable URL/hash. Native streaming gates passed on all three platfor
 App basics and Streaming response as adjacent tabs; `#streaming` opens the latter.
 
 Read the [API guide](docs/APP-API.md), [ownership contract](docs/OWNERSHIP.md), and
-[multi-session roadmap](docs/APP-API-ROADMAP.md). API-01–05 and 20 example ports
+[multi-session roadmap](docs/APP-API-ROADMAP.md). API-01–05 and 21 example ports
 are implemented. API-06 adds public middleware, typed locals, and cookie
 composition; API-07 adds typed resumable endpoints and their ownership gates.
 
@@ -90,7 +99,7 @@ remains the default for text/bytes/stream helpers; borrowing is always explicit.
 Ordinary stream writes still copy. Do not claim minimum copies.
 
 Caller std.Io remains the MVP capability; an owned provider is deferred.
-TLS is out of scope. Mustache awaits a pure Zig library choice. WebSockets needs
+TLS is out of scope. Mustache is the current integration priority. WebSockets needs
 an engine upgrade lifecycle. The [Zap comparison](reports/2026-09-06-basic-zap.md)
 measures prototype `c152e59`, before package extraction. Its raw inputs and
 statistics are unchanged. Never benchmark or warm up a Debug build.

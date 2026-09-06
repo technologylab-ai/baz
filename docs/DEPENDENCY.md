@@ -88,3 +88,14 @@ with no dependencies of its own. Baz retains its MIT license. The public `baz`
 and `bounded_http` modules have no zli import; application code chooses its own
 CLI parser. The package dependency may still be fetched when Zig evaluates the
 Baz build graph. No zli code runs on the request I/O loop.
+
+
+## Mustache templates
+
+Baz's public `web.mustache` adapter consumes the immutable URL/hash-pinned
+[pure Zig Mustache fork](https://github.com/technologylab-ai/mustache-zig). The
+module is imported internally as `mustache_engine`; consumers use Baz's wrapper.
+The library is MIT licensed and requires exact Zig 0.16.0. Its parser/runtime
+changes and core-spec tests belong in that separate repository. Baz owns startup
+storage limits, response integration, examples, and native HTTP gates.
+See [MUSTACHE.md](MUSTACHE.md) for API, lifetime, output-copy, and feature limits.
