@@ -109,6 +109,10 @@ zig build examples -Doptimize=ReleaseSafe
 zig build run-http_params -Doptimize=ReleaseSafe -- --port 8080
 ```
 
+All examples use [zli](https://github.com/renerocksai/zli) with Zig 0.16
+`std.process.Init` for typed startup options and `--help`. Both `--port 8080`
+and `--port=8080` work. See the [CLI guide](examples/README.md#typed-cli-options-with-process-initialization).
+
 Middleware/authentication/cookie composition is currently demonstrated through
 typed example helpers; the public composition API and typed resumable endpoints
 are the next roadmap steps.

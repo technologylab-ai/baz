@@ -19,6 +19,8 @@ pub fn build(b: *std.Build) void {
         .link_libc = true,
         .imports = &.{.{ .name = "bounded_http", .module = engine }},
     });
+    // CLI parsing belongs to executables; the public baz module has no zli import.
+    const zli = b.dependency("zli", .{ .target = target, .optimize = optimize }).module("zli");
     // Consumers may import the framework and its exact engine module together.
     b.modules.put(b.allocator, b.dupe("bounded_http"), engine) catch @panic("out of memory");
     // Arch's GCC 16 CRT contains .sframe R_X86_64_PC64 relocations which
@@ -33,7 +35,7 @@ pub fn build(b: *std.Build) void {
             .target = target,
             .optimize = optimize,
             .link_libc = true,
-            .imports = &.{.{ .name = "baz", .module = module }},
+            .imports = &.{ .{ .name = "baz", .module = module }, .{ .name = "zli", .module = zli } },
         }),
     });
     b.installArtifact(app_exe);
@@ -52,7 +54,7 @@ pub fn build(b: *std.Build) void {
             .target = target,
             .optimize = optimize,
             .link_libc = true,
-            .imports = &.{.{ .name = "baz", .module = module }},
+            .imports = &.{ .{ .name = "baz", .module = module }, .{ .name = "zli", .module = zli } },
         }),
     });
     b.installArtifact(stream_fixture);
@@ -64,7 +66,7 @@ pub fn build(b: *std.Build) void {
         .root_source_file = b.path("examples/support.zig"),
         .target = target,
         .optimize = optimize,
-        .imports = &.{.{ .name = "baz", .module = module }},
+        .imports = &.{ .{ .name = "baz", .module = module }, .{ .name = "zli", .module = zli } },
     });
     const borrow_fixture = b.addExecutable(.{
         .name = "baz-borrow",
@@ -75,7 +77,7 @@ pub fn build(b: *std.Build) void {
             .target = target,
             .optimize = optimize,
             .link_libc = true,
-            .imports = &.{ .{ .name = "baz", .module = module }, .{ .name = "example_support", .module = example_support } },
+            .imports = &.{ .{ .name = "baz", .module = module }, .{ .name = "example_support", .module = example_support }, .{ .name = "zli", .module = zli } },
         }),
     });
     b.installArtifact(borrow_fixture);

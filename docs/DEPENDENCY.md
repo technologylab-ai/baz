@@ -73,3 +73,18 @@ Run engine gates upstream when the engine changes.
 The original App/Zap throughput receipt measured `c152e59` before package extraction.
 It does not measure the extracted package or these additional adapter methods.
 No throughput comparison is rerun solely for package naming or documentation.
+
+## Executable CLI dependency
+
+The [zli fork](https://github.com/renerocksai/zli), pinned to
+`4f17b1f1eacda7b87c49461e34b1520c392788b2` from its [Init adapter PR](https://github.com/renerocksai/zli/pull/1), supplies typed command-line
+parsing for all public examples and the App/streaming/borrow fixture executables.
+Its `parseInit(init, Options)` entry point consumes Zig 0.16 `std.process.Init`,
+using the supplied I/O and process arena. The [example guide](../examples/README.md#typed-cli-options-with-process-initialization)
+records syntax, ownership, and startup behavior.
+
+The dependency is pure Zig under [Apache-2.0](https://github.com/renerocksai/zli/blob/main/LICENSE),
+with no dependencies of its own. Baz retains its MIT license. The public `baz`
+and `bounded_http` modules have no zli import; application code chooses its own
+CLI parser. The package dependency may still be fetched when Zig evaluates the
+Baz build graph. No zli code runs on the request I/O loop.

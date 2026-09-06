@@ -1,6 +1,7 @@
-//! Executable-only lifecycle support shared by the migration examples.
+//! Executable-only CLI and lifecycle support shared by every public example.
 const std = @import("std");
 const web = @import("baz");
+const zli = @import("zli");
 const builtin = @import("builtin");
 const win32 = struct {
     extern "kernel32" fn SetConsoleCtrlHandler(?*const fn (u32) callconv(.winapi) i32, i32) callconv(.winapi) i32;
@@ -15,37 +16,51 @@ pub fn workerConfig(init: std.process.Init) !web.Config {
     return parseConfig(init, true);
 }
 
-fn parseConfig(init: std.process.Init, workers_required: bool) !web.Config {
-    var args = try std.process.Args.Iterator.initAllocator(init.minimal.args, init.gpa);
-    defer args.deinit();
-    _ = args.next();
-    var result: web.Config = .{ .port = 8080, .shards = 1, .connections = 16 };
-    if (workers_required) {
-        result.execution = .workers;
-        result.workers = 2;
-    }
-    while (args.next()) |flag| {
-        const value = args.next() orelse return error.MissingArgument;
-        if (std.mem.eql(u8, flag, "--port")) {
-            result.port = try std.fmt.parseInt(u16, value, 10);
-        } else if (std.mem.eql(u8, flag, "--duration-ms")) {
-            result.duration_ms = try std.fmt.parseInt(u32, value, 10);
-        } else if (std.mem.eql(u8, flag, "--execution")) {
-            if (std.mem.eql(u8, value, "inline")) {
-                result.execution = .inline_event_loop;
-                result.workers = 0;
-            } else if (std.mem.eql(u8, value, "workers")) {
-                result.execution = .workers;
-                result.workers = 2;
-            } else return error.InvalidArgument;
-        } else if (std.mem.eql(u8, flag, "--workers")) {
-            result.workers = try std.fmt.parseInt(u16, value, 10);
-        } else if (std.mem.eql(u8, flag, "--connections")) {
-            result.connections = try std.fmt.parseInt(u16, value, 10);
-        } else if (std.mem.eql(u8, flag, "--shards")) {
-            result.shards = try std.fmt.parseInt(u8, value, 10);
-        } else return error.InvalidArgument;
-    }
+/// Typed startup arguments. Underscores become CLI hyphens in zli.
+/// Worker-only examples choose their own execution default below.
+pub fn Options(comptime workers_required: bool) type {
+    return struct {
+        port: u16 = 8080,
+        duration_ms: u32 = 0,
+        execution: enum { @"inline", workers } = if (workers_required) .workers else .@"inline",
+        workers: ?u16 = null,
+        connections: u16 = 16,
+        shards: u8 = 1,
+
+        pub const help =
+            \\Baz example — Zig 0.16.0
+            \\Usage: EXAMPLE [options]
+            \\
+            \\  -h, --help                    Show this help and exit
+            \\  -p, --port N                  Listen port; 0 selects an available port (default: 8080)
+            \\      --duration-ms N           Stop after N milliseconds; 0 waits for shutdown
+            \\      --execution inline|workers
+            \\      --workers N               Worker count (default: 2 for workers, 0 for inline)
+            \\      --connections N           Connection slots (default: 16)
+            \\      --shards N                I/O shards (default: 1)
+            \\
+            \\Options accept both --port 8080 and --port=8080. Repeated options are errors.
+        ++ if (workers_required)
+            \\
+            \\This example defaults to workers and requires worker execution with one shard.
+        else
+            \\
+            \\This example defaults to inline execution.
+        ;
+        pub const aliases = .{ .port = "p" };
+    };
+}
+
+fn parseConfig(init: std.process.Init, comptime workers_required: bool) !web.Config {
+    const options = try zli.parseInit(init, Options(workers_required));
+    const result: web.Config = .{
+        .port = options.port,
+        .duration_ms = options.duration_ms,
+        .execution = if (options.execution == .workers) .workers else .inline_event_loop,
+        .workers = options.workers orelse if (options.execution == .workers) @as(u16, 2) else 0,
+        .connections = options.connections,
+        .shards = options.shards,
+    };
     if (workers_required and (result.execution != .workers or result.shards != 1)) return error.WorkerExecutionRequired;
     return result;
 }

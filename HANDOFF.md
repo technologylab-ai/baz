@@ -6,7 +6,23 @@ GitHub Pages: <https://technologylab-ai.github.io/baz/>.
 Baz and its [bounded/http](https://technologylab-ai.github.io/bounded-http/) engine are implemented in Zig. Baz is MIT licensed.
 The website, reader, diagrams, and publishing workflow belong to this repository.
 
-## Verified current baseline
+## CLI integration candidate
+
+The `feat/zli-cli` worktree adds typed startup options to all 21 public examples
+and the three App/streaming/borrow executables. It pins the pure Zig zli fork's
+[Init adapter PR](https://github.com/renerocksai/zli/pull/1) and uses
+`try zli.parseInit(init, Options)` with Zig 0.16's supplied I/O and process arena.
+The public framework module does not import zli. Existing space-separated
+flags remain supported; equals syntax, help, and public-example port aliases
+are available. Repeated options now fail and worker counts are independent of
+argument order. See [examples/README.md](examples/README.md#typed-cli-options-with-process-initialization).
+
+The CLI suite checks 24 executables before startup and exercises finite
+ReleaseSafe startup/shutdown cases. Native CI includes that suite alongside all
+existing wire gates. This candidate changes executable/build inputs, so the
+older receipts below document the framework baseline, not new CLI evidence.
+
+## Verified framework baseline
 
 **Native Windows x64, Linux, and macOS are supported, including streaming.**
 Runtime/test source `86249ad4ea6a85407dd9463b43311c0c2be1e293` passed all three
@@ -15,7 +31,7 @@ consumer test per mode), 14 App groups, 20 ported-example groups, and 14 streami
 groups including the runnable example, plus nine large-borrow groups. Windows additionally passed three native
 shard-handoff and console-shutdown cases. The [large-borrow receipt](reports/2026-09-06-large-borrow.md)
 retains source identity, environments, logs, and ownership statistics. Later
-website/docs edits preserve those runtime/test inputs.
+website/docs edits up to `6a326f6` preserve those runtime/test inputs.
 
 The engine pin is `2a269ef57301b21df22f1c616d02d6d244e5d6ca`, package hash
 `bounded_http-0.1.0-N3A1uD4IEQBXzMxjafNtPTuGXAGeklCjLXIInMVXvL9e`.
@@ -64,7 +80,8 @@ records current copying paths. The large-borrow change separates the total
 response bound from staging capacity: immutable 5 MB assets can use `borrowBody`
 with a small arena. Native Linux/macOS/Windows verification passed for this PR;
 the separate streaming receipt preserves the preceding baseline.
-PR #1 is merged. The third website tab, File from memory, shows the complete
+PR #1 is merged. The third website tab, Avoid body copies, leads with the payload-copy benefit
+and shows the complete
 compiled `serve.zig` handler and explains that its file is the entire body.
 The API/streaming guides explicitly document the current inability to insert
 a borrowed span between streaming writes. Use the copying stream writer for
