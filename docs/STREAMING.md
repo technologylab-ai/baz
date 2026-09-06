@@ -21,9 +21,9 @@ work; `Stream` also provides convenience `writeAll`, `print`, and `flush` method
 Every write copies input bytes before returning. Stack buffers are valid sources.
 Writes use the connection's startup-reserved staging buffer. Payload bytes then
 move once more into the final snapshot layout. See [the copy and borrowing
-contract](OWNERSHIP.md#response-copies-and-borrowing), including `borrowBody`
-for large preexisting assets with a suitable lifetime. Filling that buffer
-automatically flushes it before accepting more data. Explicit `flush()` sends a
+contract](OWNERSHIP.md#response-copies-and-borrowing). `borrowBody` is a separate
+whole-response API for retained assets; it cannot be inserted into a stream.
+Filling the staging buffer automatically flushes it before accepting more data. Explicit `flush()` sends a
 partial buffer and waits for local transmission completion. An empty flush sends
 pending headers but does not terminate a chunked response.
 
@@ -43,6 +43,25 @@ The convenience methods return that error directly. Propagate errors from custom
 formatters and source readers used through the raw writer; those errors can occur
 outside the response writer's methods.
 
+## Current limit: borrowed bodies cannot be inserted into a stream
+
+`response.borrowBody()` selects a complete one-shot response body. It cannot be
+mixed with `response.stream()` on the same active response. This includes the
+sequence **write → flush → borrow a large image → continue writing**. The conflict
+exists as soon as the stream starts, even before its first write or flush.
+Likewise, starting a stream after preparing a borrowed body is unsupported.
+
+To place a large image between other output chunks today, pass its bytes to the
+stream writer's `writeAll` and continue writing through that same writer. This
+uses bounded copying and automatic staging flushes. The application supplies any
+required body representation, separators, and content type; `borrowBody` does
+not insert multipart parts or choose their encoding.
+
+Headers can be added until the first publication, independently of these body
+choices. See [the combination rules](OWNERSHIP.md#one-complete-body-or-a-stream)
+for header changes, body replacement, and error handling. A borrowed stream-write
+API remains [future work](APP-API-ROADMAP.md#response-copy-follow-up).
+
 ## Framing and bounds
 
 The default `.content_length = null` selects HTTP/1.1 chunked framing. Supply a
@@ -51,8 +70,9 @@ and requires an exact match at finish. HEAD follows the handler but suppresses
 payload transmission. Statuses 204, 205, and 304 reject nonempty output.
 
 `response.body_bytes` controls per-stream staging capacity and the copied/generated
-one-shot body limit. Borrowed one-shot bodies use `server.max_response_bytes`. `server.max_response_bytes` controls the entire streaming response. A zero
-staging allowance permits only empty output. Large writes may publish accepted
+one-shot body limit. `server.max_response_bytes` bounds both a borrowed one-shot
+body and the entire streaming response. For streaming, zero staging permits only
+empty output; a borrowed one-shot body can use zero staging. Large writes may publish accepted
 prefixes before encountering an error; they are not transactional.
 
 Flushes retain the original request deadline. Repeated writes or sleeps cannot

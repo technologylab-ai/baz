@@ -119,9 +119,9 @@ def build():
     streaming = re.search(r'^fn progress\(.*?^}', (ROOT / 'examples/streaming.zig').read_text(), re.M | re.S)
     if not streaming:
         raise ValueError('Maintained streaming endpoint not found.')
-    borrowed = re.search(r'^    try ctx\.response\.borrowBody\(.*?\);$', (ROOT / 'src/borrow_demo.zig').read_text(), re.M)
+    borrowed = re.search(r'^const Shared = struct \{\};\n.*?^fn index\(.*?^}', (ROOT / 'examples/serve.zig').read_text(), re.M | re.S)
     if not borrowed:
-        raise ValueError('Maintained borrowed-asset response not found.')
+        raise ValueError('Maintained file-response handler not found.')
     cards = []
     for name, group, description in EXAMPLES:
         if 'examples/' + name + '.zig' not in docs:

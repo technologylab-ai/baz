@@ -173,8 +173,15 @@ first, preserving the request and running application side effects once.
 | `jsonBytes(status, encoded)` | Copies pre-encoded JSON. |
 | `jsonValue(status, value)` | Serializes once into a bounded fixed standard writer. |
 | `print(status, content_type, format, args)` | Standard formatting into the reserved body. |
-| `borrowBody(status, content_type, bytes)` | Explicit body borrow from retained request input or immutable server-lifetime assets, bounded by server.max_response_bytes rather than staging. |
+| `borrowBody(status, content_type, bytes)` | Selects the entire body from retained input or an immutable server-lifetime asset; bounded by server.max_response_bytes rather than staging. Cannot be mixed with stream/body helpers. |
 | `stream(status, content_type, options)` | Worker response with a standard writer, incremental flushes, and bounded staging. |
+
+`borrowBody` is a whole-body choice, not an append or stream-write operation.
+You may add headers before or after it while the draft is private. You cannot
+write/flush a stream, borrow an image, and resume the stream; even starting a
+stream before borrowing is a conflict. For mixed output today, send all body
+bytes through the stream writer, including the image via `writeAll` (which copies).
+See [the complete combination rules](OWNERSHIP.md#one-complete-body-or-a-stream).
 
 For a one-shot response, return after preparing a body. App finalizes it on successful handler return.
 Headers can be appended before or after preparing the body. A second body,

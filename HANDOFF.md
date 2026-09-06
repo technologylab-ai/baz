@@ -64,9 +64,12 @@ records current copying paths. The large-borrow change separates the total
 response bound from staging capacity: immutable 5 MB assets can use `borrowBody`
 with a small arena. Native Linux/macOS/Windows verification passed for this PR;
 the separate streaming receipt preserves the preceding baseline.
-The PR also adds a third Borrowed asset website tab, using the compiled 5 MiB
-fixture’s call. It publishes with the fix when the PR merges. Copying remains
-the default for text/bytes/stream helpers; borrowing is always explicit.
+PR #1 is merged. The third website tab, File from memory, shows the complete
+compiled `serve.zig` handler and explains that its file is the entire body.
+The API/streaming guides explicitly document the current inability to insert
+a borrowed span between streaming writes. Use the copying stream writer for
+that sequence today; a borrowed stream-write API remains future work. Copying
+remains the default for text/bytes/stream helpers; borrowing is always explicit.
 Ordinary stream writes still copy. Do not claim minimum copies.
 
 Caller std.Io remains the MVP capability; an owned provider is deferred.

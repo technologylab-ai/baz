@@ -323,8 +323,10 @@ native Linux, macOS, and Windows ownership gates for the PR.
 
 Further copy reduction remains separate work:
 
-1. Consider direct generation into final output and synchronous borrowed stream
-   writes. Any new lifetime/release API needs explicit cancellation and
+1. Support the desired write/flush → borrow a large span → continue-streaming
+   sequence through a future explicit stream operation. The current `borrowBody`
+   only selects a whole response body and cannot provide this sequence. Consider
+   direct generation into final output and synchronous borrowed stream writes. Any new lifetime/release API needs explicit cancellation and
    kernel-completion gates. Dynamic heap/pool leases are not implied by the
    immutable-asset path.
 2. Make copy accounting comprehensive before publishing a total-copy claim or

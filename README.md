@@ -72,6 +72,8 @@ Response helpers have explicit copying and borrowing paths; the
 [copy contract](docs/OWNERSHIP.md#response-copies-and-borrowing) describes their
 costs and lifetimes. `borrowBody` can serve a large immutable asset directly from
 retained memory, bounded by the total response limit rather than staging capacity.
+It selects the whole body; inserting a borrowed image between streaming writes
+is [currently unsupported](docs/STREAMING.md#current-limit-borrowed-bodies-cannot-be-inserted-into-a-stream).
 
 Use exact Zig 0.16.0 from [.zig-version](.zig-version), with Python 3 installed:
 

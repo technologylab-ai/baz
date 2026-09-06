@@ -32,7 +32,7 @@ The website worktree is only a branch of Baz, not another project or repository.
 | Landing-page prose | [index.template.html](index.template.html) |
 | App excerpt | `Hello` in [app_demo.zig](../src/app_demo.zig), extracted at build time |
 | Streaming excerpt | `progress` in [streaming.zig](../examples/streaming.zig), extracted at build time |
-| Borrowed-asset call | `borrowBody` in [borrow_demo.zig](../src/borrow_demo.zig), extracted from the compiled 5 MiB native fixture |
+| File-from-memory handler | App types and complete `index` handler in [serve.zig](../examples/serve.zig), extracted from the compiled example; the separate 5 MiB fixture backs the large-body evidence |
 | Example cards | The catalog in [build_pages.py](../tools/build_pages.py), linked to all 21 compiled examples |
 | Benchmark chart and table | Original [Mac](../reports/2026-09-06-basic-zap/macos-summary.json) and [Linux](../reports/2026-09-06-basic-zap/linux-summary.json) summaries; medians checked against recorded trial rates |
 | Diagrams | [Raw parameters](diagrams/parameters.svg), [package boundary](diagrams/layers.svg), [response lifetime](diagrams/lifetime.svg) |
@@ -63,7 +63,7 @@ A restrictive Content Security Policy supplies a second boundary.
 The reader includes a heading table of contents, raw and GitHub links, syntax
 highlighting, code copy buttons, and print styles. Mobile menus support Escape;
 skip links and scrollable code, table, and diagram regions support keyboards.
-The landing page shows App, streaming, and borrowed-asset excerpts without JavaScript.
+The landing page shows App, streaming, and file-response excerpts without JavaScript.
 With JavaScript, keyboard-accessible tabs select the excerpt; `#streaming` and
 `#borrowed` open their options directly. Print output includes all three. Example filtering is optional.
 System fonts and local browser libraries avoid third-party asset requests.

@@ -162,8 +162,8 @@ try {
     return {exactSource:true, keyboard:true, deepLink:true, mobileWidths:[390,320]};
   });
   await check('borrowed-example-source-tabs-and-deep-link', async () => {
-    const source = await readFile(new URL('../src/borrow_demo.zig', import.meta.url), 'utf8');
-    const excerpt = source.match(/^    try ctx\.response\.borrowBody\(.*?\);$/m)[0].trim();
+    const source = await readFile(new URL('../examples/serve.zig', import.meta.url), 'utf8');
+    const excerpt = source.match(/^const Shared = struct \{\};\n.*?^fn index\(.*?^}/ms)[0];
     await navigate();
     assert.equal(await evaluate('document.querySelectorAll(".example-tabs [role=tab]").length'), 3);
     assert.equal(await evaluate('document.querySelector("#borrowed code.language-zig").textContent'), excerpt);

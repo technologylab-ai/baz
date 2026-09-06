@@ -87,6 +87,37 @@ compacts draft bytes and handles explicit borrows. The engine then sends borrowe
 spans through bounded scatter/gather vectors. Ordinary socket operations still
 perform kernel/network transfers; this is not zero-copy networking.
 
+### One complete body or a stream
+
+`borrowBody(status, content_type, bytes)` selects the **entire response body**.
+It stores a retained slice in an unpublished response. On successful handler
+return, App adds HTTP framing and publishes that body; transmission can finish
+later. It does not insert a piece into an existing response or stream.
+The complete [file handler](../examples/serve.zig) uses this mode for an embedded
+HTML file. An image response works the same way with its own Content-Type.
+
+| Combination in one response | Current behavior |
+| --- | --- |
+| Handler work, authentication, asset selection, then `borrowBody` | Supported, subject to the handler’s normal execution/resource rules. |
+| `header` before or after `borrowBody`, before publication | Supported; metadata is copied and the borrowed slice remains the whole body. |
+| `borrowBody` plus another body helper (`text`, `bytes`, `print`, JSON, or another borrow) | Unsupported; preparing a second body fails. |
+| Start a stream, then `borrowBody`, even before any write/flush | Unsupported; starting the stream already selects its body mode. |
+| `borrowBody`, then start a stream | Unsupported; a complete body is already prepared. |
+| Write → flush → borrow an image → continue streaming | **Not supported by Baz’s current API.** There is no borrowed-write operation on `Stream`. |
+| Stream writer `writeAll(prefix)`, `flush()`, `writeAll(image)`, `writeAll(suffix)` | Supported within the stream’s bounds, using the copying writer path. The application chooses the representation and content type. |
+
+Conflicting body choices return an error; on an active worker the state conflict
+is `InvalidState`. Inline execution rejects `stream()` as unavailable before its
+body-state check. Propagate errors normally: before publication App can replace
+an invalid draft with an error response; after a flush it can only close the
+already-started response. Catching the conflicting-call error leaves the
+original response selected and usable. `discard()` can replace an unpublished
+draft with a new body choice, but never concatenates bodies and cannot undo a published flush.
+
+A future borrowed stream write would need its own lifetime, completion, and
+cancellation contract. It is [queued design work](APP-API-ROADMAP.md#response-copy-follow-up),
+not a capability of `borrowBody` or the current standard stream writer.
+
 ### An image already in memory
 
 An immutable global image, an embedded asset, or a startup heap allocation kept
