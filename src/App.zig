@@ -4,6 +4,7 @@ const engine = @import("bounded_http");
 const Request = @import("request.zig").Request;
 const responses = @import("response.zig");
 const routing = @import("router.zig");
+const continuation = @import("continuation.zig");
 
 pub fn App(comptime Shared: type) type {
     return AppWithLocals(Shared, struct {});
@@ -28,6 +29,21 @@ pub fn AppWithLocals(comptime Shared: type, comptime Locals: type) type {
         };
         pub const RouteOptions = struct { middleware: []const Middleware = &.{} };
         const BoundHandler = *const fn (?*anyopaque, *Context) anyerror!void;
+        const Continuation = struct {
+            initialize: *const fn ([]align(64) u8) void,
+            start: *const fn (*Context, []align(64) u8) anyerror!continuation.Step,
+            call_resume: *const fn (*Context, []align(64) u8, continuation.Event) anyerror!continuation.Step,
+            cleanup: *const fn (*Context, []align(64) u8) void,
+        };
+        const Retained = struct {
+            locals: Locals,
+            response: responses.Response,
+            route: *const Route,
+            captures: routing.Captures = .{},
+            global_entered: usize = 0,
+            route_entered: usize = 0,
+        };
+        const Pool = continuation.Pool(Retained);
         const Phase = enum { registration, starting, started, running, stopped, failed, unsafe };
 
         pub const Options = struct {
@@ -37,6 +53,10 @@ pub fn AppWithLocals(comptime Shared: type, comptime Locals: type) type {
             server: engine.Config = .{},
             response: responses.Limits = .{},
             max_routes: u16 = 128,
+            /// Opt-in concurrent retained requests. Ordinary routes use no slots.
+            max_continuations: u16 = 0,
+            /// Per-request user State bound; response drafts are accounted separately.
+            max_continuation_state_bytes: u32 = 256,
             /// Total copied global and route middleware descriptors.
             max_middleware: u16 = 128,
             middleware: []const Middleware = &.{},
@@ -99,6 +119,7 @@ pub fn AppWithLocals(comptime Shared: type, comptime Locals: type) type {
             instance: ?*anyopaque,
             allow: []const u8 = "",
             middleware: []const Middleware = &.{},
+            continuation: ?Continuation = null,
         };
 
         // init returns a stable allocation; all callbacks retain this address.
@@ -109,6 +130,9 @@ pub fn AppWithLocals(comptime Shared: type, comptime Locals: type) type {
         response_limits: responses.Limits,
         routes: []Route,
         routes_len: usize = 0,
+        continuations: Pool,
+        continuation_state_bytes: u32,
+        continuation_draft_offset: usize,
         middleware: []Middleware,
         middleware_len: usize = 0,
         global_middleware_len: usize = 0,
@@ -126,6 +150,9 @@ pub fn AppWithLocals(comptime Shared: type, comptime Locals: type) type {
             if (options.max_routes == 0 or options.max_routes > 4096 or
                 options.route_bytes < 64 or options.route_bytes > 1024 * 1024 or options.max_middleware > 4096)
                 return error.InvalidConfiguration;
+            if (options.max_continuation_state_bytes > 65536) return error.InvalidConfiguration;
+            const draft_offset = (try std.math.add(usize, options.max_continuation_state_bytes, 63)) & ~@as(usize, 63);
+            const payload_bytes: u32 = @intCast(try std.math.add(usize, draft_offset, try options.response.reservationBytes()));
             if (options.middleware.len > options.max_middleware) return error.TooManyMiddleware;
             try validateMiddleware(options.middleware);
             var config = options.server;
@@ -137,6 +164,7 @@ pub fn AppWithLocals(comptime Shared: type, comptime Locals: type) type {
             heap = try std.math.add(usize, heap, try std.math.mul(usize, options.max_routes, @sizeOf(Route)));
             heap = try std.math.add(usize, heap, options.route_bytes);
             heap = try std.math.add(usize, heap, try std.math.mul(usize, options.max_middleware, @sizeOf(Middleware)));
+            heap = try std.math.add(usize, heap, try Pool.heapBytes(options.max_continuations, payload_bytes));
             if (try std.math.add(usize, heap, stacks) > config.memory_budget_bytes)
                 return error.MemoryBudgetExceeded;
 
@@ -150,6 +178,9 @@ pub fn AppWithLocals(comptime Shared: type, comptime Locals: type) type {
                 .config = config,
                 .response_limits = options.response,
                 .routes = &.{},
+                .continuations = undefined,
+                .continuation_state_bytes = options.max_continuation_state_bytes,
+                .continuation_draft_offset = draft_offset,
                 .middleware = &.{},
                 .init_locals = options.init_locals,
                 .cleanup_locals = options.cleanup_locals,
@@ -164,6 +195,8 @@ pub fn AppWithLocals(comptime Shared: type, comptime Locals: type) type {
             self.names = try allocator.alloc(u8, options.route_bytes);
             errdefer allocator.free(self.names);
             self.middleware = try allocator.alloc(Middleware, options.max_middleware);
+            errdefer allocator.free(self.middleware);
+            self.continuations = try Pool.init(allocator, options.max_continuations, payload_bytes);
             @memcpy(self.middleware[0..options.middleware.len], options.middleware);
             self.middleware_len = options.middleware.len;
             self.global_middleware_len = options.middleware.len;
@@ -182,6 +215,44 @@ pub fn AppWithLocals(comptime Shared: type, comptime Locals: type) type {
                 }
             };
             try self.addRoute(method, path, null, Adapter.call, options);
+        }
+
+        /// Typed callbacks return between flushes and timed waits. State defaults
+        /// are initialized once, before middleware; optional State.deinit(*State,
+        /// *Context) runs once before locals cleanup, including failed startup.
+        /// State and Locals cannot back borrowed output or retain Context/writers.
+        pub fn routeContinuation(self: *Self, method: []const u8, path: []const u8, comptime State: type, comptime start_handler: *const fn (*Context, *State) anyerror!continuation.Step, comptime resume_handler: *const fn (*Context, *State, continuation.Event) anyerror!continuation.Step, options: RouteOptions) !void {
+            if (@typeInfo(State) != .@"struct" or @alignOf(State) > 64 or @sizeOf(State) > 65536)
+                @compileError("Continuation State must be a default-initializable struct <= 65536 bytes, alignment <= 64");
+            if (self.continuations.slots.len == 0) return error.ContinuationsDisabled;
+            if (@sizeOf(State) > self.continuation_state_bytes) return error.ContinuationStateTooLarge;
+            const Adapter = struct {
+                fn state(bytes: []align(64) u8) *State {
+                    return @ptrCast(bytes.ptr);
+                }
+                fn initialize(bytes: []align(64) u8) void {
+                    state(bytes).* = .{};
+                }
+                fn start(ctx: *Context, bytes: []align(64) u8) anyerror!continuation.Step {
+                    return start_handler(ctx, state(bytes));
+                }
+                fn resumeCall(ctx: *Context, bytes: []align(64) u8, event: continuation.Event) anyerror!continuation.Step {
+                    return resume_handler(ctx, state(bytes), event);
+                }
+                fn cleanup(ctx: *Context, bytes: []align(64) u8) void {
+                    if (@hasDecl(State, "deinit")) State.deinit(state(bytes), ctx);
+                }
+                fn unreachableCall(_: ?*anyopaque, _: *Context) anyerror!void {
+                    unreachable;
+                }
+            };
+            try self.addRoute(method, path, null, Adapter.unreachableCall, options);
+            self.routes[self.routes_len - 1].continuation = .{
+                .initialize = Adapter.initialize,
+                .start = Adapter.start,
+                .call_resume = Adapter.resumeCall,
+                .cleanup = Adapter.cleanup,
+            };
         }
 
         /// Register a stateful method. The instance is borrowed through deinit.
@@ -356,15 +427,21 @@ pub fn AppWithLocals(comptime Shared: type, comptime Locals: type) type {
             allocator.free(self.names);
             allocator.free(self.routes);
             allocator.free(self.middleware);
+            self.continuations.deinit();
             std.debug.assert(self.budget.live_bytes == @sizeOf(Self));
             allocator.destroy(self);
         }
 
         fn dispatch(raw: *engine.api.Context) engine.api.Action {
             const self: *Self = @ptrCast(@alignCast(raw.application.?));
-            // Worker streams retain this same callback stack across flushes.
-            // The engine's separate continuation API is not used by App.
-            std.debug.assert(raw.event == .request);
+            if (raw.event != .request) return self.resumeContinuation(raw);
+            // Select storage before application code runs, preserving stable locals.
+            // Captures remain unavailable to global middleware until routing.
+            if (self.continuations.slots.len != 0) {
+                if (self.selectedRoute(.init(raw.request))) |entry| {
+                    if (entry.continuation != null) return self.beginContinuation(raw, entry);
+                }
+            }
             var response = responses.Response.initWithLimit(raw.writer, self.response_limits, self.config.max_response_bytes) catch return .close;
             response.context = raw;
             var locals: Locals = .{};
@@ -372,6 +449,143 @@ pub fn AppWithLocals(comptime Shared: type, comptime Locals: type) type {
             defer self.cleanup(&context);
             self.process(&context) catch |err| return self.handleError(&context, err);
             return response.finish() catch |err| self.handleError(&context, err);
+        }
+
+        fn selectedRoute(self: *Self, request: Request) ?*const Route {
+            const method = request.method();
+            const target = request.target();
+            if (std.mem.eql(u8, method, "CONNECT") or std.mem.eql(u8, target.raw, "*")) return null;
+            const raw_path = target.path orelse "/";
+            const path = if (raw_path.len == 0) "/" else raw_path;
+            var best: ?*const Route = null;
+            for (self.routes[0..self.routes_len]) |*entry| {
+                if (routing.matches(entry.pattern, path) and (best == null or entry.rank > best.?.rank)) best = entry;
+            }
+            const path_route = best orelse return null;
+            var get: ?*const Route = null;
+            for (self.routes[0..self.routes_len]) |*entry| {
+                if (!routing.equivalent(entry.pattern, path_route.pattern)) continue;
+                if (std.mem.eql(u8, entry.method, method)) return entry;
+                if (std.mem.eql(u8, entry.method, "GET")) get = entry;
+            }
+            return if (std.mem.eql(u8, method, "HEAD")) get else null;
+        }
+
+        fn retainedContext(self: *Self, raw: *engine.api.Context, record: *Retained) Context {
+            record.response.writer = raw.writer;
+            record.response.context = raw;
+            return .{ .shared = self.shared, .locals = &record.locals, .request = .init(raw.request), .response = &record.response, .captures = record.captures, .app = self, .cancelled = raw.cancelled, .global_entered = record.global_entered, .route_entered = record.route_entered, .route_middleware = record.route.middleware };
+        }
+
+        fn beginContinuation(self: *Self, raw: *engine.api.Context, entry: *const Route) engine.api.Action {
+            const lease = self.continuations.acquire() orelse {
+                var response = responses.Response.initWithLimit(raw.writer, self.response_limits, self.config.max_response_bytes) catch return .close;
+                return response.errorResponse(503) catch .close;
+            };
+            const response = responses.Response.initWithLimit(raw.writer, self.response_limits, self.config.max_response_bytes) catch {
+                self.continuations.release(lease);
+                return .close;
+            };
+            lease.record.* = .{ .locals = .{}, .response = response, .route = entry };
+            lease.record.response.storage = lease.state[self.continuation_draft_offset..];
+            lease.record.response.allow_blocking_stream = false;
+            const state = lease.state[0..self.continuation_state_bytes];
+            entry.continuation.?.initialize(state);
+            raw.state[0] = lease.index + 1;
+            raw.state[1] = lease.generation;
+            raw.requestCancellation();
+            var context = self.retainedContext(raw, lease.record);
+            const step = self.startContinuation(&context, entry, state) catch |err| {
+                const action = self.handleError(&context, err);
+                self.releaseContinuation(raw, lease, &context);
+                return action;
+            };
+            return self.advanceContinuation(raw, lease, &context, step);
+        }
+
+        fn startContinuation(self: *Self, context: *Context, entry: *const Route, state: []align(64) u8) !continuation.Step {
+            if (context.cancelled.load(.acquire)) return error.Cancelled;
+            if (self.init_locals) |call| try call(context);
+            if (context.response.prepared) return error.InvalidMiddlewareResponse;
+            if (try runBefore(context, self.middleware[0..self.global_middleware_len], &context.global_entered) == .respond) return .finish;
+            const path = context.request.target().path orelse "/";
+            context.captures = routing.capture(entry.pattern, if (path.len == 0) "/" else path);
+            if (try runBefore(context, entry.middleware, &context.route_entered) == .respond) return .finish;
+            if (context.cancelled.load(.acquire)) return error.Cancelled;
+            return entry.continuation.?.start(context, state);
+        }
+
+        fn resumeContinuation(self: *Self, raw: *engine.api.Context) engine.api.Action {
+            std.debug.assert(raw.state[0] != 0);
+            const lease = self.continuations.get(raw.state[0] - 1, raw.state[1]) orelse unreachable;
+            var context = self.retainedContext(raw, lease.record);
+            if (raw.event == .cancelled or raw.cancelled.load(.acquire)) {
+                self.releaseContinuation(raw, lease, &context);
+                return .close;
+            }
+            const event: continuation.Event = switch (raw.event) {
+                .flushed => .flushed,
+                .timer => .timer,
+                else => unreachable,
+            };
+            const step = lease.record.route.continuation.?.call_resume(&context, lease.state[0..self.continuation_state_bytes], event) catch |err| {
+                const action = self.handleError(&context, err);
+                self.releaseContinuation(raw, lease, &context);
+                return action;
+            };
+            return self.advanceContinuation(raw, lease, &context, step);
+        }
+
+        fn advanceContinuation(self: *Self, raw: *engine.api.Context, lease: Pool.Lease, context: *Context, step: continuation.Step) engine.api.Action {
+            const action = self.continuationAction(raw, context, step) catch |err| {
+                const action = self.handleError(context, err);
+                self.releaseContinuation(raw, lease, context);
+                return action;
+            };
+            switch (action) {
+                .finish, .close => self.releaseContinuation(raw, lease, context),
+                .flush, .wait => {
+                    lease.record.captures = context.captures;
+                    lease.record.global_entered = context.global_entered;
+                    lease.record.route_entered = context.route_entered;
+                    lease.record.response.context = null;
+                },
+            }
+            return action;
+        }
+
+        fn continuationAction(self: *Self, raw: *engine.api.Context, context: *Context, step: continuation.Step) !engine.api.Action {
+            if (context.cancelled.load(.acquire)) return error.Cancelled;
+            try self.validateContinuationBorrow(context.response);
+            switch (step) {
+                .flush => return context.response.continuationFlush(),
+                .wait => |delay_ns| {
+                    try context.response.continuationWait();
+                    return raw.wait(delay_ns);
+                },
+                .finish => {
+                    try runAfter(context, context.route_middleware[0..context.route_entered]);
+                    try runAfter(context, self.middleware[0..context.global_entered]);
+                    try self.validateContinuationBorrow(context.response);
+                    return context.response.finish();
+                },
+            }
+        }
+
+        fn validateContinuationBorrow(self: *Self, response: *responses.Response) !void {
+            const borrowed = response.borrowed orelse return;
+            const overlap = @import("params.zig").overlap;
+            if (overlap(borrowed, self.continuations.bytes) or
+                overlap(borrowed, std.mem.sliceAsBytes(self.continuations.slots)))
+                return error.InvalidContinuationBorrow;
+        }
+
+        fn releaseContinuation(self: *Self, raw: *engine.api.Context, lease: Pool.Lease, context: *Context) void {
+            lease.record.route.continuation.?.cleanup(context, lease.state[0..self.continuation_state_bytes]);
+            self.cleanup(context);
+            raw.state[0] = 0;
+            raw.state[1] = 0;
+            self.continuations.release(lease);
         }
 
         fn runBefore(context: *Context, chain: []const Middleware, entered: *usize) !Decision {
@@ -434,6 +648,7 @@ pub fn AppWithLocals(comptime Shared: type, comptime Locals: type) type {
             if (self.on_error) |handler| {
                 context.response.discard() catch return .close;
                 handler(context, err) catch return context.response.errorResponse(500) catch .close;
+                self.validateContinuationBorrow(context.response) catch return context.response.errorResponse(500) catch .close;
                 return context.response.finish() catch context.response.errorResponse(500) catch .close;
             }
             const status: u16 = switch (err) {

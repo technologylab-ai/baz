@@ -1,3 +1,13 @@
+# Active composition work
+
+`feat/middleware-locals` adds public middleware/locals, bounded reusable sessions
+with fixed expiry and revocation, and typed streaming continuations. Engine
+[PR #4](https://github.com/technologylab-ai/bounded-http/pull/4) must merge first;
+Baz pins candidate `6f6af03e828159455b91cece6ba468201651e1f6` by immutable URL/hash.
+[The composition receipt](reports/2026-09-07-composition.md) tracks native gates.
+The standard caller `std.Io` remains; an owned provider is deferred. No benchmarks
+or JWT policy were added. The earlier merged baseline follows for history.
+
 # Baz handoff — 2026-09-06
 
 Work from the independent `baz` repository, primary branch `main`.

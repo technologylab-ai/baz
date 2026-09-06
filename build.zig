@@ -115,7 +115,7 @@ pub fn build(b: *std.Build) void {
     check.dependOn(&middleware_fixture.step);
     verify.dependOn(&middleware_fixture.step);
     const examples = b.step("examples", "Build and install all supported Zap example ports");
-    for ([_][]const u8{ "hello", "hello2", "hello_json", "simple_router", "routes", "serve", "sendfile", "senderror", "accept", "app_basic", "app_auth", "app_errors", "endpoint", "endpoint_auth", "middleware", "middleware_with_endpoint", "userpass_session", "cookies", "http_params", "bindataformpost", "streaming", "mustache" }) |name| {
+    for ([_][]const u8{ "hello", "hello2", "hello_json", "simple_router", "routes", "serve", "sendfile", "senderror", "accept", "app_basic", "app_auth", "app_errors", "endpoint", "endpoint_auth", "middleware", "middleware_with_endpoint", "userpass_session", "cookies", "http_params", "bindataformpost", "streaming", "mustache", "continuations" }) |name| {
         const example = b.addExecutable(.{
             .name = name,
             .use_llvm = if (target.result.os.tag == .linux and optimize == .Debug) true else null,

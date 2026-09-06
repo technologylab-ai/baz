@@ -12,6 +12,9 @@ curl -N http://127.0.0.1:8080/
 Run curl in another terminal; use `curl.exe` on Windows. The first line arrives
 before the handler produces the next one.
 
+For many waiting streams on a small worker pool, use [typed continuations](CONTINUATIONS.md).
+They return between flushes and timed waits; the linear API below retains one worker.
+
 ## Writer and lifecycle
 
 Call `ctx.response.stream(status, content_type, options)` to obtain a `baz.Stream`.

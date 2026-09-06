@@ -91,7 +91,8 @@ arguments before startup, both option spellings, worker defaults, and shutdown.
 | `app_errors` | [app_errors.zig](app_errors.zig) | App error mapping, discarded private draft and synchronized error count. |
 | `endpoint` | [endpoint.zig](endpoint.zig) | Bounded in-memory user CRUD. A mutex protects shared state on explicit workers; JSON scratch uses a fixed buffer allocator. |
 | `endpoint_auth` | [endpoint_auth.zig](endpoint_auth.zig) | Stateful endpoint wrapped by a typed bearer check. |
-| `middleware` | [middleware.zig](middleware.zig) | Ordered ordinary Zig middleware functions and typed stack locals. |
+| `continuations` | [continuations.zig](continuations.zig) | Typed flush/wait/finish callbacks; many waiting streams share one worker or run inline. |
+| `middleware` | [middleware.zig](middleware.zig) | Public before/after/cleanup hooks and typed request locals. |
 | `middleware_with_endpoint` | [middleware_with_endpoint.zig](middleware_with_endpoint.zig) | The same composition around an endpoint, with an early-stop path. |
 | `userpass_session` | [userpass_session.zig](userpass_session.zig) | Bounded local login/logout/session demonstration; source states its finite demo policy. |
 | `cookies` | [cookies.zig](cookies.zig) | Raw ordered request cookies and copied Set-Cookie output; explicit duplicate policy. |
@@ -100,8 +101,8 @@ arguments before startup, both option spellings, worker defaults, and shutdown.
 
 Cookie parsing, Set-Cookie formatting, deletion and redirects now use public Baz
 APIs. Read [cookie lifetimes, flags and session limits](../docs/COOKIES.md).
-Middleware/auth wrappers remain example-local while public middleware and typed
-locals remain queued. Demo credentials and session policy are local example
+Middleware/auth examples use public [middleware and typed locals](../docs/MIDDLEWARE.md).
+The session example has 32 reusable slots, fixed server expiry and all-device revocation. Demo credentials and session policy are local example
 choices, not a general authentication service. Application scratch and services
 have explicit bounds but remain outside the framework allocator's ledger.
 

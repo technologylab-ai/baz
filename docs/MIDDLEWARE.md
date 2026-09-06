@@ -4,6 +4,8 @@
 at a stable address. `App(Shared)` remains the shortcut with empty locals. Locals
 must be a struct with field defaults, at most 4,096 bytes and alignment at most 64.
 Synchronous handlers retain their locals through worker stream flushes.
+[Typed continuations](CONTINUATIONS.md) reserve locals in startup pool records,
+retaining their addresses through flushes and timers.
 
 ```zig
 const Application = web.AppWithLocals(Shared, struct { user_id: ?u64 = null });

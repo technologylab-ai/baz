@@ -15,8 +15,8 @@ provide bounded tasks, acceptance gates, ownership, and resume instructions.
 | Zap examples | 21 supported ports plus worker streaming | Keep native behavior coverage and record semantic differences. |
 | External dependency | Baz imports `bounded_http` | Maintain an immutable engine pin and upstream generic engine changes. |
 | Cookies and redirects | Public helpers implemented | Preserve raw views, explicit lifetimes and [cookie/session gates](docs/COOKIES.md). |
-| Middleware and locals | Example helpers available | API-06: establish the remaining public composition contract. |
-| Resumable endpoints | Worker streaming implemented | API-07: typed inline continuation state and retention rules. |
+| Middleware and locals | Implemented; native gates in progress | Public copied hooks and typed locals; [guide](docs/MIDDLEWARE.md). |
+| Resumable endpoints | Implemented; native gates in progress | Typed callbacks release workers between flushes/timers; [guide](docs/CONTINUATIONS.md). |
 | Standalone repository | Published GitHub repository and Pages, MIT licensed | Maintain package, documentation and native CI. |
 | Owned `std.Io` | Deferred | Revisit after the first API MVP. |
 | Mustache | Implemented; native Linux/macOS/Windows gates passed | Maintain the Baz-specific pure Zig fork, explicit template bounds and [compatibility/ownership coverage](reports/2026-09-06-mustache.md). |

@@ -214,8 +214,9 @@ Use [streaming responses](STREAMING.md) to write, flush, sleep, and write again
 inside the same fixed worker callback. The returned handle exposes `writer()`,
 `flush()`, and `finish()`. Headers become immutable after the first flush.
 `body_bytes` bounds staging; `server.max_response_bytes` bounds the whole stream.
-The advanced raw `engine.api.Handler` remains available for explicit
-return-and-resume continuations. Typed inline continuations remain future work.
+Use [typed continuations](CONTINUATIONS.md) to return between flushes and timers,
+sharing a small worker pool or running inline. [Middleware and typed locals](MIDDLEWARE.md)
+retain authentication and request state across these callbacks without replay.
 
 ## std.Io and resource boundaries
 
@@ -259,12 +260,12 @@ Baz additionally supports native Windows x64, with [its own native gate](../repo
 | Borrowing an arbitrary response slice | `borrowBody` restricted to retained input or server-lifetime assets. |
 | Global start/stop | App instance lifecycle on the existing Cluster. |
 | Incremental response output | `response.stream()` and `std.Io.Writer`, on fixed workers. |
-| Public authentication middleware / typed inline continuation | Follow-up API-06 / API-07; low-level engine remains usable. |
+| Public authentication middleware / typed continuation | `AppWithLocals`, copied hooks, `routeContinuation`; see [composition](MIDDLEWARE.md) and [continuations](CONTINUATIONS.md). |
 
 Use the [roadmap](APP-API-ROADMAP.md) for the next session and named verification
 gates. The [20 supported Zap example ports](../examples/README.md) are implemented.
 This remains an experimental checkpoint before complete successor-MVP
-qualification and public middleware/resumable APIs. Baz’s independent repository
+qualification; public middleware and resumable APIs now have explicit ownership contracts. Baz’s independent repository
 and GitHub Pages site are published.
 
 ## Basic performance comparison

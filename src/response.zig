@@ -53,6 +53,9 @@ pub const Response = struct {
     stream_error: ?anyerror = null,
     stream_written: usize = 0,
     stream_length: ?usize = null,
+    /// App disables blocking streams for callbacks that retain a continuation.
+    allow_blocking_stream: bool = true,
+    snapshot_mode: bool = false,
 
     pub fn init(writer: *api.Writer, limits: Limits) !Response {
         return initWithLimit(writer, limits, limits.body_bytes);
@@ -236,8 +239,9 @@ pub const Response = struct {
 
     /// Only original request input or immutable server-lifetime assets are
     /// eligible. Caller scratch, callback stack locals, mutable Shared storage,
-    /// and external pools are not. No release callback exists after finish or
-    /// cancellation. The core may copy small borrows as its counted exception.
+    /// continuation State/Locals, and external pools are not eligible.
+    /// No release callback exists after finish or cancellation.
+    /// The core may copy small borrows as its counted exception.
     /// The total response limit applies; copied/generated staging does not.
     pub fn borrowBody(self: *Response, status: u16, content_type: []const u8, body: []const u8) !void {
         try self.checkBody(status, content_type, body.len);
@@ -257,6 +261,7 @@ pub const Response = struct {
     /// Headers remain editable until the first flush. Keep the returned handle
     /// on this callback's stack; never retain its writer past the callback.
     pub fn stream(self: *Response, status: u16, content_type: []const u8, options: StreamOptions) !Stream {
+        if (!self.allow_blocking_stream) return error.BlockingFlushUnavailable;
         const context = self.context orelse return error.BlockingFlushUnavailable;
         if (!context.supportsBlockingFlush()) return error.BlockingFlushUnavailable;
         if (context.cancelled.load(.acquire)) return error.Cancelled;
@@ -269,6 +274,77 @@ pub const Response = struct {
         self.streaming = true;
         self.stream_length = if (status == 204 or status == 205 or status == 304) 0 else options.content_length;
         return .{ .response = self };
+    }
+
+    /// Start a bounded stream whose snapshots publish only when a callback
+    /// returns the flush step. A full snapshot fails instead of blocking.
+    /// Keep this handle and its writer on the current callback's stack.
+    pub fn snapshot(self: *Response, status: u16, content_type: []const u8, options: StreamOptions) !Snapshot {
+        if (self.allow_blocking_stream) return error.InvalidState;
+        const context = self.context orelse return error.InvalidState;
+        if (context.cancelled.load(.acquire)) return error.Cancelled;
+        try self.checkBody(status, content_type, 0);
+        if (options.content_length) |length| {
+            if (length > self.response_limit) return error.ResponseLimit;
+            if ((status == 204 or status == 205 or status == 304) and length != 0) return error.InvalidResponse;
+        }
+        self.setBody(status, content_type, 0);
+        self.streaming = true;
+        self.snapshot_mode = true;
+        self.stream_length = if (status == 204 or status == 205 or status == 304) 0 else options.content_length;
+        return .{ .response = self };
+    }
+
+    /// Obtain a fresh callback-local writer for an existing snapshot stream.
+    pub fn resumeSnapshot(self: *Response) !Snapshot {
+        try self.checkSnapshot();
+        return .{ .response = self };
+    }
+
+    fn checkSnapshot(self: *const Response) !void {
+        if (self.allow_blocking_stream or !self.snapshot_mode) return error.InvalidState;
+        try self.checkStream();
+        if (self.writer.frozen) return error.InvalidState;
+    }
+
+    fn appendSnapshot(self: *Response, data: []const u8) !usize {
+        try self.checkSnapshot();
+        if (data.len > self.limits.body_bytes - self.body_len) return error.ResponseLimit;
+        const total = std.math.add(usize, self.stream_written, data.len) catch return error.ResponseLimit;
+        if (total > self.response_limit) return error.ResponseLimit;
+        if (self.stream_length) |length| if (total > length) return error.ResponseLengthMismatch;
+        @memcpy(self.bodyStorage()[self.body_len..][0..data.len], data);
+        self.body_len += data.len;
+        self.stream_written = total;
+        return data.len;
+    }
+
+    /// Transfer one staged snapshot to the engine without waiting on a worker.
+    /// App returns this action after the continuation callback has returned.
+    pub fn continuationFlush(self: *Response) !api.Action {
+        self.checkSnapshot() catch |err| {
+            if (self.stream_error == null) self.stream_error = err;
+            return err;
+        };
+        self.prepareStreamSnapshot() catch |err| {
+            if (self.stream_error == null) self.stream_error = err;
+            return err;
+        };
+        self.published = true;
+        return self.writer.flush();
+    }
+
+    /// Validate a wait without publishing headers or an empty snapshot.
+    /// Pending body bytes must leave through a flush step before waiting.
+    pub fn continuationWait(self: *const Response) !void {
+        if (self.allow_blocking_stream) return error.InvalidState;
+        const context = self.context orelse return error.InvalidState;
+        if (context.cancelled.load(.acquire)) return error.Cancelled;
+        if (self.stream_error) |err| return err;
+        if (self.snapshot_mode) {
+            try self.checkSnapshot();
+        } else if (self.prepared) return error.InvalidState;
+        if (self.body_len != 0 or self.borrowed != null or self.writer.frozen) return error.InvalidState;
     }
 
     fn checkStream(self: *const Response) !void {
@@ -312,6 +388,7 @@ pub const Response = struct {
     }
 
     fn flushStream(self: *Response) !void {
+        if (!self.allow_blocking_stream or self.snapshot_mode) return error.BlockingFlushUnavailable;
         try self.checkStream();
         try self.prepareStreamSnapshot();
         // From this point an error cannot safely replace the HTTP response.
@@ -333,8 +410,14 @@ pub const Response = struct {
         if (self.streaming) {
             if (self.stream_error) |err| return err;
             if (self.context.?.cancelled.load(.acquire)) return error.Cancelled;
-            if (!self.stream_finished) try self.endStream();
-            try self.prepareStreamSnapshot();
+            if (!self.stream_finished) self.endStream() catch |err| {
+                self.stream_error = err;
+                return err;
+            };
+            self.prepareStreamSnapshot() catch |err| {
+                self.stream_error = err;
+                return err;
+            };
             self.published = true;
             return self.writer.finish();
         }
@@ -372,6 +455,7 @@ pub const Response = struct {
         self.stream_error = null;
         self.stream_written = 0;
         self.stream_length = null;
+        self.snapshot_mode = false;
     }
 
     /// Guaranteed storage for the generic fallback follows from valid Limits;
@@ -382,6 +466,64 @@ pub const Response = struct {
         const reason = api.reason(status);
         try self.text(status, if (reason.len <= self.limits.body_bytes) reason else "");
         return self.finish();
+    }
+};
+
+/// A callback-local standard writer for one bounded continuation snapshot.
+/// Writer.flush never sends HTTP bytes. Return a flush step to publish them.
+/// Do not retain or move this handle while its writer pointer is in use.
+pub const Snapshot = struct {
+    response: *Response,
+    interface: std.Io.Writer = .{
+        .vtable = &.{ .drain = drain, .flush = flushWriter, .rebase = rebase },
+        .buffer = &.{},
+    },
+
+    pub fn writer(self: *Snapshot) *std.Io.Writer {
+        return &self.interface;
+    }
+
+    pub fn failure(self: *const Snapshot) ?anyerror {
+        return self.response.stream_error;
+    }
+
+    pub fn writeAll(self: *Snapshot, bytes: []const u8) !void {
+        self.interface.writeAll(bytes) catch |err| return self.failure() orelse err;
+    }
+
+    pub fn print(self: *Snapshot, comptime format: []const u8, args: anytype) !void {
+        self.interface.print(format, args) catch |err| {
+            if (self.response.stream_error == null) self.response.stream_error = err;
+            return self.failure().?;
+        };
+    }
+
+    fn drain(out: *std.Io.Writer, data: []const []const u8, splat: usize) std.Io.Writer.Error!usize {
+        const self: *Snapshot = @fieldParentPtr("interface", out);
+        std.debug.assert(out.end == 0 and data.len > 0);
+        for (data, 0..) |bytes, index| {
+            if (index == data.len - 1 and splat == 0) break;
+            if (bytes.len == 0) continue;
+            return self.response.appendSnapshot(bytes) catch |err| {
+                if (self.response.stream_error == null) self.response.stream_error = err;
+                return error.WriteFailed;
+            };
+        }
+        return 0;
+    }
+
+    fn flushWriter(out: *std.Io.Writer) std.Io.Writer.Error!void {
+        const self: *Snapshot = @fieldParentPtr("interface", out);
+        self.response.checkSnapshot() catch |err| {
+            if (self.response.stream_error == null) self.response.stream_error = err;
+            return error.WriteFailed;
+        };
+    }
+
+    fn rebase(out: *std.Io.Writer, _: usize, _: usize) std.Io.Writer.Error!void {
+        const self: *Snapshot = @fieldParentPtr("interface", out);
+        if (self.response.stream_error == null) self.response.stream_error = error.WriterBufferUnavailable;
+        return error.WriteFailed;
     }
 };
 
@@ -465,6 +607,168 @@ fn testCache() api.HeaderCache {
     var cache: api.HeaderCache = .{};
     cache.refresh("Sun, 06 Sep 2026 12:34:56 GMT");
     return cache;
+}
+
+const SnapshotFixture = struct {
+    arena: [2048]u8 = @splat(0xa5),
+    detached: [2048]u8 = @splat(0x5a),
+    cache: api.HeaderCache = testCache(),
+    writer: api.Writer = undefined,
+    response: Response = undefined,
+    context: api.Context = undefined,
+    request: api.http.Request = undefined,
+    state: [8]usize = @splat(0),
+    cancelled: std.atomic.Value(bool) = .init(false),
+    blocking_calls: usize = 0,
+
+    fn init(self: *SnapshotFixture, body_bytes: u32, total: usize) !void {
+        self.writer = api.Writer.init(&self.arena, &self.cache, 0);
+        self.writer.open(0, true, false);
+        self.context = .{
+            .request = &self.request,
+            .writer = &self.writer,
+            .event = .request,
+            .state = &self.state,
+            .application = null,
+            .cancelled = &self.cancelled,
+            .blocking_flush = .{ .context = &self.blocking_calls, .flush = struct {
+                fn flush(pointer: *anyopaque) api.FlushError!void {
+                    const calls: *usize = @ptrCast(@alignCast(pointer));
+                    calls.* += 1;
+                    return error.InvalidState;
+                }
+            }.flush },
+        };
+        const limits: Limits = .{ .header_bytes = 64, .body_bytes = body_bytes };
+        self.response = try Response.initWithLimit(&self.writer, limits, total);
+        self.response.storage = self.detached[0..try limits.reservationBytes()];
+        self.response.context = &self.context;
+        self.response.allow_blocking_stream = false;
+    }
+
+    /// Model the engine's completed flush barrier, after every transport borrow.
+    fn drained(self: *SnapshotFixture) void {
+        std.debug.assert(self.writer.frozen);
+        self.writer.headers_committed = true;
+        self.writer.release();
+        self.writer.resumeSnapshot(0);
+        self.context.event = .flushed;
+    }
+};
+
+test "continuation snapshots retain detached metadata and publish only on returned flush" {
+    var fixture: SnapshotFixture = .{};
+    try fixture.init(8, 16);
+    const response = &fixture.response;
+    try response.header("X-Retained", "yes");
+    try response.continuationWait();
+    var first = try response.snapshot(200, "text/plain", .{ .content_length = 8 });
+    try response.continuationWait();
+    var pieces = [_][]const u8{ "a", "bc" };
+    try first.writer().writeSplatAll(&pieces, 2);
+    try first.writer().flush();
+    try testing.expectEqualStrings("abcbc", response.bodyStorage()[0..response.body_len]);
+    try testing.expect(!fixture.writer.began and !fixture.writer.frozen);
+    try testing.expectEqual(@as(usize, 0), fixture.blocking_calls);
+    try testing.expectError(error.InvalidState, response.continuationWait());
+    try testing.expectEqual(api.Action.flush, try response.continuationFlush());
+    try testing.expectEqualStrings("abcbc", fixture.writer.committed());
+    try testing.expect(std.mem.indexOf(u8, fixture.arena[0..fixture.writer.body_start], "X-Retained: yes\r\n") != null);
+    try testing.expectError(error.InvalidState, response.resumeSnapshot());
+    try testing.expectError(error.InvalidState, response.header("X-Late", "no"));
+    fixture.drained();
+    try response.continuationWait();
+    var last = try response.resumeSnapshot();
+    try last.print("{s}", .{"XYZ"});
+    try testing.expectEqual(api.Action.finish, try response.finish());
+    try testing.expectEqualStrings("XYZ", fixture.writer.committed());
+    try testing.expectEqual(@as(usize, 8), response.stream_written);
+    try testing.expectEqual(@as(?usize, 8), fixture.writer.content_length);
+    try testing.expectEqualStrings("yes", response.headerStorage()["X-Retained: ".len..][0..3]);
+    try testing.expectEqual(@as(usize, 0), fixture.blocking_calls);
+}
+
+test "snapshot capacity errors remain private and sticky without an automatic flush" {
+    var fixture: SnapshotFixture = .{};
+    try fixture.init(4, 16);
+    var snapshot = try fixture.response.snapshot(200, "text/plain", .{});
+    try snapshot.writeAll("abc");
+    try testing.expectError(error.WriteFailed, snapshot.writer().writeAll("de"));
+    try testing.expectEqual(error.ResponseLimit, snapshot.failure().?);
+    try testing.expectEqualStrings("abc", fixture.response.bodyStorage()[0..fixture.response.body_len]);
+    try testing.expectError(error.WriteFailed, snapshot.writer().flush());
+    try testing.expectError(error.ResponseLimit, snapshot.writeAll("x"));
+    try testing.expectError(error.ResponseLimit, fixture.response.continuationFlush());
+    try testing.expectError(error.ResponseLimit, fixture.response.continuationWait());
+    try testing.expectError(error.ResponseLimit, fixture.response.finish());
+    try testing.expect(!fixture.writer.began and !fixture.writer.frozen);
+    try testing.expectEqual(api.Action.finish, try fixture.response.errorResponse(500));
+    try testing.expectEqualStrings("", fixture.writer.committed());
+    try testing.expect(!fixture.response.snapshot_mode and !fixture.response.allow_blocking_stream);
+    try testing.expectEqual(@as(usize, 0), fixture.blocking_calls);
+}
+
+test "snapshot cumulative and declared lengths apply across completed flush barriers" {
+    var fixture: SnapshotFixture = .{};
+    try fixture.init(4, 6);
+    var first = try fixture.response.snapshot(200, "text/plain", .{});
+    try first.writeAll("1234");
+    _ = try fixture.response.continuationFlush();
+    fixture.drained();
+    var second = try fixture.response.resumeSnapshot();
+    try testing.expectError(error.ResponseLimit, second.writeAll("567"));
+    try testing.expectEqual(@as(usize, 4), fixture.response.stream_written);
+    try testing.expectEqual(@as(usize, 0), fixture.response.body_len);
+    try testing.expectError(error.ResponseLimit, fixture.response.finish());
+    try testing.expectError(error.InvalidState, fixture.response.errorResponse(500));
+
+    var known: SnapshotFixture = .{};
+    try known.init(4, 16);
+    var start = try known.response.snapshot(200, "text/plain", .{ .content_length = 5 });
+    try start.writeAll("1234");
+    _ = try known.response.continuationFlush();
+    known.drained();
+    var end = try known.response.resumeSnapshot();
+    try testing.expectError(error.ResponseLengthMismatch, end.writeAll("56"));
+    try testing.expectError(error.ResponseLengthMismatch, known.response.finish());
+
+    var short: SnapshotFixture = .{};
+    try short.init(4, 16);
+    var output = try short.response.snapshot(200, "text/plain", .{ .content_length = 4 });
+    try output.writeAll("abc");
+    try testing.expectError(error.ResponseLengthMismatch, short.response.finish());
+    try testing.expectEqual(error.ResponseLengthMismatch, output.failure().?);
+    try testing.expectError(error.ResponseLengthMismatch, output.writeAll("d"));
+    try testing.expect(!short.writer.began);
+}
+
+test "snapshot waits and mode selection reject incompatible response ownership" {
+    var fixture: SnapshotFixture = .{};
+    try fixture.init(4, 16);
+    try testing.expect(fixture.context.supportsBlockingFlush());
+    try testing.expectError(error.BlockingFlushUnavailable, fixture.response.stream(200, "text/plain", .{}));
+    try testing.expectError(error.InvalidState, fixture.response.resumeSnapshot());
+    fixture.response.allow_blocking_stream = true;
+    try testing.expectError(error.InvalidState, fixture.response.snapshot(200, "text/plain", .{}));
+    try testing.expectError(error.InvalidState, fixture.response.continuationWait());
+    fixture.response.allow_blocking_stream = false;
+    try fixture.response.text(200, "");
+    try testing.expectError(error.InvalidState, fixture.response.continuationWait());
+    try fixture.response.discard();
+    var snapshot = try fixture.response.snapshot(200, "text/plain", .{});
+    fixture.cancelled.store(true, .release);
+    try testing.expectError(error.Cancelled, fixture.response.continuationWait());
+    try testing.expectError(error.Cancelled, snapshot.writeAll("x"));
+    try testing.expectEqual(@as(usize, 0), fixture.response.body_len);
+    try testing.expectEqual(error.Cancelled, snapshot.failure().?);
+    try testing.expectEqual(@as(usize, 0), fixture.blocking_calls);
+
+    var zero: SnapshotFixture = .{};
+    try zero.init(0, 16);
+    var empty = try zero.response.snapshot(200, "text/plain", .{});
+    try empty.writer().flush();
+    try zero.response.continuationWait();
+    try testing.expectError(error.ResponseLimit, empty.writeAll("x"));
 }
 
 test "stream writer preserves vector order and makes a length error sticky" {

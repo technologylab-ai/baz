@@ -26,7 +26,7 @@ tracks transport reliability, performance, and platform work. Its
   startup parsing and bounded typed rendering. See [MUSTACHE.md](MUSTACHE.md).
   TLS is out of scope; WebSockets needs upgrade support.
 - Worker streaming is implemented and passed native gates on all three platforms;
-  see [STREAMING.md](STREAMING.md). Typed inline continuations remain API-07.
+  see [STREAMING.md](STREAMING.md). Typed continuations are implemented on the composition branch; native gates are in progress.
 - API-09 Mustache passed all three native gates; see the
   [verification report](../reports/2026-09-06-mustache.md). The user prioritized
   real application templating ahead of composition work.
@@ -57,7 +57,7 @@ Inspect Git state before editing; do not overwrite another session's work.
 | Input | Raw immutable slices, ordered duplicates, no coercion, no bracket-array syntax, no merged query/body/JSON bag. |
 | Decoding | Explicit caller destination; percent and form-plus decoding are separately named; raw bytes remain available. |
 | Bodies/forms | Contiguous form parsers; explicit logical-body copy for segmented input. Flat multipart Part iterator. No implicit disk writes or receive streaming. |
-| Responses | One-shot handlers with capacity secured before execution; same-handler streaming through std.Io.Writer on fixed workers. Typed inline continuations remain planned. Never replay application side effects. |
+| Responses | One-shot handlers with capacity secured before execution; same-handler streaming through std.Io.Writer on fixed workers. Typed continuations release the executor between flushes and timers. Never replay application side effects. |
 | std.Io now | Inject caller capabilities; standard bounded Reader/Writer interoperability; explicit workers for blocking services. |
 | std.Io provider | IO-01–04 deferred until after the first API MVP by user decision (2026-09-06); an optional bounded cooperative provider remains a candidate. |
 | Memory | Framework storage reserved at startup; fixed buffers/reservations and optional bounded locals/scratch, no growable request arena or hidden heap fallback. |
@@ -79,8 +79,8 @@ Split implementation across sessions at its named gate and record exact state.
 | API-03 | implemented; scoped receipt | App instances, one router, endpoint methods, typed Shared and startup/stop lifecycle. | API-01, API-02 | APP-COMPOSITION |
 | API-04 | implemented; scoped receipt | Body adapters and explicit URL-encoded form API. | API-01, API-03 | APP-FORM, APP-STDIO-READER |
 | API-05 | implemented; scoped receipt | Flat multipart fields/files over retained input. | API-04 | APP-MULTIPART |
-| API-06 | composition implemented; native gates in progress | Typed locals, middleware and authentication composition: [guide](MIDDLEWARE.md). Public cookie/redirect helpers: [guide](COOKIES.md). | API-02, API-03 | APP-MIDDLEWARE |
-| API-07 | worker streaming implemented; typed inline continuations queued | Typed explicit resumable endpoints and retention rules. | API-03, API-06 | APP-RESUME |
+| API-06 | implemented; native gates in progress | Typed locals, middleware and authentication composition: [guide](MIDDLEWARE.md). Public cookie/redirect helpers: [guide](COOKIES.md). | API-02, API-03 | APP-MIDDLEWARE |
+| API-07 | typed continuations implemented; native gates in progress | Typed start/resume callbacks, timed waits, startup State/Locals/draft pool; [guide](CONTINUATIONS.md). | API-03, API-06 | APP-RESUME |
 | API-08 | partial: 21 ports, streaming example and external package | Finish remaining migration examples and successor MVP qualification; repository and Pages publication are integrated. | API-01–07 | APP-NATIVE |
 | API-09 | implemented; native gates passed | Pure Zig Mustache: startup template/partial ownership, bounded typed rendering into reserved HTML, original Zap compatibility and official core fixtures. | API-02, API-03 | APP-MUSTACHE |
 | IO-01–04 | deferred | Owned std.Io feasibility, isolated prototype, HTTP integration and adoption decision. | First API MVP; see STD-IO-DECISION | STDIO-PROTOTYPE, STDIO-HTTP-OWNERSHIP, STDIO-ADOPTION |
@@ -257,8 +257,10 @@ Parser helper work remains separately owned.
 
 Same-handler worker streaming now has a standard writer, explicit flush,
 cancellation-aware sleep, and [native ownership gates](../reports/2026-09-06-streaming.md).
-One callback retains one fixed worker through each wait. The remaining work below
-is a distinct typed continuation API for handlers that return between flushes.
+That linear API retains one fixed worker through each wait. The separate typed
+continuation API is now implemented; [its guide](CONTINUATIONS.md) records the
+flush/wait/finish contract. APP-RESUME native gates are in progress.
+The design and gate requirements follow.
 
 Expose an explicit advanced registration/handler shape using the current
 request/flushed events and flush/finish/close actions. Keep route selection,
@@ -428,3 +430,5 @@ partials and implicit filesystem lookup remain outside this slice.
 | Session | Completed work | Evidence | Next |
 | --- | --- | --- | --- |
 | 2026-09-06: Mustache pages | API-09: pure Zig fork, bounded cached rendering, startup owners, reserved HTML response helper, concise real page and partial, documentation/preview. Dependency PR #1 and Baz PR #3 merged in order. | [Native receipt](../reports/2026-09-06-mustache.md): 136 core cases at two capacities, four Zap cases, 346 library tests; Baz 90 root/two consumer tests per mode, 12 Mustache groups and existing suites on Linux/macOS/Windows. Five example-browser and 17 site-browser groups. | API-06 composition; retain fork ownership and explicit template limits. |
+
+| 2026-09-07: composition and continuations | Public middleware/locals, reusable sessions with expiry and revocation, typed start/resume handlers and bounded retained storage. | [Composition receipt](../reports/2026-09-07-composition.md); native gates in progress. | Complete APP-MIDDLEWARE and APP-RESUME evidence; own std.Io remains deferred. |

@@ -189,3 +189,13 @@ survive every flush. One active handler occupies one fixed worker.
 
 See [the streaming guide](STREAMING.md) for writer lifetime, error propagation,
 sleep, HEAD, and framing. This does not permit tasks that outlive the callback.
+
+## Typed continuation storage
+
+[Typed continuations](CONTINUATIONS.md) reserve State, Locals and a detached response
+draft at startup. This storage survives timers and flushes but cannot back borrowed
+output. Snapshot bytes are copied into engine-owned output before releasing the
+lease. Callbacks never retain a Context or writer pointer. Terminal cleanup runs
+once; cancellation cleanup waits for outstanding kernel borrows. A successful
+finish releases application state before the final output completes, so only the
+engine owns those output bytes.

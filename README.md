@@ -36,6 +36,8 @@ The first implementation provides:
   reserved HTML response storage. See the [guide](docs/MUSTACHE.md) and
   [greeting form and user-card example](examples/mustache.zig).
   [Verified natively on Linux, macOS, and Windows](reports/2026-09-06-mustache.md).
+- **Many waiting streams, few workers:** [typed continuations](docs/CONTINUATIONS.md)
+  retain bounded state between flushes and timers, releasing the executor.
 - **Cookies and redirects:** borrowed token views, explicit session/persistent expiry,
   scoped deletion, and empty redirects. See [the guide](docs/COOKIES.md) and
   [local login/logout example](examples/userpass_session.zig).
@@ -132,7 +134,8 @@ and `--port=8080` work. See the [CLI guide](examples/README.md#typed-cli-options
 Public [middleware and typed request locals](docs/MIDDLEWARE.md) compose global
 and route authentication hooks with deterministic cleanup. The session example
 uses 32 reusable slots, fixed server expiry, and individual or all-device logout.
-Typed resumable endpoints are the next roadmap step.
+[Typed continuations](docs/CONTINUATIONS.md) let many waiting streams share a
+small worker pool: return flush, wait, or finish with bounded typed state.
 
 ## Basic performance comparison with Zap
 

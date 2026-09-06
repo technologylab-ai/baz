@@ -89,3 +89,43 @@ test "consumer registers typed locals and copied route middleware" {
     defer app.deinit();
     try app.routeWith("GET", "/account", Hooks.page, .{ .middleware = &.{.{ .before = Hooks.authorize }} });
 }
+
+test "consumer registers bounded typed continuations and rejects disabled or oversized state" {
+    const Shared = struct {};
+    const Application = web.App(Shared);
+    const State = struct { count: u32 = 0 };
+    const H = struct {
+        fn start(ctx: *Application.Context, _: *State) !web.continuation.Step {
+            var out = try ctx.response.snapshot(200, "text/plain", .{});
+            try out.writeAll("first");
+            return .flush;
+        }
+        fn advance(ctx: *Application.Context, state: *State, event: web.continuation.Event) !web.continuation.Step {
+            if (event == .flushed) return .{ .wait = 1 };
+            state.count += 1;
+            var out = try ctx.response.resumeSnapshot();
+            try out.print("{d}", .{state.count});
+            return .finish;
+        }
+    };
+    var shared: Shared = .{};
+    const base: Application.Options = .{
+        .allocator = std.testing.allocator,
+        .io = std.testing.io,
+        .shared = &shared,
+        .server = .{ .connections = 1, .shards = 1 },
+    };
+    const disabled = try Application.init(base);
+    defer disabled.deinit();
+    try std.testing.expectError(error.ContinuationsDisabled, disabled.routeContinuation("GET", "/", State, H.start, H.advance, .{}));
+    var options = base;
+    options.max_continuations = 1;
+    options.max_continuation_state_bytes = 1;
+    const small = try Application.init(options);
+    defer small.deinit();
+    try std.testing.expectError(error.ContinuationStateTooLarge, small.routeContinuation("GET", "/", State, H.start, H.advance, .{}));
+    options.max_continuation_state_bytes = @sizeOf(State);
+    const app = try Application.init(options);
+    defer app.deinit();
+    try app.routeContinuation("GET", "/", State, H.start, H.advance, .{});
+}
