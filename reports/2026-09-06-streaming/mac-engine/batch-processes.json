@@ -1,0 +1,67 @@
+{
+  "name": "batch",
+  "command": [
+    "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+    "tests/batch_integration.py",
+    "--server",
+    "/Users/rs/code/github.com/technologylab.ai/bounded-http-streaming/zig-out/bin/bounded-http",
+    "--timeout",
+    "120",
+    "--json",
+    "/Users/rs/code/github.com/technologylab.ai/baz-streaming/.zig-cache/streaming-evidence/mac-engine/batch.json"
+  ],
+  "started_utc": "2026-09-06T17:43:06.038693+00:00",
+  "ended_utc": "2026-09-06T17:43:10.395661+00:00",
+  "exit_code": 0,
+  "watchdog_seconds": 140,
+  "timed_out": false,
+  "interrupted": null,
+  "owned_processes": [
+    {
+      "pid": 27285,
+      "ppid": 27224,
+      "pgid": 27285,
+      "start": "Sun Sep 6 19:43:06 2026",
+      "command": "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python tests/batch_integration.py --server /Users/rs/code/github.com/technologylab.ai/bounded-http-streaming/zig-out/bin/bounded-http --timeout 120 --json /Users/rs/code/github.com/technologylab.ai/baz-streaming/.zig-cache/streaming-evidence/mac-engine/batch.json"
+    },
+    {
+      "pid": 27295,
+      "ppid": 27285,
+      "pgid": 27295,
+      "start": "Sun Sep 6 19:43:06 2026",
+      "command": "/Users/rs/code/github.com/technologylab.ai/bounded-http-streaming/zig-out/bin/bounded-http --execution inline --port 0 --connections 16 --workers 0 --max-body 1024 --max-header 2048 --timeout-ms 3000 --stall-ms 1000 --send-chunk 1 --response-batch-limit 16"
+    },
+    {
+      "pid": 27304,
+      "ppid": 27285,
+      "pgid": 27304,
+      "start": "Sun Sep 6 19:43:06 2026",
+      "command": "<defunct>"
+    },
+    {
+      "pid": 27318,
+      "ppid": 27285,
+      "pgid": 27318,
+      "start": "Sun Sep 6 19:43:06 2026",
+      "command": "(bounded-http)"
+    },
+    {
+      "pid": 27333,
+      "ppid": 27285,
+      "pgid": 27333,
+      "start": "Sun Sep 6 19:43:07 2026",
+      "command": "/Users/rs/code/github.com/technologylab.ai/bounded-http-streaming/zig-out/bin/bounded-http --execution inline --port 0 --connections 8 --workers 0 --max-body 2097152 --max-header 2048 --timeout-ms 1000 --stall-ms 1000 --send-chunk 65536 --socket-send-buffer 4096 --prearm-receive 0 --submit-batch 0 --response-batch-limit 16"
+    },
+    {
+      "pid": 27578,
+      "ppid": 27285,
+      "pgid": 27578,
+      "start": "Sun Sep 6 19:43:08 2026",
+      "command": "/Users/rs/code/github.com/technologylab.ai/bounded-http-streaming/zig-out/bin/bounded-http --execution inline --port 0 --connections 8 --workers 0 --max-body 2097152 --max-header 2048 --timeout-ms 1000 --stall-ms 1000 --send-chunk 65536 --socket-send-buffer 4096 --prearm-receive 1 --submit-batch 1 --response-batch-limit 16"
+    }
+  ],
+  "cleanup": {
+    "signals": [],
+    "remaining": []
+  }
+}

@@ -1,0 +1,125 @@
+{
+  "revision": "79021c5f6f896b4e8e2c034dbaa9face54b90e87",
+  "run_id": 34049191530,
+  "hosts": {
+    "linux": {
+      "environment": [
+        "79021c5f6f896b4e8e2c034dbaa9face54b90e87",
+        "Linux runnervmejwal 6.17.0-1022-azure #22-Ubuntu SMP Mon Jul 27 17:24:03 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux",
+        "0.16.0",
+        "Python 3.12.3"
+      ],
+      "verify": {
+        "debug": {
+          "consumer_steps": 3,
+          "consumer_tests": 1,
+          "root_steps": 43,
+          "root_tests": 62
+        },
+        "release-safe": {
+          "consumer_steps": 3,
+          "consumer_tests": 1,
+          "root_steps": 43,
+          "root_tests": 62
+        }
+      },
+      "suites": {
+        "app": 14,
+        "examples": 20,
+        "streaming": 14
+      },
+      "streaming_cases": 14,
+      "streaming_backends": [
+        "io_uring"
+      ],
+      "streaming_final_ownership_zero": true,
+      "streaming_all_callbacks_returned": true,
+      "artifact_sha256": "sha256:46af8a4043bb554b9c1d1d02600e895436f8b2775ac3468dedd644f68a4a0d55"
+    },
+    "macos": {
+      "environment": [
+        "79021c5f6f896b4e8e2c034dbaa9face54b90e87",
+        "Darwin iad20-eo1205-b35cebe9-8231-4c32-a81d-e1eb125d16f9-96BD7FA11D0A.local 25.6.0 Darwin Kernel Version 25.6.0: Fri Jul 31 19:16:43 PDT 2026; root:xnu-12377.161.14~5/RELEASE_ARM64_VMAPPLE arm64",
+        "0.16.0",
+        "Python 3.14.7"
+      ],
+      "verify": {
+        "debug": {
+          "consumer_steps": 3,
+          "consumer_tests": 1,
+          "root_steps": 43,
+          "root_tests": 62
+        },
+        "release-safe": {
+          "consumer_steps": 3,
+          "consumer_tests": 1,
+          "root_steps": 43,
+          "root_tests": 62
+        }
+      },
+      "suites": {
+        "app": 14,
+        "examples": 20,
+        "streaming": 14
+      },
+      "streaming_cases": 14,
+      "streaming_backends": [
+        "kqueue"
+      ],
+      "streaming_final_ownership_zero": true,
+      "streaming_all_callbacks_returned": true,
+      "artifact_sha256": "sha256:8cfa890f6db7479bb3b3d9ee3e048b5a0bc0df1441d36c6cfb576994de4aa36b"
+    },
+    "windows": {
+      "environment_raw": "commit=79021c5f6f896b4e8e2c034dbaa9face54b90e87 image=win25-vs2026 version=20260824.214.3 zig=0.16.0\r\n{\r\n  \"Caption\": \"Microsoft Windows Server 2025 Datacenter\",\r\n  \"Version\": \"10.0.26100\",\r\n  \"BuildNumber\": \"26100\",\r\n  \"OSArchitecture\": \"64-bit\"\r\n}\r\n",
+      "verify": {
+        "Debug": {
+          "consumer_steps": 3,
+          "consumer_tests": 1,
+          "root_steps": 43,
+          "root_tests": 62
+        },
+        "ReleaseSafe": {
+          "consumer_steps": 3,
+          "consumer_tests": 1,
+          "root_steps": 43,
+          "root_tests": 62
+        }
+      },
+      "suites": {
+        "app": 14,
+        "examples": 20,
+        "streaming": 14,
+        "shards": 3
+      },
+      "run_id": 34049191487,
+      "streaming_final_ownership_zero": true,
+      "streaming_all_callbacks_returned": true,
+      "shards_final_ownership_zero": true,
+      "shards": [
+        {
+          "name": "borrowed pipelines and typed shared state with 2 owners",
+          "owners": 2,
+          "handoffs_sent": 3,
+          "handoffs_received": 3,
+          "responses": 19
+        },
+        {
+          "name": "borrowed pipelines and typed shared state with 3 owners",
+          "owners": 3,
+          "handoffs_sent": 4,
+          "handoffs_received": 4,
+          "responses": 19
+        },
+        {
+          "name": "console shutdown with pending receives across three owners",
+          "owners": 3,
+          "handoffs_sent": 4,
+          "handoffs_received": 4,
+          "responses": 6
+        }
+      ],
+      "artifact_sha256": "sha256:dc4da85a83bec50655f6b2b9b491d3dddc7c28db665ffedc49e7ccf491deff4f"
+    }
+  }
+}

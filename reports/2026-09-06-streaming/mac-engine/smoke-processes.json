@@ -1,0 +1,62 @@
+{
+  "name": "smoke",
+  "command": [
+    "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+    "tools/smoke.py",
+    "--server",
+    "/Users/rs/code/github.com/technologylab.ai/bounded-http-streaming/zig-out/bin/bounded-http",
+    "--requests",
+    "10000",
+    "--timeout",
+    "150",
+    "--json",
+    "/Users/rs/code/github.com/technologylab.ai/baz-streaming/.zig-cache/streaming-evidence/mac-engine/smoke.json"
+  ],
+  "started_utc": "2026-09-06T17:43:17.112310+00:00",
+  "ended_utc": "2026-09-06T17:43:18.174850+00:00",
+  "exit_code": 0,
+  "watchdog_seconds": 170,
+  "timed_out": false,
+  "interrupted": null,
+  "owned_processes": [
+    {
+      "pid": 27727,
+      "ppid": 27224,
+      "pgid": 27727,
+      "start": "Sun Sep 6 19:43:17 2026",
+      "command": "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python tools/smoke.py --server /Users/rs/code/github.com/technologylab.ai/bounded-http-streaming/zig-out/bin/bounded-http --requests 10000 --timeout 150 --json /Users/rs/code/github.com/technologylab.ai/baz-streaming/.zig-cache/streaming-evidence/mac-engine/smoke.json"
+    },
+    {
+      "pid": 27736,
+      "ppid": 27727,
+      "pgid": 27736,
+      "start": "Sun Sep 6 19:43:17 2026",
+      "command": "/Users/rs/code/github.com/technologylab.ai/bounded-http-streaming/zig-out/bin/bounded-http --execution inline --port 0 --connections 128 --workers 0 --max-body 65536 --max-header 16384 --timeout-ms 5000 --stall-ms 1000 --send-chunk 65536 --socket-send-buffer 65536 --duration-ms 150000"
+    },
+    {
+      "pid": 27737,
+      "ppid": 27727,
+      "pgid": 27727,
+      "start": "Sun Sep 6 19:43:17 2026",
+      "command": "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python /Users/rs/code/github.com/technologylab.ai/bounded-http-streaming/tools/benchmark.py http://127.0.0.1:54243/plaintext --connections 8 --requests 10000 --pipeline 1 --timeout 5 --deadline 38"
+    },
+    {
+      "pid": 27743,
+      "ppid": 27727,
+      "pgid": 27727,
+      "start": "Sun Sep 6 19:43:17 2026",
+      "command": "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python /Users/rs/code/github.com/technologylab.ai/bounded-http-streaming/tools/benchmark.py http://127.0.0.1:54243/plaintext --connections 8 --requests 10000 --pipeline 16 --timeout 5 --deadline 38"
+    },
+    {
+      "pid": 27747,
+      "ppid": 27727,
+      "pgid": 27727,
+      "start": "Sun Sep 6 19:43:17 2026",
+      "command": "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python /Users/rs/code/github.com/technologylab.ai/bounded-http-streaming/tools/benchmark.py http://127.0.0.1:54243/index.html --connections 8 --requests 10000 --pipeline 16 --timeout 5 --deadline 38 --expect-file /Users/rs/code/github.com/technologylab.ai/bounded-http-streaming/assets/index.html"
+    }
+  ],
+  "cleanup": {
+    "signals": [],
+    "remaining": []
+  }
+}

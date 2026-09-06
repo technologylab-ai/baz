@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "baz_source_revision": "79021c5f6f896b4e8e2c034dbaa9face54b90e87",
+  "engine_source_candidate": "2a269ef57301b21df22f1c616d02d6d244e5d6ca",
+  "scope": "Local macOS correctness checks supplement the exact-head hosted receipts.",
+  "provenance_limit": "Local build logs lack a contemporaneous full-source manifest. Hosted receipts identify the executed Baz revision.",
+  "engine_debug_scope": "The local Debug check preceded the tree-identical engine publication repair.",
+  "performance_comparison": false
+}

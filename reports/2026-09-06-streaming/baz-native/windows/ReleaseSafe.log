@@ -1,0 +1,50 @@
+Build Summary: 3/3 steps succeeded; 1/1 tests passed
+test success
++- run test 1 pass (1 total) 19ms MaxRSS:4M
+   +- compile test ReleaseSafe native success 28s MaxRSS:287M
+
+Build Summary: 43/43 steps succeeded; 62/62 tests passed
+verify success
++- compile exe baz-streaming ReleaseSafe native success 24s MaxRSS:295M
++- compile exe baz ReleaseSafe native success 24s MaxRSS:298M
++- compile exe hello ReleaseSafe native success 24s MaxRSS:290M
++- compile exe hello2 ReleaseSafe native success 24s MaxRSS:292M
++- compile exe hello_json ReleaseSafe native success 27s MaxRSS:291M
++- compile exe simple_router ReleaseSafe native success 19s MaxRSS:291M
++- compile exe routes ReleaseSafe native success 18s MaxRSS:291M
++- compile exe serve ReleaseSafe native success 17s MaxRSS:291M
++- compile exe sendfile ReleaseSafe native success 25s MaxRSS:290M
++- compile exe senderror ReleaseSafe native success 24s MaxRSS:290M
++- compile exe accept ReleaseSafe native success 24s MaxRSS:292M
++- compile exe app_basic ReleaseSafe native success 23s MaxRSS:292M
++- compile exe app_auth ReleaseSafe native success 24s MaxRSS:290M
++- compile exe app_errors ReleaseSafe native success 27s MaxRSS:295M
++- compile exe endpoint ReleaseSafe native success 23s MaxRSS:307M
++- compile exe endpoint_auth ReleaseSafe native success 24s MaxRSS:292M
++- compile exe middleware ReleaseSafe native success 19s MaxRSS:291M
++- compile exe middleware_with_endpoint ReleaseSafe native success 30s MaxRSS:291M
++- compile exe userpass_session ReleaseSafe native success 24s MaxRSS:294M
++- compile exe cookies ReleaseSafe native success 23s MaxRSS:294M
++- compile exe http_params ReleaseSafe native success 25s MaxRSS:293M
++- compile exe bindataformpost ReleaseSafe native success 25s MaxRSS:295M
++- compile exe streaming ReleaseSafe native success 23s MaxRSS:292M
++- zig fmt --check success
++- run python3 success 106ms
++- run D:\a\_temp\baz-zig\zig-x86_64-windows-0.16.0\zig.exe success 28s
++- run test 3 pass (3 total) 12ms MaxRSS:4M
+|  +- compile test ReleaseSafe native success 27s MaxRSS:273M
++- run test 5 pass (5 total) 19s MaxRSS:4M
+|  +- compile test ReleaseSafe native success 24s MaxRSS:275M
++- run test 12 pass (12 total) 15ms MaxRSS:4M
+|  +- compile test ReleaseSafe native success 24s MaxRSS:290M
++- run test 8 pass (8 total) 24s MaxRSS:4M
+|  +- compile test ReleaseSafe native success 19s MaxRSS:279M
++- run test 7 pass (7 total) 18ms MaxRSS:4M
+|  +- compile test ReleaseSafe native success 30s MaxRSS:283M
++- run test 2 pass (2 total) 16ms MaxRSS:4M
+|  +- compile test ReleaseSafe native success 24s MaxRSS:269M
++- run test 25 pass (25 total) 160ms MaxRSS:5M
+|  +- compile test ReleaseSafe native success 24s MaxRSS:364M
++- run test success 14ms MaxRSS:4M
+   +- compile test ReleaseSafe native success 24s MaxRSS:266M
+

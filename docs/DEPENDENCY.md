@@ -49,6 +49,12 @@ It adds same-callback worker flushes through [engine PR #3](https://github.com/t
 `Context.flushAndWait()` keeps the worker stack live while the I/O owner sends a snapshot.
 Baz supplies the standard writer and cancellation-aware sleep described in [STREAMING.md](STREAMING.md).
 It includes the package rename and [Windows shard handoff from PR #2](https://github.com/technologylab-ai/bounded-http/pull/2).
+The current pin passed Baz’s native Linux, macOS, and Windows x64 verification,
+App/example suites, all 14 streaming groups, and Windows shard/shutdown checks.
+The [streaming receipt](../reports/2026-09-06-streaming.md) preserves those results
+and the separate engine gates. PR #3 merged as `86e8ec2` on 2026-09-06.
+The pin retains its exact tested head, which is an ancestor of that merge and
+has the same complete Git tree.
 The preceding `7c240039` pin passed Baz’s native Windows x64, Linux, and macOS gates,
 including all supported examples. The [native receipt](../reports/2026-09-06-windows-baz.md)
 records exact source identity, environments, and Windows handoff/shutdown behavior.

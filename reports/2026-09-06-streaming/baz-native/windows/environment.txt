@@ -1,0 +1,7 @@
+commit=79021c5f6f896b4e8e2c034dbaa9face54b90e87 image=win25-vs2026 version=20260824.214.3 zig=0.16.0
+{
+  "Caption": "Microsoft Windows Server 2025 Datacenter",
+  "Version": "10.0.26100",
+  "BuildNumber": "26100",
+  "OSArchitecture": "64-bit"
+}

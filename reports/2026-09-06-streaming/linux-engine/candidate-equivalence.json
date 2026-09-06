@@ -1,0 +1,10 @@
+{
+  "executed_revision": "62c238a76ff3fd09ec425066a8a8d7dc3449e733",
+  "candidate_revision": "2a269ef57301b21df22f1c616d02d6d244e5d6ca",
+  "git_trees": {
+    "62c238a76ff3fd09ec425066a8a8d7dc3449e733": "2465f8b25ce564cfc81e72daffe890b77c62a832",
+    "2a269ef57301b21df22f1c616d02d6d244e5d6ca": "2465f8b25ce564cfc81e72daffe890b77c62a832"
+  },
+  "entire_tree_identical": true,
+  "source_receipt_unchanged": true
+}

@@ -1,0 +1,50 @@
+Build Summary: 48/48 steps succeeded
+install success
++- install baz success
+|  +- compile exe baz ReleaseSafe native cached 40ms MaxRSS:18M
++- install baz-streaming success
+   +- compile exe baz-streaming ReleaseSafe native cached 55ms MaxRSS:18M
+examples success
++- install hello success
+|  +- compile exe hello ReleaseSafe native cached 48ms MaxRSS:18M
++- install hello2 success
+|  +- compile exe hello2 ReleaseSafe native cached 51ms MaxRSS:18M
++- install hello_json success
+|  +- compile exe hello_json ReleaseSafe native cached 50ms MaxRSS:18M
++- install simple_router success
+|  +- compile exe simple_router ReleaseSafe native cached 51ms MaxRSS:18M
++- install routes success
+|  +- compile exe routes ReleaseSafe native cached 55ms MaxRSS:18M
++- install serve success
+|  +- compile exe serve ReleaseSafe native cached 51ms MaxRSS:18M
++- install sendfile success
+|  +- compile exe sendfile ReleaseSafe native cached 56ms MaxRSS:18M
++- install senderror success
+|  +- compile exe senderror ReleaseSafe native cached 50ms MaxRSS:18M
++- install accept success
+|  +- compile exe accept ReleaseSafe native cached 50ms MaxRSS:18M
++- install app_basic success
+|  +- compile exe app_basic ReleaseSafe native cached 55ms MaxRSS:18M
++- install app_auth success
+|  +- compile exe app_auth ReleaseSafe native cached 57ms MaxRSS:18M
++- install app_errors success
+|  +- compile exe app_errors ReleaseSafe native cached 61ms MaxRSS:18M
++- install endpoint success
+|  +- compile exe endpoint ReleaseSafe native cached 46ms MaxRSS:18M
++- install endpoint_auth success
+|  +- compile exe endpoint_auth ReleaseSafe native cached 49ms MaxRSS:18M
++- install middleware success
+|  +- compile exe middleware ReleaseSafe native cached 57ms MaxRSS:18M
++- install middleware_with_endpoint success
+|  +- compile exe middleware_with_endpoint ReleaseSafe native cached 57ms MaxRSS:18M
++- install userpass_session success
+|  +- compile exe userpass_session ReleaseSafe native cached 49ms MaxRSS:18M
++- install cookies success
+|  +- compile exe cookies ReleaseSafe native cached 39ms MaxRSS:18M
++- install http_params success
+|  +- compile exe http_params ReleaseSafe native cached 56ms MaxRSS:18M
++- install bindataformpost success
+|  +- compile exe bindataformpost ReleaseSafe native cached 60ms MaxRSS:18M
++- install streaming success
+   +- compile exe streaming ReleaseSafe native cached 60ms MaxRSS:18M
+

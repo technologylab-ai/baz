@@ -1,0 +1,10 @@
+{
+  "index_url": "https://ziglang.org/download/index.json",
+  "zig_version": "0.16.0",
+  "platform": "x86_64-windows",
+  "archive_url": "https://ziglang.org/download/0.16.0/zig-x86_64-windows-0.16.0.zip",
+  "expected_sha256": "68659eb5f1e4eb1437a722f1dd889c5a322c9954607f5edcf337bc3684a75a7e",
+  "actual_sha256": "68659eb5f1e4eb1437a722f1dd889c5a322c9954607f5edcf337bc3684a75a7e",
+  "actual_bytes": 97217739,
+  "compiler_pe_machine": "8664"
+}

@@ -1,0 +1,21 @@
+PASS hello
+PASS hello2
+PASS hello_json
+PASS simple_router
+PASS routes
+PASS serve
+PASS sendfile
+PASS senderror
+PASS accept
+PASS app_basic
+PASS app_auth
+PASS endpoint_auth
+PASS app_errors
+PASS cookies
+PASS middleware
+PASS middleware_with_endpoint
+PASS http_params
+PASS bindataformpost
+PASS endpoint
+PASS userpass_session
+{"passed": 20, "cases": ["hello", "hello2", "hello_json", "simple_router", "routes", "serve", "sendfile", "senderror", "accept", "app_basic", "app_auth", "endpoint_auth", "app_errors", "cookies", "middleware", "middleware_with_endpoint", "http_params", "bindataformpost", "endpoint", "userpass_session"]}

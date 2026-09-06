@@ -1,0 +1,42 @@
+{
+  "Debug": "Build Summary: 16/16 steps succeeded; 102/104 tests passed (2 skipped)",
+  "ReleaseSafe": "Build Summary: 16/16 steps succeeded; 102/104 tests passed (2 skipped)",
+  "arena_lifecycle_integration": {
+    "ok": true,
+    "passed": 8,
+    "sessions": 8,
+    "ownership_zero": true
+  },
+  "batch_integration": {
+    "ok": true,
+    "passed": 29,
+    "sessions": 28,
+    "ownership_zero": true
+  },
+  "gather_integration": {
+    "ok": true,
+    "passed": 11,
+    "sessions": 11,
+    "ownership_zero": true
+  },
+  "inline_integration": {
+    "ok": true,
+    "passed": 10,
+    "sessions": 3,
+    "ownership_zero": true
+  },
+  "integration": {
+    "ok": true,
+    "passed": 26,
+    "sessions": 6,
+    "ownership_zero": true
+  },
+  "test_compare": "9 passed",
+  "smoke": {
+    "ok": true,
+    "optimize": "ReleaseSafe",
+    "workloads": 3,
+    "exact_responses": 30000,
+    "ownership_zero": true
+  }
+}

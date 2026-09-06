@@ -19,7 +19,10 @@ Its `writer()` returns `*std.Io.Writer`. Standard `writeAll`, `print`, and `flus
 work; `Stream` also provides convenience `writeAll`, `print`, and `flush` methods.
 
 Every write copies input bytes before returning. Stack buffers are valid sources.
-Writes use the connection's startup-reserved staging buffer. Filling that buffer
+Writes use the connection's startup-reserved staging buffer. Payload bytes then
+move once more into the final snapshot layout. See [the copy and borrowing
+contract](OWNERSHIP.md#response-copies-and-borrowing), including the current
+limitation for large preexisting assets. Filling that buffer
 automatically flushes it before accepting more data. Explicit `flush()` sends a
 partial buffer and waits for local transmission completion. An empty flush sends
 pending headers but does not terminate a chunked response.
@@ -79,5 +82,15 @@ unwinds; the slot is reusable only after callback and kernel borrows both end.
 
 The engine operation is provided by [bounded/http](https://technologylab-ai.github.io/bounded-http/)
 through [engine PR #3](https://github.com/technologylab-ai/bounded-http/pull/3).
-Baz pins its immutable candidate revision; the engine remains a separate package.
+PR #3 is merged. Baz pins its exact tested head revision; the engine remains a separate package.
 The existing callback-returning engine API remains available for explicit continuations.
+
+## Native verification
+
+The [streaming receipt](../reports/2026-09-06-streaming.md) records 14 passing
+streaming groups on native Linux/io_uring, macOS/kqueue, and Windows x64/IOCP.
+The tests gate later writes on the client's receipt of the first chunk, retain
+stack and request data across flushes, exercise backpressure and cancellation,
+and verify final callback return and zero remaining connection/operation owners.
+All timed wire fixtures use ReleaseSafe with assertions enabled. These are
+correctness gates; the earlier Zap throughput comparison is unchanged.

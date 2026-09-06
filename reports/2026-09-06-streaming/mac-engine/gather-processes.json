@@ -1,0 +1,46 @@
+{
+  "name": "gather",
+  "command": [
+    "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+    "tests/gather_integration.py",
+    "--server",
+    "/Users/rs/code/github.com/technologylab.ai/bounded-http-streaming/zig-out/bin/bounded-http",
+    "--timeout",
+    "120",
+    "--json",
+    "/Users/rs/code/github.com/technologylab.ai/baz-streaming/.zig-cache/streaming-evidence/mac-engine/gather.json"
+  ],
+  "started_utc": "2026-09-06T17:43:10.395981+00:00",
+  "ended_utc": "2026-09-06T17:43:12.040503+00:00",
+  "exit_code": 0,
+  "watchdog_seconds": 140,
+  "timed_out": false,
+  "interrupted": null,
+  "owned_processes": [
+    {
+      "pid": 27598,
+      "ppid": 27224,
+      "pgid": 27598,
+      "start": "Sun Sep 6 19:43:10 2026",
+      "command": "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python tests/gather_integration.py --server /Users/rs/code/github.com/technologylab.ai/bounded-http-streaming/zig-out/bin/bounded-http --timeout 120 --json /Users/rs/code/github.com/technologylab.ai/baz-streaming/.zig-cache/streaming-evidence/mac-engine/gather.json"
+    },
+    {
+      "pid": 27605,
+      "ppid": 27598,
+      "pgid": 27605,
+      "start": "Sun Sep 6 19:43:10 2026",
+      "command": "(bounded-http)"
+    },
+    {
+      "pid": 27612,
+      "ppid": 27598,
+      "pgid": 27612,
+      "start": "Sun Sep 6 19:43:10 2026",
+      "command": "/Users/rs/code/github.com/technologylab.ai/bounded-http-streaming/zig-out/bin/bounded-http --execution inline --port 0 --connections 4 --workers 0 --max-body 2097152 --max-header 2048 --timeout-ms 1000 --stall-ms 1000 --send-chunk 65536 --response-batch-limit 1 --gather-send 1 --socket-send-buffer 4096"
+    }
+  ],
+  "cleanup": {
+    "signals": [],
+    "remaining": []
+  }
+}

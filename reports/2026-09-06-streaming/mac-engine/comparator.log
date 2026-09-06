@@ -1,0 +1,14 @@
+test_abba_keeps_equal_workload_adjacent_and_balances_samples (test_compare.WrkReceiptTests) ... ok
+test_abba_rejects_ambiguous_or_non_pair_comparisons (test_compare.WrkReceiptTests) ... ok
+test_any_error_invalidates_trial (test_compare.WrkReceiptTests) ... ok
+test_counts_are_already_responses_not_batches (test_compare.WrkReceiptTests) ... ok
+test_current_and_historical_framework_names_retain_validation (test_compare.WrkReceiptTests) ... ok
+test_default_shuffle_retains_each_requested_sample_once (test_compare.WrkReceiptTests) ... ok
+test_incomplete_or_ambiguous_receipt_rejected (test_compare.WrkReceiptTests) ... ok
+test_invalid_latency_does_not_invalidate_response_count (test_compare.WrkReceiptTests) ... ok
+test_required_power_profile_cannot_silently_change_or_disappear (test_compare.WrkReceiptTests) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.001s
+
+OK

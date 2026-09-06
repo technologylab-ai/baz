@@ -70,7 +70,7 @@ Baz exports a distinct `baz` module and consumes the external `bounded_http` mod
 Consumers can also import the same engine module directly.
 The [dependency record](DEPENDENCY.md) describes the public adapter contract and immutable pin.
 [bounded/http](https://technologylab-ai.github.io/bounded-http/) remains independently usable as the engine case study.
-Baz's own repository publication is still pending.
+Baz has its own [public repository](https://github.com/technologylab-ai/baz) and [documentation website](https://technologylab-ai.github.io/baz/).
 
 `std.process.Init` belongs in executable examples. Libraries receive the narrow
 capabilities they need: an allocator for startup, the caller's `std.Io` where

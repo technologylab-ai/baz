@@ -1,0 +1,45 @@
+{
+  "total_count": 2,
+  "artifacts": [
+    {
+      "id": 9994118731,
+      "node_id": "MDg6QXJ0aWZhY3Q5OTk0MTE4NzMx",
+      "name": "baz-ubuntu-latest-34049191530-1",
+      "size_in_bytes": 5592,
+      "url": "https://api.github.com/repos/technologylab-ai/baz/actions/artifacts/9994118731",
+      "archive_download_url": "https://api.github.com/repos/technologylab-ai/baz/actions/artifacts/9994118731/zip",
+      "expired": false,
+      "digest": "sha256:46af8a4043bb554b9c1d1d02600e895436f8b2775ac3468dedd644f68a4a0d55",
+      "created_at": "2026-09-06T17:44:45Z",
+      "updated_at": "2026-09-06T17:44:45Z",
+      "expires_at": "2026-09-20T17:44:44Z",
+      "workflow_run": {
+        "id": 34049191530,
+        "repository_id": 1359326012,
+        "head_repository_id": 1359326012,
+        "head_branch": "feat/streaming",
+        "head_sha": "79021c5f6f896b4e8e2c034dbaa9face54b90e87"
+      }
+    },
+    {
+      "id": 9994073504,
+      "node_id": "MDg6QXJ0aWZhY3Q5OTk0MDczNTA0",
+      "name": "baz-macos-latest-34049191530-1",
+      "size_in_bytes": 5526,
+      "url": "https://api.github.com/repos/technologylab-ai/baz/actions/artifacts/9994073504",
+      "archive_download_url": "https://api.github.com/repos/technologylab-ai/baz/actions/artifacts/9994073504/zip",
+      "expired": false,
+      "digest": "sha256:8cfa890f6db7479bb3b3d9ee3e048b5a0bc0df1441d36c6cfb576994de4aa36b",
+      "created_at": "2026-09-06T17:41:32Z",
+      "updated_at": "2026-09-06T17:41:32Z",
+      "expires_at": "2026-09-20T17:41:31Z",
+      "workflow_run": {
+        "id": 34049191530,
+        "repository_id": 1359326012,
+        "head_repository_id": 1359326012,
+        "head_branch": "feat/streaming",
+        "head_sha": "79021c5f6f896b4e8e2c034dbaa9face54b90e87"
+      }
+    }
+  ]
+}

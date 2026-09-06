@@ -1,0 +1,33 @@
+{
+  "name": "readiness",
+  "command": [
+    "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+    "/Users/rs/code/github.com/technologylab.ai/baz-streaming/.zig-cache/streaming-evidence/mac-engine/probe.py"
+  ],
+  "started_utc": "2026-09-06T17:43:04.671107+00:00",
+  "ended_utc": "2026-09-06T17:43:05.294965+00:00",
+  "exit_code": 0,
+  "watchdog_seconds": 25,
+  "timed_out": false,
+  "interrupted": null,
+  "owned_processes": [
+    {
+      "pid": 27243,
+      "ppid": 27224,
+      "pgid": 27243,
+      "start": "Sun Sep 6 19:43:04 2026",
+      "command": "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python /Users/rs/code/github.com/technologylab.ai/baz-streaming/.zig-cache/streaming-evidence/mac-engine/probe.py"
+    },
+    {
+      "pid": 27245,
+      "ppid": 27243,
+      "pgid": 27245,
+      "start": "Sun Sep 6 19:43:04 2026",
+      "command": "/Users/rs/code/github.com/technologylab.ai/bounded-http-streaming/zig-out/bin/bounded-http --execution workers --port 0 --connections 16 --workers 2 --max-body 1024 --max-header 2048 --timeout-ms 3000 --stall-ms 1000 --send-chunk 7"
+    }
+  ],
+  "cleanup": {
+    "signals": [],
+    "remaining": []
+  }
+}

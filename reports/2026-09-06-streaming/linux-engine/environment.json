@@ -1,0 +1,17 @@
+{
+  "platform": "Linux-7.1.9-arch1-2-x86_64-with-glibc2.44",
+  "uname": [
+    "Linux",
+    "omarx1",
+    "7.1.9-arch1-2",
+    "#1 SMP PREEMPT_DYNAMIC Fri, 21 Aug 2026 22:18:59 +0000",
+    "x86_64",
+    ""
+  ],
+  "python": "3.14.7 (main, Aug 10 2026, 07:46:56) [GCC 16.1.1 20260728]",
+  "zig": "0.16.0",
+  "zig_path": "/home/rs/.local/share/mise/shims/zig",
+  "os_release": "NAME=\"Omarchy\"\nPRETTY_NAME=\"Omarchy\"\nID=omarchy\nID_LIKE=arch\nBUILD_ID=\"4.0.2\"\nVERSION_ID=\"4.0.2\"\nANSI_COLOR=\"38;2;158;206;106\"\nHOME_URL=\"https://omarchy.org/\"\nDOCUMENTATION_URL=\"https://learn.omacom.io/2/the-omarchy-manual\"\nSUPPORT_URL=\"https://discord.gg/tXFUdasqhY\"\nBUG_REPORT_URL=\"https://github.com/basecamp/omarchy/issues\"\nLOGO=omarchy\n",
+  "io_uring_disabled": "0",
+  "cpu_model": "Intel(R) Core(TM) Ultra 7 258V"
+}

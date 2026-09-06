@@ -190,7 +190,9 @@ logical body bytes. Reservation is `384 + 128 + header_bytes + body_bytes` and
 must fit `server.output_bytes`. `server.max_response_bytes` must cover the body
 limit. Header names/values/Content-Type are copied. Generated/copied bodies
 move once within the arena at finalization, counted by
-`Stats.response_draft_copy_bytes`; no zero-overhead claim is made.
+`Stats.response_draft_copy_bytes`; that counter is not total copy volume.
+See [response copies and borrowing](OWNERSHIP.md#response-copies-and-borrowing)
+for each path, asset lifetimes, and the current borrowed-body size limitation.
 
 Content-Length, Transfer-Encoding and other canonical framing fields belong to
 the engine. Use repeated `header("Set-Cookie", ...)` or a validated Location

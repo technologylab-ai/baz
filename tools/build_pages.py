@@ -45,6 +45,7 @@ def documents():
              'examples/embedding/build.zig.zon', 'examples/embedding/src/main.zig',
              'reports/2026-09-06-basic-zap.md', 'reports/2026-09-06-app-api.md',
              'reports/2026-09-06-baz-extraction.md', 'reports/2026-09-06-windows-baz.md',
+             'reports/2026-09-06-streaming.md',
              'reports/2026-09-06-basic-zap/PROTOCOL.md',
              'reports/2026-09-06-basic-zap/reproducer/README.md'}
     for pattern in ('docs/*.md', 'src/*.zig', 'examples/*.zig'):

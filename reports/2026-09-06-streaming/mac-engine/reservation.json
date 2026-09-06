@@ -1,0 +1,9 @@
+{
+  "agent": "/root/stream_wire",
+  "purpose": "bounded/http ReleaseSafe native macOS regression and 30000-response correctness smoke",
+  "host": "renerocksai-M3-Max-6.local",
+  "started_utc": "2026-09-06T17:43:04.574070+00:00",
+  "owner_pid": 27224,
+  "token": "8bf23948-98fc-46c4-a130-1f457d5e106e",
+  "cwd": "/Users/rs/code/github.com/technologylab.ai/bounded-http-streaming"
+}

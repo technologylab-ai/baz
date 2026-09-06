@@ -1,0 +1,33 @@
+{
+  "name": "comparator",
+  "command": [
+    "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests",
+    "-p",
+    "test_compare.py",
+    "-v"
+  ],
+  "started_utc": "2026-09-06T17:43:05.295336+00:00",
+  "ended_utc": "2026-09-06T17:43:05.598051+00:00",
+  "exit_code": 0,
+  "watchdog_seconds": 30,
+  "timed_out": false,
+  "interrupted": null,
+  "owned_processes": [
+    {
+      "pid": 27255,
+      "ppid": 27224,
+      "pgid": 27255,
+      "start": "Sun Sep 6 19:43:05 2026",
+      "command": "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python -m unittest discover -s tests -p test_compare.py -v"
+    }
+  ],
+  "cleanup": {
+    "signals": [],
+    "remaining": []
+  }
+}

@@ -1,0 +1,181 @@
+{
+  "schema_version": 1,
+  "ok": true,
+  "steps": [
+    {
+      "name": "Debug",
+      "command": [
+        "zig",
+        "build",
+        "verify",
+        "--summary",
+        "all"
+      ],
+      "timeout_seconds": 300,
+      "exit_code": 0,
+      "seconds": 7.156,
+      "cleanup": {
+        "before": [],
+        "after": [],
+        "ok": true
+      }
+    },
+    {
+      "name": "ReleaseSafe",
+      "command": [
+        "zig",
+        "build",
+        "verify",
+        "-Doptimize=ReleaseSafe",
+        "--summary",
+        "all"
+      ],
+      "timeout_seconds": 300,
+      "exit_code": 0,
+      "seconds": 18.925,
+      "cleanup": {
+        "before": [],
+        "after": [],
+        "ok": true
+      }
+    },
+    {
+      "name": "install",
+      "command": [
+        "zig",
+        "build",
+        "-Doptimize=ReleaseSafe",
+        "--summary",
+        "all"
+      ],
+      "timeout_seconds": 300,
+      "exit_code": 0,
+      "seconds": 0.064,
+      "cleanup": {
+        "before": [],
+        "after": [],
+        "ok": true
+      }
+    },
+    {
+      "name": "test_compare",
+      "command": [
+        "python3",
+        "tests/test_compare.py",
+        "-v"
+      ],
+      "timeout_seconds": 60,
+      "exit_code": 0,
+      "seconds": 0.114,
+      "cleanup": {
+        "before": [],
+        "after": [],
+        "ok": true
+      }
+    },
+    {
+      "name": "arena_lifecycle_integration",
+      "command": [
+        "python3",
+        "tests/arena_lifecycle_integration.py",
+        "--json",
+        "/tmp/baz-stream-engine.1fiusALk/evidence/arena_lifecycle_integration.json"
+      ],
+      "timeout_seconds": 240,
+      "exit_code": 0,
+      "seconds": 0.164,
+      "cleanup": {
+        "before": [],
+        "after": [],
+        "ok": true
+      }
+    },
+    {
+      "name": "batch_integration",
+      "command": [
+        "python3",
+        "tests/batch_integration.py",
+        "--json",
+        "/tmp/baz-stream-engine.1fiusALk/evidence/batch_integration.json"
+      ],
+      "timeout_seconds": 240,
+      "exit_code": 0,
+      "seconds": 4.473,
+      "cleanup": {
+        "before": [],
+        "after": [],
+        "ok": true
+      }
+    },
+    {
+      "name": "gather_integration",
+      "command": [
+        "python3",
+        "tests/gather_integration.py",
+        "--json",
+        "/tmp/baz-stream-engine.1fiusALk/evidence/gather_integration.json"
+      ],
+      "timeout_seconds": 240,
+      "exit_code": 0,
+      "seconds": 1.567,
+      "cleanup": {
+        "before": [],
+        "after": [],
+        "ok": true
+      }
+    },
+    {
+      "name": "inline_integration",
+      "command": [
+        "python3",
+        "tests/inline_integration.py",
+        "--json",
+        "/tmp/baz-stream-engine.1fiusALk/evidence/inline_integration.json"
+      ],
+      "timeout_seconds": 240,
+      "exit_code": 0,
+      "seconds": 0.565,
+      "cleanup": {
+        "before": [],
+        "after": [],
+        "ok": true
+      }
+    },
+    {
+      "name": "integration",
+      "command": [
+        "python3",
+        "tests/integration.py",
+        "--json",
+        "/tmp/baz-stream-engine.1fiusALk/evidence/integration.json"
+      ],
+      "timeout_seconds": 240,
+      "exit_code": 0,
+      "seconds": 4.123,
+      "cleanup": {
+        "before": [],
+        "after": [],
+        "ok": true
+      }
+    },
+    {
+      "name": "smoke",
+      "command": [
+        "python3",
+        "tools/smoke.py",
+        "--json",
+        "/tmp/baz-stream-engine.1fiusALk/evidence/smoke.json"
+      ],
+      "timeout_seconds": 180,
+      "exit_code": 0,
+      "seconds": 0.765,
+      "cleanup": {
+        "before": [],
+        "after": [],
+        "ok": true
+      }
+    }
+  ],
+  "started_utc": "2026-09-06T17:30:03.744913+00:00",
+  "finished_utc": "2026-09-06T17:30:42.179923+00:00"
+}

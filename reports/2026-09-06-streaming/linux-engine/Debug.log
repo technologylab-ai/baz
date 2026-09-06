@@ -1,0 +1,19 @@
+{"binary_sha256": "64dfa2fffc620f15ecb0808bfe6b7c5a547c6cbf4dec1253b7a36208e1809d45", "command": ["/tmp/baz-stream-engine.1fiusALk/source/.zig-cache/embedding-Debug/bin/embedded-http", "--port", "0", "--duration-ms", "1500"], "elapsed_seconds": 1.535263372992631, "exact_responses": 3, "methods": ["GET", "HEAD", "GET"], "ok": true, "platform": "Linux-7.1.9-arch1-2-x86_64-with-glibc2.44", "server_log": "READY port=39135\nSTATS {\"execution\":\"inline_event_loop\",\"gather_send\":true,\"response_batch_limit\":128,\"callbacks_per_turn\":2048,\"shards\":1,\"response_batches\":1,\"batched_finished_responses\":3,\"max_batch_responses\":3,\"scalar_send_operations\":0,\"gather_send_operations\":1,\"single_span_send_operations\":1,\"borrow_copies\":3,\"response_draft_copy_bytes\":0,\"send_completions\":1,\"short_send_completions\":0,\"gather_cancel_requests\":0,\"gather_canceled_completions\":0,\"max_canceled_batch_responses\":0,\"max_send_parts\":1,\"max_send_bytes\":417,\"max_inline_callbacks_per_turn\":3,\"inline_dispatches\":3,\"worker_dispatches\":0,\"accepted\":1,\"handoffs_sent\":0,\"handoffs_received\":0,\"handoffs_closed\":0,\"max_handoff_delay_ns\":0,\"completed\":3,\"rejected\":0,\"timeouts\":0,\"flushes\":0,\"resumed\":0,\"bytes_received\":146,\"bytes_sent\":417,\"pipeline_copy_bytes\":0,\"live_connections\":0,\"peak_connections\":1,\"live_operations\":0,\"peak_operations\":2,\"max_loop_ns\":22213,\"turns\":153,\"idle_polls\":149,\"prearmed_receives\":0,\"max_handler_ns\":0,\"max_queue_ns\":0,\"max_request_ns\":91199,\"workers\":0,\"allocation_calls_after_start\":0,\"framework_heap_peak_bytes\":3705978,\"framework_heap_limit_bytes\":16777216}\n", "stats": {"accepted": 1, "allocation_calls_after_start": 0, "batched_finished_responses": 3, "borrow_copies": 3, "bytes_received": 146, "bytes_sent": 417, "callbacks_per_turn": 2048, "completed": 3, "execution": "inline_event_loop", "flushes": 0, "framework_heap_limit_bytes": 16777216, "framework_heap_peak_bytes": 3705978, "gather_cancel_requests": 0, "gather_canceled_completions": 0, "gather_send": true, "gather_send_operations": 1, "handoffs_closed": 0, "handoffs_received": 0, "handoffs_sent": 0, "idle_polls": 149, "inline_dispatches": 3, "live_connections": 0, "live_operations": 0, "max_batch_responses": 3, "max_canceled_batch_responses": 0, "max_handler_ns": 0, "max_handoff_delay_ns": 0, "max_inline_callbacks_per_turn": 3, "max_loop_ns": 22213, "max_queue_ns": 0, "max_request_ns": 91199, "max_send_bytes": 417, "max_send_parts": 1, "peak_connections": 1, "peak_operations": 2, "pipeline_copy_bytes": 0, "prearmed_receives": 0, "rejected": 0, "response_batch_limit": 128, "response_batches": 1, "response_draft_copy_bytes": 0, "resumed": 0, "scalar_send_operations": 0, "send_completions": 1, "shards": 1, "short_send_completions": 0, "single_span_send_operations": 1, "timeouts": 0, "turns": 153, "worker_dispatches": 0, "workers": 0}}
+Build Summary: 16/16 steps succeeded; 102/104 tests passed (2 skipped)
+verify success
++- compile exe bounded-http Debug native success 3s MaxRSS:360M
++- zig fmt --check success
++- run python3 success 27ms
++- run python3 success 1s
+|  +- run /home/rs/.local/share/mise/installs/zig/0.16.0/zig success 4s
++- run test 15 pass (15 total) 38ms MaxRSS:8M
+|  +- compile test Debug native success 3s MaxRSS:348M
++- run test 25 pass (25 total) 41ms MaxRSS:8M
+|  +- compile test Debug native success 4s MaxRSS:351M
++- run test 1 pass (1 total) 15ms MaxRSS:8M
+|  +- compile test Debug native success 3s MaxRSS:335M
++- run test 7 pass (7 total) 30ms MaxRSS:8M
+|  +- compile test Debug native success 4s MaxRSS:355M
++- run test 54 pass, 2 skip (56 total) 84ms MaxRSS:9M
+   +- compile test Debug native success 4s MaxRSS:405M
+

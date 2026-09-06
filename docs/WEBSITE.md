@@ -31,7 +31,8 @@ The website worktree is only a branch of Baz, not another project or repository.
 | --- | --- |
 | Landing-page prose | [index.template.html](index.template.html) |
 | App excerpt | `Hello` in [app_demo.zig](../src/app_demo.zig), extracted at build time |
-| Example cards | The catalog in [build_pages.py](../tools/build_pages.py), linked to all 20 compiled examples |
+| Streaming excerpt | `progress` in [streaming.zig](../examples/streaming.zig), extracted at build time |
+| Example cards | The catalog in [build_pages.py](../tools/build_pages.py), linked to all 21 compiled examples |
 | Benchmark chart and table | Original [Mac](../reports/2026-09-06-basic-zap/macos-summary.json) and [Linux](../reports/2026-09-06-basic-zap/linux-summary.json) summaries; medians checked against recorded trial rates |
 | Diagrams | [Raw parameters](diagrams/parameters.svg), [package boundary](diagrams/layers.svg), [response lifetime](diagrams/lifetime.svg) |
 | Reader content | Repository Markdown and source files, copied unchanged from an explicit allowlist |
@@ -61,7 +62,9 @@ A restrictive Content Security Policy supplies a second boundary.
 The reader includes a heading table of contents, raw and GitHub links, syntax
 highlighting, code copy buttons, and print styles. Mobile menus support Escape;
 skip links and scrollable code, table, and diagram regions support keyboards.
-The landing page shows all examples without JavaScript; filtering is optional.
+The landing page shows both App and streaming excerpts without JavaScript.
+With JavaScript, keyboard-accessible tabs select the excerpt; `#streaming` opens
+the streaming option directly. Print output includes both. Example filtering is optional.
 System fonts and local browser libraries avoid third-party asset requests.
 
 Browser dependencies are vendored with their original notices and checksums:

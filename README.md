@@ -46,9 +46,10 @@ support beyond [Zap’s facil.io-based platform support](https://github.com/zigz
 Both the framework and its [bounded/http](https://technologylab-ai.github.io/bounded-http/) engine are written in Zig.
 
 All three platforms passed Debug and ReleaseSafe verification, the independent
-package consumer, all 14 App groups, and all 20 example groups. Windows also
-passed three native shard-handoff and console-shutdown cases. See the
-[native Windows and regression receipt](reports/2026-09-06-windows-baz.md)
+package consumer, all 14 App groups, all 20 ported-example groups, and all 14
+streaming groups—including the new runnable example. Windows also passed three
+native shard-handoff and console-shutdown cases. See the
+[streaming and three-platform receipt](reports/2026-09-06-streaming.md)
 for exact environments and evidence. Windows is supported within Baz’s overall
 experimental status; this is correctness coverage, not production qualification.
 
@@ -66,6 +67,9 @@ The [handler](examples/streaming.zig) sends three updates with pauses between th
 Each stream uses one fixed application worker and bounded output storage.
 The HTTP I/O loop continues while the worker waits. Response size and request
 deadlines still apply; [the guide](docs/STREAMING.md) explains cancellation and framing.
+Response helpers have explicit copying and borrowing paths; the
+[copy contract](docs/OWNERSHIP.md#response-copies-and-borrowing) describes their
+costs, lifetimes, and the current borrowed-body size limit.
 
 Use exact Zig 0.16.0 from [.zig-version](.zig-version), with Python 3 installed:
 
@@ -126,9 +130,10 @@ not individually for every timed response. See the
 
 ## Status and documentation
 
-This is an experimental first implementation. The source at `b3d4d8a` passed native macOS and Linux
-Debug/ReleaseSafe verification, package embedding, all 20 example groups,
-and all 14 App groups. The engine passed its own native verification gates.
+This is an experimental first implementation. Runtime source at `79021c5` passed
+native Linux, macOS, and Windows streaming and regression gates. The
+[streaming receipt](reports/2026-09-06-streaming.md) identifies the exact sources
+and retains the raw results. The engine passed its own native gates separately.
 The [package receipt](reports/2026-09-06-baz-extraction.md) records external-dependency
 verification and source identity. The [prototype receipt](reports/2026-09-06-app-api.md)
 preserves the earlier combined engine/framework gates.

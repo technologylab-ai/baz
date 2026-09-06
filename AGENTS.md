@@ -43,3 +43,6 @@ always links to https://technologylab-ai.github.io/bounded-http/. Use a separate
 “engine source” label for GitHub links. Code identifiers remain `bounded_http`.
 Streaming must become a prominent website feature after its implementation and
 wire/ownership gates pass; do not describe the one-shot API as streaming.
+
+Use explicit `source:destination` refs for feature-branch pushes. Some engine checkouts
+use `push.default=upstream`; abbreviated pushes can target the tracked main branch.

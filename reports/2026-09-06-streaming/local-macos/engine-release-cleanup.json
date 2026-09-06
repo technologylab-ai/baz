@@ -1,0 +1,11 @@
+{
+  "agent": "baz streaming /root",
+  "purpose": "engine-release",
+  "host": "renerocksai-M3-Max-6.local",
+  "started_utc": "2026-09-06T17:30:15.076377+00:00",
+  "owner_pid": 16674,
+  "token": "02e099c0-f9d9-4196-a79b-b49c001639b1",
+  "cwd": "/Users/rs/code/github.com/technologylab.ai/baz-streaming",
+  "exit_code": 0,
+  "owned_group_absent": 16705
+}

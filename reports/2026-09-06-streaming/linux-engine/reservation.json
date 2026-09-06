@@ -1,0 +1,10 @@
+{
+  "agent": "/root/stream_engine",
+  "purpose": "bounded/http 62c238a streaming native Linux correctness; ReleaseSafe smoke only",
+  "host": "omarx1",
+  "started_utc": "2026-09-06T17:30:03.744913+00:00",
+  "pid": 1838476,
+  "process_start_ticks": 55973669,
+  "token": "370adeb1-76ca-4107-981f-9482cefb8248",
+  "cwd": "/tmp/baz-stream-engine.1fiusALk"
+}

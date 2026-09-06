@@ -1,0 +1,46 @@
+{
+  "name": "inline",
+  "command": [
+    "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+    "tests/inline_integration.py",
+    "--server",
+    "/Users/rs/code/github.com/technologylab.ai/bounded-http-streaming/zig-out/bin/bounded-http",
+    "--timeout",
+    "45",
+    "--json",
+    "/Users/rs/code/github.com/technologylab.ai/baz-streaming/.zig-cache/streaming-evidence/mac-engine/inline.json"
+  ],
+  "started_utc": "2026-09-06T17:43:12.040811+00:00",
+  "ended_utc": "2026-09-06T17:43:12.621228+00:00",
+  "exit_code": 0,
+  "watchdog_seconds": 65,
+  "timed_out": false,
+  "interrupted": null,
+  "owned_processes": [
+    {
+      "pid": 27645,
+      "ppid": 27224,
+      "pgid": 27645,
+      "start": "Sun Sep 6 19:43:12 2026",
+      "command": "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python tests/inline_integration.py --server /Users/rs/code/github.com/technologylab.ai/bounded-http-streaming/zig-out/bin/bounded-http --timeout 45 --json /Users/rs/code/github.com/technologylab.ai/baz-streaming/.zig-cache/streaming-evidence/mac-engine/inline.json"
+    },
+    {
+      "pid": 27651,
+      "ppid": 27645,
+      "pgid": 27651,
+      "start": "Sun Sep 6 19:43:12 2026",
+      "command": "/Users/rs/code/github.com/technologylab.ai/bounded-http-streaming/zig-out/bin/bounded-http --execution inline --port 0 --connections 2 --workers 0 --max-body 1024 --max-header 2048 --timeout-ms 200 --stall-ms 1000 --send-chunk 65536 --response-batch-limit 1"
+    },
+    {
+      "pid": 27653,
+      "ppid": 27645,
+      "pgid": 27653,
+      "start": "Sun Sep 6 19:43:12 2026",
+      "command": "/Users/rs/code/github.com/technologylab.ai/bounded-http-streaming/zig-out/bin/bounded-http --execution inline --port 0 --connections 4 --workers 0 --max-body 2097152 --max-header 2048 --timeout-ms 5000 --stall-ms 1000 --send-chunk 65536 --socket-send-buffer 4096 --response-batch-limit 1"
+    }
+  ],
+  "cleanup": {
+    "signals": [],
+    "remaining": []
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "ok": true,
+  "reservation_released": true,
+  "remaining_processes": [],
+  "source_commit_unchanged": true,
+  "source_files_unchanged": true,
+  "binary_unchanged": true,
+  "stages": [
+    {
+      "name": "readiness",
+      "exit_code": 0,
+      "timed_out": false,
+      "interrupted": null,
+      "cleanup": {
+        "signals": [],
+        "remaining": []
+      }
+    },
+    {
+      "name": "comparator",
+      "exit_code": 0,
+      "timed_out": false,
+      "interrupted": null,
+      "cleanup": {
+        "signals": [],
+        "remaining": []
+      }
+    },
+    {
+      "name": "arena_lifecycle",
+      "exit_code": 0,
+      "timed_out": false,
+      "interrupted": null,
+      "cleanup": {
+        "signals": [],
+        "remaining": []
+      }
+    },
+    {
+      "name": "batch",
+      "exit_code": 0,
+      "timed_out": false,
+      "interrupted": null,
+      "cleanup": {
+        "signals": [],
+        "remaining": []
+      }
+    },
+    {
+      "name": "gather",
+      "exit_code": 0,
+      "timed_out": false,
+      "interrupted": null,
+      "cleanup": {
+        "signals": [],
+        "remaining": []
+      }
+    },
+    {
+      "name": "inline",
+      "exit_code": 0,
+      "timed_out": false,
+      "interrupted": null,
+      "cleanup": {
+        "signals": [],
+        "remaining": []
+      }
+    },
+    {
+      "name": "integration",
+      "exit_code": 0,
+      "timed_out": false,
+      "interrupted": null,
+      "cleanup": {
+        "signals": [],
+        "remaining": []
+      }
+    },
+    {
+      "name": "smoke",
+      "exit_code": 0,
+      "timed_out": false,
+      "interrupted": null,
+      "cleanup": {
+        "signals": [],
+        "remaining": []
+      }
+    }
+  ]
+}

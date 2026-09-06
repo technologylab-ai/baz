@@ -1,0 +1,37 @@
+{
+  "repository_commit": "2a269ef57301b21df22f1c616d02d6d244e5d6ca",
+  "workflow_run": "34048745802",
+  "workflow_attempt": "1",
+  "runner_image": "win25-vs2026",
+  "runner_image_version": "20260824.214.3",
+  "os_caption": "Microsoft Windows Server 2025 Datacenter",
+  "os_version": "10.0.26100",
+  "os_architecture": "X64",
+  "windows_full_build": "26100.33296",
+  "windows_display_version": "24H2",
+  "powershell_version": "7.6.5",
+  "python": "Python 3.12.10",
+  "zig_version": "0.16.0",
+  "compiler_execution": "native x64",
+  "http_execution": "native x64 Windows IOCP; not cross-compilation evidence",
+  "processors": [
+    {
+      "Name": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "NumberOfCores": 2,
+      "NumberOfLogicalProcessors": 4
+    }
+  ],
+  "memory_bytes": 17174360064,
+  "logical_disks": [
+    {
+      "DeviceID": "C:",
+      "FileSystem": "NTFS",
+      "Size": 160467759104
+    },
+    {
+      "DeviceID": "D:",
+      "FileSystem": "NTFS",
+      "Size": 161060220928
+    }
+  ]
+}

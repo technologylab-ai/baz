@@ -1,0 +1,186 @@
+{
+  "ok": true,
+  "revision": "2a269ef57301b21df22f1c616d02d6d244e5d6ca",
+  "source_files_verified": 28,
+  "run_id": 34048745802,
+  "phases": 11,
+  "counts": {
+    "verify-debug": "Build Summary: 16/16 steps succeeded; 115/119 tests passed (4 skipped)",
+    "verify-debug-embedding": 3,
+    "verify-release-safe": "Build Summary: 16/16 steps succeeded; 115/119 tests passed (4 skipped)",
+    "verify-release-safe-embedding": 3,
+    "arena_lifecycle_integration": {
+      "passed": 8,
+      "sessions": 8
+    },
+    "batch_integration": {
+      "passed": 25,
+      "sessions": 24
+    },
+    "gather_integration": {
+      "passed": 11,
+      "sessions": 11
+    },
+    "inline_integration": {
+      "passed": 10,
+      "sessions": 3
+    },
+    "integration": {
+      "passed": 26,
+      "sessions": 6
+    },
+    "windows-shards-integration": {
+      "passed": 9,
+      "sessions": 10
+    },
+    "smoke": {
+      "workloads": 3,
+      "exact_responses": 30000,
+      "optimize": "ReleaseSafe"
+    },
+    "comparator": 9
+  },
+  "ownership": {
+    "arena_lifecycle_integration": {
+      "zero_live_connections": true,
+      "zero_live_operations": true,
+      "zero_after_start_allocations": true
+    },
+    "batch_integration": {
+      "zero_live_connections": true,
+      "zero_live_operations": true,
+      "zero_after_start_allocations": true
+    },
+    "gather_integration": {
+      "zero_live_connections": true,
+      "zero_live_operations": true,
+      "zero_after_start_allocations": true
+    },
+    "inline_integration": {
+      "zero_live_connections": true,
+      "zero_live_operations": true,
+      "zero_after_start_allocations": true
+    },
+    "integration": {
+      "zero_live_connections": true,
+      "zero_live_operations": true,
+      "zero_after_start_allocations": true
+    },
+    "windows-shards-integration": {
+      "zero_live_connections": true,
+      "zero_live_operations": true,
+      "zero_after_start_allocations": true
+    },
+    "verify-debug-embedding": {
+      "zero_live_connections": true,
+      "zero_live_operations": true,
+      "zero_after_start_allocations": true
+    },
+    "verify-release-safe-embedding": {
+      "zero_live_connections": true,
+      "zero_live_operations": true,
+      "zero_after_start_allocations": true
+    }
+  },
+  "shards_tests": [
+    "distinct_borrowed_pipeline_on_2_iocp_owners",
+    "distinct_borrowed_pipeline_on_3_iocp_owners",
+    "distinct_borrowed_pipeline_on_4_iocp_owners",
+    "concurrent_distinct_payloads_and_flushes",
+    "acknowledged_global_ceiling_and_recovery",
+    "fresh_stream_generations_and_half_close",
+    "ctrl_break_with_live_receives_and_partial_borrows",
+    "repeated_three_owner_idle_duration_shutdown",
+    "native_listener_failure_and_invalid_worker_configuration"
+  ],
+  "shards_sessions": [
+    {
+      "phase": "distinct_borrowed_pipeline_on_2_iocp_owners",
+      "shards": 2,
+      "handoffs_sent": 3,
+      "handoffs_received": 3,
+      "handoffs_closed": 0,
+      "completed": 18
+    },
+    {
+      "phase": "distinct_borrowed_pipeline_on_3_iocp_owners",
+      "shards": 3,
+      "handoffs_sent": 6,
+      "handoffs_received": 6,
+      "handoffs_closed": 0,
+      "completed": 27
+    },
+    {
+      "phase": "distinct_borrowed_pipeline_on_4_iocp_owners",
+      "shards": 4,
+      "handoffs_sent": 9,
+      "handoffs_received": 9,
+      "handoffs_closed": 0,
+      "completed": 36
+    },
+    {
+      "phase": "concurrent_distinct_payloads_and_flushes",
+      "shards": 4,
+      "handoffs_sent": 9,
+      "handoffs_received": 9,
+      "handoffs_closed": 0,
+      "completed": 192
+    },
+    {
+      "phase": "acknowledged_global_ceiling_and_recovery",
+      "shards": 3,
+      "handoffs_sent": 4,
+      "handoffs_received": 4,
+      "handoffs_closed": 0,
+      "completed": 19
+    },
+    {
+      "phase": "fresh_stream_generations_and_half_close",
+      "shards": 4,
+      "handoffs_sent": 18,
+      "handoffs_received": 18,
+      "handoffs_closed": 0,
+      "completed": 96
+    },
+    {
+      "phase": "ctrl_break_with_live_receives_and_partial_borrows",
+      "shards": 3,
+      "handoffs_sent": 4,
+      "handoffs_received": 4,
+      "handoffs_closed": 0,
+      "completed": 3
+    },
+    {
+      "phase": "idle_duration_shutdown_0",
+      "shards": 3,
+      "handoffs_sent": 0,
+      "handoffs_received": 0,
+      "handoffs_closed": 0,
+      "completed": 0
+    },
+    {
+      "phase": "idle_duration_shutdown_1",
+      "shards": 3,
+      "handoffs_sent": 0,
+      "handoffs_received": 0,
+      "handoffs_closed": 0,
+      "completed": 0
+    },
+    {
+      "phase": "idle_duration_shutdown_2",
+      "shards": 3,
+      "handoffs_sent": 0,
+      "handoffs_received": 0,
+      "handoffs_closed": 0,
+      "completed": 0
+    }
+  ],
+  "exclusions": [
+    "Four batch maximum-cell fixtures need POSIX SIGSTOP/SIGCONT",
+    "POSIX-only transport fixtures remain explicit skips",
+    "CTRL_BREAK shutdown only; console-close, logoff and service control remain unqualified",
+    "No ARM64, WOW64, device, production-load or latency qualification"
+  ],
+  "suite_sessions": 62,
+  "embedding_sessions": 2
+}

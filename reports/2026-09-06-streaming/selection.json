@@ -1,0 +1,931 @@
+{
+  "schema_version": 1,
+  "selected_utc": "2026-09-06T17:53:28.147448+00:00",
+  "byte_preservation": "Every selected source file was copied without decoding or newline conversion.",
+  "original_digest_manifests": "Original receipt.sha256.json files retain their original scope, including excluded archives.",
+  "retained_digest_manifest": "retained-files.sha256.json covers retained files, excluding that manifest itself.",
+  "original_manifest_checks": [
+    {
+      "group": "baz-native",
+      "entries_verified": 43,
+      "ok": true
+    },
+    {
+      "group": "mac-engine",
+      "entries_verified": 32,
+      "ok": true
+    },
+    {
+      "group": "linux-engine",
+      "entries_verified": 28,
+      "ok": true
+    },
+    {
+      "group": "windows-engine",
+      "entries_verified": 28,
+      "ok": true
+    }
+  ],
+  "copied_files": [
+    {
+      "source": ".zig-cache/streaming-evidence/baz-native/artifacts.json",
+      "retained": "baz-native/artifacts.json",
+      "sha256": "a53524f433f2c56e2acc3ac4f51ac99c94d25c43b58829beb37c31500c2d57ca",
+      "bytes": 1771
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/baz-native/linux/app.json",
+      "retained": "baz-native/linux/app.json",
+      "sha256": "03c696e457b569e0b82896a599eaf6519bbe695ac73c6f3c9dd974b895e4d0ae",
+      "bytes": 1082
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/baz-native/linux/app.log",
+      "retained": "baz-native/linux/app.log",
+      "sha256": "e509d8e723174e8acff442c7554a10940598b43fc4daa7b6accfd44e158c6e90",
+      "bytes": 2034
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/baz-native/linux/artifact.json",
+      "retained": "baz-native/linux/artifact.json",
+      "sha256": "1899bf8ddc02409e3df321b3546597aed487f187ee2f6210871e267ceaf6ff0d",
+      "bytes": 783
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/baz-native/linux/debug.log",
+      "retained": "baz-native/linux/debug.log",
+      "sha256": "bc42a9b97f57386e7d063b4c96ec283a7986f19030465ab09788e5f7c92cd7c5",
+      "bytes": 2578
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/baz-native/linux/environment.log",
+      "retained": "baz-native/linux/environment.log",
+      "sha256": "5f699ce7c590699890edc21a9d3124efef23ec5cb88e3e848e1ed9317a907a87",
+      "bytes": 175
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/baz-native/linux/examples.json",
+      "retained": "baz-native/linux/examples.json",
+      "sha256": "1ac113fee2781c18c652e7e452431314122947b32e322a4d9074a9a2050f206a",
+      "bytes": 395
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/baz-native/linux/examples.log",
+      "retained": "baz-native/linux/examples.log",
+      "sha256": "6c09df88e460fff38e04dae643ac5d61e734b3ace901d3d6586232a50f0d5bfa",
+      "bytes": 624
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/baz-native/linux/install.log",
+      "retained": "baz-native/linux/install.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/baz-native/linux/release-safe.log",
+      "retained": "baz-native/linux/release-safe.log",
+      "sha256": "35d28ae7e375db9af01acc1da402ac94b6f2032f8cc65ac9119d473d1b49f549",
+      "bytes": 2796
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/baz-native/linux/streaming.json",
+      "retained": "baz-native/linux/streaming.json",
+      "sha256": "57f61d9f7bf111fb36b970255a1b1007babfaa91d025381c54efd9a6ac335c9e",
+      "bytes": 35981
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/baz-native/linux/streaming.log",
+      "retained": "baz-native/linux/streaming.log",
+      "sha256": "108a4eddb245b3a001c19ffaf1c81955e58e7bb309bb7fdd87d4edffa8b70305",
+      "bytes": 27268
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/baz-native/macos/app.json",
+      "retained": "baz-native/macos/app.json",
+      "sha256": "03c696e457b569e0b82896a599eaf6519bbe695ac73c6f3c9dd974b895e4d0ae",
+      "bytes": 1082
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/baz-native/macos/app.log",
+      "retained": "baz-native/macos/app.log",
+      "sha256": "e509d8e723174e8acff442c7554a10940598b43fc4daa7b6accfd44e158c6e90",
+      "bytes": 2034
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/baz-native/macos/artifact.json",
+      "retained": "baz-native/macos/artifact.json",
+      "sha256": "62e16f712d1cfbf2a584ea22c99faba203c011dd2c5927aad0a75156d6605bb3",
+      "bytes": 782
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/baz-native/macos/debug.log",
+      "retained": "baz-native/macos/debug.log",
+      "sha256": "9890abf506151e9feb767c1aa9abac00b1872e82ced8a172e7f27d229e2b530a",
+      "bytes": 2576
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/baz-native/macos/environment.log",
+      "retained": "baz-native/macos/environment.log",
+      "sha256": "d84abdb235249289b95524a7b4552bf1d95bd6d56e36968cda24a60a909e509e",
+      "bytes": 257
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/baz-native/macos/examples.json",
+      "retained": "baz-native/macos/examples.json",
+      "sha256": "1ac113fee2781c18c652e7e452431314122947b32e322a4d9074a9a2050f206a",
+      "bytes": 395
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/baz-native/macos/examples.log",
+      "retained": "baz-native/macos/examples.log",
+      "sha256": "6c09df88e460fff38e04dae643ac5d61e734b3ace901d3d6586232a50f0d5bfa",
+      "bytes": 624
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/baz-native/macos/install.log",
+      "retained": "baz-native/macos/install.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/baz-native/macos/release-safe.log",
+      "retained": "baz-native/macos/release-safe.log",
+      "sha256": "f65fe152bcd4b6bfa7deadbe46470026c3df5fd376def1d39f4000e8ad6ab8b8",
+      "bytes": 2779
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/baz-native/macos/streaming.json",
+      "retained": "baz-native/macos/streaming.json",
+      "sha256": "247c2a6a45d2cc3357964ab80eb8a32d7a7a14ed30bc74248153e4336286086e",
+      "bytes": 35978
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/baz-native/macos/streaming.log",
+      "retained": "baz-native/macos/streaming.log",
+      "sha256": "7654500d71a87dd311783f451cc7ba6403ed7f59f0fcfcc7bc03bf1b829b2d7d",
+      "bytes": 27265
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/baz-native/receipt.sha256.json",
+      "retained": "baz-native/receipt.sha256.json",
+      "sha256": "83ab419ebdf61efc7444ab3f0c45e4d9e41818551a87ac055d4e0d205d6f5336",
+      "bytes": 4010
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/baz-native/run.json",
+      "retained": "baz-native/run.json",
+      "sha256": "2f581b8e810188d25a3a508f02bb3ed173c92b269c603daf179cc40cf8dd32b0",
+      "bytes": 13838
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/baz-native/verification.json",
+      "retained": "baz-native/verification.json",
+      "sha256": "11e53ed34d9882a9c994cbf870d8c003e2b588f6529e24ca2ff05b27153e7963",
+      "bytes": 3830
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/baz-native/windows/Debug.log",
+      "retained": "baz-native/windows/Debug.log",
+      "sha256": "568a356d7ef66e0de9e148172c2db21cfa4e5b7915f99a57bc02220afbf14a50",
+      "bytes": 2626
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/baz-native/windows/ReleaseSafe.log",
+      "retained": "baz-native/windows/ReleaseSafe.log",
+      "sha256": "b12e7928d4f3909bbd17d4fc554c06a402fb23d39d825dfbb36bac6f38f4376c",
+      "bytes": 2847
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/baz-native/windows/app.json",
+      "retained": "baz-native/windows/app.json",
+      "sha256": "03c696e457b569e0b82896a599eaf6519bbe695ac73c6f3c9dd974b895e4d0ae",
+      "bytes": 1082
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/baz-native/windows/app_integration.log",
+      "retained": "baz-native/windows/app_integration.log",
+      "sha256": "8330f814a171d50a207f1041d0d9af482c3ecb85a16f13983c44c172d76ee51b",
+      "bytes": 2049
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/baz-native/windows/artifact.json",
+      "retained": "baz-native/windows/artifact.json",
+      "sha256": "59279043b3c776195301f00695bd2e98f627fb4c6c5918177bc128c318692262",
+      "bytes": 781
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/baz-native/windows/environment.txt",
+      "retained": "baz-native/windows/environment.txt",
+      "sha256": "d56cc55876f9f048d8d9d364ee262b42d604a07955dbd75d7fb2e22c88d13323",
+      "bytes": 251
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/baz-native/windows/examples.json",
+      "retained": "baz-native/windows/examples.json",
+      "sha256": "1ac113fee2781c18c652e7e452431314122947b32e322a4d9074a9a2050f206a",
+      "bytes": 395
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/baz-native/windows/examples_integration.log",
+      "retained": "baz-native/windows/examples_integration.log",
+      "sha256": "ad68accb3897f455f3862023e0f792e018bb9cb7d993bab9f0d2af1bbea1216f",
+      "bytes": 645
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/baz-native/windows/install.log",
+      "retained": "baz-native/windows/install.log",
+      "sha256": "ef2910ecbfd7cdff3ebb5da517e9cd5e70fe3daf7c49376aeeadc6e028edac3b",
+      "bytes": 2432
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/baz-native/windows/shards.json",
+      "retained": "baz-native/windows/shards.json",
+      "sha256": "ca67e287b041e9d316282ce65e46a10fa0d1d4ef558d9c6fc4485350da2f9f9f",
+      "bytes": 6513
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/baz-native/windows/streaming.json",
+      "retained": "baz-native/windows/streaming.json",
+      "sha256": "8e86d4aa54196a21f5d7179bd9fce041e4ccf51898c13029cccb70a51cf511c2",
+      "bytes": 35913
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/baz-native/windows/streaming_integration.log",
+      "retained": "baz-native/windows/streaming_integration.log",
+      "sha256": "b1524ae01a7ac63b4645a2c6d5df5529a0c231d949a66766533eccdf32c35199",
+      "bytes": 27215
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/baz-native/windows/windows_smoke.log",
+      "retained": "baz-native/windows/windows_smoke.log",
+      "sha256": "fe21db3f483d4e6302f30bb0d23323afa0327ad630146be2605c1dc520ebfb70",
+      "bytes": 5049
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/baz-native/windows-artifacts.json",
+      "retained": "baz-native/windows-artifacts.json",
+      "sha256": "b62fb178405da1ca10829bed25b63283b82b6641e873b664adad5ba1c53c0661",
+      "bytes": 906
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/baz-native/windows-run.json",
+      "retained": "baz-native/windows-run.json",
+      "sha256": "276626ff7cfec27976df10c27e50fe794328b932f6e7d56cfc4fb8aedc835cf6",
+      "bytes": 13870
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/mac-engine/arena_lifecycle-processes.json",
+      "retained": "mac-engine/arena_lifecycle-processes.json",
+      "sha256": "ba6264d6ffdce89a483c03732ef2926b0a9d147666b42254012007886aecd074",
+      "bytes": 1421
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/mac-engine/arena_lifecycle.json",
+      "retained": "mac-engine/arena_lifecycle.json",
+      "sha256": "607211c6db88be6f650d5ae22808be1d85b397841ed950a944e667990e55a094",
+      "bytes": 11172
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/mac-engine/arena_lifecycle.log",
+      "retained": "mac-engine/arena_lifecycle.log",
+      "sha256": "1259e040e2e03db0041209fde61c8ee593510094b88592c456bb5b0822895a2a",
+      "bytes": 11462
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/mac-engine/batch-processes.json",
+      "retained": "mac-engine/batch-processes.json",
+      "sha256": "966df0156b91047fb8930469bf77405558bd0a173a3dc751106c83af6997dfd9",
+      "bytes": 2834
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/mac-engine/batch.json",
+      "retained": "mac-engine/batch.json",
+      "sha256": "2dfa47361fadb87681c7b6979b2fcaba2d7720c756a2d712bdb64d88498a5922",
+      "bytes": 39823
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/mac-engine/batch.log",
+      "retained": "mac-engine/batch.log",
+      "sha256": "04c6972fa8083afac4d660509439c514f36bca40e45dc909a4fb5e2eb661636b",
+      "bytes": 41363
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/mac-engine/cleanup.json",
+      "retained": "mac-engine/cleanup.json",
+      "sha256": "68a3f278bbdb5541b10ab4b781610c4f4c4a1589f2297247e9b39d834c782a87",
+      "bytes": 1700
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/mac-engine/comparator-processes.json",
+      "retained": "mac-engine/comparator-processes.json",
+      "sha256": "e62f21fff03fbe4f0492fe04519aa0fd4bb9b566b6cf4a3fee52788cd55b4d52",
+      "bytes": 823
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/mac-engine/comparator.log",
+      "retained": "mac-engine/comparator.log",
+      "sha256": "b912791161af7e87c55a152756e041e08ea4524d5e1b0fc25199ab4f44ee51aa",
+      "bytes": 916
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/mac-engine/environment.json",
+      "retained": "mac-engine/environment.json",
+      "sha256": "1184fa48d57211140bbd5ed03e5ceaae000e3ad4c81d5f137f45c40f976cca5c",
+      "bytes": 433
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/mac-engine/gather-processes.json",
+      "retained": "mac-engine/gather-processes.json",
+      "sha256": "4e5d88715700ba94221f0af47199e35a6eb76c2b31b9b079e71f83071c2ad5fd",
+      "bytes": 1818
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/mac-engine/gather.json",
+      "retained": "mac-engine/gather.json",
+      "sha256": "7452f7dff01de8c3d8e4115b281b69edeea5a260ca4f2ac0828539788f76bfdc",
+      "bytes": 15510
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/mac-engine/gather.log",
+      "retained": "mac-engine/gather.log",
+      "sha256": "4bce594060be42bf038e7c4fc20a1ef027486ffb9b123cceb26ee335ed0ae94f",
+      "bytes": 15965
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/mac-engine/inline-processes.json",
+      "retained": "mac-engine/inline-processes.json",
+      "sha256": "60c7f542ddae50209abe3fa1277c9838ad6371cc31b8b38fcf73c024a7d2fa85",
+      "bytes": 2042
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/mac-engine/inline.json",
+      "retained": "mac-engine/inline.json",
+      "sha256": "09266b42a0c314558c55c58590d425b91dd9b6492df1e88bfd3b703ed96b4b47",
+      "bytes": 5081
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/mac-engine/inline.log",
+      "retained": "mac-engine/inline.log",
+      "sha256": "54cd5da6bc033efff981530b8da254cec2966dbaa7c55b251c91309b957f986e",
+      "bytes": 5564
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/mac-engine/integration-processes.json",
+      "retained": "mac-engine/integration-processes.json",
+      "sha256": "3462af099b43f8cdfec5c7647925c9cb7e881fcf1576f9ee47def1ed69e1afac",
+      "bytes": 2785
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/mac-engine/integration.json",
+      "retained": "mac-engine/integration.json",
+      "sha256": "28326b810de9bcc1d0427045fe90bb03332d9c22bcac6f1106a6d8932f11c9c8",
+      "bytes": 9950
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/mac-engine/integration.log",
+      "retained": "mac-engine/integration.log",
+      "sha256": "e05e7536f99e16d2cd983c26c7a882cff5de7e769c71376b7360dc84d300f192",
+      "bytes": 10840
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/mac-engine/preexisting-processes.json",
+      "retained": "mac-engine/preexisting-processes.json",
+      "sha256": "3f70d4efb7d88469baf2f3e982b707769ab0a1ea1d8ee2f39b555db735dbff8b",
+      "bytes": 75
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/mac-engine/probe.py",
+      "retained": "mac-engine/probe.py",
+      "sha256": "0ab24f273cfc5dba170a61813a295b1b6ab6121cc75eb893846801e4c86dc580",
+      "bytes": 669
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/mac-engine/readiness-processes.json",
+      "retained": "mac-engine/readiness-processes.json",
+      "sha256": "371ef2b329130a16c04e2f5f7df17e7c354b73d1ab1e1e4b798b545a8c67ea6a",
+      "bytes": 1251
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/mac-engine/readiness.json",
+      "retained": "mac-engine/readiness.json",
+      "sha256": "1490ab8164a4620744a23476648b887d512cd5b288554ea931b3c4e65f8ff6e5",
+      "bytes": 1627
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/mac-engine/readiness.log",
+      "retained": "mac-engine/readiness.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/mac-engine/receipt.sha256.json",
+      "retained": "mac-engine/receipt.sha256.json",
+      "sha256": "d6197553fb4fb7e19d97b8ce6575b05ed861bad86c0a68c3c69a9c12927f077c",
+      "bytes": 2876
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/mac-engine/reservation.json",
+      "retained": "mac-engine/reservation.json",
+      "sha256": "2cc0ae766efce3474da7a9e3480601b3078cdec078a206d1ccb0bcd64f3861e6",
+      "bytes": 381
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/mac-engine/run-native.py",
+      "retained": "mac-engine/run-native.py",
+      "sha256": "57f3b1b5428d1aab9e45ab73602d6e3fe4899ac4c72ce19bd82c03d3f472b759",
+      "bytes": 9715
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/mac-engine/run.json",
+      "retained": "mac-engine/run.json",
+      "sha256": "eacebdb80da84a9ec932b9568ab122c829933712c748a50b3c621a1b5ca9c67f",
+      "bytes": 18433
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/mac-engine/smoke-processes.json",
+      "retained": "mac-engine/smoke-processes.json",
+      "sha256": "13dc02b1dc096ef9b50f6190cce987a0983f153c4e65c716b30e89eb81a0b9a3",
+      "bytes": 3155
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/mac-engine/smoke.json",
+      "retained": "mac-engine/smoke.json",
+      "sha256": "536531c16484f509a71c84185ed92d4ec62e30305821a53ac79793a6821ccf1c",
+      "bytes": 6986
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/mac-engine/smoke.log",
+      "retained": "mac-engine/smoke.log",
+      "sha256": "c06561391dcf18da62c6824bb184ec02f331ca3c71778afc72f58f5f1f2ca8ef",
+      "bytes": 7154
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/mac-engine/source-after.json",
+      "retained": "mac-engine/source-after.json",
+      "sha256": "14c0e140e334e6a09b32f7e517b94f4b9a4bd69842d0c3b07ba8604e63a39d31",
+      "bytes": 3485
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/mac-engine/source.json",
+      "retained": "mac-engine/source.json",
+      "sha256": "14c0e140e334e6a09b32f7e517b94f4b9a4bd69842d0c3b07ba8604e63a39d31",
+      "bytes": 3485
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/linux-engine/Debug.log",
+      "retained": "linux-engine/Debug.log",
+      "sha256": "46a9d754ce43a079cdb87db41b1373502e7bb248ffbb9cdefb1358dca8de0ecc",
+      "bytes": 3741
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/linux-engine/ReleaseSafe.log",
+      "retained": "linux-engine/ReleaseSafe.log",
+      "sha256": "e1a362abd357080d53c2bb1913f04b895d28a6949a8358a2b42c7e08684e7bd6",
+      "bytes": 3788
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/linux-engine/arena_lifecycle_integration.json",
+      "retained": "linux-engine/arena_lifecycle_integration.json",
+      "sha256": "3a5327144e9703bf3f4f082e74c12b19e36be620c32393dc3ba724da16181e5c",
+      "bytes": 11143
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/linux-engine/arena_lifecycle_integration.log",
+      "retained": "linux-engine/arena_lifecycle_integration.log",
+      "sha256": "a79d96177b30740e0e7e510d1fabbece9209b7aafd633fec0076b46de813c443",
+      "bytes": 11433
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/linux-engine/batch_integration.json",
+      "retained": "linux-engine/batch_integration.json",
+      "sha256": "7853948b6e9b2caa060176de1bb665e0e84432a23b909edaab96d1948eade25c",
+      "bytes": 39822
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/linux-engine/batch_integration.log",
+      "retained": "linux-engine/batch_integration.log",
+      "sha256": "52aa95f269761dacfe613afa4f70a13362b8aca66475e18174de21c086deeffa",
+      "bytes": 41362
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/linux-engine/candidate-equivalence.json",
+      "retained": "linux-engine/candidate-equivalence.json",
+      "sha256": "0785f614f11127c4fed8e98e1b21d575ddef7acb58c9664a64e557f85ca591ec",
+      "bytes": 412
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/linux-engine/cleanup.json",
+      "retained": "linux-engine/cleanup.json",
+      "sha256": "53ad21fcfa38f14831d2802fa2367b7c7c985951b2b4ee8c10d4a8a7938573b2",
+      "bytes": 73
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/linux-engine/environment.json",
+      "retained": "linux-engine/environment.json",
+      "sha256": "c25f63f6cb456753c0f5b59ea6b9a8c6b3a13c3e80528a3aadb2713d144e37b6",
+      "bytes": 826
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/linux-engine/gate-counts.json",
+      "retained": "linux-engine/gate-counts.json",
+      "sha256": "c928f6fedcbbead930605a13caf64995d53edfbffee863d0acaf343dac917507",
+      "bytes": 908
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/linux-engine/gather_integration.json",
+      "retained": "linux-engine/gather_integration.json",
+      "sha256": "70ba3649cb45c3a336665c6749b2a9aaa64e77191f295291d9a91f36e9b0d2e5",
+      "bytes": 15485
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/linux-engine/gather_integration.log",
+      "retained": "linux-engine/gather_integration.log",
+      "sha256": "d148407f5325eb7813fdb26682ec4fe68030f9d657bd7a1461b69270241e77ba",
+      "bytes": 15940
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/linux-engine/inline_integration.json",
+      "retained": "linux-engine/inline_integration.json",
+      "sha256": "dc05a423324e6c0d4d55e6d35f666d3e310ca09849dfe1236d00d00f033b7b87",
+      "bytes": 5063
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/linux-engine/inline_integration.log",
+      "retained": "linux-engine/inline_integration.log",
+      "sha256": "579e5443936f26e6796f9bb13dda7ead63473ab8f2ef2c4dd970d1e82afc660c",
+      "bytes": 5546
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/linux-engine/install.log",
+      "retained": "linux-engine/install.log",
+      "sha256": "638f4fc96e49b3b489dbd02bc95db5d5ce7f5c3ea08b6ecec5e7ec15dc3bbded",
+      "bytes": 157
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/linux-engine/integration.json",
+      "retained": "linux-engine/integration.json",
+      "sha256": "0f995f6861f9e0a79a3ee3c8363354f9ac656eaa9cfa8a262ab9141dd10eb63b",
+      "bytes": 9934
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/linux-engine/integration.log",
+      "retained": "linux-engine/integration.log",
+      "sha256": "304cdc7ebdabb6d2222784036c7f028c4e1b4b2d07d690b427be6e596ef7bd43",
+      "bytes": 10824
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/linux-engine/preflight.json",
+      "retained": "linux-engine/preflight.json",
+      "sha256": "3375bf3b5dbc5d9552db13474557bb4de988bfe9696d30bc3740f600a695fcd0",
+      "bytes": 69
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/linux-engine/receipt.sha256.json",
+      "retained": "linux-engine/receipt.sha256.json",
+      "sha256": "92bb3981c4e45c8d6952bddfe858a54538d925d1f99571f8ab721b11b8526c89",
+      "bytes": 2550
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/linux-engine/remote.json",
+      "retained": "linux-engine/remote.json",
+      "sha256": "80f595f634e9b75a33a4da0152c36f0d4b1202ff1ea1b3820e3332cca56bf090",
+      "bytes": 73
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/linux-engine/reservation.json",
+      "retained": "linux-engine/reservation.json",
+      "sha256": "901dcbd0e1d68a8a45b8cef632ab7b1119e0d74d10940f67a75da0c8eef8ac2c",
+      "bytes": 354
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/linux-engine/run_remote.py",
+      "retained": "linux-engine/run_remote.py",
+      "sha256": "9e0737fe9ebbd49e4d0966858056408637bff6f6b9e4c5f8214d0566d06d5bd3",
+      "bytes": 8684
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/linux-engine/smoke.json",
+      "retained": "linux-engine/smoke.json",
+      "sha256": "334d2ca990c555c94d18c21fe86c503b8185096459d028fa5e774538ba7ce2f8",
+      "bytes": 6674
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/linux-engine/smoke.log",
+      "retained": "linux-engine/smoke.log",
+      "sha256": "b92f28f1044951518d538279d9ee7f83f595439f300437e4dd4d7f151e513c6a",
+      "bytes": 6842
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/linux-engine/source.json",
+      "retained": "linux-engine/source.json",
+      "sha256": "cb13dae1bcf613b436936bb99937d77a2cf8887f4e1c38874ee13b18532b538f",
+      "bytes": 41819
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/linux-engine/summary.json",
+      "retained": "linux-engine/summary.json",
+      "sha256": "c69d2451c6784e2bf402f9c01a4c60f65ea26ede884abd0a0bfae6c67d01f939",
+      "bytes": 3787
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/linux-engine/test_compare.log",
+      "retained": "linux-engine/test_compare.log",
+      "sha256": "2eea129060f83b387b9d4049a54297ae5971cb4055575ccc492795e80f7d87cc",
+      "bytes": 1356
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/linux-engine/transfer-cleanup.json",
+      "retained": "linux-engine/transfer-cleanup.json",
+      "sha256": "c50baabe25951e7788a57cff9da567eb3312ea63085b4a4302c6bc8e75213cf2",
+      "bytes": 2177
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/windows-engine/artifacts.json",
+      "retained": "windows-engine/artifacts.json",
+      "sha256": "78bc55f3decfe6c51f0749004ff67024e4af2069d3995b067ff5704c7e8c34d6",
+      "bytes": 941
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/windows-engine/packet/arena_lifecycle_integration.json",
+      "retained": "windows-engine/packet/arena_lifecycle_integration.json",
+      "sha256": "a2697c21ec34934356a07235a66081b2253728bf327a01ec9819f1d3173efe20",
+      "bytes": 11157
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/windows-engine/packet/arena_lifecycle_integration.log",
+      "retained": "windows-engine/packet/arena_lifecycle_integration.log",
+      "sha256": "94a9450a18895640ec7a0ca7a35917697d4d170c4c8bbab3132d1869c9600686",
+      "bytes": 11455
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/windows-engine/packet/batch_integration.json",
+      "retained": "windows-engine/packet/batch_integration.json",
+      "sha256": "6577217e9154365d3bfa10f9f979989897bc6b4ba9c2199d3eb4457824604ae4",
+      "bytes": 34321
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/windows-engine/packet/batch_integration.log",
+      "retained": "windows-engine/packet/batch_integration.log",
+      "sha256": "550b7ab50273bc7b44aa8dcc5b9237ae3fb81238227ab41170eb191ddc89d251",
+      "bytes": 35752
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/windows-engine/packet/build-release-safe.log",
+      "retained": "windows-engine/packet/build-release-safe.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/windows-engine/packet/comparator-receipts.log",
+      "retained": "windows-engine/packet/comparator-receipts.log",
+      "sha256": "1387fa41f48dc715a075f35bbf5cf9120c4f9b56b2fbde291459334accd15b10",
+      "bytes": 1370
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/windows-engine/packet/gather_integration.json",
+      "retained": "windows-engine/packet/gather_integration.json",
+      "sha256": "7589d8e02b097a7cad6a17b6f8569fe3cfd68bf7a215f4a540d0178e734ee692",
+      "bytes": 15501
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/windows-engine/packet/gather_integration.log",
+      "retained": "windows-engine/packet/gather_integration.log",
+      "sha256": "5c7d5105870b7a41f44330580f41f558981894231bd4122180e8fee7e926fd55",
+      "bytes": 15967
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/windows-engine/packet/host-and-toolchain.json",
+      "retained": "windows-engine/packet/host-and-toolchain.json",
+      "sha256": "6ac1a1129a9d27cb26acdbe7716918b3e57c110ae0e39eda9562d13d0d893fc2",
+      "bytes": 1033
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/windows-engine/packet/inline_integration.json",
+      "retained": "windows-engine/packet/inline_integration.json",
+      "sha256": "ed326b826b283bc6c5774381abd303277223e269d3e25598034783a630354b08",
+      "bytes": 5018
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/windows-engine/packet/inline_integration.log",
+      "retained": "windows-engine/packet/inline_integration.log",
+      "sha256": "491613d6f676f30789dcc17177b7d5256a54b0451ff082c8d20f7cb7c8fac501",
+      "bytes": 5511
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/windows-engine/packet/integration.json",
+      "retained": "windows-engine/packet/integration.json",
+      "sha256": "c389780ba1a5f41ea841a934880c01fe6eb87a74dac038b9b897dc4081f117b1",
+      "bytes": 9834
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/windows-engine/packet/integration.log",
+      "retained": "windows-engine/packet/integration.log",
+      "sha256": "aa9e5237094e08c3cd81b0646b0674e17b812aada3695d86486477cd1265e961",
+      "bytes": 10750
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/windows-engine/packet/orchestrator.log",
+      "retained": "windows-engine/packet/orchestrator.log",
+      "sha256": "b8caa6c89df60af446cd7f1e9b9155cbb086cca0ae5f68f260a7c3dfe9ecc832",
+      "bytes": 545
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/windows-engine/packet/repository-status.txt",
+      "retained": "windows-engine/packet/repository-status.txt",
+      "sha256": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6",
+      "bytes": 2
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/windows-engine/packet/runtime-gate.json",
+      "retained": "windows-engine/packet/runtime-gate.json",
+      "sha256": "189ae1daf8a473684bd695ff31567aa0cc6b9f45ff2a117c6ecaea1e7757bcaf",
+      "bytes": 9507
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/windows-engine/packet/smoke.json",
+      "retained": "windows-engine/packet/smoke.json",
+      "sha256": "1f27e58b489335d130f9b0a623f387f67b5159a1915948df12ff2a6756394557",
+      "bytes": 6736
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/windows-engine/packet/smoke.log",
+      "retained": "windows-engine/packet/smoke.log",
+      "sha256": "e371a9d0232d1a1159a03327e6fd50d5e872ee4609cd450ae91a78c8c0c7f6ff",
+      "bytes": 6907
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/windows-engine/packet/verify-debug.log",
+      "retained": "windows-engine/packet/verify-debug.log",
+      "sha256": "5bbd58ee58ae8abdfb1a0bfd8c23fe9e35c3b8910249eebcb6cf2f5f741ef976",
+      "bytes": 3752
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/windows-engine/packet/verify-release-safe.log",
+      "retained": "windows-engine/packet/verify-release-safe.log",
+      "sha256": "bccb61241b8091dc76e48392bb3bf6cf3cf968cb2a52e09a916443fa60942468",
+      "bytes": 3802
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/windows-engine/packet/windows-shards-integration.json",
+      "retained": "windows-engine/packet/windows-shards-integration.json",
+      "sha256": "df486bb5967b556833db43a44ac56d62572af82edef70933b2705a42310baad4",
+      "bytes": 17971
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/windows-engine/packet/windows-shards-integration.log",
+      "retained": "windows-engine/packet/windows-shards-integration.log",
+      "sha256": "bb91bea89036ae98e2d65aa656e2cc8228a0cb8bfc582254f1195a4341e7bc2e",
+      "bytes": 18430
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/windows-engine/packet/zig-download.json",
+      "retained": "windows-engine/packet/zig-download.json",
+      "sha256": "9159cbaeadf6fe2f0c98b8fcfe11bd070fe28673994c6b79d8610f5e03eed764",
+      "bytes": 453
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/windows-engine/packet/zig-env.txt",
+      "retained": "windows-engine/packet/zig-env.txt",
+      "sha256": "0ac8fd2039785d3b550d314428b11ea1d269e76b003e61ae734d95bc98d07778",
+      "bytes": 1374
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/windows-engine/receipt.sha256.json",
+      "retained": "windows-engine/receipt.sha256.json",
+      "sha256": "a4917da8accffe6dd8f58c72f1f9848330157d9873decdab3bb682e06a457d41",
+      "bytes": 2790
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/windows-engine/run.json",
+      "retained": "windows-engine/run.json",
+      "sha256": "b819d853780f6c0f58624f2d5595aafde797786d02df01ae6897c022daac5e8d",
+      "bytes": 15550
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/windows-engine/verification.json",
+      "retained": "windows-engine/verification.json",
+      "sha256": "c71f43523f1c6fe8f38bbc3a1278c4cb6189fac184ed90f56ef2e95642425af2",
+      "bytes": 5098
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/baz-final-release.log",
+      "retained": "local-macos/baz-final-release.log",
+      "sha256": "5f8728e76463272fc5d4e280ecde512f5a74e0d731443c1b82b3ee8397e08a5a",
+      "bytes": 4811
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/baz-final-release-cleanup.json",
+      "retained": "local-macos/baz-final-release-cleanup.json",
+      "sha256": "e5643f68d2d33b158d77af4f7a65c74bd7b4cc5c6c44a2a1a644b499172e8160",
+      "bytes": 355
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/baz-streaming-wire-final.log",
+      "retained": "local-macos/baz-streaming-wire-final.log",
+      "sha256": "d84b1c46398ce5fe457b863b6c52dbcc50fbb9005c72f0704edc112f0ad9b8c2",
+      "bytes": 27275
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/baz-streaming-wire-final-cleanup.json",
+      "retained": "local-macos/baz-streaming-wire-final-cleanup.json",
+      "sha256": "71c1bf94fd630d87a3eff792960bac877b053958196f0895f4f97e352dac2470",
+      "bytes": 362
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/engine-debug.log",
+      "retained": "local-macos/engine-debug.log",
+      "sha256": "eda3560336c2735ee12203460e805693a12e2c6b18c5cc988c915ff6489db22a",
+      "bytes": 3780
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/engine-debug-cleanup.json",
+      "retained": "local-macos/engine-debug-cleanup.json",
+      "sha256": "c29813b642372712793320281de7cf4f68d890cc7e45c4ae4c85947358e81484",
+      "bytes": 350
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/engine-release.log",
+      "retained": "local-macos/engine-release.log",
+      "sha256": "20ea487444b4bdce00a6ad896215143871c48f40a36a7660f88614e24e4ed5c7",
+      "bytes": 3922
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/engine-release-cleanup.json",
+      "retained": "local-macos/engine-release-cleanup.json",
+      "sha256": "8a19ae9b1342a920d1998d8371f0ff43e8850ecd496701943512997a977db032",
+      "bytes": 352
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/mac-streaming.json",
+      "retained": "local-macos/mac-streaming.json",
+      "sha256": "0865828e8abd2bcbf8100163c44a04b8240ee064551585e83e27c2b427ad332a",
+      "bytes": 35988
+    },
+    {
+      "source": ".zig-cache/run-reserved.py",
+      "retained": "local-macos/run-reserved.py",
+      "sha256": "4b53c0f669a74008d3662a0002bab334e009a236bc97d4c72974cc8c30e2a7c7",
+      "bytes": 2488
+    },
+    {
+      "source": ".zig-cache/website-qa/streaming-tabs/receipt.json",
+      "retained": "website-preview/receipt.json",
+      "sha256": "2593c652b5b65e1be6e723921809dd7f732c4aa97c0d52f414ae31280aafa0a4",
+      "bytes": 3207
+    },
+    {
+      "source": ".zig-cache/website-qa/streaming-tabs/cleanup.json",
+      "retained": "website-preview/cleanup.json",
+      "sha256": "32bb42aa5deea6c168a189085546cefee865b5e227848045805d234d6e62d654",
+      "bytes": 491
+    },
+    {
+      "source": ".zig-cache/run-site-qa.py",
+      "retained": "website-preview/run-site-qa.py",
+      "sha256": "4a5538042ec4b9234ebb264b53f5cc0f390d48361b1b0777a46e2f4d20753617",
+      "bytes": 3516
+    }
+  ],
+  "excluded_files": [
+    {
+      "source": ".zig-cache/streaming-evidence/baz-native/linux/artifact.zip",
+      "sha256": "46af8a4043bb554b9c1d1d02600e895436f8b2775ac3468dedd644f68a4a0d55",
+      "bytes": 5592,
+      "reason": "Archive or binary stays outside the retained packet."
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/baz-native/macos/artifact.zip",
+      "sha256": "8cfa890f6db7479bb3b3d9ee3e048b5a0bc0df1441d36c6cfb576994de4aa36b",
+      "bytes": 5526,
+      "reason": "Archive or binary stays outside the retained packet."
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/baz-native/windows/artifact.zip",
+      "sha256": "dc4da85a83bec50655f6b2b9b491d3dddc7c28db665ffedc49e7ccf491deff4f",
+      "bytes": 7132,
+      "reason": "Archive or binary stays outside the retained packet."
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/linux-engine/source.tar",
+      "sha256": "eaf312038b6455b4452db80ad49c5da781fa04d610755602d958e50d65f1308b",
+      "bytes": 10127360,
+      "reason": "Archive or binary stays outside the retained packet."
+    },
+    {
+      "source": ".zig-cache/streaming-evidence/windows-engine/artifact.zip",
+      "sha256": "f6ba89c35e40b4845056c00605b4b83fc1f479776a705a955d69ad35512c33a3",
+      "bytes": 35399,
+      "reason": "Archive or binary stays outside the retained packet."
+    }
+  ],
+  "excluded_categories": [
+    "Browser screenshots and print files",
+    "Browser profiles and caches",
+    "Earlier failed or superseded local Baz checks",
+    "Archives and executable binaries"
+  ],
+  "historical_paths": "Recorded absolute paths and runner scripts describe the original hosts. Retained receipts need no temporary files.",
+  "runner_scope": "Archived runner scripts document orchestration. These scripts are not portable entry points.",
+  "source_manifest": "source-input.sha256.json",
+  "website_scope": "website-preview/context.json labels the local preview and its uncommitted documentation."
+}

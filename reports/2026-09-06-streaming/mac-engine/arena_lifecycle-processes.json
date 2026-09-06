@@ -1,0 +1,39 @@
+{
+  "name": "arena_lifecycle",
+  "command": [
+    "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+    "tests/arena_lifecycle_integration.py",
+    "--server",
+    "/Users/rs/code/github.com/technologylab.ai/bounded-http-streaming/zig-out/bin/bounded-http",
+    "--timeout",
+    "90",
+    "--json",
+    "/Users/rs/code/github.com/technologylab.ai/baz-streaming/.zig-cache/streaming-evidence/mac-engine/arena_lifecycle.json"
+  ],
+  "started_utc": "2026-09-06T17:43:05.598338+00:00",
+  "ended_utc": "2026-09-06T17:43:06.038373+00:00",
+  "exit_code": 0,
+  "watchdog_seconds": 110,
+  "timed_out": false,
+  "interrupted": null,
+  "owned_processes": [
+    {
+      "pid": 27262,
+      "ppid": 27224,
+      "pgid": 27262,
+      "start": "Sun Sep 6 19:43:05 2026",
+      "command": "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python tests/arena_lifecycle_integration.py --server /Users/rs/code/github.com/technologylab.ai/bounded-http-streaming/zig-out/bin/bounded-http --timeout 90 --json /Users/rs/code/github.com/technologylab.ai/baz-streaming/.zig-cache/streaming-evidence/mac-engine/arena_lifecycle.json"
+    },
+    {
+      "pid": 27273,
+      "ppid": 27262,
+      "pgid": 27273,
+      "start": "Sun Sep 6 19:43:05 2026",
+      "command": "(bounded-http)"
+    }
+  ],
+  "cleanup": {
+    "signals": [],
+    "remaining": []
+  }
+}

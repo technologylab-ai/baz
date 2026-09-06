@@ -1,0 +1,25 @@
+{
+  "total_count": 1,
+  "artifacts": [
+    {
+      "id": 9993954085,
+      "node_id": "MDg6QXJ0aWZhY3Q5OTkzOTU0MDg1",
+      "name": "bounded-http-windows-x64-34048745802-1",
+      "size_in_bytes": 35399,
+      "url": "https://api.github.com/repos/technologylab-ai/bounded-http/actions/artifacts/9993954085",
+      "archive_download_url": "https://api.github.com/repos/technologylab-ai/bounded-http/actions/artifacts/9993954085/zip",
+      "expired": false,
+      "digest": "sha256:f6ba89c35e40b4845056c00605b4b83fc1f479776a705a955d69ad35512c33a3",
+      "created_at": "2026-09-06T17:33:24Z",
+      "updated_at": "2026-09-06T17:33:24Z",
+      "expires_at": "2026-10-06T17:33:23Z",
+      "workflow_run": {
+        "id": 34048745802,
+        "repository_id": 1358292683,
+        "head_repository_id": 1358292683,
+        "head_branch": "feat/worker-streaming",
+        "head_sha": "2a269ef57301b21df22f1c616d02d6d244e5d6ca"
+      }
+    }
+  ]
+}

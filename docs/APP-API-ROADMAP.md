@@ -1,9 +1,9 @@
 # Baz implementation roadmap
 
-Status: first implementation, 20 example ports, published pure Zig package/site, and native Windows x64/Linux/macOS support, 2026-09-06.
+Status: first implementation, 20 example ports plus worker streaming, published pure Zig package/site, and native Windows x64/Linux/macOS support, 2026-09-06.
 Exact target: Zig 0.16.0. See the [implemented API](APP-API.md),
 [20 example ports](../examples/README.md), and
-[native receipt](../reports/2026-09-06-app-api.md) for exact evidence and limits.
+[current native receipt](../reports/2026-09-06-streaming.md) for exact evidence and limits.
 
 Build Baz (Bounded Async Zap) with Zap's typed App/endpoint ergonomics, borrowed-byte
 request APIs, modern Zig capabilities, and the external [bounded/http](https://technologylab-ai.github.io/bounded-http/) engine.
@@ -25,6 +25,8 @@ tracks transport reliability, performance, and platform work. Its
   23 original example targets are ported/adapted, with explicit differences.
   TLS is out of scope; WebSockets needs upgrade support; Mustache is postponed
   pending a [pure Zig library evaluation](MUSTACHE-CANDIDATES.md).
+- Worker streaming is implemented and passed native gates on all three platforms;
+  see [STREAMING.md](STREAMING.md). Typed inline continuations remain API-07.
 - Next bounded work: finish API-06's public composition/locals/cookie contract,
   using the example-local wrappers as real use cases; then API-07.
   Baz now consumes an external engine package; repository and Pages publication are complete.
@@ -47,12 +49,12 @@ Inspect Git state before editing; do not overwrite another session's work.
 | --- | --- |
 | Product | Baz (Bounded Async Zap), package/import `baz`, external dependency/import `bounded_http`. Repository: [technologylab-ai/baz](https://github.com/technologylab-ai/baz), with its [Pages documentation](https://technologylab-ai.github.io/baz/). [bounded/http](https://technologylab-ai.github.io/bounded-http/) stays independently usable. No Zap source-compatibility layer. |
 | Platform/version | Exact Zig 0.16.0; plain HTTP/1.1 on Linux, macOS, and native Windows x64. Public bind addresses need later qualification. TLS is out of scope. |
-| Windows | Supported natively on x64 with CI: Debug/ReleaseSafe verification, 14 App groups, 20 example groups, and three shard/shutdown cases. Windows performance remains deferred; Baz remains experimental. |
+| Windows | Supported natively on x64 with CI: Debug/ReleaseSafe verification, 14 App groups, 20 ported-example groups, 14 streaming groups, and three shard/shutdown cases. Windows performance remains deferred; Baz remains experimental. |
 | App | Real instances; typed Shared; borrowed endpoint instances; startup-only registration; one routing/context model. |
 | Input | Raw immutable slices, ordered duplicates, no coercion, no bracket-array syntax, no merged query/body/JSON bag. |
 | Decoding | Explicit caller destination; percent and form-plus decoding are separately named; raw bytes remain available. |
 | Bodies/forms | Contiguous form parsers; explicit logical-body copy for segmented input. Flat multipart Part iterator. No implicit disk writes or receive streaming. |
-| Responses | Easy one-shot handlers with capacity secured before execution; explicit advanced resumable handlers. Never replay application side effects. |
+| Responses | One-shot handlers with capacity secured before execution; same-handler streaming through std.Io.Writer on fixed workers. Typed inline continuations remain planned. Never replay application side effects. |
 | std.Io now | Inject caller capabilities; standard bounded Reader/Writer interoperability; explicit workers for blocking services. |
 | std.Io provider | IO-01–04 deferred until after the first API MVP by user decision (2026-09-06); an optional bounded cooperative provider remains a candidate. |
 | Memory | Framework storage reserved at startup; fixed buffers/reservations and optional bounded locals/scratch, no growable request arena or hidden heap fallback. |
@@ -75,7 +77,7 @@ Split implementation across sessions at its named gate and record exact state.
 | API-04 | implemented; scoped receipt | Body adapters and explicit URL-encoded form API. | API-01, API-03 | APP-FORM, APP-STDIO-READER |
 | API-05 | implemented; scoped receipt | Flat multipart fields/files over retained input. | API-04 | APP-MULTIPART |
 | API-06 | queued | Typed locals, middleware, authentication composition, cookies and redirects. | API-02, API-03 | APP-MIDDLEWARE |
-| API-07 | queued | Typed explicit resumable endpoints and retention rules. | API-03, API-06 | APP-RESUME |
+| API-07 | worker streaming implemented; typed inline continuations queued | Typed explicit resumable endpoints and retention rules. | API-03, API-06 | APP-RESUME |
 | API-08 | partial: 20 examples and external package | Finish remaining migration examples and successor MVP qualification; repository and Pages publication are integrated. | API-01–07 | APP-NATIVE |
 | IO-01–04 | deferred | Owned std.Io feasibility, isolated prototype, HTTP integration and adoption decision. | First API MVP; see STD-IO-DECISION | STDIO-PROTOTYPE, STDIO-HTTP-OWNERSHIP, STDIO-ADOPTION |
 
@@ -248,6 +250,11 @@ Parser helper work remains separately owned.
 
 ### API-07 — resumable endpoints and typed continuation state
 
+Same-handler worker streaming now has a standard writer, explicit flush,
+cancellation-aware sleep, and [native ownership gates](../reports/2026-09-06-streaming.md).
+One callback retains one fixed worker through each wait. The remaining work below
+is a distinct typed continuation API for handlers that return between flushes.
+
 Expose an explicit advanced registration/handler shape using the current
 request/flushed events and flush/finish/close actions. Keep route selection,
 locals and authentication established once; resumptions enter the selected
@@ -280,7 +287,7 @@ Engine framing, scheduling, transports, and core suites belong upstream.
 The independent consumer imports both packages using one engine module identity.
 
 The user selected the product name and package name on 2026-09-06.
-Publishing Baz as its own repository remains a separate step.
+Baz’s independent repository and GitHub Pages site are published.
 Keep the original case-study history and port attribution available.
 Future dependency updates require native Linux/macOS/Windows x64 verification of the selected revision.
 
@@ -304,13 +311,37 @@ qualification. Record framework memory and optional controlled low-level versus
 App comparisons separately from API correctness. Do not claim zero API overhead
 without measurements or use old engine receipts as new App evidence.
 
+## Response copy follow-up
+
+The [copy review](OWNERSHIP.md#response-copies-and-borrowing) identified a concrete
+next improvement: `borrowBody` currently shares the copied-body staging limit.
+An immutable 5 MB asset should be bounded by total response policy without
+requiring a 5 MB per-connection arena. The engine already accepts such spans.
+
+This work is queued, not implemented:
+
+1. Separate borrowed-body length validation from `response.body_bytes`, retaining
+   `server.max_response_bytes` as the total bound. Keep status/header checks and
+   pre-dispatch head/error reservation. In `Response.finish`, form a staging
+   slice only in the copied/generated branch; merely relaxing the length check
+   would otherwise create an out-of-bounds slice.
+2. Verify a startup-owned immutable 5 MB asset with a small output arena, exact
+   content, HEAD, partial sends, cancellation, and zero remaining borrows. Keep
+   copied-body limits, fallback behavior, and existing small-borrow tests intact.
+3. Consider direct generation into final output and synchronous borrowed stream
+   writes separately. Any new lifetime/release API needs explicit cancellation
+   and kernel-completion gates. Dynamic heap/pool leases are not implied by
+   the immutable-asset path.
+4. Make copy accounting comprehensive before publishing a total-copy claim or
+   assessing an optimization. Preserve the original prototype performance data.
+
 ## Verification and shared-host protocol
 
 Planning-only edits need source/link review and `git diff --check`; they do not
 establish new Zig/runtime evidence. Every implementation step registers all new
 Zig modules and examples in `zig build verify`, including instantiated generic
 APIs. The current build formats `src`, `examples` and named build files, and
-compiles all 20 port executables through `verify`.
+compiles all 20 port executables, the streaming example, and its wire fixture through `verify`.
 
 Before heavy builds or runtime suites on maxross/omarx1, inspect existing
 measurement processes and acquire `/tmp/zig-http-measurement.lock` atomically
@@ -331,6 +362,7 @@ zig build verify -Doptimize=ReleaseSafe
 zig build install examples -Doptimize=ReleaseSafe
 python3 tests/app_integration.py
 python3 tests/examples_integration.py
+python3 tests/streaming_integration.py
 ```
 
 The maintained App integration suite and all supported example ports now have
@@ -373,3 +405,5 @@ For each implementation session add: commit(s), owned/changed files, decisions,
 named gates passed/pending and exact receipts, remaining blocker (if any), and
 the next bounded task. Refresh [HANDOFF.md](../HANDOFF.md) briefly when this track
 becomes the active implementation. Keep historical engine evidence intact.
+
+| 2026-09-06: worker streaming | Added std.Io.Writer response streams, same-handler flushes, cancellation-aware sleep, and a runnable example beside App basics on the website. Engine seam submitted as PR #3 and pinned by immutable URL/hash. | [Streaming receipt](../reports/2026-09-06-streaming.md): native Linux/macOS/Windows, Debug and ReleaseSafe, 62 root tests and one consumer test per mode, 14 App, 20 ported-example, and 14 streaming groups per platform; Windows also passes three shard cases. Engine gates passed separately. | API-06 composition; typed inline continuations remain API-07. PR #3 is merged; future dependency updates retain the normal native gates. |

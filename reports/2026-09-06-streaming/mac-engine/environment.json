@@ -1,0 +1,15 @@
+{
+  "platform": "macOS-26.6.2-arm64-arm-64bit",
+  "uname": [
+    "Darwin",
+    "renerocksai-M3-Max-6.local",
+    "25.6.0",
+    "Darwin Kernel Version 25.6.0: Fri Jul 31 19:18:53 PDT 2026; root:xnu-12377.161.14~5/RELEASE_ARM64_T6031",
+    "arm64",
+    "arm"
+  ],
+  "python": "3.9.6 (default, May 22 2026, 11:13:45) \n[Clang 21.0.0 (clang-2100.1.1.101)]",
+  "zig": "0.16.0",
+  "cpu": "Apple M3 Max",
+  "memory_bytes": "137438953472"
+}

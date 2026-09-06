@@ -1,0 +1,14 @@
+test_abba_keeps_equal_workload_adjacent_and_balances_samples (__main__.WrkReceiptTests.test_abba_keeps_equal_workload_adjacent_and_balances_samples) ... ok
+test_abba_rejects_ambiguous_or_non_pair_comparisons (__main__.WrkReceiptTests.test_abba_rejects_ambiguous_or_non_pair_comparisons) ... ok
+test_any_error_invalidates_trial (__main__.WrkReceiptTests.test_any_error_invalidates_trial) ... ok
+test_counts_are_already_responses_not_batches (__main__.WrkReceiptTests.test_counts_are_already_responses_not_batches) ... ok
+test_current_and_historical_framework_names_retain_validation (__main__.WrkReceiptTests.test_current_and_historical_framework_names_retain_validation) ... ok
+test_default_shuffle_retains_each_requested_sample_once (__main__.WrkReceiptTests.test_default_shuffle_retains_each_requested_sample_once) ... ok
+test_incomplete_or_ambiguous_receipt_rejected (__main__.WrkReceiptTests.test_incomplete_or_ambiguous_receipt_rejected) ... ok
+test_invalid_latency_does_not_invalidate_response_count (__main__.WrkReceiptTests.test_invalid_latency_does_not_invalidate_response_count) ... ok
+test_required_power_profile_cannot_silently_change_or_disappear (__main__.WrkReceiptTests.test_required_power_profile_cannot_silently_change_or_disappear) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.001s
+
+OK

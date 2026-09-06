@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "base_revision": "79021c5f6f896b4e8e2c034dbaa9face54b90e87",
+  "scope": "Local browser preview with uncommitted documentation changes. This receipt does not establish live publication.",
+  "observed_base": "http://127.0.0.1:52644/baz/",
+  "runtime_inputs": "../source-input.sha256.json",
+  "browser": "Chrome/152.0.7977.76",
+  "cases": 15,
+  "documents": 62,
+  "source_limit": "The receipt identifies source links at the base revision. Documentation bytes were uncommitted.",
+  "excluded": "Screenshots, print files, browser profiles, cookies, and caches are not retained."
+}
