@@ -32,6 +32,8 @@ exists, hold off; owner.json records who and why. Also inspect pre-existing
 measurement processes that may not honor the new protocol. Retain your lock
 through child cleanup and remove only your own metadata/directory. Never steal
 an old lock by age alone. Read the wiki's [full cooperative protocol](https://github.com/technologylab-ai/zigllmwiki/blob/main/docs/platform-testing.md). Mac measurements by another agent take precedence
-while that agent holds its reservation. Windows performance remains deferred. The current Windows dependency update
-is paused while another session prepares the engine sharding PR. Read HANDOFF.md
-for the completed baseline and draft branch before resuming it.
+while that agent holds its reservation. Windows performance remains deferred.
+The user resumed the Windows dependency update after bounded/http PR #2 merged.
+Keep native Windows compilation, wire behavior, shard handoff, and shutdown
+evidence separate from cross-compilation. Read HANDOFF.md for the baseline and
+current verification state.

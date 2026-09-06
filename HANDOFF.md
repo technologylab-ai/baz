@@ -21,21 +21,26 @@ independent consumers, 14 App groups, and 20 example groups.
 Main keeps its tested immutable engine pin until the paused dependency update is qualified.
 Repository preparation changes documentation and package contents, not runtime behavior.
 
-## Paused Windows work
+## Windows integration candidate
 
-The local `work/windows-update` branch preserves the paused draft.
-Its [partial receipts](reports/2026-09-06-windows-draft/README.md) are retained on that branch.
-It adds portable process exits, counted console-handler borrows, target-aware compile-only checks, and Windows build/unit CI.
-Its provisional engine pin is `bb14d98756152936fadb6e8353852a686e8d315d`.
-The user paused this update while another agent implements bounded connection handoff to Windows shards.
-Wait for that PR and its native evidence before choosing the final pin and resuming verification.
+The user resumed this update after [bounded/http PR #2](https://github.com/technologylab-ai/bounded-http/pull/2)
+merged. Candidate branch `work/windows-update` pins engine main
+`7c24003924bcc76b2a3808cc2fae194082a40105`, with package hash
+`bounded_http-0.1.0-N3A1uJjOEAD4Yg0JPgeoRomLUpBJeFlfujb4gpSUDcgc`.
+The engine’s native Windows gate ran at `419de5445901a87ea6973020df5b13a420917483`;
+its tree matches merge `1c74a4e379c365ec0a201e6fe3df1a5a9718d504`.
+The later main commit changes documentation only.
 
-Windows x64 Debug cross-compilation passed all 33 root steps and the consumer's two steps before the pause.
-ReleaseSafe cross-compilation was stopped at the user's request; no Windows Baz executable has run.
-The draft has no new native Mac/Linux regression evidence.
-All owned builds stopped and both host reservations were released.
-The original partial receipts are under `/tmp/baz-windows-macos-20260906/` and
-`omarx1:/tmp/baz-windows-linux.0h7c_368/`.
+This candidate retains the original portable exits, counted console-handler
+borrows, target-aware compile checks, and Windows CI. It adds Windows process
+group/control-console handling to the wire harness and three finite native
+multi-shard App checks. Existing App and example suites remain shared across
+platforms. New native Windows, Linux, and macOS gates must pass before merging.
+No cross-compilation or engine receipt alone qualifies Baz runtime behavior.
+
+The old paused draft’s [partial receipts](reports/2026-09-06-windows-draft/README.md)
+remain intact. Its earlier x64 Debug cross-compilation passed; the stopped
+ReleaseSafe run was not a pass. No timing experiment is part of this update.
 
 ## Next API sessions
 

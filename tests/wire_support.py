@@ -106,7 +106,9 @@ class ResponseReader:
 
 class Server:
     def __init__(self, binary, **options):
-        self.binary = binary
+        self.binary = Path(binary)
+        if os.name == "nt" and self.binary.suffix.lower() != ".exe":
+            self.binary = self.binary.with_name(self.binary.name + ".exe")
         self.options = dict(execution="workers", port=0, connections=16, workers=2, max_body=1024,
                             max_header=2048, timeout_ms=3000, stall_ms=1000,
                             send_chunk=7)
@@ -138,12 +140,20 @@ class Server:
             self.ready.set()
 
     def __enter__(self):
+        if os.name == "nt":
+            # Hosted runners can lack a console. Child process groups need one
+            # to receive the explicit CTRL_BREAK shutdown event.
+            import ctypes
+            kernel = ctypes.WinDLL("kernel32", use_last_error=True)
+            if kernel.GetConsoleCP() == 0:
+                require(kernel.AllocConsole() != 0, "cannot allocate test control console")
         command = [str(self.binary)]
         for key, value in self.options.items():
             command += ["--" + key.replace("_", "-"), str(value)]
         self.process = subprocess.Popen(command, cwd=ROOT, stdin=subprocess.DEVNULL,
                                         stdout=subprocess.DEVNULL, stderr=subprocess.PIPE,
-                                        start_new_session=(os.name == "posix"))
+                                        start_new_session=(os.name == "posix"),
+                                        creationflags=subprocess.CREATE_NEW_PROCESS_GROUP if os.name == "nt" else 0)
         self.reader_thread = threading.Thread(target=self._read_log, daemon=True)
         self.reader_thread.start()
         if not self.ready.wait(8) or self.port is None:
@@ -167,11 +177,14 @@ class Server:
                 self.process.kill()
             self.process.wait(timeout=3)
 
+    def request_stop(self):
+        if self.process.poll() is None:
+            self.process.send_signal(signal.CTRL_BREAK_EVENT if os.name == "nt" else signal.SIGINT)
+
     def __exit__(self, kind, value, tb):
         failure = None
         try:
-            if self.process.poll() is None:
-                self.process.send_signal(signal.SIGINT)
+            self.request_stop()
             try:
                 code = self.process.wait(timeout=8)
             except subprocess.TimeoutExpired:
@@ -190,6 +203,15 @@ class Server:
             require(self.stats["peak_connections"] <= self.options["connections"], "connection cap exceeded")
             require(self.stats["workers"] == self.options["workers"], "worker provisioning differs from config")
             require(self.stats["allocation_calls_after_start"] == 0, "framework allocated after startup")
+            handoff_fields = ("handoffs_sent", "handoffs_received", "handoffs_closed", "max_handoff_delay_ns")
+            if any(field in self.stats for field in handoff_fields):
+                for field in handoff_fields:
+                    require(type(self.stats.get(field)) is int and self.stats[field] >= 0,
+                            "missing/non-integer/negative handoff counter: " + field)
+                require(self.stats["handoffs_sent"] == self.stats["handoffs_received"],
+                        "published socket handoffs remained outstanding at shutdown")
+                require(self.stats["handoffs_closed"] <= self.stats["handoffs_received"],
+                        "handoff close count exceeds received sockets")
             heap_fields = ("framework_heap_peak_bytes", "framework_heap_limit_bytes")
             if any(field in self.stats for field in heap_fields):
                 for field in heap_fields:

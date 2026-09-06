@@ -1,4 +1,4 @@
-name: Windows build and unit tests
+name: Native Windows verification
 
 on:
   push:
@@ -65,6 +65,19 @@ jobs:
             & zig build verify "-Doptimize=$mode" -j2 --summary all 2>&1 |
               Tee-Object "$env:RUNNER_TEMP/baz-windows-logs/$mode.log"
             if ($LASTEXITCODE -ne 0) { throw "$mode verification failed" }
+          }
+
+      - name: Exercise the App, examples, and Windows shard handoff
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          & zig build install examples -Doptimize=ReleaseSafe -j2 --summary all 2>&1 |
+            Tee-Object "$env:RUNNER_TEMP/baz-windows-logs/install.log"
+          if ($LASTEXITCODE -ne 0) { throw "ReleaseSafe example installation failed" }
+          foreach ($suite in @("app_integration", "examples_integration", "windows_smoke")) {
+            & python "tests/$suite.py" 2>&1 |
+              Tee-Object "$env:RUNNER_TEMP/baz-windows-logs/$suite.log"
+            if ($LASTEXITCODE -ne 0) { throw "$suite failed" }
           }
 
       - name: Upload build logs

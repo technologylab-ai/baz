@@ -5,8 +5,8 @@
     .minimum_zig_version = "0.16.0",
     .dependencies = .{
         .bounded_http = .{
-            .url = "https://github.com/technologylab-ai/bounded-http/archive/bb14d98756152936fadb6e8353852a686e8d315d.tar.gz",
-            .hash = "bounded_http-0.1.0-N3A1uCyoDwDajWIHGI92en6omD5RGiWO-qtLQU7R56FA",
+            .url = "https://github.com/technologylab-ai/bounded-http/archive/7c24003924bcc76b2a3808cc2fae194082a40105.tar.gz",
+            .hash = "bounded_http-0.1.0-N3A1uJjOEAD4Yg0JPgeoRomLUpBJeFlfujb4gpSUDcgc",
         },
     },
     .paths = .{ "build.zig", "build.zig.zon", ".zig-version", "src", "tests", "tools", "examples", "docs", "reports", ".github", "LICENSE", "README.md", "ROADMAP.md", "HANDOFF.md", "AGENTS.md" },
