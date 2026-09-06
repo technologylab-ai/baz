@@ -1,0 +1,11 @@
+{
+  "agent": "baz large borrow /root",
+  "purpose": "debug",
+  "host": "renerocksai-M3-Max-6.local",
+  "started_utc": "2026-09-06T18:00:42.844125+00:00",
+  "owner_pid": 46012,
+  "token": "56f02756-caaa-46ad-b691-a27034344fc8",
+  "cwd": "/Users/rs/code/github.com/technologylab.ai/baz-borrow",
+  "exit_code": 0,
+  "owned_group_absent": 46028
+}

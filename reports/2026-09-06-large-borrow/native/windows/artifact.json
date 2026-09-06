@@ -1,0 +1,20 @@
+{
+  "id": 9994548422,
+  "node_id": "MDg6QXJ0aWZhY3Q5OTk0NTQ4NDIy",
+  "name": "baz-windows-x64-34050619965-1",
+  "size_in_bytes": 9126,
+  "url": "https://api.github.com/repos/technologylab-ai/baz/actions/artifacts/9994548422",
+  "archive_download_url": "https://api.github.com/repos/technologylab-ai/baz/actions/artifacts/9994548422/zip",
+  "expired": false,
+  "digest": "sha256:a8e00e65caa6c8db1189079ea5c343be81fe959e87b9c1ce0cbdfa220f0f3416",
+  "created_at": "2026-09-06T18:14:38Z",
+  "updated_at": "2026-09-06T18:14:38Z",
+  "expires_at": "2026-09-20T18:14:37Z",
+  "workflow_run": {
+    "id": 34050619965,
+    "repository_id": 1359326012,
+    "head_repository_id": 1359326012,
+    "head_branch": "fix/large-borrowed-bodies",
+    "head_sha": "86249ad4ea6a85407dd9463b43311c0c2be1e293"
+  }
+}

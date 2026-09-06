@@ -45,17 +45,19 @@
         : (index + (event.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length;
       select(tabs[next], true);
     });
-    function revealStreaming() {
-      if (location.hash !== '#streaming') return;
-      select(tabs.find(tab => tab.dataset.panel === 'streaming'));
-      document.getElementById('streaming').scrollIntoView({behavior: 'instant'});
+    function revealExample() {
+      const tab = tabs.find(item => '#' + item.dataset.panel === location.hash);
+      if (!tab) return;
+      select(tab);
+      document.getElementById(tab.dataset.panel).scrollIntoView({behavior: 'instant'});
     }
-    window.addEventListener('hashchange', revealStreaming);
-    // Repeated clicks must also reveal a tab hidden since the last deep link.
-    document.querySelectorAll('a[href="#streaming"]').forEach(link => link.addEventListener('click', () => {
-      select(tabs.find(tab => tab.dataset.panel === 'streaming'));
+    window.addEventListener('hashchange', revealExample);
+    // Repeated clicks also reveal a panel hidden since the previous deep link.
+    document.querySelectorAll('a[href^="#"]').forEach(link => link.addEventListener('click', () => {
+      const tab = tabs.find(item => '#' + item.dataset.panel === link.getAttribute('href'));
+      if (tab) select(tab);
     }));
-    revealStreaming();
+    revealExample();
   }
   const filters = document.querySelector('.filter-bar');
   if (filters) {

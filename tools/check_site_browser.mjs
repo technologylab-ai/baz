@@ -161,6 +161,35 @@ try {
     await send('Emulation.setDeviceMetricsOverride', {width:1440,height:1040,deviceScaleFactor:1,mobile:false});
     return {exactSource:true, keyboard:true, deepLink:true, mobileWidths:[390,320]};
   });
+  await check('borrowed-example-source-tabs-and-deep-link', async () => {
+    const source = await readFile(new URL('../src/borrow_demo.zig', import.meta.url), 'utf8');
+    const excerpt = source.match(/^    try ctx\.response\.borrowBody\(.*?\);$/m)[0].trim();
+    await navigate();
+    assert.equal(await evaluate('document.querySelectorAll(".example-tabs [role=tab]").length'), 3);
+    assert.equal(await evaluate('document.querySelector("#borrowed code.language-zig").textContent'), excerpt);
+    await evaluate('document.querySelector("#borrowed-tab").scrollIntoView({behavior:"instant",block:"start"})');
+    await click('#borrowed-tab');
+    assert(await evaluate('!document.querySelector("#borrowed").hidden && document.querySelector("#streaming").hidden && document.querySelector("#app-example").hidden'));
+    await noOverflow(); await screenshot('baz-borrowed-desktop');
+    await key('ArrowRight');
+    assert.equal(await evaluate('document.activeElement.id'), 'basics-tab');
+    await key('End');
+    assert.equal(await evaluate('document.activeElement.id'), 'borrowed-tab');
+    await key('ArrowLeft');
+    assert.equal(await evaluate('document.activeElement.id'), 'streaming-tab');
+    for (const width of [390, 320]) {
+      await send('Emulation.setDeviceMetricsOverride', {width,height:1040,deviceScaleFactor:1,mobile:false});
+      await navigate('#borrowed');
+      assert(await evaluate('!document.querySelector("#borrowed").hidden'));
+      await noOverflow(); await screenshot('baz-borrowed-' + width);
+    }
+    await send('Emulation.setDeviceMetricsOverride', {width:1440,height:1040,deviceScaleFactor:1,mobile:false});
+    await evaluate('document.querySelector("#basics-tab").scrollIntoView({behavior:"instant",block:"start"})');
+    await click('#basics-tab');
+    await click('a[href="#borrowed"]');
+    assert(await evaluate('!document.querySelector("#borrowed").hidden'));
+    return {exactSource:true, keyboard:true, deepLink:true, repeatedDeepLink:true, mobileWidths:[390,320]};
+  });
   await check('keyboard-skip-link', async () => {
     await navigate(); await key('Tab');
     assert.equal(await evaluate('document.activeElement.className'),'skip');
@@ -264,12 +293,14 @@ try {
     await send('Emulation.setDeviceMetricsOverride',{width:1440,height:1040,deviceScaleFactor:1,mobile:false}); await navigate();
     await send('Emulation.setEmulatedMedia',{media:'print'});
     assert.equal(await evaluate('getComputedStyle(document.querySelector(".rail")).display'),'none');
+    assert(await evaluate('[...document.querySelectorAll("[role=tabpanel]")].every(panel => getComputedStyle(panel).display !== "none")'));
     const pdf = await send('Page.printToPDF',{printBackground:true,preferCSSPageSize:true});
     await writeFile(path.join(output,'baz-print.pdf'),Buffer.from(pdf.data,'base64'));
     await send('Emulation.setEmulatedMedia',{media:''}); await send('Emulation.setScriptExecutionDisabled',{value:true});
     await navigate();
     assert.equal(await evaluate('document.querySelectorAll(".example-card:not([hidden])").length'),21);
     assert(await evaluate('document.querySelector(".language-zig").textContent.includes("percentDecodeInto")'));
+    assert(await evaluate('[...document.querySelectorAll("[role=tabpanel]")].every(panel => !panel.hidden && getComputedStyle(panel).display !== "none")'));
     await send('Emulation.setScriptExecutionDisabled',{value:false}); return {printBytes:Buffer.from(pdf.data,'base64').length,noJsExamples:21};
   });
   await check('no-unexpected-network-or-errors', async () => {

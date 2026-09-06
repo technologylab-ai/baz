@@ -1,0 +1,51 @@
+Build Summary: 3/3 steps succeeded; 1/1 tests passed
+test success
++- run test 1 pass (1 total) 3ms MaxRSS:6M
+   +- compile test ReleaseSafe native success 23s MaxRSS:410M
+
+Build Summary: 44/44 steps succeeded; 68/68 tests passed
+verify success
++- compile exe baz-streaming ReleaseSafe native success 21s MaxRSS:448M
++- compile exe baz ReleaseSafe native success 28s MaxRSS:455M
++- compile exe baz-borrow ReleaseSafe native success 27s MaxRSS:479M
++- compile exe hello ReleaseSafe native success 27s MaxRSS:442M
++- compile exe hello2 ReleaseSafe native success 19s MaxRSS:439M
++- compile exe hello_json ReleaseSafe native success 21s MaxRSS:437M
++- compile exe simple_router ReleaseSafe native success 29s MaxRSS:440M
++- compile exe routes ReleaseSafe native success 21s MaxRSS:446M
++- compile exe serve ReleaseSafe native success 33s MaxRSS:445M
++- compile exe sendfile ReleaseSafe native success 30s MaxRSS:454M
++- compile exe senderror ReleaseSafe native success 20s MaxRSS:435M
++- compile exe accept ReleaseSafe native success 20s MaxRSS:450M
++- compile exe app_basic ReleaseSafe native success 19s MaxRSS:446M
++- compile exe app_auth ReleaseSafe native success 31s MaxRSS:458M
++- compile exe app_errors ReleaseSafe native success 20s MaxRSS:449M
++- compile exe endpoint ReleaseSafe native success 28s MaxRSS:460M
++- compile exe endpoint_auth ReleaseSafe native success 21s MaxRSS:450M
++- compile exe middleware ReleaseSafe native success 27s MaxRSS:449M
++- compile exe middleware_with_endpoint ReleaseSafe native success 21s MaxRSS:445M
++- compile exe userpass_session ReleaseSafe native success 28s MaxRSS:451M
++- compile exe cookies ReleaseSafe native success 20s MaxRSS:459M
++- compile exe http_params ReleaseSafe native success 26s MaxRSS:455M
++- compile exe bindataformpost ReleaseSafe native success 27s MaxRSS:457M
++- compile exe streaming ReleaseSafe native success 26s MaxRSS:447M
++- zig fmt --check success
++- run python3 success 44ms
++- run /home/runner/work/_temp/baz-zig/zig-x86_64-linux-0.16.0/zig success 23s
++- run test 3 pass (3 total) 4ms MaxRSS:7M
+|  +- compile test ReleaseSafe native success 18s MaxRSS:394M
++- run test 5 pass (5 total) 4ms MaxRSS:7M
+|  +- compile test ReleaseSafe native success 24s MaxRSS:407M
++- run test 12 pass (12 total) 5ms MaxRSS:5M
+|  +- compile test ReleaseSafe native success 20s MaxRSS:425M
++- run test 8 pass (8 total) 4ms MaxRSS:5M
+|  +- compile test ReleaseSafe native success 26s MaxRSS:404M
++- run test 10 pass (10 total) 3ms MaxRSS:7M
+|  +- compile test ReleaseSafe native success 25s MaxRSS:437M
++- run test 2 pass (2 total) 3ms MaxRSS:5M
+|  +- compile test ReleaseSafe native success 24s MaxRSS:409M
++- run test 28 pass (28 total) 16ms MaxRSS:5M
+|  +- compile test ReleaseSafe native success 26s MaxRSS:541M
++- run test success 4ms MaxRSS:6M
+   +- compile test ReleaseSafe native success 15s MaxRSS:399M
+

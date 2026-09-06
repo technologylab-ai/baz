@@ -1,0 +1,40 @@
+{
+  "sha": "4239e052cc569dc3b89c3a821a4df5db126788a1",
+  "node_id": "C_kwDOUQWrPNoAKDQyMzllMDUyY2M1NjlkYzNiODljM2E4MjFhNGRmNWRiMTI2Nzg4YTE",
+  "url": "https://api.github.com/repos/technologylab-ai/baz/git/commits/4239e052cc569dc3b89c3a821a4df5db126788a1",
+  "html_url": "https://github.com/technologylab-ai/baz/commit/4239e052cc569dc3b89c3a821a4df5db126788a1",
+  "author": {
+    "name": "Rene Schallner",
+    "email": "30892199+renerocksai@users.noreply.github.com",
+    "date": "2026-09-06T18:05:36Z"
+  },
+  "committer": {
+    "name": "GitHub",
+    "email": "noreply@github.com",
+    "date": "2026-09-06T18:05:36Z"
+  },
+  "tree": {
+    "sha": "addf88eb3b1352d94db6fc6842903f223199ecc8",
+    "url": "https://api.github.com/repos/technologylab-ai/baz/git/trees/addf88eb3b1352d94db6fc6842903f223199ecc8"
+  },
+  "message": "Merge 86249ad4ea6a85407dd9463b43311c0c2be1e293 into 589e05865780a5e40118af156e447e98455306ec",
+  "parents": [
+    {
+      "sha": "589e05865780a5e40118af156e447e98455306ec",
+      "url": "https://api.github.com/repos/technologylab-ai/baz/git/commits/589e05865780a5e40118af156e447e98455306ec",
+      "html_url": "https://github.com/technologylab-ai/baz/commit/589e05865780a5e40118af156e447e98455306ec"
+    },
+    {
+      "sha": "86249ad4ea6a85407dd9463b43311c0c2be1e293",
+      "url": "https://api.github.com/repos/technologylab-ai/baz/git/commits/86249ad4ea6a85407dd9463b43311c0c2be1e293",
+      "html_url": "https://github.com/technologylab-ai/baz/commit/86249ad4ea6a85407dd9463b43311c0c2be1e293"
+    }
+  ],
+  "verification": {
+    "verified": true,
+    "reason": "valid",
+    "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJqnatwCRC1aQ7uu5UhlAAABgkQALEaSXLQ1kZPmPNcQYZRSgGO\n6SsWbaoYxWSENjvH813MPrvnX4WZkxFr8JrXi8nHA5OdSZKgftve4ZZeR816m3Zt\nE5ljSR075PcAbOgufYK/5v2eZGIMj3YcHlbHSXKIXmz/00Z0tYkBfQ/o2jT4iTey\nNY2CoZjKaQydIqMjr7cj/SAQRdbdUPOD8QKoEtpkIB5x1sQb8+5YwCjMxph3+XfL\nxaldGwACxaqbKeSggF1jMdpRfOwTbQGxi5DVl42gVl7FKmvIW0NQNkpOYr6zvqXR\n+7WYvndt1AUotCrdDzKI+zGG1jgF7ADOz8ZjHjtlsuEsAOcVvRb8hn0o2FkMMyJu\nFsctKqdHfB5D2dPyY+pUhcgfG+ngDhtS93CQLGF4LwnZ6m8nVTTAkaofvSdrWE3b\n5BTN0tuZcz9Eizw0pMLnAtmvOwuAjtpKctIF87kVvDLCsvFmwoLe3aRiv6CHk7Ox\ngoREgUEaBnXhy2CYXtdx9HXh0PHJGM8x1G5qhhTx6os23g2ec8hUclMNNxnpE2nn\nXojkf3SIPJ46Y+fcDLj2hYuoXXBH4A6ECedj0h5WBf7BYge2N5PdPsrVzREcPfzF\nE7/IJoHt/zODxU4Z55K6ZOV5X7vEf/vSax2UBkYpEMbZ23VDGa2hQFkFxskqkThD\n7iDFPf4qrxyhOwOA4s9X\n=88K4\n-----END PGP SIGNATURE-----\n",
+    "payload": "tree addf88eb3b1352d94db6fc6842903f223199ecc8\nparent 589e05865780a5e40118af156e447e98455306ec\nparent 86249ad4ea6a85407dd9463b43311c0c2be1e293\nauthor Rene Schallner <30892199+renerocksai@users.noreply.github.com> 1788717936 +0200\ncommitter GitHub <noreply@github.com> 1788717936 +0200\n\nMerge 86249ad4ea6a85407dd9463b43311c0c2be1e293 into 589e05865780a5e40118af156e447e98455306ec\n",
+    "verified_at": "2026-09-06T18:05:36Z"
+  }
+}

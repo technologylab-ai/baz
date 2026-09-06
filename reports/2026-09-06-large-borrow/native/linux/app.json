@@ -1,0 +1,19 @@
+{
+  "passed": 14,
+  "cases": [
+    "raw query bytes, explicit decode and borrowed target forms",
+    "typed endpoint, raw captures, case/trailing-slash routing, HEAD and Allow",
+    "crossing routes in both registration orders, explicit HEAD and extension method",
+    "URL-encoded forms remain separate; explicit copy spans HTTP chunks",
+    "flat repeated fields/files, binary and empty uploads, chunk splits and validation before side effects",
+    "copied and explicitly borrowed binary response bodies",
+    "copied header metadata, repeated Set-Cookie and redirect framing",
+    "unpublished response failures recover; inline service I/O is explicit",
+    "fragmented input and ordered recovery around a failed draft",
+    "128 side-effecting requests execute once across bounded arena drains",
+    "caller std.Io works in explicitly selected fixed workers",
+    "incomplete-request deadline and subsequent recovery",
+    "connection overload refusal and admitted-slot recovery",
+    "deadline during worker service retains storage through callback return and shutdown"
+  ]
+}

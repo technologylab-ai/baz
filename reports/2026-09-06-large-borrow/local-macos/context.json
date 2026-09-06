@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "checked_out_revision": "589e05865780a5e40118af156e447e98455306ec",
+  "working_tree": "Dirty final implementation during local correctness checks.",
+  "implementation_later_committed_as": "ae25240737a714c07629df0667971d4fdc2107e9",
+  "native_pr_head": "86249ad4ea6a85407dd9463b43311c0c2be1e293",
+  "provenance_basis": "The parent agent recorded the local checkout and dirty input identities. Native checkout trees were verified independently.",
+  "implementation_equivalence": "All Zig and build inputs match both later commits. Only the borrowed-body case description changed between those commits.",
+  "changed_file": "tests/borrow_integration.py",
+  "changed_file_sha256": {
+    "ae25240737a714c07629df0667971d4fdc2107e9": "aa752873e3ec9009a348b221faa606f19bedadcd4b9975bc4f24fafbc5b9a5dc",
+    "86249ad4ea6a85407dd9463b43311c0c2be1e293": "6e71a7bd5b392b6de6dc64529318d279a018d092c3751fd3a09b1f4f2abdd53b"
+  },
+  "wording_diff": "fixture-label-change.diff",
+  "source_limit": "The local logs do not contain a contemporaneous complete source manifest. Hosted receipts identify the exact executed checkout.",
+  "performance_comparison": false
+}

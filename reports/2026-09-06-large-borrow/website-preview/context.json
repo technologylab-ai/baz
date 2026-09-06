@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "checked_out_revision": "86249ad4ea6a85407dd9463b43311c0c2be1e293",
+  "working_tree": "Uncommitted documentation, website JavaScript, styles, builder, and browser-check changes.",
+  "scope": "Local browser preview. This receipt does not establish live publication.",
+  "observed_base": "http://127.0.0.1:65124/baz/",
+  "browser": "Chrome/152.0.7977.76",
+  "cases": 16,
+  "documents": 65,
+  "source_inputs": "../source-input.sha256.json",
+  "source_limit": "The browser checked the local draft. Preview file bytes were uncommitted.",
+  "excluded": "Screenshots, print files, browser profiles, cookies, and caches are not retained."
+}

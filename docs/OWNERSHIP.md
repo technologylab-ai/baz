@@ -118,6 +118,8 @@ There is no dynamic release callback for a per-request heap buffer or recyclable
 pool. Those would need a separate completion/cancellation release contract.
 `stream.finish()` alone is not permission to release externally borrowed memory.
 Ordinary stream writes continue to use bounded copying as listed above.
+The [large-borrow receipt](../reports/2026-09-06-large-borrow.md) records the
+5 MiB fixture, source identity, and ownership gates.
 
 ### Copy statistics
 

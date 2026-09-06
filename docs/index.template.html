@@ -60,12 +60,13 @@
     <div class="example-tabs" role="tablist" aria-label="Application examples" hidden>
       <button type="button" role="tab" id="basics-tab" aria-controls="app-example" aria-selected="true" data-panel="app-example">App basics</button>
       <button type="button" role="tab" id="streaming-tab" aria-controls="streaming" aria-selected="false" tabindex="-1" data-panel="streaming">Streaming response <span aria-hidden="true">↗</span></button>
+      <button type="button" role="tab" id="borrowed-tab" aria-controls="borrowed" aria-selected="false" tabindex="-1" data-panel="borrowed">Borrowed asset <span aria-hidden="true">↗</span></button>
     </div>
     <div id="app-example" role="tabpanel" aria-labelledby="basics-tab" tabindex="0">
     <div class="codebox"><div class="codehead"><a href="docs/read.html?file=src/app_demo.zig">src/app_demo.zig · maintained example</a><button class="copy" type="button" hidden aria-label="Copy Hello endpoint">Copy</button></div><pre tabindex="0" aria-label="Hello endpoint source"><code class="language-zig">@@HELLO@@</code></pre></div>
     <p class="note">This excerpt uses <code>Context = web.App(Shared).Context</code>. Register it with <code>try app.endpoint("/hello", &amp;hello)</code>. See the <a href="docs/read.html?file=examples/app_basic.zig">complete App example</a> for initialization, stable state, and shutdown.</p>
     <div class="columns"><div><h3>Start with explicit state.</h3><p class="note">Shared state and endpoint instances stay at stable addresses through App destruction. Register routes before startup. Synchronize mutable state used by concurrent callbacks.</p></div><div><h3>Return a finished response.</h3><p class="note">Text, bytes, copied headers, JSON, and standard formatting all use bounded output. A failed handler discards its private draft before error mapping.</p></div></div>
-    <p class="annotation"><b>OWNERSHIP</b><span>This name is temporary, so <code>response.text</code> copies it. For retained input and immutable startup assets, <code>borrowBody</code> borrows the payload independently of staging capacity, within the total response limit. <a href="docs/read.html?file=docs/OWNERSHIP.md#response-copies-and-borrowing">See the copy paths and limits →</a></span></p>
+    <p class="annotation"><b>OWNERSHIP</b><span>This name is temporary, so <code>response.text</code> copies it. For retained input and immutable startup assets, <code>borrowBody</code> borrows the payload independently of staging capacity, within the total response limit. <a href="docs/read.html?file=docs/OWNERSHIP.md#response-copies-and-borrowing">See the copy paths and limits →</a> <a href="#borrowed">Try the borrowed-asset example →</a></span></p>
     </div>
     <div id="streaming" role="tabpanel" aria-labelledby="streaming-tab" tabindex="0">
       <h3>Send the first bytes. Keep working.</h3>
@@ -74,6 +75,14 @@
       <p class="annotation"><b>STREAMING</b><span><code>out</code> is a standard <code>std.Io.Writer</code>. Each <code>flush()</code> sends the current bytes before the handler continues.</span></p>
       <div class="columns"><div><h3>Updates as they happen.</h3><p class="note">Progress reports, generated text, and incremental output can reach clients before the handler returns. Use <code>curl -N</code> to watch the example arrive in three parts.</p></div><div><h3>Bounded while you wait.</h3><p class="note">A stream uses one existing application worker and fixed output storage. A slow reader applies backpressure; cancellation releases the waiting handler safely. The HTTP I/O loop keeps running.</p></div></div>
       <p class="note">The complete example selects fixed workers. Headers are final after the first flush, and response size and request time remain bounded. <a href="docs/read.html?file=docs/STREAMING.md">Read the streaming guide →</a> <a href="docs/read.html?file=reports/2026-09-06-streaming.md">Native streaming evidence →</a></p>
+    </div>
+    <div id="borrowed" role="tabpanel" aria-labelledby="borrowed-tab" tabindex="0">
+      <h3>Already in memory. Ready to send.</h3>
+      <p class="intro">An image, a download, an embedded asset. Keep its bytes immutable and alive, then explicitly borrow them for the response.</p>
+      <div class="codebox"><div class="codehead"><a href="docs/read.html?file=src/borrow_demo.zig">src/borrow_demo.zig · 5 MiB native fixture</a><button class="copy" type="button" hidden aria-label="Copy borrowed response">Copy</button></div><pre tabindex="0" aria-label="Borrowed response source"><code class="language-zig">@@BORROWED@@</code></pre></div>
+      <p class="annotation"><b>BORROWED</b><span>This call runs inside a handler. <code>asset_bytes</code> refers to a 5 MiB immutable asset in Shared. Its storage outlives the App; the handler passes a slice, and the engine retains it through transmission.</span></p>
+      <div class="columns"><div><h3>Large asset, small arena.</h3><p class="note">The native fixture sends 5 MiB through a 4 KiB output arena. Borrowed bodies use the total response limit, independently of staging capacity. Large eligible payloads stay in their original memory.</p></div><div><h3>You choose the contract.</h3><p class="note"><code>text()</code>, <code>bytes()</code>, and stream writes still copy. <code>borrowBody()</code> is explicit: use retained input or immutable assets kept alive through App shutdown. Memory freed when the handler returns is too short-lived.</p></div></div>
+      <p class="note">Small borrows may be copied under the engine’s configured threshold (256 bytes by default). Headers and kernel network transfers still have their own copying costs. <a href="docs/read.html?file=docs/OWNERSHIP.md#response-copies-and-borrowing">Read the copy and lifetime contract →</a> <a href="docs/read.html?file=reports/2026-09-06-large-borrow.md">5 MiB ownership evidence →</a></p>
     </div>
   </section>
   <section class="chapter" id="data">

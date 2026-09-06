@@ -1,0 +1,51 @@
+Build Summary: 3/3 steps succeeded; 1/1 tests passed
+test success
++- run test 1 pass (1 total) 7ms MaxRSS:2M
+   +- compile test Debug native success 2s MaxRSS:285M
+
+Build Summary: 44/44 steps succeeded; 68/68 tests passed
+verify success
++- compile exe baz-streaming Debug native success 2s MaxRSS:298M
++- compile exe baz Debug native success 2s MaxRSS:299M
++- compile exe baz-borrow Debug native success 2s MaxRSS:384M
++- compile exe hello Debug native success 2s MaxRSS:293M
++- compile exe hello2 Debug native success 2s MaxRSS:292M
++- compile exe hello_json Debug native success 2s MaxRSS:291M
++- compile exe simple_router Debug native success 2s MaxRSS:291M
++- compile exe routes Debug native success 3s MaxRSS:291M
++- compile exe serve Debug native success 2s MaxRSS:290M
++- compile exe sendfile Debug native success 2s MaxRSS:290M
++- compile exe senderror Debug native success 2s MaxRSS:291M
++- compile exe accept Debug native success 2s MaxRSS:292M
++- compile exe app_basic Debug native success 3s MaxRSS:290M
++- compile exe app_auth Debug native success 2s MaxRSS:291M
++- compile exe app_errors Debug native success 2s MaxRSS:291M
++- compile exe endpoint Debug native success 3s MaxRSS:306M
++- compile exe endpoint_auth Debug native success 2s MaxRSS:291M
++- compile exe middleware Debug native success 2s MaxRSS:291M
++- compile exe middleware_with_endpoint Debug native success 2s MaxRSS:291M
++- compile exe userpass_session Debug native success 2s MaxRSS:297M
++- compile exe cookies Debug native success 2s MaxRSS:292M
++- compile exe http_params Debug native success 2s MaxRSS:296M
++- compile exe bindataformpost Debug native success 2s MaxRSS:297M
++- compile exe streaming Debug native success 2s MaxRSS:291M
++- zig fmt --check success
++- run python3 success 230ms
++- run /Users/runner/work/_temp/baz-zig/zig-aarch64-macos-0.16.0/zig success 8s
++- run test 3 pass (3 total) 6ms MaxRSS:2M
+|  +- compile test Debug native success 2s MaxRSS:267M
++- run test 5 pass (5 total) 7ms MaxRSS:2M
+|  +- compile test Debug native success 2s MaxRSS:273M
++- run test 12 pass (12 total) 22ms MaxRSS:2M
+|  +- compile test Debug native success 2s MaxRSS:289M
++- run test 8 pass (8 total) 7ms MaxRSS:2M
+|  +- compile test Debug native success 2s MaxRSS:276M
++- run test 10 pass (10 total) 7ms MaxRSS:2M
+|  +- compile test Debug native success 3s MaxRSS:373M
++- run test 2 pass (2 total) 9ms MaxRSS:2M
+|  +- compile test Debug native success 2s MaxRSS:266M
++- run test 28 pass (28 total) 28ms MaxRSS:3M
+|  +- compile test Debug native success 3s MaxRSS:448M
++- run test success 6ms MaxRSS:2M
+   +- compile test Debug native success 1s MaxRSS:258M
+
