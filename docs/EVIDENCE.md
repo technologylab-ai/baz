@@ -16,7 +16,8 @@ The engine inputs below explain that lineage; they do not replace Baz-specific e
 Authoritative API source: installed exact Zig 0.16.0 standard library, especially
 `std/os/linux/IoUring.zig`, `std/Thread.zig`, `std/atomic.zig`, `std/c.zig`.
 Protocol: immutable RFC 9110, RFC 9112 and RFC 6585, as pinned and scoped by
-`../zigllmwiki/sources/http11-framing-and-limits.md` and `http-overload-refusal.md`.
+the wiki's [framing record](https://github.com/technologylab-ai/zigllmwiki/blob/362da3b8023e6918d4b72c046821334ebd3722ca/sources/http11-framing-and-limits.md)
+and [overload record](https://github.com/technologylab-ai/zigllmwiki/blob/362da3b8023e6918d4b72c046821334ebd3722ca/sources/http-overload-refusal.md).
 URI grammar: [RFC 3986](https://www.rfc-editor.org/rfc/rfc3986.html), published
 January 2005; notably scheme case-insensitivity is separate from path semantics.
 
@@ -46,4 +47,4 @@ and full kernel/process resource accounting remain work; this is an applied
 TigerStyle experiment, not a claim of complete TigerStyle conformance.
 
 The first source-hashed native result is
-[the MVP receipt](../reports/2026-09-05-mvp.md).
+[the MVP receipt](https://github.com/technologylab-ai/bounded-http/blob/4b3cd5551d80b422ec6ef763627d019e6f1dfb83/reports/2026-09-05-mvp.md).

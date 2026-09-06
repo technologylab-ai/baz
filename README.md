@@ -25,9 +25,10 @@ The first implementation provides:
 Baz is a separate framework package with a pinned external engine dependency.
 The package and public import are `baz`; the engine import is `bounded_http`.
 The engine remains independently usable as a standalone case study.
-Development continues in this worktree until Baz receives its own repository.
+Baz now has its own local Git repository. GitHub publication is pending.
 The [package boundary](docs/DEPENDENCY.md) and [roadmap](docs/APP-API-ROADMAP.md)
 record the dependency, upstream changes, and remaining work.
+See [repository preparation](docs/REPOSITORY.md) for branches, history, CI, and publication status.
 
 ## Try it
 
@@ -90,7 +91,7 @@ not individually for every timed response. See the
 
 ## Status and documentation
 
-This is an experimental first implementation. Native macOS and Linux passed
+This is an experimental first implementation. The source at `b3d4d8a` passed native macOS and Linux
 Debug/ReleaseSafe verification, package embedding, all 20 example groups,
 and all 14 App groups. The engine passed its own native verification gates.
 The [package receipt](reports/2026-09-06-baz-extraction.md) records external-dependency
@@ -99,8 +100,8 @@ preserves the earlier combined engine/framework gates.
 
 Current deployment is IPv4 loopback, plain HTTP/1.1. TLS is out of scope.
 Mustache is postponed pending a [pure Zig library choice](docs/MUSTACHE-CANDIDATES.md).
-WebSockets needs an engine upgrade lifecycle. Framework Windows compilation/CI
-waits for the other session's engine support on main. An owned `std.Io` provider
+WebSockets needs an engine upgrade lifecycle. The paused `work/windows-update` branch prepares Baz's Windows compilation and CI.
+It awaits the engine's Windows sharding PR and fresh Baz verification. An owned `std.Io` provider
 is deferred until after the first API MVP.
 
 - [Implemented API and migration from Zap](docs/APP-API.md)
@@ -115,3 +116,8 @@ Framework storage is reserved at startup; borrowed input and output remain alive
 until their owners finish. Application services and the caller's I/O provider
 have their own resource responsibilities. Read the ownership contract before
 retaining slices or introducing asynchronous work.
+
+## License
+
+Baz is [MIT licensed](LICENSE). The adapted Zap examples retain their
+[original copyright and license notice](examples/LICENSE-ZAP).

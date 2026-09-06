@@ -1,0 +1,74 @@
+name: Baz CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: baz-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native:
+    name: Native ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Install exact checksum-verified Zig
+        shell: bash
+        run: |
+          python3 - <<'PYTHON'
+          import hashlib, json, os, pathlib, platform, tarfile, urllib.request
+          version = pathlib.Path('.zig-version').read_text().strip()
+          assert version == '0.16.0', 'Expected exact Zig 0.16.0'
+          architecture = {'x86_64': 'x86_64', 'arm64': 'aarch64', 'aarch64': 'aarch64'}[platform.machine()]
+          system = {'Linux': 'linux', 'Darwin': 'macos'}[platform.system()]
+          with urllib.request.urlopen('https://ziglang.org/download/index.json', timeout=30) as response:
+              artifact = json.load(response)[version][f'{architecture}-{system}']
+          assert artifact['tarball'].startswith('https://ziglang.org/')
+          directory = pathlib.Path(os.environ['RUNNER_TEMP']) / 'baz-zig'
+          directory.mkdir()
+          archive = directory / 'zig.tar.xz'
+          with urllib.request.urlopen(artifact['tarball'], timeout=180) as response:
+              archive.write_bytes(response.read())
+          assert hashlib.sha256(archive.read_bytes()).hexdigest() == artifact['shasum']
+          with tarfile.open(archive) as package:
+              package.extractall(directory, filter='data')
+          compiler, = directory.glob('*/zig')
+          with open(os.environ['GITHUB_PATH'], 'a') as path:
+              path.write(str(compiler.parent) + '\n')
+          PYTHON
+
+      - name: Verify and exercise examples
+        shell: bash
+        run: |
+          set -euo pipefail
+          packet="$RUNNER_TEMP/baz-ci"
+          mkdir -p "$packet"
+          { git rev-parse HEAD; uname -a; zig version; python3 --version; } > "$packet/environment.log"
+          zig build verify -Doptimize=Debug -j2 --summary all 2>&1 | tee "$packet/debug.log"
+          zig build verify -Doptimize=ReleaseSafe -j2 --summary all 2>&1 | tee "$packet/release-safe.log"
+          zig build install examples -Doptimize=ReleaseSafe -j2 2>&1 | tee "$packet/install.log"
+          python3 tests/app_integration.py 2>&1 | tee "$packet/app.log"
+          python3 tests/examples_integration.py 2>&1 | tee "$packet/examples.log"
+
+      - name: Upload verification logs
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: baz-${{ matrix.os }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/baz-ci
+          if-no-files-found: warn
+          retention-days: 14

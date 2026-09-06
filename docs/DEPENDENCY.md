@@ -41,12 +41,16 @@ App delegates signal stopping to `Cluster.requestStopFromSignal`.
 That helper only stores atomic stop flags and performs no wake or other system call.
 The callback-progress and external-watchdog limits still apply.
 
-These generic extensions are proposed in [bounded/http PR #1](https://github.com/technologylab-ai/bounded-http/pull/1).
-Baz pins commit `e52f09f723388685263d14a9bfa265f2456a3744` while that PR is pending.
+These generic extensions landed through [bounded/http PR #1](https://github.com/technologylab-ai/bounded-http/pull/1).
+PR #1 merged on 2026-09-06 as `c90281b600deb699a667e2bcc115da32862c794f`.
+The verified `main` baseline retains its exact tested pin, `e52f09f723388685263d14a9bfa265f2456a3744`.
 Its Zig package hash is `zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv`.
 The hash prefix reflects that revision's package metadata; Baz's dependency key and source import are `bounded_http`.
 The [engine receipt](https://github.com/technologylab-ai/bounded-http/blob/e52f09f723388685263d14a9bfa265f2456a3744/reports/2026-09-06-app-response-reservation.md) records its native gates.
-Do not silently switch to a moving branch or assume the PR is already merged.
+The local `work/windows-update` branch contains a paused update to `bb14d98756152936fadb6e8353852a686e8d315d`.
+That revision includes the engine rename and initial single-shard Windows IOCP support.
+Wait for the forthcoming Windows sharding PR before choosing the final update.
+The [repository record](REPOSITORY.md) describes the branch and verification boundary.
 
 ## Future updates
 

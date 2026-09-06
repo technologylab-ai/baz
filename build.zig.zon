@@ -9,5 +9,5 @@
             .hash = "zig_http-0.1.0-N3A1uPSxDgCdGi1-281VXQB_4LNfMRgQ5asPchYB99xv",
         },
     },
-    .paths = .{ "build.zig", "build.zig.zon", ".zig-version", "src", "tests", "tools", "examples", "docs", "reports", "benchmarks", "README.md", "ROADMAP.md", "HANDOFF.md", "AGENTS.md" },
+    .paths = .{ "build.zig", "build.zig.zon", ".zig-version", "src", "tests", "tools", "examples", "docs", "reports", "LICENSE", "README.md", "ROADMAP.md", "HANDOFF.md", "AGENTS.md" },
 }

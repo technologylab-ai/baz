@@ -1,6 +1,6 @@
 # Baz implementation roadmap
 
-Status: first implementation, example ports, and external engine packaging, 2026-09-06.
+Status: first implementation, example ports, external engine package, and independent local repository, 2026-09-06.
 Exact target: Zig 0.16.0. See the [implemented API](APP-API.md),
 [20 example ports](../examples/README.md), and
 [native receipt](../reports/2026-09-06-app-api.md) for exact evidence and limits.
@@ -15,8 +15,9 @@ tracks transport reliability, performance, and platform work. Its
 
 ## Resume here
 
-- Worktree: `/Users/rs/code/github.com/technologylab.ai/zig-http-app-api`.
-- Branch: `roadmap/app-api`.
+- Repository: standalone `baz` checkout; main branch `main`.
+- Paused Windows draft: `work/windows-update`.
+- See [repository preparation](REPOSITORY.md) and [handoff](../HANDOFF.md) for current state.
 - Starting engine commit: `4b3cd5551d80b422ec6ef763627d019e6f1dfb83`.
 - Reviewed Zap port: `../fi/deps/zap` at
   `f6099ecec496c7ec623c5913baa5b6b5da2e883d` (its own Git repository).
@@ -36,7 +37,7 @@ tracks transport reliability, performance, and platform work. Its
   Reconcile their landed docs/current engine contracts before the next session;
   preserve this plan's baseline and re-evaluate changed ownership assumptions.
 
-Use `git worktree list` to locate the branch if the local directory changes.
+Use `git branch --list` to find the local draft branch.
 Read AGENTS.md, the current ownership contract and the two design documents.
 Inspect Git state before editing; do not overwrite another session's work.
 
@@ -46,7 +47,7 @@ Inspect Git state before editing; do not overwrite another session's work.
 | --- | --- |
 | Product | Baz (Bounded Async Zap), package/import `baz`, external dependency/import `bounded_http`. Repository publication remains pending. bounded/http stays independently usable. No Zap source-compatibility layer. |
 | Platform/version | Exact Zig 0.16.0; initial plain HTTP/1.1 on the existing Linux/macOS engine. Public bind addresses need later qualification. TLS is out of scope. |
-| Windows | Await the other session's engine support on main before adding framework compilation/CI checks; no Windows work in this checkpoint (user correction, 2026-09-06). |
+| Windows | Initial engine support is merged. Baz portability/CI work is paused on `work/windows-update` while another session prepares bounded handoff to Windows shards. |
 | App | Real instances; typed Shared; borrowed endpoint instances; startup-only registration; one routing/context model. |
 | Input | Raw immutable slices, ordered duplicates, no coercion, no bracket-array syntax, no merged query/body/JSON bag. |
 | Decoding | Explicit caller destination; percent and form-plus decoding are separately named; raw bytes remain available. |
@@ -361,6 +362,8 @@ the conversation.
 | 2026-09-06: basic comparison | Isolated fixture using the public App API versus pinned Zig 0.16 Zap; ReleaseSafe only, c1/t1 and c32/t2, three alternating pairs per profile on each host. TLS excluded; Mustache postponed with a pure Zig shortlist; Windows waits for the engine session. | [Raw trials, results and cleanup](../reports/2026-09-06-basic-zap.md). All 24 measured trials completed with zero wrk socket/non-2xx-or-3xx errors. Owned server groups are gone and both host reservations released. Benchmark fixture remains separate from framework dependencies. | No benchmark is left running. Continue the API roadmap; reconcile incoming engine/docs changes before extraction. |
 
 | 2026-09-06: Baz package extraction | Selected Baz (Bounded Async Zap), package/import `baz`. Removed copied engine sources and switched to URL/hash-pinned `bounded_http`. Added a separate consumer fixture and public draft/signal methods through [bounded/http PR #1](https://github.com/technologylab-ai/bounded-http/pull/1). Reconciled current engine contracts and linked its repository/Pages site. | [Package receipt](../reports/2026-09-06-baz-extraction.md): native macOS/Linux, Debug and ReleaseSafe, 41/41 steps and 60/60 root tests per mode, independent consumers, 14 App and 20 example groups. [50-file source manifest](../reports/2026-09-06-baz-extraction-source.sha256.json). Engine gates passed separately. Prototype performance evidence remains unchanged and explicitly predates extraction. | API-06 public composition, then API-07 resumable endpoints. Merge/update the engine pin through the normal upstream process. Publish Baz's repository separately when requested. |
+
+| 2026-09-06: standalone repository preparation | Created an independent local Baz repository with full reachable history, MIT license, public source links, and Linux/macOS CI. Moved engine-only working-tree material back to upstream references. Preserved the paused Windows changes on `work/windows-update`. | Git integrity and object independence, unchanged runtime/evidence bytes on `main`, local Markdown links, manifest formatting, actionlint, and CI installer syntax. No runtime gates restarted while the Windows update is paused. | Await the engine sharding PR for the draft branch. Publish Baz's GitHub repository when requested; continue API-06 independently. |
 
 For each implementation session add: commit(s), owned/changed files, decisions,
 named gates passed/pending and exact receipts, remaining blocker (if any), and

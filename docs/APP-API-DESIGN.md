@@ -400,7 +400,7 @@ fatal/retain boundary explicit in embedding and compiled examples.
 The current engine's implementation and measured scope are in
 [INTERFACES.md](INTERFACES.md), [OWNERSHIP.md](OWNERSHIP.md),
 [EVIDENCE.md](EVIDENCE.md), and the
-[arena adoption report](../reports/2026-09-05-arena-adoption.md). The wiki's
+[arena adoption report](https://github.com/technologylab-ai/bounded-http/blob/4b3cd5551d80b422ec6ef763627d019e6f1dfb83/reports/2026-09-05-arena-adoption.md). The wiki's
 [adoption source record](https://github.com/technologylab-ai/zigllmwiki/blob/362da3b8023e6918d4b72c046821334ebd3722ca/sources/zig-http-arena-adoption-2026-09-05.md)
 pins those receipts. They establish neither this proposed framework nor a
 performance cost for its future conveniences.

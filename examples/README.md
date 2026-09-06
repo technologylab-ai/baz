@@ -3,7 +3,7 @@
 These examples adapt the public behavior of our predecessor
 [Zap](https://github.com/zigzap/zap), using the local Zig 0.16 port at
 `f6099ecec496c7ec623c5913baa5b6b5da2e883d`, using the new `baz` API and
-the external bounded/http engine. Original source: `../../fi/deps/zap/examples`.
+the external bounded/http engine. Original source: [the pinned Zap examples](https://github.com/zigzap/zap/tree/f6099ecec496c7ec623c5913baa5b6b5da2e883d/examples).
 Zap's copyright/license is preserved in [LICENSE-ZAP](LICENSE-ZAP).
 
 The 20 supported examples are standalone executables. Each uses the public
@@ -74,6 +74,6 @@ The source-reviewed [Mustache shortlist](../docs/MUSTACHE-CANDIDATES.md) records
 two pure Zig candidates and their unresolved exact-version, license and work-bound
 questions. No renderer dependency has been added.
 
-The [framework roadmap](../docs/APP-API-ROADMAP.md) tracks repository extraction
+The [framework roadmap](../docs/APP-API-ROADMAP.md) tracks repository publication
 with a pinned bounded/http dependency, public middleware/resumable API work and
 remaining qualification. The engine remains a standalone case study.

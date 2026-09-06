@@ -3,8 +3,10 @@
 Use exact Zig 0.16.0 from `.zig-version`. Baz consumes the separate bounded/http
 engine through its exported `bounded_http` module. Keep engine parser, transport and scheduler changes in that dependency
 and submit an upstream PR. This repository owns App, routing, request/form views,
-responses, examples and their tests. The sibling `../zigllmwiki` provides pinned
-source guidance. Preserve its source/evidence hierarchy.
+responses, examples and their tests. The [Zig wiki](https://github.com/technologylab-ai/zigllmwiki)
+provides pinned source guidance; a sibling checkout is optional. Preserve its
+source/evidence hierarchy. Baz is an independent repository; never push Baz
+branches to the bounded/http engine repository.
 
 Preallocate framework threads, buffers, queues and operation state at startup.
 Never allocate, spawn threads or perform blocking work on the request I/O loop.
@@ -29,7 +31,7 @@ Before benchmarks, heavy builds or runtime suites on maxross or omarx1, acquire
 exists, hold off; owner.json records who and why. Also inspect pre-existing
 measurement processes that may not honor the new protocol. Retain your lock
 through child cleanup and remove only your own metadata/directory. Never steal
-an old lock by age alone. The full cooperative protocol is in the sibling wiki's
-`docs/platform-testing.md`. Mac measurements by another agent take precedence
-while that agent holds its reservation. Windows performance/publication gates
-are deferred during the current Linux/macOS HTTP tuning loop by user decision.
+an old lock by age alone. Read the wiki's [full cooperative protocol](https://github.com/technologylab-ai/zigllmwiki/blob/main/docs/platform-testing.md). Mac measurements by another agent take precedence
+while that agent holds its reservation. Windows performance remains deferred. The current Windows dependency update
+is paused while another session prepares the engine sharding PR. Read HANDOFF.md
+for the completed baseline and draft branch before resuming it.
