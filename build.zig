@@ -66,6 +66,21 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
         .imports = &.{.{ .name = "baz", .module = module }},
     });
+    const borrow_fixture = b.addExecutable(.{
+        .name = "baz-borrow",
+        .use_llvm = if (target.result.os.tag == .linux and optimize == .Debug) true else null,
+        .use_lld = if (target.result.os.tag == .linux and optimize == .Debug) true else null,
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("src/borrow_demo.zig"),
+            .target = target,
+            .optimize = optimize,
+            .link_libc = true,
+            .imports = &.{ .{ .name = "baz", .module = module }, .{ .name = "example_support", .module = example_support } },
+        }),
+    });
+    b.installArtifact(borrow_fixture);
+    check.dependOn(&borrow_fixture.step);
+    verify.dependOn(&borrow_fixture.step);
     const examples = b.step("examples", "Build and install all supported Zap example ports");
     for ([_][]const u8{ "hello", "hello2", "hello_json", "simple_router", "routes", "serve", "sendfile", "senderror", "accept", "app_basic", "app_auth", "app_errors", "endpoint", "endpoint_auth", "middleware", "middleware_with_endpoint", "userpass_session", "cookies", "http_params", "bindataformpost", "streaming" }) |name| {
         const example = b.addExecutable(.{

@@ -313,26 +313,20 @@ without measurements or use old engine receipts as new App evidence.
 
 ## Response copy follow-up
 
-The [copy review](OWNERSHIP.md#response-copies-and-borrowing) identified a concrete
-next improvement: `borrowBody` currently shares the copied-body staging limit.
-An immutable 5 MB asset should be bounded by total response policy without
-requiring a 5 MB per-connection arena. The engine already accepts such spans.
+The large-borrow fix separates `borrowBody` length from copied-body staging.
+`server.max_response_bytes` bounds the borrowed span while pre-dispatch head/error
+reservation stays small. `Response.finish` forms a staging slice only for
+copied/generated bodies. Direct response users have an explicit
+`Response.initWithLimit` constructor; App supplies the server limit.
+Native ownership evidence for this change is being recorded in its PR.
 
-This work is queued, not implemented:
+Further copy reduction remains separate work:
 
-1. Separate borrowed-body length validation from `response.body_bytes`, retaining
-   `server.max_response_bytes` as the total bound. Keep status/header checks and
-   pre-dispatch head/error reservation. In `Response.finish`, form a staging
-   slice only in the copied/generated branch; merely relaxing the length check
-   would otherwise create an out-of-bounds slice.
-2. Verify a startup-owned immutable 5 MB asset with a small output arena, exact
-   content, HEAD, partial sends, cancellation, and zero remaining borrows. Keep
-   copied-body limits, fallback behavior, and existing small-borrow tests intact.
-3. Consider direct generation into final output and synchronous borrowed stream
-   writes separately. Any new lifetime/release API needs explicit cancellation
-   and kernel-completion gates. Dynamic heap/pool leases are not implied by
-   the immutable-asset path.
-4. Make copy accounting comprehensive before publishing a total-copy claim or
+1. Consider direct generation into final output and synchronous borrowed stream
+   writes. Any new lifetime/release API needs explicit cancellation and
+   kernel-completion gates. Dynamic heap/pool leases are not implied by the
+   immutable-asset path.
+2. Make copy accounting comprehensive before publishing a total-copy claim or
    assessing an optimization. Preserve the original prototype performance data.
 
 ## Verification and shared-host protocol

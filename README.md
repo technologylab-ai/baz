@@ -69,7 +69,8 @@ The HTTP I/O loop continues while the worker waits. Response size and request
 deadlines still apply; [the guide](docs/STREAMING.md) explains cancellation and framing.
 Response helpers have explicit copying and borrowing paths; the
 [copy contract](docs/OWNERSHIP.md#response-copies-and-borrowing) describes their
-costs, lifetimes, and the current borrowed-body size limit.
+costs and lifetimes. `borrowBody` can serve a large immutable asset directly from
+retained memory, bounded by the total response limit rather than staging capacity.
 
 Use exact Zig 0.16.0 from [.zig-version](.zig-version), with Python 3 installed:
 

@@ -95,19 +95,29 @@ location is not the deciding factor: the bytes must remain alive and unchanged
 through all application and kernel borrows. Heap memory freed when the handler
 returns is not eligible. See the maintained [asset example](../examples/serve.zig).
 
-**Current limitation:** Baz applies `response.body_bytes` to borrowed bodies as
-well as copied bodies. It defaults to 8,192 bytes, and the entire draft reservation
-(including headers) must fit within 1 MiB. A 5 MB image therefore cannot currently
-use Baz's `borrowBody`, even though the engine supports a borrowed span larger
-than its output arena. Streaming can send it incrementally within
-`server.max_response_bytes` (16 MiB by default), but uses the two copying steps
-above. These limits are checked; there is no automatic allocation fallback.
+`borrowBody` is bounded by `server.max_response_bytes` (16 MiB by default),
+independently of `response.body_bytes` and the size of the output arena. A 5 MB
+asset can therefore be borrowed with a small per-connection arena. The engine
+sends bounded portions from the retained span; Baz does not stage the entire
+asset or make a payload-sized framework allocation.
 
-Separating the borrowed-body size bound from staging capacity is recorded in the
-[roadmap](APP-API-ROADMAP.md#response-copy-follow-up). That is an API improvement
-still to implement. A separate completion/cancellation release contract would
-be needed for per-request heap buffers or recyclable pools. `stream.finish()`
-alone is not permission to release externally borrowed memory.
+For example, an endpoint can use an immutable asset stored in Shared:
+
+```zig
+return ctx.response.borrowBody(200, "image/png", ctx.shared.image);
+```
+
+Here `image` must remain valid and unchanged until terminal App shutdown. The
+normal App constructor supplies the total bound automatically. Direct users of
+`Response` can call `Response.initWithLimit(writer, limits, max_response_bytes)`;
+`Response.init(writer, limits)` retains its conservative `limits.body_bytes`
+total bound. The total bound must cover staging capacity, so ordinary error
+fallbacks remain available. Copied/generated bodies still obey `body_bytes`.
+
+There is no dynamic release callback for a per-request heap buffer or recyclable
+pool. Those would need a separate completion/cancellation release contract.
+`stream.finish()` alone is not permission to release externally borrowed memory.
+Ordinary stream writes continue to use bounded copying as listed above.
 
 ### Copy statistics
 

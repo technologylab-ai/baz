@@ -295,9 +295,8 @@ pub fn App(comptime Shared: type) type {
             // Worker streams retain this same callback stack across flushes.
             // The engine's separate continuation API is not used by App.
             std.debug.assert(raw.event == .request);
-            var response = responses.Response.init(raw.writer, self.response_limits) catch return .close;
+            var response = responses.Response.initWithLimit(raw.writer, self.response_limits, self.config.max_response_bytes) catch return .close;
             response.context = raw;
-            response.stream_limit = self.config.max_response_bytes;
             var context: Context = .{ .shared = self.shared, .request = .init(raw.request), .response = &response, .captures = .{}, .app = self, .cancelled = raw.cancelled };
             self.handle(&context) catch |err| return self.handleError(&context, err);
             return response.finish() catch |err| self.handleError(&context, err);

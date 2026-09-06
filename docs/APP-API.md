@@ -173,7 +173,7 @@ first, preserving the request and running application side effects once.
 | `jsonBytes(status, encoded)` | Copies pre-encoded JSON. |
 | `jsonValue(status, value)` | Serializes once into a bounded fixed standard writer. |
 | `print(status, content_type, format, args)` | Standard formatting into the reserved body. |
-| `borrowBody(status, content_type, bytes)` | Explicit body borrow from retained request input or immutable server-lifetime assets only. |
+| `borrowBody(status, content_type, bytes)` | Explicit body borrow from retained request input or immutable server-lifetime assets, bounded by server.max_response_bytes rather than staging. |
 | `stream(status, content_type, options)` | Worker response with a standard writer, incremental flushes, and bounded staging. |
 
 For a one-shot response, return after preparing a body. App finalizes it on successful handler return.
@@ -186,13 +186,15 @@ application/draft failures. Caller scratch exhaustion remains a 500; choose
 scratch limits consistent with accepted input or handle that error explicitly.
 
 Defaults are 2,048 serialized extra-header bytes, 32 extra headers and 8,192
-logical body bytes. Reservation is `384 + 128 + header_bytes + body_bytes` and
+copied/generated body bytes (also streaming staging capacity). Borrowed bodies
+use `server.max_response_bytes` independently. Reservation is `384 + 128 + header_bytes + body_bytes` and
 must fit `server.output_bytes`. `server.max_response_bytes` must cover the body
 limit. Header names/values/Content-Type are copied. Generated/copied bodies
 move once within the arena at finalization, counted by
 `Stats.response_draft_copy_bytes`; that counter is not total copy volume.
 See [response copies and borrowing](OWNERSHIP.md#response-copies-and-borrowing)
-for each path, asset lifetimes, and the current borrowed-body size limitation.
+for each path, asset lifetimes, and how to serve a large retained asset with a
+small output arena.
 
 Content-Length, Transfer-Encoding and other canonical framing fields belong to
 the engine. Use repeated `header("Set-Cookie", ...)` or a validated Location
