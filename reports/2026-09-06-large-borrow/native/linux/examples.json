@@ -1,0 +1,25 @@
+{
+  "passed": 20,
+  "cases": [
+    "hello",
+    "hello2",
+    "hello_json",
+    "simple_router",
+    "routes",
+    "serve",
+    "sendfile",
+    "senderror",
+    "accept",
+    "app_basic",
+    "app_auth",
+    "endpoint_auth",
+    "app_errors",
+    "cookies",
+    "middleware",
+    "middleware_with_endpoint",
+    "http_params",
+    "bindataformpost",
+    "endpoint",
+    "userpass_session"
+  ]
+}

@@ -47,9 +47,10 @@ Both the framework and its [bounded/http](https://technologylab-ai.github.io/bou
 
 All three platforms passed Debug and ReleaseSafe verification, the independent
 package consumer, all 14 App groups, all 20 ported-example groups, and all 14
-streaming groups—including the new runnable example. Windows also passed three
+streaming groups—including the runnable example—plus nine large-borrow groups.
+Windows also passed three
 native shard-handoff and console-shutdown cases. See the
-[streaming and three-platform receipt](reports/2026-09-06-streaming.md)
+[large-borrow and three-platform receipt](reports/2026-09-06-large-borrow.md)
 for exact environments and evidence. Windows is supported within Baz’s overall
 experimental status; this is correctness coverage, not production qualification.
 
@@ -69,7 +70,8 @@ The HTTP I/O loop continues while the worker waits. Response size and request
 deadlines still apply; [the guide](docs/STREAMING.md) explains cancellation and framing.
 Response helpers have explicit copying and borrowing paths; the
 [copy contract](docs/OWNERSHIP.md#response-copies-and-borrowing) describes their
-costs, lifetimes, and the current borrowed-body size limit.
+costs and lifetimes. `borrowBody` can serve a large immutable asset directly from
+retained memory, bounded by the total response limit rather than staging capacity.
 
 Use exact Zig 0.16.0 from [.zig-version](.zig-version), with Python 3 installed:
 
@@ -130,9 +132,9 @@ not individually for every timed response. See the
 
 ## Status and documentation
 
-This is an experimental first implementation. Runtime source at `79021c5` passed
-native Linux, macOS, and Windows streaming and regression gates. The
-[streaming receipt](reports/2026-09-06-streaming.md) identifies the exact sources
+This is an experimental first implementation. Runtime source at `86249ad` passed
+native Linux, macOS, and Windows large-borrow, streaming, and regression gates. The
+[large-borrow receipt](reports/2026-09-06-large-borrow.md) identifies the exact sources
 and retains the raw results. The engine passed its own native gates separately.
 The [package receipt](reports/2026-09-06-baz-extraction.md) records external-dependency
 verification and source identity. The [prototype receipt](reports/2026-09-06-app-api.md)

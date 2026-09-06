@@ -21,8 +21,8 @@ work; `Stream` also provides convenience `writeAll`, `print`, and `flush` method
 Every write copies input bytes before returning. Stack buffers are valid sources.
 Writes use the connection's startup-reserved staging buffer. Payload bytes then
 move once more into the final snapshot layout. See [the copy and borrowing
-contract](OWNERSHIP.md#response-copies-and-borrowing), including the current
-limitation for large preexisting assets. Filling that buffer
+contract](OWNERSHIP.md#response-copies-and-borrowing), including `borrowBody`
+for large preexisting assets with a suitable lifetime. Filling that buffer
 automatically flushes it before accepting more data. Explicit `flush()` sends a
 partial buffer and waits for local transmission completion. An empty flush sends
 pending headers but does not terminate a chunked response.
@@ -50,8 +50,8 @@ known length when appropriate. Baz checks cumulative writes against that length
 and requires an exact match at finish. HEAD follows the handler but suppresses
 payload transmission. Statuses 204, 205, and 304 reject nonempty output.
 
-`response.body_bytes` controls per-stream staging capacity and the one-shot body
-limit. `server.max_response_bytes` controls the entire streaming response. A zero
+`response.body_bytes` controls per-stream staging capacity and the copied/generated
+one-shot body limit. Borrowed one-shot bodies use `server.max_response_bytes`. `server.max_response_bytes` controls the entire streaming response. A zero
 staging allowance permits only empty output. Large writes may publish accepted
 prefixes before encountering an error; they are not transactional.
 

@@ -64,6 +64,7 @@ jobs:
           python3 tests/app_integration.py 2>&1 | tee "$packet/app.log"
           python3 tests/examples_integration.py 2>&1 | tee "$packet/examples.log"
           python3 tests/streaming_integration.py 2>&1 | tee "$packet/streaming.log"
+          python3 tests/borrow_integration.py 2>&1 | tee "$packet/borrow.log"
 
       - name: Upload verification logs
         if: always()

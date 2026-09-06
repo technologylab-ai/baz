@@ -45,7 +45,7 @@ def documents():
              'examples/embedding/build.zig.zon', 'examples/embedding/src/main.zig',
              'reports/2026-09-06-basic-zap.md', 'reports/2026-09-06-app-api.md',
              'reports/2026-09-06-baz-extraction.md', 'reports/2026-09-06-windows-baz.md',
-             'reports/2026-09-06-streaming.md',
+             'reports/2026-09-06-streaming.md', 'reports/2026-09-06-large-borrow.md',
              'reports/2026-09-06-basic-zap/PROTOCOL.md',
              'reports/2026-09-06-basic-zap/reproducer/README.md'}
     for pattern in ('docs/*.md', 'src/*.zig', 'examples/*.zig'):
@@ -119,13 +119,16 @@ def build():
     streaming = re.search(r'^fn progress\(.*?^}', (ROOT / 'examples/streaming.zig').read_text(), re.M | re.S)
     if not streaming:
         raise ValueError('Maintained streaming endpoint not found.')
+    borrowed = re.search(r'^    try ctx\.response\.borrowBody\(.*?\);$', (ROOT / 'src/borrow_demo.zig').read_text(), re.M)
+    if not borrowed:
+        raise ValueError('Maintained borrowed-asset response not found.')
     cards = []
     for name, group, description in EXAMPLES:
         if 'examples/' + name + '.zig' not in docs:
             raise ValueError('Missing example: ' + name)
         cards.append('<a class="example-card" data-group="{}" href="docs/read.html?file=examples/{}.zig"><strong>{}<span aria-hidden="true">↗</span></strong><p>{}</p></a>'.format(group, name, name, html.escape(description)))
     results, chart = benchmark()
-    replacements = {'HELLO': html.escape(snippet.group(0)), 'STREAMING': html.escape(streaming.group(0)), 'EXAMPLES': '\n'.join(cards),
+    replacements = {'HELLO': html.escape(snippet.group(0)), 'STREAMING': html.escape(streaming.group(0)), 'BORROWED': html.escape(borrowed.group(0).strip()), 'EXAMPLES': '\n'.join(cards),
                     'RESULTS': results, 'PERFORMANCE': scroll_diagram(chart)}
     for token, name in [('PARAMETERS', 'parameters'), ('LAYERS', 'layers'), ('LIFETIME', 'lifetime')]:
         replacements[token] = scroll_diagram((ROOT / ('docs/diagrams/' + name + '.svg')).read_text())

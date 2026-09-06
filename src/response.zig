@@ -1,15 +1,15 @@
-//! Bounded response drafts and worker streams. All byte storage belongs to the current
-//! connection's startup output arena; no allocator or request-local arena is
-//! needed. The scheduler reserves Limits.reservationBytes before application
-//! execution. Earlier frozen responses are never part of this draft.
+//! Bounded response drafts and worker streams use startup-reserved output storage.
+//! Borrowed bodies retain eligible external storage without reserving its size.
+//! The scheduler reserves Limits.reservationBytes before application execution.
+//! Earlier frozen responses are never part of this draft.
 const std = @import("std");
 const api = @import("bounded_http").api;
 
 pub const Limits = struct {
     /// Serialized extra fields, including names, separators and CRLFs.
     header_bytes: u32 = 2048,
-    /// Maximum one-shot body and streaming staging capacity. Streaming totals
-    /// use the server's separate max_response_bytes bound.
+    /// Maximum copied/generated body and streaming staging capacity.
+    /// Borrowed bodies and streaming totals use the server's max_response_bytes.
     body_bytes: u32 = 8192,
     max_headers: u16 = 32,
 
@@ -44,7 +44,7 @@ pub const Response = struct {
     published: bool = false,
     /// Installed by App for the duration of one callback. Never escapes it.
     context: ?*api.Context = null,
-    stream_limit: usize = 0,
+    response_limit: usize,
     streaming: bool = false,
     stream_finished: bool = false,
     stream_error: ?anyerror = null,
@@ -52,10 +52,18 @@ pub const Response = struct {
     stream_length: ?usize = null,
 
     pub fn init(writer: *api.Writer, limits: Limits) !Response {
+        return initWithLimit(writer, limits, limits.body_bytes);
+    }
+
+    /// Set the total body limit independently of copied/generated staging.
+    /// App supplies server.max_response_bytes. init uses limits.body_bytes.
+    /// The total must cover staging so every valid draft can still be published.
+    pub fn initWithLimit(writer: *api.Writer, limits: Limits, max_response_bytes: usize) !Response {
+        if (max_response_bytes < limits.body_bytes) return error.InvalidResponseLimits;
         const storage = writer.draftStorage(try limits.reservationBytes()) catch |err| {
             return if (err == error.WouldBlock) error.OutputReservationUnavailable else err;
         };
-        return .{ .writer = writer, .storage = storage, .limits = limits };
+        return .{ .writer = writer, .storage = storage, .limits = limits, .response_limit = max_response_bytes };
     }
 
     fn typeStorage(self: *Response) []u8 {
@@ -82,7 +90,7 @@ pub const Response = struct {
             return error.InvalidResponse;
         for (content_type) |byte| if (byte < 32 or byte > 126) return error.InvalidResponse;
         if ((status == 204 or status == 205 or status == 304) and length != 0) return error.InvalidResponse;
-        if (length > self.limits.body_bytes) return error.ResponseLimit;
+        if (length > self.response_limit) return error.ResponseLimit;
     }
 
     fn setBody(self: *Response, status: u16, content_type: []const u8, length: usize) void {
@@ -115,6 +123,7 @@ pub const Response = struct {
     /// publishes nothing; middleware may still append headers before finish.
     pub fn bytes(self: *Response, status: u16, content_type: []const u8, body: []const u8) !void {
         try self.checkBody(status, content_type, body.len);
+        if (body.len > self.limits.body_bytes) return error.ResponseLimit;
         @memcpy(self.bodyStorage()[0..body.len], body);
         self.setBody(status, content_type, body.len);
     }
@@ -155,6 +164,7 @@ pub const Response = struct {
     /// eligible. Caller scratch, callback stack locals, mutable Shared storage,
     /// and external pools are not. No release callback exists after finish or
     /// cancellation. The core may copy small borrows as its counted exception.
+    /// The total response limit applies; copied/generated staging does not.
     pub fn borrowBody(self: *Response, status: u16, content_type: []const u8, body: []const u8) !void {
         try self.checkBody(status, content_type, body.len);
         self.setBody(status, content_type, body.len);
@@ -178,7 +188,7 @@ pub const Response = struct {
         if (context.cancelled.load(.acquire)) return error.Cancelled;
         try self.checkBody(status, content_type, 0);
         if (options.content_length) |length| {
-            if (length > self.stream_limit) return error.ResponseLimit;
+            if (length > self.response_limit) return error.ResponseLimit;
             if ((status == 204 or status == 205 or status == 304) and length != 0) return error.InvalidResponse;
         }
         self.setBody(status, content_type, 0);
@@ -200,7 +210,7 @@ pub const Response = struct {
         if (self.body_len == self.limits.body_bytes) try self.flushStream();
         const count = @min(data.len, self.limits.body_bytes - self.body_len);
         const total = std.math.add(usize, self.stream_written, count) catch return error.ResponseLimit;
-        if (total > self.stream_limit) return error.ResponseLimit;
+        if (total > self.response_limit) return error.ResponseLimit;
         if (self.stream_length) |length| if (total > length) return error.ResponseLengthMismatch;
         @memcpy(self.bodyStorage()[self.body_len..][0..count], data[0..count]);
         self.body_len += count;
@@ -256,7 +266,6 @@ pub const Response = struct {
         }
         try self.checkDraft();
         if (!self.prepared) return error.ResponseNotPrepared;
-        const body = self.bodyStorage()[0..self.body_len];
         try self.writer.beginWithHeaders(
             self.status,
             self.typeStorage()[0..self.content_type_len],
@@ -266,7 +275,7 @@ pub const Response = struct {
         if (self.borrowed) |span| {
             try self.writer.borrow(span);
         } else {
-            try self.writer.writeDraftBody(body);
+            try self.writer.writeDraftBody(self.bodyStorage()[0..self.body_len]);
         }
         self.published = true;
         return self.writer.finish();
@@ -408,9 +417,8 @@ test "stream writer preserves vector order and makes a length error sticky" {
             }.flush,
         },
     };
-    var response = try Response.init(&writer, .{ .header_bytes = 64, .body_bytes = 32 });
+    var response = try Response.initWithLimit(&writer, .{ .header_bytes = 64, .body_bytes = 32 }, 64);
     response.context = &context;
-    response.stream_limit = 64;
     var stream = try response.stream(200, "text/plain", .{ .content_length = 5 });
     var pieces = [_][]const u8{ "a", "bc" };
     try stream.writer().writeSplatAll(&pieces, 2);
@@ -549,6 +557,85 @@ test "response states bodyless statuses HEAD and explicit borrowing retain contr
     _ = try response.finish();
     try testing.expectEqual(@as(usize, 0), writer.bodyBytes());
     try testing.expect(std.mem.indexOf(u8, arena[0..writer.buffered], "Content-Length") == null);
+}
+
+test "large immutable borrows retain their pointer without body staging or arena copies" {
+    const asset = "0123456789abcdef" ** (5 * 1024 * 1024 / 16);
+    const prefix = "older frozen response";
+    const cache = testCache();
+    for ([_]bool{ false, true }) |head_only| {
+        var arena: [1024]u8 = @splat(0xa5);
+        @memcpy(arena[0..prefix.len], prefix);
+        var writer = api.Writer.init(&arena, &cache, 256);
+        writer.open(prefix.len, true, head_only);
+        var response = try Response.initWithLimit(&writer, .{ .header_bytes = 128, .body_bytes = 0 }, asset.len);
+        try response.header("X-Asset", "retained");
+        try response.borrowBody(200, "application/octet-stream", asset);
+        try response.header("X-After", "prepared");
+        try testing.expectEqual(@as(usize, 0), response.bodyStorage().len);
+        try testing.expect(!writer.began and !writer.frozen);
+        try testing.expectEqual(api.Action.finish, try response.finish());
+        try testing.expectEqual(@as(?usize, asset.len), writer.content_length);
+        try testing.expect(writer.head_only == head_only);
+        try testing.expectEqual(asset.ptr, writer.borrowed.?.ptr);
+        try testing.expectEqual(asset.len, writer.borrowed.?.len);
+        try testing.expectEqual(@as(usize, 0), writer.generatedBytes());
+        try testing.expectEqual(@as(usize, 0), writer.draft_copy_bytes);
+        try testing.expect(!writer.copied_borrow);
+        try testing.expectEqualStrings(prefix, arena[0..prefix.len]);
+        const head = arena[writer.base..writer.body_start];
+        try testing.expect(std.mem.indexOf(u8, head, "Content-Length: 5242880\r\n") != null);
+        try testing.expect(std.mem.indexOf(u8, head, "X-Asset: retained\r\nX-After: prepared\r\n") != null);
+        try testing.expectError(error.InvalidState, response.errorResponse(500));
+    }
+}
+
+test "borrow totals reject one excess byte before publication and preserve fallback" {
+    const asset = "retained" ** 1024;
+    var arena: [1024]u8 = undefined;
+    const cache = testCache();
+    var writer = api.Writer.init(&arena, &cache, 0);
+    writer.open(0, true, false);
+    var response = try Response.initWithLimit(&writer, .{ .header_bytes = 64, .body_bytes = 32 }, asset.len - 1);
+    for ([_]u16{ 204, 205, 304 }) |status| {
+        try testing.expectError(error.InvalidResponse, response.borrowBody(status, "text/plain", asset));
+    }
+    try response.header("X-Private", "discard-me");
+    try testing.expectError(error.ResponseLimit, response.borrowBody(200, "text/plain", asset));
+    try testing.expect(!response.prepared and response.borrowed == null and !writer.began and !writer.frozen);
+    try testing.expectEqual(api.Action.finish, try response.errorResponse(500));
+    try testing.expectEqualStrings("Internal Server Error", writer.committed());
+    try testing.expect(std.mem.indexOf(u8, arena[0..writer.buffered], "X-Private") == null);
+    writer.release();
+    writer.open(0, true, false);
+    response = try Response.initWithLimit(&writer, .{ .header_bytes = 0, .body_bytes = 0 }, asset.len);
+    try response.borrowBody(200, "text/plain", asset);
+    try response.discard();
+    try testing.expect(response.borrowed == null and !response.prepared);
+    try testing.expectEqual(api.Action.finish, try response.errorResponse(500));
+    try testing.expectEqual(@as(usize, 0), writer.bodyBytes());
+}
+
+test "a larger total allowance does not enlarge copied or generated body storage" {
+    var arena: [1024]u8 = undefined;
+    const cache = testCache();
+    var writer = api.Writer.init(&arena, &cache, 0);
+    writer.open(0, true, false);
+    const limits: Limits = .{ .header_bytes = 0, .body_bytes = 4 };
+    try testing.expectError(error.InvalidResponseLimits, Response.initWithLimit(&writer, limits, 3));
+    var response = try Response.initWithLimit(&writer, limits, 1024);
+    try testing.expectError(error.ResponseLimit, response.bytes(200, "text/plain", "12345"));
+    try testing.expectError(error.WriteFailed, response.print(200, "text/plain", "{s}", .{"12345"}));
+    try testing.expectError(error.WriteFailed, response.jsonValue(200, "abc"));
+    try testing.expect(!response.prepared and !writer.began);
+    try response.bytes(200, "text/plain", "1234");
+    _ = try response.finish();
+    try testing.expectEqualStrings("1234", writer.committed());
+    writer.release();
+    writer.open(0, true, false);
+    response = try Response.init(&writer, limits);
+    try testing.expectEqual(@as(usize, 4), response.response_limit);
+    try testing.expectError(error.ResponseLimit, response.borrowBody(200, "text/plain", "12345"));
 }
 
 test "configured reservation includes all draft storage and exact output fit" {

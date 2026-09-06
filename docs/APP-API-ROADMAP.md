@@ -313,26 +313,21 @@ without measurements or use old engine receipts as new App evidence.
 
 ## Response copy follow-up
 
-The [copy review](OWNERSHIP.md#response-copies-and-borrowing) identified a concrete
-next improvement: `borrowBody` currently shares the copied-body staging limit.
-An immutable 5 MB asset should be bounded by total response policy without
-requiring a 5 MB per-connection arena. The engine already accepts such spans.
+The large-borrow fix separates `borrowBody` length from copied-body staging.
+`server.max_response_bytes` bounds the borrowed span while pre-dispatch head/error
+reservation stays small. `Response.finish` forms a staging slice only for
+copied/generated bodies. Direct response users have an explicit
+`Response.initWithLimit` constructor; App supplies the server limit.
+The [large-borrow receipt](../reports/2026-09-06-large-borrow.md) records passing
+native Linux, macOS, and Windows ownership gates for the PR.
 
-This work is queued, not implemented:
+Further copy reduction remains separate work:
 
-1. Separate borrowed-body length validation from `response.body_bytes`, retaining
-   `server.max_response_bytes` as the total bound. Keep status/header checks and
-   pre-dispatch head/error reservation. In `Response.finish`, form a staging
-   slice only in the copied/generated branch; merely relaxing the length check
-   would otherwise create an out-of-bounds slice.
-2. Verify a startup-owned immutable 5 MB asset with a small output arena, exact
-   content, HEAD, partial sends, cancellation, and zero remaining borrows. Keep
-   copied-body limits, fallback behavior, and existing small-borrow tests intact.
-3. Consider direct generation into final output and synchronous borrowed stream
-   writes separately. Any new lifetime/release API needs explicit cancellation
-   and kernel-completion gates. Dynamic heap/pool leases are not implied by
-   the immutable-asset path.
-4. Make copy accounting comprehensive before publishing a total-copy claim or
+1. Consider direct generation into final output and synchronous borrowed stream
+   writes. Any new lifetime/release API needs explicit cancellation and
+   kernel-completion gates. Dynamic heap/pool leases are not implied by the
+   immutable-asset path.
+2. Make copy accounting comprehensive before publishing a total-copy claim or
    assessing an optimization. Preserve the original prototype performance data.
 
 ## Verification and shared-host protocol
@@ -392,18 +387,14 @@ the conversation.
 | 2026-09-06: API planning | New `roadmap/app-api` worktree; inspected current engine and local Zap public API; used zig-wiki; specified modern framework, raw forms/uploads, response reservation and std.Io provider research. | Source review and document checks only; no Zig code added, builds/runtime suites/benchmarks not run. | API-01; independently design API-02 reservation and IO-01 compatibility matrix. |
 | 2026-09-06: first implementation | API-01–05: typed App/router, raw request/form/multipart views, explicit codecs, reserved one-shot Response and standard memory I/O adapters. Core changes confined to response headers/reservation/copy accounting. Added 20 supported example ports and maintained wire harnesses. Parent owned integration/build/docs; parser, lifecycle and composition work had explicit agent file ownership. | [Native receipt](../reports/2026-09-06-app-api.md): Debug and ReleaseSafe, 51/51 steps on each host; Linux 194/194 test executions, Mac 190/194 with four Linux-only skips. Each host passed 14 App, 20 example, 84 core, 8 comparator checks and 30,000 exact smoke bodies. [63-file source identity](../reports/2026-09-06-app-api-source.sha256). | API-06 public middleware/locals/cookies; then API-07 resumable endpoints and API-08 extraction/remaining qualification. Caller std.Io remains; own provider deferred. |
 | 2026-09-06: basic comparison | Isolated fixture using the public App API versus pinned Zig 0.16 Zap; ReleaseSafe only, c1/t1 and c32/t2, three alternating pairs per profile on each host. TLS excluded; Mustache postponed with a pure Zig shortlist; Windows waits for the engine session. | [Raw trials, results and cleanup](../reports/2026-09-06-basic-zap.md). All 24 measured trials completed with zero wrk socket/non-2xx-or-3xx errors. Owned server groups are gone and both host reservations released. Benchmark fixture remains separate from framework dependencies. | No benchmark is left running. Continue the API roadmap; reconcile incoming engine/docs changes before extraction. |
-
 | 2026-09-06: Baz package extraction | Selected Baz (Bounded Async Zap), package/import `baz`. Removed copied engine sources and switched to URL/hash-pinned `bounded_http`. Added a separate consumer fixture and public draft/signal methods through [engine PR #1](https://github.com/technologylab-ai/bounded-http/pull/1). Reconciled current engine contracts and linked its repository/Pages site. | [Package receipt](../reports/2026-09-06-baz-extraction.md): native macOS/Linux, Debug and ReleaseSafe, 41/41 steps and 60/60 root tests per mode, independent consumers, 14 App and 20 example groups. [50-file source manifest](../reports/2026-09-06-baz-extraction-source.sha256.json). Engine gates passed separately. Prototype performance evidence remains unchanged and explicitly predates extraction. | API-06 public composition, then API-07 resumable endpoints. Merge/update the engine pin through the normal upstream process. Publish Baz's repository separately when requested. |
-
 | 2026-09-06: standalone repository preparation | Created an independent local Baz repository with full reachable history, MIT license, public source links, and Linux/macOS CI. Moved engine-only working-tree material back to upstream references. Preserved the paused Windows changes on `work/windows-update`. | Git integrity and object independence, unchanged runtime/evidence bytes on `main`, local Markdown links, manifest formatting, actionlint, and CI installer syntax. No runtime gates restarted while the Windows update is paused. | Await the engine sharding PR for the draft branch. Publish Baz's GitHub repository when requested; continue API-06 independently. |
 | 2026-09-06: Baz website and publication | Integrated the website worktree into Baz: landing page, ownership diagrams, source-backed App excerpt, 20 example links, prototype performance comparison, Markdown/source reader, and GitHub Pages workflow. User authorized publication in `technologylab-ai/baz`. | [Website receipt](../reports/2026-09-06-website.md): static checks, 14 browser groups, 58 documents, desktop/mobile/keyboard/print, and malicious-input checks. Runtime source, engine pin, and benchmark receipts unchanged. | Continue API-06. Windows dependency work still awaits the engine sharding PR and resumed Baz gates. |
 | 2026-09-06: native Windows support | Integrated [bounded/http](https://technologylab-ai.github.io/bounded-http/) PR #2 through pin `7c240039`, portable exits and counted console borrows, native Windows harness control, and three finite App shard cases. Promoted pure Zig implementation and native Windows support in README/site alongside a prominent engine-site link. | [Native receipt](../reports/2026-09-06-windows-baz.md): candidate `6dcbf2d`, all three native hosts passed Debug/ReleaseSafe 41/41 root steps, 60/60 tests plus the consumer; 14 App and 20 example groups each, plus three Windows shard/shutdown cases. Original benchmark evidence unchanged. | API-06 public composition, then API-07. Windows x64 is supported; production/performance claims remain outside these correctness gates. |
-
-| 2026-09-06: worker streaming | Prioritized the requested same-handler write/flush/sleep API. Added a standard response writer, bounded staging, worker flush/cancellation bridge via [engine PR #3](https://github.com/technologylab-ai/bounded-http/pull/3), and a runnable example beside App basics on the website. | Native streaming and regression gates are in progress; the first macOS streaming gate passed. Original performance data is unchanged. | Finish cross-platform evidence and publication. Typed inline continuations and public composition remain separate follow-up work. |
+| 2026-09-06: worker streaming | Added std.Io.Writer response streams, same-handler flushes, cancellation-aware sleep, and a runnable example beside App basics on the website. Engine seam submitted as PR #3 and pinned by immutable URL/hash. | [Streaming receipt](../reports/2026-09-06-streaming.md): native Linux/macOS/Windows, Debug and ReleaseSafe, 62 root tests and one consumer test per mode, 14 App, 20 ported-example, and 14 streaming groups per platform; Windows also passes three shard cases. Engine gates passed separately. | API-06 composition; typed inline continuations remain API-07. PR #3 is merged; future dependency updates retain the normal native gates. |
+| 2026-09-06: large borrowed bodies | Decoupled borrowed size from staging capacity, retained explicit lifetime rules, and added a third website example using the compiled 5 MiB fixture. | [Native receipt](../reports/2026-09-06-large-borrow.md): all three platforms passed 68 root tests plus one consumer per mode, nine borrowed-body groups and existing App/example/streaming gates; Windows adds three shard cases. Website: 16 groups, 65 documents. | Review/merge Baz PR #1. Direct generation and dynamic leases remain separate copy-reduction work. |
 
 For each implementation session add: commit(s), owned/changed files, decisions,
 named gates passed/pending and exact receipts, remaining blocker (if any), and
 the next bounded task. Refresh [HANDOFF.md](../HANDOFF.md) briefly when this track
 becomes the active implementation. Keep historical engine evidence intact.
-
-| 2026-09-06: worker streaming | Added std.Io.Writer response streams, same-handler flushes, cancellation-aware sleep, and a runnable example beside App basics on the website. Engine seam submitted as PR #3 and pinned by immutable URL/hash. | [Streaming receipt](../reports/2026-09-06-streaming.md): native Linux/macOS/Windows, Debug and ReleaseSafe, 62 root tests and one consumer test per mode, 14 App, 20 ported-example, and 14 streaming groups per platform; Windows also passes three shard cases. Engine gates passed separately. | API-06 composition; typed inline continuations remain API-07. PR #3 is merged; future dependency updates retain the normal native gates. |

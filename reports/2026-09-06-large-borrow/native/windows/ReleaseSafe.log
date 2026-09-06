@@ -1,0 +1,51 @@
+Build Summary: 3/3 steps succeeded; 1/1 tests passed
+test success
++- run test 1 pass (1 total) 18ms MaxRSS:4M
+   +- compile test ReleaseSafe native success 23s MaxRSS:287M
+
+Build Summary: 44/44 steps succeeded; 68/68 tests passed
+verify success
++- compile exe baz-streaming ReleaseSafe native success 17s MaxRSS:294M
++- compile exe baz ReleaseSafe native success 25s MaxRSS:298M
++- compile exe baz-borrow ReleaseSafe native success 25s MaxRSS:320M
++- compile exe hello ReleaseSafe native success 15s MaxRSS:290M
++- compile exe hello2 ReleaseSafe native success 21s MaxRSS:293M
++- compile exe hello_json ReleaseSafe native success 21s MaxRSS:291M
++- compile exe simple_router ReleaseSafe native success 24s MaxRSS:291M
++- compile exe routes ReleaseSafe native success 24s MaxRSS:290M
++- compile exe serve ReleaseSafe native success 21s MaxRSS:290M
++- compile exe sendfile ReleaseSafe native success 24s MaxRSS:290M
++- compile exe senderror ReleaseSafe native success 17s MaxRSS:292M
++- compile exe accept ReleaseSafe native success 20s MaxRSS:292M
++- compile exe app_basic ReleaseSafe native success 17s MaxRSS:290M
++- compile exe app_auth ReleaseSafe native success 24s MaxRSS:295M
++- compile exe app_errors ReleaseSafe native success 20s MaxRSS:291M
++- compile exe endpoint ReleaseSafe native success 29s MaxRSS:307M
++- compile exe endpoint_auth ReleaseSafe native success 17s MaxRSS:290M
++- compile exe middleware ReleaseSafe native success 17s MaxRSS:292M
++- compile exe middleware_with_endpoint ReleaseSafe native success 17s MaxRSS:291M
++- compile exe userpass_session ReleaseSafe native success 18s MaxRSS:294M
++- compile exe cookies ReleaseSafe native success 29s MaxRSS:292M
++- compile exe http_params ReleaseSafe native success 16s MaxRSS:296M
++- compile exe bindataformpost ReleaseSafe native success 24s MaxRSS:294M
++- compile exe streaming ReleaseSafe native success 21s MaxRSS:291M
++- zig fmt --check success
++- run python3 success 76ms
++- run D:\a\_temp\baz-zig\zig-x86_64-windows-0.16.0\zig.exe success 23s
++- run test 3 pass (3 total) 12ms MaxRSS:4M
+|  +- compile test ReleaseSafe native success 17s MaxRSS:273M
++- run test 5 pass (5 total) 12ms MaxRSS:4M
+|  +- compile test ReleaseSafe native success 17s MaxRSS:275M
++- run test 12 pass (12 total) 11ms MaxRSS:4M
+|  +- compile test ReleaseSafe native success 21s MaxRSS:290M
++- run test 8 pass (8 total) 13ms MaxRSS:4M
+|  +- compile test ReleaseSafe native success 21s MaxRSS:279M
++- run test 10 pass (10 total) 16ms MaxRSS:4M
+|  +- compile test ReleaseSafe native success 18s MaxRSS:316M
++- run test 2 pass (2 total) 12ms MaxRSS:4M
+|  +- compile test ReleaseSafe native success 24s MaxRSS:268M
++- run test 28 pass (28 total) 25ms MaxRSS:5M
+|  +- compile test ReleaseSafe native success 29s MaxRSS:384M
++- run test success 11ms MaxRSS:4M
+   +- compile test ReleaseSafe native success 20s MaxRSS:265M
+

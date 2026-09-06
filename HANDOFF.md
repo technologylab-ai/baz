@@ -9,11 +9,11 @@ The website, reader, diagrams, and publishing workflow belong to this repository
 ## Verified current baseline
 
 **Native Windows x64, Linux, and macOS are supported, including streaming.**
-Runtime/test source `79021c5f6f896b4e8e2c034dbaa9face54b90e87` passed all three
-hosted gates: Debug/ReleaseSafe verification (62 root tests and one independent
+Runtime/test source `86249ad4ea6a85407dd9463b43311c0c2be1e293` passed all three
+hosted gates: Debug/ReleaseSafe verification (68 root tests and one independent
 consumer test per mode), 14 App groups, 20 ported-example groups, and 14 streaming
-groups including the runnable example. Windows additionally passed three native
-shard-handoff and console-shutdown cases. The [streaming receipt](reports/2026-09-06-streaming.md)
+groups including the runnable example, plus nine large-borrow groups. Windows additionally passed three native
+shard-handoff and console-shutdown cases. The [large-borrow receipt](reports/2026-09-06-large-borrow.md)
 retains source identity, environments, logs, and ownership statistics. Later
 website/docs edits preserve those runtime/test inputs.
 
@@ -60,9 +60,14 @@ are implemented. API-06 adds public middleware, typed locals, and cookie
 composition; API-07 adds typed resumable endpoints and their ownership gates.
 
 The [response copy review](docs/OWNERSHIP.md#response-copies-and-borrowing)
-records current copying paths and a queued borrowed-body size fix. The public
-App cannot yet borrow an immutable 5 MB asset because its body bound is coupled
-to staging; streaming sends it with bounded copying. Do not claim minimum copies.
+records current copying paths. The large-borrow change separates the total
+response bound from staging capacity: immutable 5 MB assets can use `borrowBody`
+with a small arena. Native Linux/macOS/Windows verification passed for this PR;
+the separate streaming receipt preserves the preceding baseline.
+The PR also adds a third Borrowed asset website tab, using the compiled 5 MiB
+fixture’s call. It publishes with the fix when the PR merges. Copying remains
+the default for text/bytes/stream helpers; borrowing is always explicit.
+Ordinary stream writes still copy. Do not claim minimum copies.
 
 Caller std.Io remains the MVP capability; an owned provider is deferred.
 TLS is out of scope. Mustache awaits a pure Zig library choice. WebSockets needs
