@@ -1,7 +1,7 @@
 # Baz roadmap
 
 Baz (Bounded Async Zap) builds an application framework on
-[bounded/http](https://github.com/technologylab-ai/bounded-http).
+[bounded/http](https://technologylab-ai.github.io/bounded-http/).
 The engine's [Pages documentation](https://technologylab-ai.github.io/bounded-http/)
 and [roadmap](https://github.com/technologylab-ai/bounded-http/blob/main/ROADMAP.md)
 cover its independent server work.
@@ -12,15 +12,15 @@ provide bounded tasks, acceptance gates, ownership, and resume instructions.
 | Track | State | Next work |
 | --- | --- | --- |
 | App, routing, request/form views, multipart, responses | First implementation | Preserve bounded ownership while extending composition. |
-| Zap examples | 20 supported ports | Keep native behavior coverage and record semantic differences. |
+| Zap examples | 21 supported ports plus worker streaming | Keep native behavior coverage and record semantic differences. |
 | External dependency | Baz imports `bounded_http` | Maintain an immutable engine pin and upstream generic engine changes. |
 | Middleware, locals, cookies | Example helpers available | API-06: establish the public composition contract. |
-| Resumable endpoints | Queued | API-07: typed continuation state and retention rules. |
-| Standalone repository | Independent local Git repository, MIT license, CI prepared | Publish to GitHub when requested. |
+| Resumable endpoints | Worker streaming implemented | API-07: typed inline continuation state and retention rules. |
+| Standalone repository | Published GitHub repository and Pages, MIT licensed | Maintain package, documentation and native CI. |
 | Owned `std.Io` | Deferred | Revisit after the first API MVP. |
-| Mustache | Deferred | Evaluate pure Zig libraries with explicit allocation control. |
+| Mustache | Implemented; native Linux/macOS/Windows gates passed | Maintain the Baz-specific pure Zig fork, explicit template bounds and [compatibility/ownership coverage](reports/2026-09-06-mustache.md). |
 | WebSockets | Deferred | First define the engine upgrade lifecycle. |
-| Windows | Draft portability/CI branch paused | Await the engine sharding PR, then update the pin and finish verification. |
+| Windows x64 | Supported natively, including Mustache and streaming | Preserve CI, shard handoff and shutdown coverage; performance remains deferred. |
 
-TLS is outside this project's scope. Current runtime evidence covers native Linux
-and macOS loopback HTTP/1.1. The framework remains experimental.
+TLS is outside this project's scope. Current runtime evidence covers native Linux,
+macOS, and Windows x64 HTTP/1.1. The framework remains experimental.

@@ -19,7 +19,7 @@ zig build run-mustache -Doptimize=ReleaseSafe -- --port 8080
 
 It serves a greeting form and user cards. The [page template](../examples/assets/mustache.html)
 and [user partial](../examples/assets/mustache-user.html) keep HTML/CSS separate
-from the 53-line Zig program. Query values remain raw until the handler explicitly
+from the 52-line Zig program. Query values remain raw until the handler explicitly
 decodes and validates the name into a fixed stack buffer.
 
 ## Parse once, render typed data
