@@ -4,7 +4,13 @@
 with fixed expiry and revocation, and typed streaming continuations. Engine
 [PR #4](https://github.com/technologylab-ai/bounded-http/pull/4) must merge first;
 Baz pins candidate `6f6af03e828159455b91cece6ba468201651e1f6` by immutable URL/hash.
-[The composition receipt](reports/2026-09-07-composition.md) tracks native gates.
+[Baz PR #5](https://github.com/technologylab-ai/baz/pull/5) contains the implementation.
+[The composition receipt](reports/2026-09-07-composition.md) records passing native
+Linux/macOS/Windows gates at `ee36286526c075ad58947619c826885d28d2c765`, with
+161 root tests and five consumer tests per mode, 15 middleware, 17 session and
+20 continuation groups, all old wire suites, and 331 CLI checks. Documentation
+and receipts were finalized afterward; the recorded Zig source hashes are unchanged.
+Neither PR has been merged. Merge the engine first, then Baz.
 The standard caller `std.Io` remains; an owned provider is deferred. No benchmarks
 or JWT policy were added. The earlier merged baseline follows for history.
 

@@ -1,6 +1,6 @@
 # Middleware, sessions and typed continuations
 
-Status: implementation and native verification in progress on `feat/middleware-locals`.
+Status: APP-MIDDLEWARE and APP-RESUME native gates passed on `feat/middleware-locals`.
 Exact Zig: 0.16.0. Correctness builds use Debug and ReleaseSafe; no performance
 measurements are part of this work.
 
@@ -36,7 +36,7 @@ beside the worker-streaming example. [Browser receipt](2026-09-07-composition/br
 Local verification passed Debug 59/59 steps and ReleaseSafe verify/install/examples
 89/89 steps, with 161 unit test executions and five independent package-consumer
 tests in each mode. The final pipeline/header regression also passed the 20-group
-ReleaseSafe continuation suite. Hosted native CI remains in progress. [Zig source hashes](2026-09-07-composition/zig-sources.sha256)
+ReleaseSafe continuation suite. Hosted native CI also passed, as recorded below. [Zig source hashes](2026-09-07-composition/zig-sources.sha256)
 identify the final application source independently of documentation-only commits.
 
 ## Engine qualification
@@ -52,10 +52,27 @@ Windows also passed nine shard cases and 30,000 correctness responses.
 
 ## Final Baz CI
 
-Native Linux/macOS/Windows verification is pending on Baz PR #5. Its workflow
-runs Debug/ReleaseSafe, independent consumption and all suites above; Windows
-also runs its three shard/shutdown cases. The final run links and exact candidate
-will be recorded after success.
+Exact implementation commit: `ee36286526c075ad58947619c826885d28d2c765`.
+[Linux/macOS run 34065133713](https://github.com/technologylab-ai/baz/actions/runs/34065133713)
+and [Windows run 34065133700](https://github.com/technologylab-ai/baz/actions/runs/34065133700)
+passed on that direct-push commit. The PR builds also passed: Linux/macOS
+34065136187 and Windows 34065136189. Both build modes passed 59/59 root steps,
+161/161 test executions and 5/5 independent consumer tests on each platform.
+
+Every platform passed 331 CLI checks across 28 binaries, 14 App groups,
+20 ported-example groups, 14 worker-streaming, nine borrowed-body, 14 cookie,
+12 Mustache, 15 middleware, 17 session and 20 continuation groups. Windows
+additionally passed its three shard/handoff/shutdown cases. All wire fixtures
+used ReleaseSafe. The shared harnesses check terminal ownership and no framework
+allocations after startup; these tests make no throughput claim.
+
+The [native receipt](2026-09-07-composition/native.json) preserves environment,
+commit identity, build summaries and structured wire results. GitHub run artifacts
+contain the full transcripts. Later commits finalize documentation and receipts;
+the 52-file Zig source/build identity above remains unchanged. Both
+[engine PR #4](https://github.com/technologylab-ai/bounded-http/pull/4) and
+[Baz PR #5](https://github.com/technologylab-ai/baz/pull/5) remain unmerged;
+merge the engine first.
 
 Cross-compilation is not runtime evidence. These are bounded correctness gates,
 not production isolation or performance claims. The original Zap comparison

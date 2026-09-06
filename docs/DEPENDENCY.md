@@ -110,3 +110,8 @@ Baz retains its typed State, Locals and detached response drafts in an explicitl
 bounded startup pool. `.finish` and `.close` have no extra callback; Baz cleans
 application state before returning them. The immutable candidate and native
 evidence are recorded in [the composition receipt](../reports/2026-09-07-composition.md).
+
+The continuation pin is `6f6af03e828159455b91cece6ba468201651e1f6`, hash
+`bounded_http-0.1.0-N3A1uE6kEQCmFvUqq11r1gzlTXasDkLON2YXT4cUGIl9`. Both the engine
+and Baz passed native Debug/ReleaseSafe and wire gates on Linux, macOS and Windows.
+Engine PR #4 must merge before Baz PR #5; neither is merged in this checkpoint.
