@@ -45,6 +45,23 @@ pub fn App(comptime Shared: type) type {
                 if (self.app.config.execution != .workers) return error.IoRequiresWorkers;
                 return self.app.io;
             }
+
+            /// Sleep on this fixed worker, checking connection cancellation
+            /// between bounded waits. The caller's Io controls each wait;
+            /// custom providers must honor its clock and sleep contracts.
+            pub fn sleep(self: *const Context, duration: std.Io.Duration) !void {
+                const io = try self.serviceIo();
+                if (duration.nanoseconds < 0) return error.InvalidDuration;
+                const started_at = std.Io.Timestamp.now(io, .awake);
+                const deadline = std.math.add(i96, started_at.nanoseconds, duration.nanoseconds) catch return error.InvalidDuration;
+                while (true) {
+                    if (self.cancelled.load(.acquire)) return error.Cancelled;
+                    const now = std.Io.Timestamp.now(io, .awake).nanoseconds;
+                    if (now >= deadline) return;
+                    const remaining = std.math.sub(i96, deadline, now) catch return error.InvalidDuration;
+                    try io.sleep(.fromNanoseconds(@min(remaining, 5 * std.time.ns_per_ms)), .awake);
+                }
+            }
         };
 
         const Route = struct {
@@ -275,10 +292,12 @@ pub fn App(comptime Shared: type) type {
 
         fn dispatch(raw: *engine.api.Context) engine.api.Action {
             const self: *Self = @ptrCast(@alignCast(raw.application.?));
-            // The one-shot API never yields. Resumable raw handlers remain
-            // available separately through engine.api.Handler.
+            // Worker streams retain this same callback stack across flushes.
+            // The engine's separate continuation API is not used by App.
             std.debug.assert(raw.event == .request);
             var response = responses.Response.init(raw.writer, self.response_limits) catch return .close;
+            response.context = raw;
+            response.stream_limit = self.config.max_response_bytes;
             var context: Context = .{ .shared = self.shared, .request = .init(raw.request), .response = &response, .captures = .{}, .app = self, .cancelled = raw.cancelled };
             self.handle(&context) catch |err| return self.handleError(&context, err);
             return response.finish() catch |err| self.handleError(&context, err);

@@ -161,7 +161,7 @@ the validated iterator. Neither form helper receives streams or writes to disk.
 
 ## Responses and capacity
 
-`ctx.response` is an unpublished one-shot draft backed by the connection's
+`ctx.response` begins as an unpublished draft backed by the connection's
 startup output arena. The scheduler secures its entire configured reservation
 before invoking a handler. If older output fills the arena it drains that output
 first, preserving the request and running application side effects once.
@@ -174,8 +174,9 @@ first, preserving the request and running application side effects once.
 | `jsonValue(status, value)` | Serializes once into a bounded fixed standard writer. |
 | `print(status, content_type, format, args)` | Standard formatting into the reserved body. |
 | `borrowBody(status, content_type, bytes)` | Explicit body borrow from retained request input or immutable server-lifetime assets only. |
+| `stream(status, content_type, options)` | Worker response with a standard writer, incremental flushes, and bounded staging. |
 
-Return after preparing a body. App finalizes it on successful handler return.
+For a one-shot response, return after preparing a body. App finalizes it on successful handler return.
 Headers can be appended before or after preparing the body. A second body,
 missing response, invalid header, overflow or failed serializer becomes a
 generic error before publication. No success prefix is sent. Earlier finished
@@ -194,8 +195,12 @@ move once within the arena at finalization, counted by
 Content-Length, Transfer-Encoding and other canonical framing fields belong to
 the engine. Use repeated `header("Set-Cookie", ...)` or a validated Location
 header for now; cookie parsing/builders and a redirect helper belong to API-06.
+Use [streaming responses](STREAMING.md) to write, flush, sleep, and write again
+inside the same fixed worker callback. The returned handle exposes `writer()`,
+`flush()`, and `finish()`. Headers become immutable after the first flush.
+`body_bytes` bounds staging; `server.max_response_bytes` bounds the whole stream.
 The advanced raw `engine.api.Handler` remains available for explicit
-flush/resume. The typed one-shot API does not yet expose resumable endpoints.
+return-and-resume continuations. Typed inline continuations remain future work.
 
 ## std.Io and resource boundaries
 
@@ -238,7 +243,8 @@ Baz additionally supports native Windows x64, with [its own native gate](../repo
 | `sendBody` / `sendJson` | Copying `text`/`bytes`, distinct `jsonBytes` and `jsonValue`. |
 | Borrowing an arbitrary response slice | `borrowBody` restricted to retained input or server-lifetime assets. |
 | Global start/stop | App instance lifecycle on the existing Cluster. |
-| Authentication middleware / resumable output | Follow-up API-06 / API-07; low-level engine remains usable. |
+| Incremental response output | `response.stream()` and `std.Io.Writer`, on fixed workers. |
+| Public authentication middleware / typed inline continuation | Follow-up API-06 / API-07; low-level engine remains usable. |
 
 Use the [roadmap](APP-API-ROADMAP.md) for the next session and named verification
 gates. The [20 supported Zap example ports](../examples/README.md) are implemented.

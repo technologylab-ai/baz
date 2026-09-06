@@ -43,10 +43,13 @@ The callback-progress and external-watchdog limits still apply.
 
 These generic extensions landed through [engine PR #1](https://github.com/technologylab-ai/bounded-http/pull/1).
 PR #1 merged on 2026-09-06 as `c90281b600deb699a667e2bcc115da32862c794f`.
-The current engine pin is `7c24003924bcc76b2a3808cc2fae194082a40105`, with Zig package hash
-`bounded_http-0.1.0-N3A1uJjOEAD4Yg0JPgeoRomLUpBJeFlfujb4gpSUDcgc`.
+The current engine pin is `2a269ef57301b21df22f1c616d02d6d244e5d6ca`, with Zig package hash
+`bounded_http-0.1.0-N3A1uD4IEQBXzMxjafNtPTuGXAGeklCjLXIInMVXvL9e`.
+It adds same-callback worker flushes through [engine PR #3](https://github.com/technologylab-ai/bounded-http/pull/3).
+`Context.flushAndWait()` keeps the worker stack live while the I/O owner sends a snapshot.
+Baz supplies the standard writer and cancellation-aware sleep described in [STREAMING.md](STREAMING.md).
 It includes the package rename and [Windows shard handoff from PR #2](https://github.com/technologylab-ai/bounded-http/pull/2).
-Baz passed its own native Windows x64, Linux, and macOS gates on this pin,
+The preceding `7c240039` pin passed Baz’s native Windows x64, Linux, and macOS gates,
 including all supported examples. The [native receipt](../reports/2026-09-06-windows-baz.md)
 records exact source identity, environments, and Windows handoff/shutdown behavior.
 The older tested `e52f09f` pin and provisional `bb14d987` draft remain in history.

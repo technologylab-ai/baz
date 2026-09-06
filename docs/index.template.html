@@ -37,8 +37,8 @@
   <section class="hero" aria-labelledby="headline">
     <p class="eyebrow">A modern successor to Zap</p>
     <h1 id="headline">Familiar to write.<br><em>Explicit by design.</em></h1>
-    <p class="lede">Meet <strong>Baz — Bounded Async Zap.</strong> A pure Zig web framework on <a href="https://technologylab-ai.github.io/bounded-http/">bounded/http</a>. Typed applications, borrowed request data, and memory boundaries you can reason about.</p>
-    <div class="actions"><a class="button primary" href="#start">Build your first App <span aria-hidden="true">↗</span></a><a class="button" href="docs/read.html?file=docs/APP-API.md">Read the API guide <span aria-hidden="true">→</span></a></div>
+    <p class="lede">Meet <strong>Baz — Bounded Async Zap.</strong> A pure Zig web framework on <a href="https://technologylab-ai.github.io/bounded-http/">bounded/http</a>. Typed applications, streaming responses, and memory boundaries you can reason about.</p>
+    <div class="actions"><a class="button primary" href="#start">Build your first App <span aria-hidden="true">↗</span></a><a class="button" href="#streaming">See streaming <span aria-hidden="true">↓</span></a></div>
     <div class="tags"><span>PURE ZIG · EXACT 0.16.0</span><span>CALLER-SUPPLIED std.Io</span><span>LINUX · MACOS · WINDOWS x64</span><span>MIT LICENSE</span></div>
     <div class="facts"><div class="fact"><strong>Typed.</strong><p>App state and endpoint methods.<br>Ordinary Zig composition.</p></div><div class="fact"><strong>Explicit.</strong><p>Borrowed bytes in.<br>Decoding when you ask.</p></div><div class="fact"><strong>Bounded.</strong><p>Framework capacity at startup.<br>Output reserved before dispatch.</p></div></div>
   </section>
@@ -57,10 +57,24 @@
   <section class="chapter" id="app">
     <p class="eyebrow">02 / An ordinary Zig App</p><h2>A struct. A method.<br>A clear place for everything.</h2>
     <p class="intro">Define your shared state, choose <code>App(Shared)</code>, and register an endpoint. The context gives you the request, your state, route captures, and a bounded response draft.</p>
+    <div class="example-tabs" role="tablist" aria-label="Application examples" hidden>
+      <button type="button" role="tab" id="basics-tab" aria-controls="app-example" aria-selected="true" data-panel="app-example">App basics</button>
+      <button type="button" role="tab" id="streaming-tab" aria-controls="streaming" aria-selected="false" tabindex="-1" data-panel="streaming">Streaming response <span aria-hidden="true">↗</span></button>
+    </div>
+    <div id="app-example" role="tabpanel" aria-labelledby="basics-tab" tabindex="0">
     <div class="codebox"><div class="codehead"><a href="docs/read.html?file=src/app_demo.zig">src/app_demo.zig · maintained example</a><button class="copy" type="button" hidden aria-label="Copy Hello endpoint">Copy</button></div><pre tabindex="0" aria-label="Hello endpoint source"><code class="language-zig">@@HELLO@@</code></pre></div>
     <p class="note">This excerpt uses <code>Context = web.App(Shared).Context</code>. Register it with <code>try app.endpoint("/hello", &amp;hello)</code>. See the <a href="docs/read.html?file=examples/app_basic.zig">complete App example</a> for initialization, stable state, and shutdown.</p>
     <div class="columns"><div><h3>Start with explicit state.</h3><p class="note">Shared state and endpoint instances stay at stable addresses through App destruction. Register routes before startup. Synchronize mutable state used by concurrent callbacks.</p></div><div><h3>Return a finished response.</h3><p class="note">Text, bytes, copied headers, JSON, and standard formatting all use bounded output. A failed handler discards its private draft before error mapping.</p></div></div>
     <p class="annotation"><b>OWNERSHIP</b><span>The decoded name above lives on the stack. <code>response.text</code> copies it before that storage goes away.</span></p>
+    </div>
+    <div id="streaming" role="tabpanel" aria-labelledby="streaming-tab" tabindex="0">
+      <h3>Send the first bytes. Keep working.</h3>
+      <p class="intro">Write a little. Flush it to the client. Pause, then send the next update—all inside the same handler.</p>
+      <div class="codebox"><div class="codehead"><a href="docs/read.html?file=examples/streaming.zig">examples/streaming.zig · runnable example</a><button class="copy" type="button" hidden aria-label="Copy streaming endpoint">Copy</button></div><pre tabindex="0" aria-label="Streaming endpoint source"><code class="language-zig">@@STREAMING@@</code></pre></div>
+      <p class="annotation"><b>STREAMING</b><span><code>out</code> is a standard <code>std.Io.Writer</code>. Each <code>flush()</code> sends the current bytes before the handler continues.</span></p>
+      <div class="columns"><div><h3>Updates as they happen.</h3><p class="note">Progress reports, generated text, and incremental output can reach clients before the handler returns. Use <code>curl -N</code> to watch the example arrive in three parts.</p></div><div><h3>Bounded while you wait.</h3><p class="note">A stream uses one existing application worker and fixed output storage. A slow reader applies backpressure; cancellation releases the waiting handler safely. The HTTP I/O loop keeps running.</p></div></div>
+      <p class="note">The complete example selects fixed workers. Headers are final after the first flush, and response size and request time remain bounded. <a href="docs/read.html?file=docs/STREAMING.md">Read the streaming guide →</a></p>
+    </div>
   </section>
   <section class="chapter" id="data">
     <p class="eyebrow">03 / Data stays data</p><h2>No guessing what<br>your parameters mean.</h2>
@@ -98,7 +112,7 @@ curl -F 'files[]=@.zig-version' http://127.0.0.1:8080/upload</code></pre></div>
     <p class="intro">Ports of Zap’s examples, using Baz’s public API. Every card opens maintained source in the reader. Pick a small example, then follow its types.</p>
     <div class="filter-bar" role="group" aria-label="Filter examples" hidden>
       <button type="button" data-filter="all" aria-pressed="true">All 20</button><button type="button" data-filter="routing" aria-pressed="false">Routing</button><button type="button" data-filter="responses" aria-pressed="false">Responses</button><button type="button" data-filter="app" aria-pressed="false">App &amp; endpoints</button><button type="button" data-filter="composition" aria-pressed="false">Composition</button><button type="button" data-filter="data" aria-pressed="false">Forms &amp; uploads</button>
-    </div><p id="example-count" class="result-count" aria-live="polite">20 of 20 examples</p>
+    </div><p id="example-count" class="result-count" aria-live="polite">20 of 21 examples</p>
     <div class="examples-grid">@@EXAMPLES@@</div>
     <div class="codebox"><div class="codehead"><span>Build all examples, or run one</span><button class="copy" type="button" hidden aria-label="Copy example commands">Copy</button></div><pre tabindex="0"><code class="language-bash">zig build examples -Doptimize=ReleaseSafe
 zig build run-http_params -Doptimize=ReleaseSafe -- --port 8080</code></pre></div>

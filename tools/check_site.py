@@ -51,10 +51,10 @@ def check(output, documents, document_urls):
     actual = {str(path.relative_to(output)) for path in output.rglob('*') if path.is_file()}
     assert actual == set(manifest['files_sha256']) | {'publication.json'}, 'Unexpected artifact files'
     index = (output / 'index.html').read_text()
-    assert len(re.findall(r'class="example-card"', index)) == 20
+    assert len(re.findall(r'class="example-card"', index)) == 21
     assert all(text in index for text in ['1.038×', '1.771×', '0.629×', '1.025×'])
     assert all((output / document_urls.get(name, name)).read_bytes() == (Path(__file__).resolve().parents[1] / name).read_bytes() for name in documents), 'Copied document changed'
-    print('Site checks passed: links, anchors, diagrams, 20 examples, four benchmark profiles, and document identity.')
+    print('Site checks passed: links, anchors, diagrams, 21 examples, four benchmark profiles, and document identity.')
 
 
 if __name__ == '__main__':

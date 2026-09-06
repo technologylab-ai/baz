@@ -1,4 +1,11 @@
-# Zap example ports
+# Baz examples and Zap ports
+
+[streaming.zig](streaming.zig) demonstrates Baz's incremental response writer.
+It writes, flushes, sleeps, and writes again before the handler returns.
+Run `zig build run-streaming -Doptimize=ReleaseSafe -- --port 8080`, then use
+`curl -N http://127.0.0.1:8080/` in another terminal.
+See the [streaming guide](../docs/STREAMING.md) for its worker and lifetime bounds.
+This new example accompanies the 20 Zap ports below, for 21 examples in total.
 
 These examples adapt the public behavior of our predecessor
 [Zap](https://github.com/zigzap/zap), using the local Zig 0.16 port at

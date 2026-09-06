@@ -43,6 +43,21 @@ pub fn build(b: *std.Build) void {
     b.step("run", "Run the application API example").dependOn(&app_run.step);
     const verify = b.step("verify", "Compile and test the exact-version MVP");
     const check = b.step("check", "Compile all framework tests and examples without executing target binaries");
+    const stream_fixture = b.addExecutable(.{
+        .name = "baz-streaming",
+        .use_llvm = if (target.result.os.tag == .linux and optimize == .Debug) true else null,
+        .use_lld = if (target.result.os.tag == .linux and optimize == .Debug) true else null,
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("src/streaming_demo.zig"),
+            .target = target,
+            .optimize = optimize,
+            .link_libc = true,
+            .imports = &.{.{ .name = "baz", .module = module }},
+        }),
+    });
+    b.installArtifact(stream_fixture);
+    check.dependOn(&stream_fixture.step);
+    verify.dependOn(&stream_fixture.step);
     check.dependOn(&app_exe.step);
     verify.dependOn(&app_exe.step);
     const example_support = b.createModule(.{
@@ -52,7 +67,7 @@ pub fn build(b: *std.Build) void {
         .imports = &.{.{ .name = "baz", .module = module }},
     });
     const examples = b.step("examples", "Build and install all supported Zap example ports");
-    for ([_][]const u8{ "hello", "hello2", "hello_json", "simple_router", "routes", "serve", "sendfile", "senderror", "accept", "app_basic", "app_auth", "app_errors", "endpoint", "endpoint_auth", "middleware", "middleware_with_endpoint", "userpass_session", "cookies", "http_params", "bindataformpost" }) |name| {
+    for ([_][]const u8{ "hello", "hello2", "hello_json", "simple_router", "routes", "serve", "sendfile", "senderror", "accept", "app_basic", "app_auth", "app_errors", "endpoint", "endpoint_auth", "middleware", "middleware_with_endpoint", "userpass_session", "cookies", "http_params", "bindataformpost", "streaming" }) |name| {
         const example = b.addExecutable(.{
             .name = name,
             .use_llvm = if (target.result.os.tag == .linux and optimize == .Debug) true else null,

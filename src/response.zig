@@ -1,4 +1,4 @@
-//! Bounded one-shot response drafts. All byte storage belongs to the current
+//! Bounded response drafts and worker streams. All byte storage belongs to the current
 //! connection's startup output arena; no allocator or request-local arena is
 //! needed. The scheduler reserves Limits.reservationBytes before application
 //! execution. Earlier frozen responses are never part of this draft.
@@ -8,7 +8,8 @@ const api = @import("bounded_http").api;
 pub const Limits = struct {
     /// Serialized extra fields, including names, separators and CRLFs.
     header_bytes: u32 = 2048,
-    /// Maximum logical body, whether generated, copied or explicitly borrowed.
+    /// Maximum one-shot body and streaming staging capacity. Streaming totals
+    /// use the server's separate max_response_bytes bound.
     body_bytes: u32 = 8192,
     max_headers: u16 = 32,
 
@@ -41,6 +42,14 @@ pub const Response = struct {
     status: u16 = 200,
     prepared: bool = false,
     published: bool = false,
+    /// Installed by App for the duration of one callback. Never escapes it.
+    context: ?*api.Context = null,
+    stream_limit: usize = 0,
+    streaming: bool = false,
+    stream_finished: bool = false,
+    stream_error: ?anyerror = null,
+    stream_written: usize = 0,
+    stream_length: ?usize = null,
 
     pub fn init(writer: *api.Writer, limits: Limits) !Response {
         const storage = writer.draftStorage(try limits.reservationBytes()) catch |err| {
@@ -152,11 +161,99 @@ pub const Response = struct {
         self.borrowed = body;
     }
 
+    pub const StreamOptions = struct {
+        /// Null selects HTTP/1.1 chunked framing. A known length is checked
+        /// across every write and must match when the response ends.
+        content_length: ?usize = null,
+    };
+
+    /// Start a stream on an existing application worker. Writes copy into the
+    /// startup-reserved staging buffer. A full buffer applies backpressure by
+    /// flushing before accepting more data. Explicit flush sends immediately.
+    /// Headers remain editable until the first flush. Keep the returned handle
+    /// on this callback's stack; never retain its writer past the callback.
+    pub fn stream(self: *Response, status: u16, content_type: []const u8, options: StreamOptions) !Stream {
+        const context = self.context orelse return error.BlockingFlushUnavailable;
+        if (!context.supportsBlockingFlush()) return error.BlockingFlushUnavailable;
+        if (context.cancelled.load(.acquire)) return error.Cancelled;
+        try self.checkBody(status, content_type, 0);
+        if (options.content_length) |length| {
+            if (length > self.stream_limit) return error.ResponseLimit;
+            if ((status == 204 or status == 205 or status == 304) and length != 0) return error.InvalidResponse;
+        }
+        self.setBody(status, content_type, 0);
+        self.streaming = true;
+        self.stream_length = if (status == 204 or status == 205 or status == 304) 0 else options.content_length;
+        return .{ .response = self };
+    }
+
+    fn checkStream(self: *const Response) !void {
+        if (self.stream_error) |err| return err;
+        if (!self.streaming or self.stream_finished) return error.InvalidState;
+        if (self.context.?.cancelled.load(.acquire)) return error.Cancelled;
+    }
+
+    fn appendStream(self: *Response, data: []const u8) !usize {
+        try self.checkStream();
+        if (data.len == 0) return 0;
+        if (self.limits.body_bytes == 0) return error.ResponseLimit;
+        if (self.body_len == self.limits.body_bytes) try self.flushStream();
+        const count = @min(data.len, self.limits.body_bytes - self.body_len);
+        const total = std.math.add(usize, self.stream_written, count) catch return error.ResponseLimit;
+        if (total > self.stream_limit) return error.ResponseLimit;
+        if (self.stream_length) |length| if (total > length) return error.ResponseLengthMismatch;
+        @memcpy(self.bodyStorage()[self.body_len..][0..count], data[0..count]);
+        self.body_len += count;
+        self.stream_written = total;
+        return count;
+    }
+
+    fn prepareStreamSnapshot(self: *Response) !void {
+        if (!self.published) {
+            try self.writer.beginWithHeaders(self.status, self.typeStorage()[0..self.content_type_len], self.stream_length, self.headerStorage()[0..self.header_len]);
+            try self.writer.writeDraftBody(self.bodyStorage()[0..self.body_len]);
+        } else {
+            // The previous barrier returned every kernel borrow. Staging and
+            // output may overlap, so ordinary memcpy is insufficient here.
+            const source = self.bodyStorage()[0..self.body_len];
+            const destination = try self.writer.reserve(self.body_len);
+            if (@intFromPtr(destination.ptr) <= @intFromPtr(source.ptr)) {
+                std.mem.copyForwards(u8, destination, source);
+            } else {
+                std.mem.copyBackwards(u8, destination, source);
+            }
+            self.writer.commit(self.body_len);
+        }
+        self.body_len = 0;
+    }
+
+    fn flushStream(self: *Response) !void {
+        try self.checkStream();
+        try self.prepareStreamSnapshot();
+        // From this point an error cannot safely replace the HTTP response.
+        self.published = true;
+        try self.context.?.flushAndWait();
+    }
+
+    fn endStream(self: *Response) !void {
+        try self.checkStream();
+        if (self.stream_length) |length| if (self.stream_written != length) return error.ResponseLengthMismatch;
+        self.stream_finished = true;
+    }
+
     /// Publish one complete response to the low-level writer. Generated bytes
     /// move once within the reserved arena to eliminate unused head capacity;
     /// the retained batch is still one contiguous span. There are no fallible
     /// application callbacks between constructing the head and freezing output.
     pub fn finish(self: *Response) !api.Action {
+        if (self.streaming) {
+            if (self.stream_error) |err| return err;
+            if (self.context.?.cancelled.load(.acquire)) return error.Cancelled;
+            if (!self.stream_finished) try self.endStream();
+            try self.prepareStreamSnapshot();
+            self.published = true;
+            return self.writer.finish();
+        }
         try self.checkDraft();
         if (!self.prepared) return error.ResponseNotPrepared;
         const body = self.bodyStorage()[0..self.body_len];
@@ -187,6 +284,11 @@ pub const Response = struct {
         self.borrowed = null;
         self.status = 200;
         self.prepared = false;
+        self.streaming = false;
+        self.stream_finished = false;
+        self.stream_error = null;
+        self.stream_written = 0;
+        self.stream_length = null;
     }
 
     /// Guaranteed storage for the generic fallback follows from valid Limits;
@@ -200,12 +302,128 @@ pub const Response = struct {
     }
 };
 
+/// Standard Zig writer backed by a Response's bounded streaming storage.
+/// Do not move this handle while a pointer returned by writer() is in use.
+/// Errors from this response sink are sticky; failure() exposes the cause.
+/// Propagate errors from custom formatters or source readers used with writer().
+pub const Stream = struct {
+    response: *Response,
+    interface: std.Io.Writer = .{
+        .vtable = &.{ .drain = drain, .flush = flushWriter, .rebase = rebase },
+        .buffer = &.{},
+    },
+
+    pub fn writer(self: *Stream) *std.Io.Writer {
+        return &self.interface;
+    }
+
+    pub fn failure(self: *const Stream) ?anyerror {
+        return self.response.stream_error;
+    }
+
+    pub fn writeAll(self: *Stream, bytes: []const u8) !void {
+        self.interface.writeAll(bytes) catch |err| return self.failure() orelse err;
+    }
+
+    pub fn print(self: *Stream, comptime format: []const u8, args: anytype) !void {
+        self.interface.print(format, args) catch |err| {
+            if (self.response.stream_error == null) self.response.stream_error = err;
+            return self.failure().?;
+        };
+    }
+
+    /// Wait for the I/O owner to finish transmitting this snapshot. This is
+    /// local send completion, not acknowledgement by the peer application.
+    pub fn flush(self: *Stream) !void {
+        self.response.flushStream() catch |err| {
+            self.response.stream_error = err;
+            return err;
+        };
+    }
+
+    /// End application writes. App publishes the final framing when the
+    /// handler returns. Returning normally also ends a healthy open stream.
+    pub fn finish(self: *Stream) !void {
+        self.response.endStream() catch |err| {
+            self.response.stream_error = err;
+            return err;
+        };
+    }
+
+    fn drain(out: *std.Io.Writer, data: []const []const u8, splat: usize) std.Io.Writer.Error!usize {
+        const self: *Stream = @fieldParentPtr("interface", out);
+        std.debug.assert(out.end == 0 and data.len > 0);
+        for (data, 0..) |bytes, index| {
+            if (index == data.len - 1 and splat == 0) break;
+            if (bytes.len == 0) continue;
+            return self.response.appendStream(bytes) catch |err| {
+                self.response.stream_error = err;
+                return error.WriteFailed;
+            };
+        }
+        return 0;
+    }
+
+    fn flushWriter(out: *std.Io.Writer) std.Io.Writer.Error!void {
+        const self: *Stream = @fieldParentPtr("interface", out);
+        self.flush() catch return error.WriteFailed;
+    }
+
+    fn rebase(out: *std.Io.Writer, _: usize, _: usize) std.Io.Writer.Error!void {
+        const self: *Stream = @fieldParentPtr("interface", out);
+        if (self.response.stream_error == null) self.response.stream_error = error.WriterBufferUnavailable;
+        return error.WriteFailed;
+    }
+};
+
 const testing = std.testing;
 
 fn testCache() api.HeaderCache {
     var cache: api.HeaderCache = .{};
     cache.refresh("Sun, 06 Sep 2026 12:34:56 GMT");
     return cache;
+}
+
+test "stream writer preserves vector order and makes a length error sticky" {
+    var arena: [2048]u8 = undefined;
+    const cache = testCache();
+    var writer = api.Writer.init(&arena, &cache, 0);
+    writer.open(0, true, false);
+    var cancelled: std.atomic.Value(bool) = .init(false);
+    var request: api.http.Request = undefined;
+    var state: [8]usize = @splat(0);
+    var context: api.Context = .{
+        .request = &request,
+        .writer = &writer,
+        .event = .request,
+        .state = &state,
+        .application = null,
+        .cancelled = &cancelled,
+        .blocking_flush = .{
+            .context = &writer,
+            .flush = struct {
+                fn flush(_: *anyopaque) api.FlushError!void {
+                    return error.InvalidState; // This fixture must stay unpublished.
+                }
+            }.flush,
+        },
+    };
+    var response = try Response.init(&writer, .{ .header_bytes = 64, .body_bytes = 32 });
+    response.context = &context;
+    response.stream_limit = 64;
+    var stream = try response.stream(200, "text/plain", .{ .content_length = 5 });
+    var pieces = [_][]const u8{ "a", "bc" };
+    try stream.writer().writeSplatAll(&pieces, 2);
+    try testing.expectEqualStrings("abcbc", response.bodyStorage()[0..response.body_len]);
+    try testing.expectError(error.WriteFailed, stream.writer().writeAll("x"));
+    try testing.expectEqual(error.ResponseLengthMismatch, stream.failure().?);
+    try testing.expectError(error.ResponseLengthMismatch, stream.finish());
+    try testing.expectError(error.ResponseLengthMismatch, response.finish());
+    try testing.expect(!writer.began and !writer.frozen);
+    // A caught error cannot turn a truncated draft into success. App can still
+    // replace this wholly private response with its normal error policy.
+    try testing.expectEqual(api.Action.finish, try response.errorResponse(500));
+    try testing.expectEqualStrings("Internal Server Error", writer.committed());
 }
 
 test "draft copies stack metadata and body and preserves earlier frozen bytes" {

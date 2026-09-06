@@ -129,13 +129,37 @@ try {
   await check('desktop-landing', async () => {
     await navigate();
     const state = await evaluate(`({title:document.title,headline:document.querySelector('h1').textContent,diagrams:document.querySelectorAll('svg[role="img"]').length,examples:document.querySelectorAll('.example-card').length,highlight:!!document.querySelector('.hljs-keyword')})`);
-    assert.equal(state.title,'Baz — Bounded Async Zap'); assert.equal(state.diagrams,4); assert.equal(state.examples,20); assert(state.highlight);
+    assert.equal(state.title,'Baz — Bounded Async Zap'); assert.equal(state.diagrams,4); assert.equal(state.examples,21); assert(state.highlight);
     await noOverflow(); await screenshot('baz-desktop'); return state;
   });
   await check('maintained-source-excerpt', async () => {
     const source = await readFile(new URL('../src/app_demo.zig', import.meta.url),'utf8');
     const excerpt = source.match(/^const Hello = struct \{\n[\s\S]*?^\};/m)[0];
     assert.equal(await evaluate('document.querySelector(".language-zig").textContent'),excerpt); return {exactSource:true};
+  });
+  await check('streaming-example-source-tabs-and-deep-link', async () => {
+    const source = await readFile(new URL('../examples/streaming.zig', import.meta.url), 'utf8');
+    const excerpt = source.match(/^fn progress\(.*?^}/ms)[0];
+    assert.equal(await evaluate('document.querySelector("#streaming code.language-zig").textContent'), excerpt);
+    assert(await evaluate('document.querySelector("#streaming").hidden'));
+    await evaluate('document.querySelector("#streaming-tab").scrollIntoView({behavior:"instant",block:"start"})');
+    await click('#streaming-tab');
+    assert.equal(await evaluate('document.querySelector("#streaming-tab").getAttribute("aria-selected")'), 'true');
+    assert(await evaluate('document.querySelector("#app-example").hidden && !document.querySelector("#streaming").hidden'));
+    await noOverflow(); await screenshot('baz-streaming-desktop');
+    await key('Home');
+    assert.equal(await evaluate('document.activeElement.id'), 'basics-tab');
+    assert(await evaluate('document.querySelector("#streaming").hidden'));
+    await key('ArrowRight');
+    assert.equal(await evaluate('document.activeElement.id'), 'streaming-tab');
+    for (const width of [390, 320]) {
+      await send('Emulation.setDeviceMetricsOverride', {width,height:1040,deviceScaleFactor:1,mobile:false});
+      await navigate('#streaming');
+      assert(await evaluate('!document.querySelector("#streaming").hidden'));
+      await noOverflow(); await screenshot('baz-streaming-' + width);
+    }
+    await send('Emulation.setDeviceMetricsOverride', {width:1440,height:1040,deviceScaleFactor:1,mobile:false});
+    return {exactSource:true, keyboard:true, deepLink:true, mobileWidths:[390,320]};
   });
   await check('keyboard-skip-link', async () => {
     await navigate(); await key('Tab');
@@ -146,12 +170,12 @@ try {
   });
   await check('example-filters', async () => {
     await evaluate('document.querySelector("#examples").scrollIntoView({behavior:"instant"})');
-    for (const [group,count] of [['data',2],['composition',6],['app',3],['routing',5],['responses',4],['all',20]]) {
+    for (const [group,count] of [['data',2],['composition',6],['app',3],['routing',5],['responses',5],['all',21]]) {
       await click(`button[data-filter="${group}"]`);
       assert.equal(await evaluate('document.querySelectorAll(".example-card:not([hidden])").length'),count);
-      assert.equal(await evaluate('document.querySelector("#example-count").textContent'),`${count} of 20 examples`);
+      assert.equal(await evaluate('document.querySelector("#example-count").textContent'),`${count} of 21 examples`);
     }
-    return {groups:6,total:20};
+    return {groups:6,total:21};
   });
   await check('desktop-diagrams-and-benchmark', async () => {
     await evaluate('document.querySelector("#engine").scrollIntoView({behavior:"instant"})'); await screenshot('baz-engine');
@@ -244,9 +268,9 @@ try {
     await writeFile(path.join(output,'baz-print.pdf'),Buffer.from(pdf.data,'base64'));
     await send('Emulation.setEmulatedMedia',{media:''}); await send('Emulation.setScriptExecutionDisabled',{value:true});
     await navigate();
-    assert.equal(await evaluate('document.querySelectorAll(".example-card:not([hidden])").length'),20);
+    assert.equal(await evaluate('document.querySelectorAll(".example-card:not([hidden])").length'),21);
     assert(await evaluate('document.querySelector(".language-zig").textContent.includes("percentDecodeInto")'));
-    await send('Emulation.setScriptExecutionDisabled',{value:false}); return {printBytes:Buffer.from(pdf.data,'base64').length,noJsExamples:20};
+    await send('Emulation.setScriptExecutionDisabled',{value:false}); return {printBytes:Buffer.from(pdf.data,'base64').length,noJsExamples:21};
   });
   await check('no-unexpected-network-or-errors', async () => {
     assert.equal(exceptions.length,0,JSON.stringify(exceptions));

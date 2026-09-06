@@ -44,6 +44,13 @@ and both the [bounded/http](https://technologylab-ai.github.io/bounded-http/) we
 
 ## Next API sessions
 
+The current `feat/streaming` worktree implements imperative worker streaming,
+a standard response writer, cancellation-aware sleep, and a runnable streaming
+example beside App basics on the website. Read [STREAMING.md](docs/STREAMING.md).
+The engine seam is [PR #3](https://github.com/technologylab-ai/bounded-http/pull/3),
+pinned by immutable URL/hash. Native streaming and website gates are being
+recorded before this branch is integrated into `main`.
+
 Read the [API guide](docs/APP-API.md), [ownership contract](docs/OWNERSHIP.md), and
 [multi-session roadmap](docs/APP-API-ROADMAP.md). API-01–05 and 20 example ports
 are implemented. API-06 adds public middleware, typed locals, and cookie

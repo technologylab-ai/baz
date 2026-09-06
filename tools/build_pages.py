@@ -24,6 +24,7 @@ EXAMPLES = [
     ('sendfile', 'responses', 'File content as an embedded asset; no sendfile syscall.'),
     ('senderror', 'responses', 'Controlled errors, with no client-visible stack trace.'),
     ('accept', 'responses', 'Explicit, bounded content negotiation.'),
+    ('streaming', 'responses', 'Write, flush, sleep, and write again through a standard Zig writer.'),
     ('app_basic', 'app', 'Typed Shared, endpoint state, and instance shutdown.'),
     ('app_errors', 'app', 'Error mapping and discarded private response drafts.'),
     ('endpoint', 'app', 'Bounded user CRUD on explicit application workers.'),
@@ -114,13 +115,16 @@ def build():
     snippet = re.search(r'^const Hello = struct \{\n.*?^\};', (ROOT / 'src/app_demo.zig').read_text(), re.M | re.S)
     if not snippet:
         raise ValueError('Maintained Hello endpoint not found.')
+    streaming = re.search(r'^fn progress\(.*?^}', (ROOT / 'examples/streaming.zig').read_text(), re.M | re.S)
+    if not streaming:
+        raise ValueError('Maintained streaming endpoint not found.')
     cards = []
     for name, group, description in EXAMPLES:
         if 'examples/' + name + '.zig' not in docs:
             raise ValueError('Missing example: ' + name)
         cards.append('<a class="example-card" data-group="{}" href="docs/read.html?file=examples/{}.zig"><strong>{}<span aria-hidden="true">↗</span></strong><p>{}</p></a>'.format(group, name, name, html.escape(description)))
     results, chart = benchmark()
-    replacements = {'HELLO': html.escape(snippet.group(0)), 'EXAMPLES': '\n'.join(cards),
+    replacements = {'HELLO': html.escape(snippet.group(0)), 'STREAMING': html.escape(streaming.group(0)), 'EXAMPLES': '\n'.join(cards),
                     'RESULTS': results, 'PERFORMANCE': scroll_diagram(chart)}
     for token, name in [('PARAMETERS', 'parameters'), ('LAYERS', 'layers'), ('LIFETIME', 'lifetime')]:
         replacements[token] = scroll_diagram((ROOT / ('docs/diagrams/' + name + '.svg')).read_text())

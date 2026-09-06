@@ -20,6 +20,43 @@
     });
     if (button) button.hidden = false;
   });
+  const exampleTabs = document.querySelector('.example-tabs');
+  if (exampleTabs) {
+    const tabs = [...exampleTabs.querySelectorAll('[role=tab]')];
+    function select(tab, focus = false) {
+      tabs.forEach(item => {
+        const selected = item === tab;
+        item.setAttribute('aria-selected', String(selected)); item.tabIndex = selected ? 0 : -1;
+        document.getElementById(item.dataset.panel).hidden = !selected;
+      });
+      if (focus) tab.focus();
+    }
+    exampleTabs.hidden = false;
+    select(tabs[0]);
+    exampleTabs.addEventListener('click', event => {
+      const tab = event.target.closest('[role=tab]');
+      if (tab) select(tab);
+    });
+    exampleTabs.addEventListener('keydown', event => {
+      const index = tabs.indexOf(document.activeElement);
+      if (index < 0 || !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+      event.preventDefault();
+      const next = event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1
+        : (index + (event.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length;
+      select(tabs[next], true);
+    });
+    function revealStreaming() {
+      if (location.hash !== '#streaming') return;
+      select(tabs.find(tab => tab.dataset.panel === 'streaming'));
+      document.getElementById('streaming').scrollIntoView({behavior: 'instant'});
+    }
+    window.addEventListener('hashchange', revealStreaming);
+    // Repeated clicks must also reveal a tab hidden since the last deep link.
+    document.querySelectorAll('a[href="#streaming"]').forEach(link => link.addEventListener('click', () => {
+      select(tabs.find(tab => tab.dataset.panel === 'streaming'));
+    }));
+    revealStreaming();
+  }
   const filters = document.querySelector('.filter-bar');
   if (filters) {
     filters.hidden = false;
@@ -32,7 +69,7 @@
         card.hidden = button.dataset.filter !== 'all' && card.dataset.group !== button.dataset.filter;
         if (!card.hidden) count++;
       });
-      document.querySelector('#example-count').textContent = count + ' of 20 examples';
+      document.querySelector('#example-count').textContent = count + ' of ' + document.querySelectorAll('.example-card').length + ' examples';
     });
   }
   if ('IntersectionObserver' in window && document.querySelector('.hero')) {

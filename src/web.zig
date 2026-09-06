@@ -2,6 +2,7 @@
 pub const App = @import("App.zig").App;
 pub const Request = @import("request.zig").Request;
 pub const Response = @import("response.zig").Response;
+pub const Stream = @import("response.zig").Stream;
 pub const ResponseLimits = @import("response.zig").Limits;
 pub const params = @import("params.zig");
 pub const form = @import("form.zig");

@@ -2,7 +2,7 @@
 
 **Bounded Async Zap.**
 
-[Website & documentation](https://technologylab-ai.github.io/baz/) · [API guide](docs/APP-API.md) · [20 examples](examples/README.md)
+[Website & documentation](https://technologylab-ai.github.io/baz/) · [API guide](docs/APP-API.md) · [21 examples](examples/README.md)
 
 A **pure Zig** successor to [Zap](https://github.com/zigzap/zap), built in **Zig 0.16.0**
 on [bounded/http](https://technologylab-ai.github.io/bounded-http/). It keeps Zap's typed
@@ -16,6 +16,9 @@ explains its architecture, embedding API, and ownership model; the
 
 The first implementation provides:
 
+- **Streaming responses:** write, flush, sleep, and write again inside one handler,
+  through a standard `std.Io.Writer`. See the [streaming guide](docs/STREAMING.md)
+  and [runnable example](examples/streaming.zig).
 - Real `App(Shared)` instances, plain endpoint structs and one router.
 - Borrowed query and form text, ordered duplicates and explicit decoding into
   caller buffers. Values such as `001` and `false`, and names such as `a[]`,
@@ -25,7 +28,7 @@ The first implementation provides:
 - Bounded one-shot responses, JSON and copied headers; output capacity is secured
   before the handler runs.
 - Caller-supplied `std.Io` and standard memory readers/writers, on [bounded/http](https://technologylab-ai.github.io/bounded-http/)'s
-  io_uring and kqueue transports. Blocking services use explicit fixed workers.
+  io_uring, kqueue, and IOCP transports. Blocking services use explicit fixed workers.
 
 Baz is a separate framework package with a pinned external engine dependency.
 The package and public import are `baz`; the engine import is `bounded_http`.
@@ -50,6 +53,19 @@ for exact environments and evidence. Windows is supported within Baz’s overall
 experimental status; this is correctness coverage, not production qualification.
 
 ## Try it
+
+Watch a response arrive incrementally:
+
+```sh
+zig build run-streaming -Doptimize=ReleaseSafe -- --port 8080
+# In another terminal; use curl.exe on Windows:
+curl -N http://127.0.0.1:8080/
+```
+
+The [handler](examples/streaming.zig) sends three updates with pauses between them.
+Each stream uses one fixed application worker and bounded output storage.
+The HTTP I/O loop continues while the worker waits. Response size and request
+deadlines still apply; [the guide](docs/STREAMING.md) explains cancellation and framing.
 
 Use exact Zig 0.16.0 from [.zig-version](.zig-version), with Python 3 installed:
 
