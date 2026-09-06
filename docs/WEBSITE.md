@@ -30,6 +30,7 @@ The website worktree is only a branch of Baz, not another project or repository.
 | Content | Maintained source |
 | --- | --- |
 | Landing-page prose | [index.template.html](index.template.html) |
+| Native HTTP backend specs | Linux/io_uring, macOS/kqueue, and Windows x64/IOCP appear in the hero and README, attributed to the [bounded/http](https://technologylab-ai.github.io/bounded-http/) engine |
 | App excerpt | `Hello` in [app_demo.zig](../src/app_demo.zig), extracted at build time |
 | Streaming excerpt | `progress` in [streaming.zig](../examples/streaming.zig), extracted at build time |
 | Avoid-body-copies handler | App types and complete `index` handler in [serve.zig](../examples/serve.zig), extracted from the compiled example; copy avoidance leads the explanation, with the small-body threshold stated beside the example and the separate 5 MiB fixture backing the large-body evidence |

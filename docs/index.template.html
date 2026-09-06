@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Baz — Bounded Async Zap. A modern Zig 0.16.0 web framework on bounded/http, with typed applications, borrowed request data, explicit decoding, and bounded responses.">
+<meta name="description" content="Baz — Bounded Async Zap. Pure Zig 0.16.0, streaming responses, and native io_uring on Linux, kqueue on macOS, and IOCP on Windows through bounded/http.">
 <meta name="theme-color" content="#f8f7f1">
 <meta property="og:title" content="Baz — Bounded Async Zap">
-<meta property="og:description" content="Familiar to write. Explicit by design. Typed Zig applications on bounded/http.">
+<meta property="og:description" content="Pure Zig. Streaming responses. Native io_uring, kqueue, and IOCP through bounded/http.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://technologylab-ai.github.io/baz/">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'none'; form-action 'none'">
@@ -38,8 +38,10 @@
     <p class="eyebrow">A modern successor to Zap</p>
     <h1 id="headline">Familiar to write.<br><em>Explicit by design.</em></h1>
     <p class="lede">Meet <strong>Baz — Bounded Async Zap.</strong> A pure Zig web framework on <a href="https://technologylab-ai.github.io/bounded-http/">bounded/http</a>. Typed applications, streaming responses, and memory boundaries you can reason about.</p>
+    <dl class="transport-specs" aria-label="Native HTTP backends"><div><dt>Linux</dt><dd>io_uring</dd></div><div><dt>macOS</dt><dd>kqueue</dd></div><div><dt>Windows x64</dt><dd>IOCP</dd></div></dl>
+    <p class="transport-credit">Native HTTP I/O powered by <a href="https://technologylab-ai.github.io/bounded-http/">bounded/http</a>.</p>
     <div class="actions"><a class="button primary" href="#start">Build your first App <span aria-hidden="true">↗</span></a><a class="button" href="#streaming">See streaming <span aria-hidden="true">↓</span></a></div>
-    <div class="tags"><span>PURE ZIG · EXACT 0.16.0</span><span>CALLER-SUPPLIED std.Io</span><span>LINUX · MACOS · WINDOWS x64</span><span>MIT LICENSE</span></div>
+    <div class="tags"><span>PURE ZIG · EXACT 0.16.0</span><span>CALLER-SUPPLIED std.Io</span><span>MIT LICENSE</span></div>
     <div class="facts"><div class="fact"><strong>Typed.</strong><p>App state and endpoint methods.<br>Ordinary Zig composition.</p></div><div class="fact"><strong>Explicit.</strong><p>Borrowed bytes in.<br>Decoding when you ask.</p></div><div class="fact"><strong>Bounded.</strong><p>Framework capacity at startup.<br>Output reserved before dispatch.</p></div></div>
   </section>
   <section class="chapter" id="idea">
