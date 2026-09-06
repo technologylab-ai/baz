@@ -14,6 +14,15 @@ The engine's [GitHub Pages documentation](https://technologylab-ai.github.io/bou
 explains its architecture, embedding API, and ownership model; the
 [engine source](https://github.com/technologylab-ai/bounded-http) is a separate repository.
 
+Its foundation, [bounded/http](https://technologylab-ai.github.io/bounded-http/),
+takes inspiration from **Tiger Style**: set explicit limits, reserve resources
+up front, and check ownership invariants. Connections, buffers, queues, and
+workers have fixed capacities; request sizes, response sizes, and I/O deadlines
+have enforced limits. When capacity runs out, the engine applies backpressure
+or rejects work instead of growing without bounds. These guarantees cover the
+framework's resources; application code still owns its memory use and must
+cooperate with cancellation.
+
 **Native HTTP backends: Linux · io_uring, macOS · kqueue, Windows · IOCP.**
 Baz uses these transports directly through [bounded/http](https://technologylab-ai.github.io/bounded-http/),
 alongside your application's caller-supplied `std.Io`.
