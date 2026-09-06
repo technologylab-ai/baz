@@ -234,7 +234,7 @@ def run(binary):
             data.close()
             await_slot_reuse(server, control, control_reader)
     canceled_counters(server, False)
-    passed("peer disconnect releases the pending borrow before exact slot reuse", server, True)
+    passed("peer disconnect reconciles the pending borrow within the request deadline before exact slot reuse", server, True)
 
     with ExitStack() as clients:
         with BorrowServer(binary, connections=2, workers=2, socket_send_buffer=4096) as server:
