@@ -1,15 +1,35 @@
 <!doctype html>
 <html lang="en">
+<head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Local session example</title>
-<style>body{font:17px system-ui;max-width:420px;margin:4rem auto;padding:1rem}label{display:block;margin-top:1rem}input,button{font:inherit;padding:.6rem;width:100%;box-sizing:border-box}button{margin-top:1.5rem}</style>
-<h1>Local session example</h1>
-<p>Use username <code>zap</code> and password <code>awesome</code>.</p>
-<p>This example allows one active session and 32 logins per server run.</p>
+<title>Welcome back · Baz sessions</title>
+<style>
+:root{color-scheme:light;--ink:#292e29;--muted:#646d60;--accent:#355a40}
+*{box-sizing:border-box}body{margin:0;background:#f5f2e9;color:var(--ink);font:17px/1.6 system-ui,sans-serif}
+main{max-width:480px;margin:8vh auto;padding:24px}.brand{font-weight:800;letter-spacing:.08em;text-transform:uppercase;font-size:13px;color:var(--accent)}
+h1{font-size:clamp(32px,7vw,44px);line-height:1.12;letter-spacing:-.05em;margin:24px 0 16px}p{color:var(--muted)}
+form{margin:28px 0;padding:24px;background:#fffdf7;border:1px solid #dddccd;border-radius:16px;box-shadow:0 12px 30px #292e2908}
+label{display:block;font-size:14px;font-weight:650;margin-bottom:6px}input,button{font:inherit;padding:12px 14px;width:100%;border-radius:8px}
+input{border:1px solid #c9cfc2;background:white;color:var(--ink);margin-bottom:20px}button{border:0;background:var(--accent);color:white;font-weight:650;cursor:pointer}
+input:focus-visible,button:focus-visible{outline:3px solid #b58027;outline-offset:3px}button:hover{background:#24452e}
+.note{font-size:14px}code{background:#e9ecdf;padding:2px 5px;border-radius:4px;color:var(--ink)}
+</style>
+</head>
+<body>
+<main>
+<div class="brand">Baz / cookie sessions</div>
+<h1>A small sign-in.<br>A clear session.</h1>
+<p>Sign in to open a protected page. Baz sends a session cookie and redirects your browser.</p>
 <form action="/login" method="post">
-<label for="username">Username</label><input id="username" name="username" autocomplete="username" required>
-<label for="password">Password</label><input id="password" name="password" type="password" autocomplete="current-password" required>
-<button>Log in</button>
+<label for="username">Username</label>
+<input id="username" name="username" autocomplete="username" placeholder="zap" required>
+<label for="password">Password</label>
+<input id="password" name="password" type="password" autocomplete="current-password" placeholder="awesome" required>
+<button>Log in →</button>
 </form>
+<p class="note">Try <code>zap</code> / <code>awesome</code>. These credentials are public demo data.</p>
+<p class="note">One active session. Up to 32 logins per server run. Each new login replaces the previous session.</p>
+</main>
+</body>
 </html>

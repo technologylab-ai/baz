@@ -7,6 +7,7 @@ pub const ResponseLimits = @import("response.zig").Limits;
 pub const params = @import("params.zig");
 pub const form = @import("form.zig");
 pub const multipart = @import("multipart.zig");
+pub const cookies = @import("cookies.zig");
 pub const router = @import("router.zig");
 pub const mustache = @import("mustache.zig");
 

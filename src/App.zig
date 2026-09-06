@@ -309,7 +309,8 @@ pub fn App(comptime Shared: type) type {
                 return context.response.finish() catch context.response.errorResponse(500) catch .close;
             }
             const status: u16 = switch (err) {
-                error.InvalidEscape, error.InvalidMetadata, error.DuplicateMetadataParameter, error.InvalidBoundary, error.InvalidMultipart, error.MissingBoundary, error.InvalidQuotedPair, error.AmbiguousContentType => 400,
+                error.InvalidEscape, error.InvalidMetadata, error.DuplicateMetadataParameter, error.InvalidBoundary, error.InvalidMultipart, error.MissingBoundary, error.InvalidQuotedPair, error.AmbiguousContentType, error.MalformedCookie, error.MalformedHeaders, error.DuplicateCookie => 400,
+                error.CookiesTooLarge, error.TooManyCookies => 431,
                 error.ParamsTooLarge, error.TooManyParams, error.NameTooLarge, error.ValueTooLarge, error.MultipartTooLarge, error.TooManyParts, error.PartTooLarge, error.PartHeadersTooLarge, error.MetadataTooLarge, error.TooManyMetadataParameters => 413,
                 error.MissingContentType, error.UnsupportedMediaType, error.UnsupportedContentEncoding, error.UnsupportedMultipartEncoding => 415,
                 else => 500,

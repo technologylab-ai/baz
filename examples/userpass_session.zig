@@ -1,9 +1,11 @@
 //! A local login example has one active session and 32 startup-generated tokens.
 //! Credentials are public demo data. This example is not a production identity service.
+//! The cookie has no Max-Age or Expires. Browser cookie lifetime differs from server session lifetime.
+//! The server retains its active session until logout, replacement, or shutdown.
+//! Tokens are opaque random bytes encoded as hex. This example does not implement JWT.
 const std = @import("std");
 const web = @import("baz");
 const support = @import("example_support");
-const auth = @import("endpoint/auth_helpers.zig");
 
 const Shared = struct {
     tokens: [32][64]u8 = undefined,
@@ -16,9 +18,8 @@ const Context = Application.Context;
 const cookie_name = "demo-session";
 
 fn redirect(ctx: *Context, path: []const u8) !void {
-    try ctx.response.header("Location", path);
     try ctx.response.header("Cache-Control", "no-store");
-    return ctx.response.text(303, "");
+    return ctx.response.redirect(303, path);
 }
 
 fn loginPage(ctx: *Context) !void {
@@ -26,7 +27,22 @@ fn loginPage(ctx: *Context) !void {
     return ctx.response.borrowBody(200, "text/html; charset=utf-8", @embedFile("assets/session_login.html"));
 }
 
+// Reject explicit cross-origin browser POSTs. Clients without Fetch Metadata remain allowed.
+fn acceptsPost(request: web.Request) bool {
+    var seen = false;
+    var headers = request.headers();
+    while (headers.next()) |header| {
+        if (!std.ascii.eqlIgnoreCase(header.name_raw, "Sec-Fetch-Site")) continue;
+        if (seen) return false;
+        seen = true;
+        if (!std.mem.eql(u8, header.value_raw, "same-origin") and
+            !std.mem.eql(u8, header.value_raw, "none")) return false;
+    }
+    return true;
+}
+
 fn login(ctx: *Context) !void {
+    if (!acceptsPost(ctx.request)) return ctx.response.text(403, "Cross-origin POST rejected");
     var body_buffer: [1024]u8 = undefined;
     const limits: web.params.Limits = .{ .max_bytes = body_buffer.len, .max_pairs = 2, .max_name_bytes = 16, .max_value_bytes = 128 };
     const fields = ctx.request.formUrlEncoded(limits) catch |err| switch (err) {
@@ -53,9 +69,7 @@ fn login(ctx: *Context) !void {
     if (shared.busy.swap(true, .acquire)) return ctx.response.text(503, "Session state is busy");
     defer shared.busy.store(false, .release);
     if (shared.used == shared.tokens.len) return ctx.response.text(503, "Demo login capacity reached; restart the example");
-    var cookie_buffer: [192]u8 = undefined;
-    const cookie = try std.fmt.bufPrint(&cookie_buffer, cookie_name ++ "={s}; Path=/; HttpOnly; SameSite=Strict", .{shared.tokens[shared.used]});
-    try ctx.response.header("Set-Cookie", cookie);
+    try ctx.response.setCookie(cookie_name, &shared.tokens[shared.used], .{ .same_site = .strict });
     try redirect(ctx, "/normal_page");
     // A new login replaces the prior session. A retired token never returns.
     shared.active = shared.used;
@@ -64,8 +78,7 @@ fn login(ctx: *Context) !void {
 
 fn authenticated(shared: *const Shared, request: web.Request) bool {
     const active = shared.active orelse return false;
-    const parsed = auth.cookies(request) catch return false;
-    const token = (parsed.unique(cookie_name) catch return false) orelse return false;
+    const token = (request.cookie(cookie_name) catch return false) orelse return false;
     if (token.len != 64) return false;
     return std.crypto.timing_safe.eql([64]u8, token[0..64].*, shared.tokens[active]);
 }
@@ -75,21 +88,21 @@ fn home(ctx: *Context) !void {
     defer ctx.shared.busy.store(false, .release);
     if (!authenticated(ctx.shared, ctx.request)) return redirect(ctx, "/login");
     try ctx.response.header("Cache-Control", "no-store");
-    return ctx.response.bytes(200, "text/html; charset=utf-8", "<!doctype html><html lang=\"en\"><meta charset=\"utf-8\"><title>Demo session</title>" ++
-        "<h1>You are logged in!</h1><p>This local demo has one active session.</p>" ++
-        "<form action=\"/logout\" method=\"post\"><button>Log out</button></form></html>");
+    return ctx.response.borrowBody(200, "text/html; charset=utf-8", @embedFile("assets/session_home.html"));
 }
 
 fn logout(ctx: *Context) !void {
+    if (!acceptsPost(ctx.request)) return ctx.response.text(403, "Cross-origin POST rejected");
     if (ctx.shared.busy.swap(true, .acquire)) return ctx.response.text(503, "Session state is busy");
     defer ctx.shared.busy.store(false, .release);
     if (!authenticated(ctx.shared, ctx.request)) return redirect(ctx, "/login");
-    try ctx.response.header("Set-Cookie", cookie_name ++ "=; Path=/; Max-Age=0; HttpOnly; SameSite=Strict");
+    try ctx.response.deleteCookie(cookie_name, .{ .same_site = .strict });
     try redirect(ctx, "/login");
     ctx.shared.active = null;
 }
 
 fn stop(ctx: *Context) !void {
+    if (!acceptsPost(ctx.request)) return ctx.response.text(403, "Cross-origin POST rejected");
     if (ctx.shared.busy.swap(true, .acquire)) return ctx.response.text(503, "Session state is busy");
     defer ctx.shared.busy.store(false, .release);
     if (!authenticated(ctx.shared, ctx.request)) return redirect(ctx, "/login");

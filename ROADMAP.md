@@ -14,7 +14,8 @@ provide bounded tasks, acceptance gates, ownership, and resume instructions.
 | App, routing, request/form views, multipart, responses | First implementation | Preserve bounded ownership while extending composition. |
 | Zap examples | 21 supported ports plus worker streaming | Keep native behavior coverage and record semantic differences. |
 | External dependency | Baz imports `bounded_http` | Maintain an immutable engine pin and upstream generic engine changes. |
-| Middleware, locals, cookies | Example helpers available | API-06: establish the public composition contract. |
+| Cookies and redirects | Public helpers implemented | Preserve raw views, explicit lifetimes and [cookie/session gates](docs/COOKIES.md). |
+| Middleware and locals | Example helpers available | API-06: establish the remaining public composition contract. |
 | Resumable endpoints | Worker streaming implemented | API-07: typed inline continuation state and retention rules. |
 | Standalone repository | Published GitHub repository and Pages, MIT licensed | Maintain package, documentation and native CI. |
 | Owned `std.Io` | Deferred | Revisit after the first API MVP. |

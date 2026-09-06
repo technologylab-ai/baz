@@ -5,6 +5,8 @@
 const std = @import("std");
 const api = @import("bounded_http").api;
 const templates = @import("mustache.zig");
+const cookies = @import("cookies.zig");
+const overlap = @import("params.zig").overlap;
 
 pub const Limits = struct {
     /// Serialized extra fields, including names, separators and CRLFs.
@@ -118,6 +120,65 @@ pub const Response = struct {
         @memcpy(out[header_size - 2 ..], "\r\n");
         self.header_len += header_size;
         self.header_count += 1;
+    }
+
+    /// Append one Set-Cookie field directly into reserved header storage. Inputs
+    /// are copied before returning; invalid fields/capacity leave the draft intact.
+    /// With neither Max-Age nor Expires, the cookie lasts for the browser session.
+    pub fn setCookie(self: *Response, name: []const u8, value: []const u8, options: cookies.Options) !void {
+        try self.checkDraft();
+        const length = try cookies.encodedLength(name, value, options);
+        const prefix = "Set-Cookie: ";
+        const size = std.math.add(usize, length, prefix.len + 2) catch return error.ResponseLimit;
+        if (self.header_count == self.limits.max_headers or size > self.limits.header_bytes - self.header_len)
+            return error.ResponseLimit;
+        const out = self.headerStorage()[self.header_len..][0..size];
+        if (overlap(name, out) or overlap(value, out)) return error.OverlappingBuffers;
+        if (options.path) |path| if (overlap(path, out)) return error.OverlappingBuffers;
+        if (options.domain) |domain| if (overlap(domain, out)) return error.OverlappingBuffers;
+        _ = try cookies.encodeInto(name, value, options, out[prefix.len..][0..length]);
+        @memcpy(out[0..prefix.len], prefix);
+        @memcpy(out[size - 2 ..], "\r\n");
+        self.header_len += size;
+        self.header_count += 1;
+    }
+
+    /// Expire an empty cookie now. Reuse the original Path/Domain scope and
+    /// security options; deleting a browser cookie does not revoke server state.
+    pub fn deleteCookie(self: *Response, name: []const u8, scope: cookies.Options) !void {
+        var options = scope;
+        options.max_age = 0;
+        options.expires = 0;
+        return self.setCookie(name, "", options);
+    }
+
+    /// Prepare an empty redirect, with an explicit HTTP redirect status. The
+    /// destination is copied unchanged: supply a trusted, already encoded URI
+    /// reference. This helper does not enforce an application origin allowlist.
+    pub fn redirect(self: *Response, status: u16, location: []const u8) !void {
+        try self.checkBody(status, "text/plain; charset=utf-8", 0);
+        switch (status) {
+            301, 302, 303, 307, 308 => {},
+            else => return error.InvalidRedirect,
+        }
+        if (location.len == 0) return error.InvalidRedirect;
+        for (location, 0..) |byte, index| {
+            if (byte <= 0x20 or byte >= 0x7f or std.mem.indexOfScalar(u8, "\\\"<>^`{|}", byte) != null) return error.InvalidRedirect;
+            if (byte == '%' and (location.len - index < 3 or
+                !std.ascii.isHex(location[index + 1]) or !std.ascii.isHex(location[index + 2])))
+                return error.InvalidRedirect;
+        }
+        var fields = std.mem.splitSequence(u8, self.headerStorage()[0..self.header_len], "\r\n");
+        while (fields.next()) |field| {
+            const colon = std.mem.findScalar(u8, field, ':') orelse continue;
+            if (std.ascii.eqlIgnoreCase(field[0..colon], "Location")) return error.DuplicateLocation;
+        }
+        const size = std.math.add(usize, location.len, "Location: \r\n".len) catch return error.ResponseLimit;
+        if (self.header_count == self.limits.max_headers or size > self.limits.header_bytes - self.header_len)
+            return error.ResponseLimit;
+        if (overlap(location, self.headerStorage()[self.header_len..][0..size])) return error.OverlappingBuffers;
+        try self.header("Location", location);
+        self.setBody(status, "text/plain; charset=utf-8", 0);
     }
 
     /// Copy a complete body now. A successful call prepares the response but
@@ -713,4 +774,118 @@ test "Mustache overflow work exhaustion and bodyless status keep prefixes privat
         try testing.expect(std.mem.indexOf(u8, arena[0..writer.buffered], "private") == null);
         writer.release();
     }
+}
+
+test "cookie headers copy metadata once, repeat independently, and coexist with a borrowed body" {
+    var arena: [2048]u8 = @splat(0xa5);
+    const cache = testCache();
+    var writer = api.Writer.init(&arena, &cache, 0);
+    writer.open(0, true, false);
+    var response = try Response.init(&writer, .{ .header_bytes = 512, .body_bytes = 32 });
+    var token = "original".*;
+    try response.setCookie("sid", &token, .{});
+    @memset(&token, 'x');
+    try response.borrowBody(200, "text/plain", "asset");
+    try response.deleteCookie("old", .{ .path = "/app", .domain = "example.test", .max_age = 3600, .expires = 253402300799, .secure = true, .same_site = .strict });
+    try testing.expect(!writer.began);
+    _ = try response.finish();
+    const head = arena[0..writer.body_start];
+    try testing.expect(std.mem.indexOf(u8, head, "Set-Cookie: sid=original; Path=/; HttpOnly; SameSite=Lax\r\n") != null);
+    try testing.expect(std.mem.indexOf(u8, head, "Set-Cookie: old=; Path=/app; Domain=example.test; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Secure; HttpOnly; SameSite=Strict\r\n") != null);
+    try testing.expectError(error.InvalidState, response.setCookie("late", "x", .{}));
+}
+
+test "cookie header exact bounds and validation failures preserve every draft byte" {
+    const expected = "Set-Cookie: a=b; Path=/; HttpOnly; SameSite=Lax\r\n";
+    var arena: [1024]u8 = @splat(0xa5);
+    const cache = testCache();
+    var writer = api.Writer.init(&arena, &cache, 0);
+    writer.open(0, true, false);
+    var response = try Response.init(&writer, .{ .header_bytes = expected.len, .body_bytes = 0, .max_headers = 1 });
+    const before = arena;
+    try testing.expectError(error.ResponseLimit, response.setCookie("a", "bb", .{}));
+    try testing.expectError(error.InvalidCookieValue, response.setCookie("a", "b\r\nInjected: x", .{}));
+    try testing.expectError(error.InsecureCookie, response.setCookie("a", "b", .{ .same_site = .none }));
+    try testing.expectEqualSlices(u8, &before, &arena);
+    try testing.expectEqual(@as(usize, 0), response.header_len);
+    try testing.expectEqual(@as(u16, 0), response.header_count);
+    try response.setCookie("a", "b", .{});
+    try testing.expectEqualStrings(expected, response.headerStorage());
+    try testing.expectError(error.ResponseLimit, response.deleteCookie("a", .{}));
+    try response.text(200, "");
+    _ = try response.finish();
+}
+
+test "cookie encoding rejects aliasing anywhere in the new header before mutation" {
+    var arena: [1024]u8 = @splat('a');
+    const cache = testCache();
+    var writer = api.Writer.init(&arena, &cache, 0);
+    writer.open(0, true, false);
+    var response = try Response.init(&writer, .{ .header_bytes = 128, .body_bytes = 0 });
+    const before = arena;
+    try testing.expectError(error.OverlappingBuffers, response.setCookie("sid", response.headerStorage()[0..1], .{}));
+    try testing.expectEqualSlices(u8, &before, &arena);
+    try testing.expectEqual(@as(usize, 0), response.header_len);
+}
+
+test "redirect validates destination and status atomically and leaves cookie headers ordered" {
+    var arena: [2048]u8 = @splat(0xa5);
+    const cache = testCache();
+    var writer = api.Writer.init(&arena, &cache, 0);
+    for ([_]u16{ 301, 302, 303, 307, 308 }) |status| {
+        writer.open(0, true, false);
+        var response = try Response.init(&writer, .{ .header_bytes = 256, .body_bytes = 32 });
+        try response.setCookie("sid", "token", .{});
+        const before = arena;
+        const old_len = response.header_len;
+        try testing.expectError(error.InvalidRedirect, response.redirect(304, "/"));
+        for ([_][]const u8{ "", " /", "/two words", "/\\evil", "/bad%", "/bad%xy", "/<bad>", "/{bad}", "/a\r\nInjected: x", "/\xff" }) |bad|
+            try testing.expectError(error.InvalidRedirect, response.redirect(status, bad));
+        try testing.expectEqualSlices(u8, &before, &arena);
+        try testing.expectEqual(old_len, response.header_len);
+        try testing.expect(!response.prepared);
+        var location = "/home?x=%20#ok".*;
+        try response.redirect(status, &location);
+        @memset(&location, 'x');
+        try response.setCookie("after", "yes", .{});
+        try testing.expectError(error.InvalidState, response.text(200, "other"));
+        _ = try response.finish();
+        try testing.expectEqual(status, writer.status);
+        try testing.expectEqualStrings("", writer.committed());
+        try testing.expect(std.mem.indexOf(u8, arena[0..writer.body_start], "Location: /home?x=%20#ok\r\nSet-Cookie: after=yes;") != null);
+        writer.release();
+    }
+}
+
+test "redirect refuses ambiguous Location and insufficient capacity without selecting a body" {
+    var arena: [1024]u8 = @splat(0xa5);
+    const cache = testCache();
+    var writer = api.Writer.init(&arena, &cache, 0);
+    writer.open(0, true, false);
+    var response = try Response.init(&writer, .{ .header_bytes = 64, .body_bytes = 0 });
+    try response.header("lOcAtIoN", "/old");
+    const before = arena;
+    try testing.expectError(error.DuplicateLocation, response.redirect(303, "/new"));
+    try testing.expectEqualSlices(u8, &before, &arena);
+    try testing.expect(!response.prepared);
+    try response.text(200, "");
+    _ = try response.finish();
+    writer.release();
+    writer.open(0, true, false);
+    response = try Response.init(&writer, .{ .header_bytes = 12, .body_bytes = 0 });
+    try testing.expectError(error.ResponseLimit, response.redirect(303, "/"));
+    try testing.expectEqual(@as(usize, 0), response.header_len);
+    try testing.expect(!response.prepared);
+}
+
+test "redirect rejects overlapping Location before writing any header prefix" {
+    var arena: [1024]u8 = @splat('a');
+    const cache = testCache();
+    var writer = api.Writer.init(&arena, &cache, 0);
+    writer.open(0, true, false);
+    var response = try Response.init(&writer, .{ .header_bytes = 64, .body_bytes = 0 });
+    const before = arena;
+    try testing.expectError(error.OverlappingBuffers, response.redirect(303, response.headerStorage()[0..1]));
+    try testing.expectEqualSlices(u8, &before, &arena);
+    try testing.expect(!response.prepared and response.header_len == 0);
 }

@@ -34,7 +34,7 @@ EXAMPLES = [
     ('middleware', 'composition', 'Ordered Zig functions and typed stack locals.'),
     ('middleware_with_endpoint', 'composition', 'Endpoint composition with an early-stop path.'),
     ('userpass_session', 'composition', 'A bounded local login, logout, and session demonstration.'),
-    ('cookies', 'composition', 'Raw cookie input and copied Set-Cookie output.'),
+    ('cookies', 'composition', 'Borrowed cookie input, explicit expiry, and validated Set-Cookie output.'),
     ('http_params', 'data', 'Raw duplicates and explicit query versus form decoding.'),
     ('bindataformpost', 'data', 'One flat loop for fields and files, with bounded previews.'),
 ]
@@ -43,6 +43,7 @@ EXAMPLES = [
 def documents():
     paths = {'README.md', 'ROADMAP.md', 'LICENSE', '.zig-version', 'build.zig', 'build.zig.zon',
              'examples/README.md', 'examples/LICENSE-ZAP',
+             'examples/assets/session_login.html', 'examples/assets/session_home.html',
              'examples/assets/mustache.html', 'examples/assets/mustache-user.html', 'examples/embedding/build.zig',
              'examples/embedding/build.zig.zon', 'examples/embedding/src/main.zig',
              'reports/2026-09-06-basic-zap.md', 'reports/2026-09-06-app-api.md',

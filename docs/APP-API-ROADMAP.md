@@ -30,7 +30,7 @@ tracks transport reliability, performance, and platform work. Its
 - API-09 Mustache passed all three native gates; see the
   [verification report](../reports/2026-09-06-mustache.md). The user prioritized
   real application templating ahead of composition work.
-- Next bounded work: finish API-06's public composition/locals/cookie contract,
+- Next bounded work: finish API-06's public composition/locals contract,
   using the example-local wrappers as real use cases; then API-07.
   Baz now consumes an external engine package; repository and Pages publication are complete.
   IO-01–04 remains deferred until after the first API MVP by user decision.
@@ -79,7 +79,7 @@ Split implementation across sessions at its named gate and record exact state.
 | API-03 | implemented; scoped receipt | App instances, one router, endpoint methods, typed Shared and startup/stop lifecycle. | API-01, API-02 | APP-COMPOSITION |
 | API-04 | implemented; scoped receipt | Body adapters and explicit URL-encoded form API. | API-01, API-03 | APP-FORM, APP-STDIO-READER |
 | API-05 | implemented; scoped receipt | Flat multipart fields/files over retained input. | API-04 | APP-MULTIPART |
-| API-06 | queued | Typed locals, middleware, authentication composition, cookies and redirects. | API-02, API-03 | APP-MIDDLEWARE |
+| API-06 | cookies/redirects implemented; composition queued | Typed locals, middleware and authentication composition remain. Public cookie/redirect helpers: [guide](COOKIES.md). | API-02, API-03 | APP-MIDDLEWARE |
 | API-07 | worker streaming implemented; typed inline continuations queued | Typed explicit resumable endpoints and retention rules. | API-03, API-06 | APP-RESUME |
 | API-08 | partial: 21 ports, streaming example and external package | Finish remaining migration examples and successor MVP qualification; repository and Pages publication are integrated. | API-01–07 | APP-NATIVE |
 | API-09 | implemented; native gates passed | Pure Zig Mustache: startup template/partial ownership, bounded typed rendering into reserved HTML, original Zap compatibility and official core fixtures. | API-02, API-03 | APP-MUSTACHE |
@@ -235,9 +235,10 @@ storage accounting. Introduce a fixed ordered middleware chain with named
 continue/respond behavior and endpoint/authentication wrappers. Hooks operate
 on one request context, with no hidden parameter parsing or generic context bag.
 
-Provide raw cookie iteration plus bounded validated Set-Cookie and redirect
-helpers on API-02 headers. Request cookie parsing does not apply URL decoding
-by default; cookie semantics need their own source/fixture review at this step.
+The cookie/redirect slice is implemented: borrowed views, validated Set-Cookie,
+explicit lifetime/scope, deletion and empty redirect helpers. The [guide](COOKIES.md)
+records the source/fixture profile and session/JWT boundary. APP-COOKIES covers
+codec/response/consumer tests and native HTTP/session gates.
 Authentication policy/storage stays in application services. Include a fake
 in-memory authenticator to demonstrate composition without requiring external
 credentials or a database.

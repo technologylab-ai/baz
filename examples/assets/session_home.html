@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>You are signed in · Baz sessions</title>
+<style>
+:root{color-scheme:light}*{box-sizing:border-box}body{margin:0;background:#f5f2e9;color:#292e29;font:17px/1.6 system-ui,sans-serif}
+main{max-width:520px;margin:12vh auto;padding:24px}.brand{font-weight:800;letter-spacing:.08em;text-transform:uppercase;font-size:13px;color:#355a40}
+.badge{display:inline-block;margin-top:32px;background:#e2ebda;color:#355a40;padding:5px 12px;border-radius:20px;font-size:14px;font-weight:650}
+h1{font-size:clamp(32px,7vw,44px);line-height:1.12;letter-spacing:-.05em;margin:20px 0}p{color:#646d60}
+section{margin:28px 0;padding:22px;background:#fffdf7;border:1px solid #dddccd;border-radius:16px}section p{margin:0}
+button{font:inherit;font-weight:650;padding:12px 22px;border:0;border-radius:8px;background:#355a40;color:white;cursor:pointer}
+button:hover{background:#24452e}button:focus-visible{outline:3px solid #b58027;outline-offset:3px}.note{font-size:14px}
+</style>
+</head>
+<body>
+<main>
+<div class="brand">Baz / cookie sessions</div>
+<span class="badge">Session active</span>
+<h1>You are logged in!</h1>
+<p>Your browser sent its session cookie. The handler checked that cookie before opening this page.</p>
+<section><p>Log out to retire this token and clear the cookie. The old token will no longer open this page.</p></section>
+<form action="/logout" method="post"><button>Log out →</button></form>
+<p class="note">This local demo has one active session and 32 logins per server run.</p>
+</main>
+</body>
+</html>

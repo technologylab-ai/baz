@@ -98,9 +98,10 @@ arguments before startup, both option spellings, worker defaults, and shutdown.
 | `http_params` | [http_params.zig](http_params.zig) | Separate query/form lists, raw duplicates and explicitly compared percent/form decoding. |
 | `bindataformpost` | [bindataformpost.zig](bindataformpost.zig) | One flat loop for fields, one file or repeated files; binary hex previews, no implicit saving. |
 
-The middleware/auth/cookie utilities are example-local implementations. They
-demonstrate typed composition while API-06's public middleware/locals/cookie
-facilities remain queued. Demo credentials and session policy are local example
+Cookie parsing, Set-Cookie formatting, deletion and redirects now use public Baz
+APIs. Read [cookie lifetimes, flags and session limits](../docs/COOKIES.md).
+Middleware/auth wrappers remain example-local while public middleware and typed
+locals remain queued. Demo credentials and session policy are local example
 choices, not a general authentication service. Application scratch and services
 have explicit bounds but remain outside the framework allocator's ledger.
 
