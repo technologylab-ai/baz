@@ -28,7 +28,7 @@ class Page(HTMLParser):
             assert attrs.get('role') == 'img' and attrs.get('aria-labelledby'), 'Diagram needs an accessible name'
 
 
-def check(output, documents):
+def check(output, documents, document_urls):
     pages = {name: Page((output / name).read_text()) for name in ['index.html', 'docs/read.html']}
     for name, page in pages.items():
         for href in page.links:
@@ -53,10 +53,10 @@ def check(output, documents):
     index = (output / 'index.html').read_text()
     assert len(re.findall(r'class="example-card"', index)) == 20
     assert all(text in index for text in ['1.038×', '1.771×', '0.629×', '1.025×'])
-    assert all((output / name).read_bytes() == (Path(__file__).resolve().parents[1] / name).read_bytes() for name in documents), 'Copied document changed'
+    assert all((output / document_urls.get(name, name)).read_bytes() == (Path(__file__).resolve().parents[1] / name).read_bytes() for name in documents), 'Copied document changed'
     print('Site checks passed: links, anchors, diagrams, 20 examples, four benchmark profiles, and document identity.')
 
 
 if __name__ == '__main__':
-    from build_pages import OUTPUT, documents
-    check(OUTPUT, documents())
+    from build_pages import OUTPUT, DOCUMENT_URLS, documents
+    check(OUTPUT, documents(), DOCUMENT_URLS)

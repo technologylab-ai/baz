@@ -44,6 +44,9 @@ requires ReleaseSafe with assertions.
 The artifact’s `publication.json` records its Git revision and every other
 file’s SHA-256. Reader source links use that exact revision. Documents excluded
 from the Pages allowlist, such as large raw evidence files, link to GitHub.
+The `.zig-version` document is served through `docs/zig-version.txt` because
+Pages hides dot-prefixed paths; its reader identity and GitHub source stay canonical.
+The artifact’s `.nojekyll` control file is not a public document.
 The artifact includes no Git object store, caches, temporary browser profiles,
 or benchmark archives.
 
