@@ -74,7 +74,7 @@ jobs:
           & zig build install examples -Doptimize=ReleaseSafe -j2 --summary all 2>&1 |
             Tee-Object "$env:RUNNER_TEMP/baz-windows-logs/install.log"
           if ($LASTEXITCODE -ne 0) { throw "ReleaseSafe example installation failed" }
-          foreach ($suite in @("cli_integration", "app_integration", "examples_integration", "streaming_integration", "borrow_integration", "mustache_integration", "cookies_integration", "windows_smoke")) {
+          foreach ($suite in @("cli_integration", "app_integration", "examples_integration", "streaming_integration", "borrow_integration", "mustache_integration", "cookies_integration", "middleware_integration", "session_integration", "continuations_integration", "windows_smoke")) {
             & python "tests/$suite.py" 2>&1 |
               Tee-Object "$env:RUNNER_TEMP/baz-windows-logs/$suite.log"
             if ($LASTEXITCODE -ne 0) { throw "$suite failed" }

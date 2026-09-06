@@ -12,6 +12,7 @@ h1{font-size:clamp(32px,7vw,44px);line-height:1.12;letter-spacing:-.05em;margin:
 section{margin:28px 0;padding:22px;background:#fffdf7;border:1px solid #dddccd;border-radius:16px}section p{margin:0}
 button{font:inherit;font-weight:650;padding:12px 22px;border:0;border-radius:8px;background:#355a40;color:white;cursor:pointer}
 button:hover{background:#24452e}button:focus-visible{outline:3px solid #b58027;outline-offset:3px}.note{font-size:14px}
+.actions{display:flex;flex-wrap:wrap;gap:12px}.secondary{background:#e2ebda;color:#355a40}.secondary:hover{background:#d2dfc7}
 </style>
 </head>
 <body>
@@ -19,10 +20,14 @@ button:hover{background:#24452e}button:focus-visible{outline:3px solid #b58027;o
 <div class="brand">Baz / cookie sessions</div>
 <span class="badge">Session active</span>
 <h1>You are logged in!</h1>
-<p>Your browser sent its session cookie. The handler checked that cookie before opening this page.</p>
+<p>Your browser sent its session cookie. Middleware checked the token and server deadline before this handler ran.</p>
 <section><p>Log out to retire this token and clear the cookie. The old token will no longer open this page.</p></section>
+<div class="actions">
 <form action="/logout" method="post"><button>Log out →</button></form>
-<p class="note">This local demo has one active session and 32 logins per server run.</p>
+<form action="/logout-all" method="post"><button class="secondary">Log out all devices</button></form>
+</div>
+<p class="note">Each session has a fixed server deadline: 30 minutes by default. Page visits do not extend it.</p>
+<p class="note">The server supports 32 active sessions. Expiry and logout free slots for future logins.</p>
 </main>
 </body>
 </html>

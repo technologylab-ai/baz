@@ -1,0 +1,161 @@
+{
+  "head_sha": "ee36286526c075ad58947619c826885d28d2c765",
+  "zig_version": "0.16.0",
+  "kind": "native correctness; no performance comparison",
+  "runs": {
+    "native": {
+      "databaseId": 34065133713,
+      "headSha": "ee36286526c075ad58947619c826885d28d2c765",
+      "event": "push",
+      "conclusion": "success",
+      "url": "https://github.com/technologylab-ai/baz/actions/runs/34065133713"
+    },
+    "windows": {
+      "databaseId": 34065133700,
+      "headSha": "ee36286526c075ad58947619c826885d28d2c765",
+      "event": "push",
+      "conclusion": "success",
+      "url": "https://github.com/technologylab-ai/baz/actions/runs/34065133700"
+    }
+  },
+  "platforms": {
+    "linux": {
+      "environment": "ee36286526c075ad58947619c826885d28d2c765\nLinux runnervmejwal 6.17.0-1022-azure #22-Ubuntu SMP Mon Jul 27 17:24:03 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux\n0.16.0\nPython 3.12.3\n",
+      "root_tests_per_mode": 161,
+      "consumer_tests_per_mode": 5,
+      "root_build_steps_per_mode": 59,
+      "consumer_build_steps_per_mode": 4,
+      "modes": [
+        "Debug",
+        "ReleaseSafe"
+      ],
+      "runtime_optimize": "ReleaseSafe",
+      "suites": {
+        "middleware": {
+          "passed": 15
+        },
+        "borrow": {
+          "passed": 9
+        },
+        "continuations": {
+          "passed": 20
+        },
+        "mustache": {
+          "passed": 12
+        },
+        "streaming": {
+          "passed": 14
+        },
+        "cli": {
+          "passed": 331,
+          "executables": 28
+        },
+        "examples": {
+          "passed": 20
+        },
+        "app": {
+          "passed": 14
+        },
+        "sessions": {
+          "passed": 17
+        },
+        "cookies": {
+          "passed": 14
+        }
+      }
+    },
+    "macos": {
+      "environment": "ee36286526c075ad58947619c826885d28d2c765\nDarwin iad20-eo1209-bc0a7b8e-e081-4f3a-b6b2-3e58038768e2-A20DED18D4B8.local 25.5.0 Darwin Kernel Version 25.5.0: Tue Jun  9 22:26:00 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_VMAPPLE arm64\n0.16.0\nPython 3.14.6\n",
+      "root_tests_per_mode": 161,
+      "consumer_tests_per_mode": 5,
+      "root_build_steps_per_mode": 59,
+      "consumer_build_steps_per_mode": 4,
+      "modes": [
+        "Debug",
+        "ReleaseSafe"
+      ],
+      "runtime_optimize": "ReleaseSafe",
+      "suites": {
+        "middleware": {
+          "passed": 15
+        },
+        "borrow": {
+          "passed": 9
+        },
+        "continuations": {
+          "passed": 20
+        },
+        "mustache": {
+          "passed": 12
+        },
+        "streaming": {
+          "passed": 14
+        },
+        "cli": {
+          "passed": 331,
+          "executables": 28
+        },
+        "examples": {
+          "passed": 20
+        },
+        "app": {
+          "passed": 14
+        },
+        "sessions": {
+          "passed": 17
+        },
+        "cookies": {
+          "passed": 14
+        }
+      }
+    },
+    "windows": {
+      "environment": "commit=ee36286526c075ad58947619c826885d28d2c765 image=win25-vs2026 version=20260824.214.3 zig=0.16.0\n{\n  \"Caption\": \"Microsoft Windows Server 2025 Datacenter\",\n  \"Version\": \"10.0.26100\",\n  \"BuildNumber\": \"26100\",\n  \"OSArchitecture\": \"64-bit\"\n}\n",
+      "root_tests_per_mode": 161,
+      "consumer_tests_per_mode": 5,
+      "root_build_steps_per_mode": 59,
+      "consumer_build_steps_per_mode": 4,
+      "modes": [
+        "Debug",
+        "ReleaseSafe"
+      ],
+      "runtime_optimize": "ReleaseSafe",
+      "suites": {
+        "mustache": {
+          "passed": 12
+        },
+        "borrow": {
+          "passed": 9
+        },
+        "middleware": {
+          "passed": 15
+        },
+        "cli": {
+          "passed": 331,
+          "executables": 28
+        },
+        "app": {
+          "passed": 14
+        },
+        "cookies": {
+          "passed": 14
+        },
+        "continuations": {
+          "passed": 20
+        },
+        "windows_smoke": {
+          "passed": 3
+        },
+        "examples": {
+          "passed": 20
+        },
+        "streaming": {
+          "passed": 14
+        },
+        "sessions": {
+          "passed": 17
+        }
+      }
+    }
+  }
+}

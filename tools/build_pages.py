@@ -25,15 +25,16 @@ EXAMPLES = [
     ('senderror', 'responses', 'Controlled errors, with no client-visible stack trace.'),
     ('accept', 'responses', 'Explicit, bounded content negotiation.'),
     ('mustache', 'responses', 'A greeting form and user cards: startup templates, typed data, bounded HTML.'),
+    ('continuations', 'responses', 'Many waiting streams, a small worker pool: typed flush, wait, and finish callbacks.'),
     ('streaming', 'responses', 'Write, flush, sleep, and write again through a standard Zig writer.'),
     ('app_basic', 'app', 'Typed Shared, endpoint state, and instance shutdown.'),
     ('app_errors', 'app', 'Error mapping and discarded private response drafts.'),
     ('endpoint', 'app', 'Bounded user CRUD on explicit application workers.'),
-    ('app_auth', 'composition', 'A typed bearer wrapper and early unauthorized response.'),
+    ('app_auth', 'composition', 'Public authentication middleware and typed request locals.'),
     ('endpoint_auth', 'composition', 'Stateful endpoints with an explicit authentication check.'),
-    ('middleware', 'composition', 'Ordered Zig functions and typed stack locals.'),
+    ('middleware', 'composition', 'Public ordered before/after/cleanup hooks and typed request locals.'),
     ('middleware_with_endpoint', 'composition', 'Endpoint composition with an early-stop path.'),
-    ('userpass_session', 'composition', 'A bounded local login, logout, and session demonstration.'),
+    ('userpass_session', 'composition', '32 reusable sessions, fixed server expiry, and logout across devices.'),
     ('cookies', 'composition', 'Borrowed cookie input, explicit expiry, and validated Set-Cookie output.'),
     ('http_params', 'data', 'Raw duplicates and explicit query versus form decoding.'),
     ('bindataformpost', 'data', 'One flat loop for fields and files, with bounded previews.'),
@@ -49,10 +50,10 @@ def documents():
              'reports/2026-09-06-basic-zap.md', 'reports/2026-09-06-app-api.md',
              'reports/2026-09-06-baz-extraction.md', 'reports/2026-09-06-windows-baz.md',
              'reports/2026-09-06-streaming.md', 'reports/2026-09-06-large-borrow.md',
-             'reports/2026-09-06-mustache.md',
+             'reports/2026-09-06-mustache.md', 'reports/2026-09-07-composition.md',
              'reports/2026-09-06-basic-zap/PROTOCOL.md',
              'reports/2026-09-06-basic-zap/reproducer/README.md'}
-    for pattern in ('docs/*.md', 'src/*.zig', 'examples/*.zig'):
+    for pattern in ('docs/*.md', 'src/*.zig', 'examples/*.zig', 'examples/endpoint/*.zig'):
         paths.update(str(p.relative_to(ROOT)) for p in ROOT.glob(pattern))
     return sorted(paths)
 

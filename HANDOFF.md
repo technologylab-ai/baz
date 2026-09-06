@@ -1,3 +1,19 @@
+# Active composition work
+
+`feat/middleware-locals` adds public middleware/locals, bounded reusable sessions
+with fixed expiry and revocation, and typed streaming continuations. Engine
+[PR #4](https://github.com/technologylab-ai/bounded-http/pull/4) must merge first;
+Baz pins candidate `6f6af03e828159455b91cece6ba468201651e1f6` by immutable URL/hash.
+[Baz PR #5](https://github.com/technologylab-ai/baz/pull/5) contains the implementation.
+[The composition receipt](reports/2026-09-07-composition.md) records passing native
+Linux/macOS/Windows gates at `ee36286526c075ad58947619c826885d28d2c765`, with
+161 root tests and five consumer tests per mode, 15 middleware, 17 session and
+20 continuation groups, all old wire suites, and 331 CLI checks. Documentation
+and receipts were finalized afterward; the recorded Zig source hashes are unchanged.
+Neither PR has been merged. Merge the engine first, then Baz.
+The standard caller `std.Io` remains; an owned provider is deferred. No benchmarks
+or JWT policy were added. The earlier merged baseline follows for history.
+
 # Baz handoff — 2026-09-06
 
 Work from the independent `baz` repository, primary branch `main`.
@@ -12,7 +28,7 @@ The public API now includes borrowed request cookie views, duplicate-rejecting
 `cookie(name)`, `setCookie`, `deleteCookie` and `redirect`. See [COOKIES.md](docs/COOKIES.md).
 Session/persistent lifetimes are explicit; JWT interpretation remains application
 work. Cookie and login examples use these APIs and separate styled page assets.
-CI includes the cookie wire/session suite. Public middleware/locals remain next.
+CI includes the cookie wire/session suite. Public middleware/locals and bounded expiring sessions are being verified in feat/middleware-locals.
 
 ## Integrated Mustache templates
 
@@ -96,7 +112,7 @@ App basics and Streaming response as adjacent tabs; `#streaming` opens the latte
 Read the [API guide](docs/APP-API.md), [ownership contract](docs/OWNERSHIP.md), and
 [multi-session roadmap](docs/APP-API-ROADMAP.md). API-01–05 and 21 example ports
 are implemented. API-06 has public cookie/redirect helpers; public middleware
-and typed locals remain; API-07 adds typed resumable endpoints and their ownership gates.
+and typed locals are implemented on the composition branch; API-07 adds typed resumable endpoints and their ownership gates.
 
 The [response copy review](docs/OWNERSHIP.md#response-copies-and-borrowing)
 records current copying paths. The large-borrow change separates the total

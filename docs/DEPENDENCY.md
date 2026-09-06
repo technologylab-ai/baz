@@ -43,13 +43,13 @@ The callback-progress and external-watchdog limits still apply.
 
 These generic extensions landed through [engine PR #1](https://github.com/technologylab-ai/bounded-http/pull/1).
 PR #1 merged on 2026-09-06 as `c90281b600deb699a667e2bcc115da32862c794f`.
-The current engine pin is `2a269ef57301b21df22f1c616d02d6d244e5d6ca`, with Zig package hash
+The previous worker-streaming pin is `2a269ef57301b21df22f1c616d02d6d244e5d6ca`, with Zig package hash
 `bounded_http-0.1.0-N3A1uD4IEQBXzMxjafNtPTuGXAGeklCjLXIInMVXvL9e`.
 It adds same-callback worker flushes through [engine PR #3](https://github.com/technologylab-ai/bounded-http/pull/3).
 `Context.flushAndWait()` keeps the worker stack live while the I/O owner sends a snapshot.
 Baz supplies the standard writer and cancellation-aware sleep described in [STREAMING.md](STREAMING.md).
 It includes the package rename and [Windows shard handoff from PR #2](https://github.com/technologylab-ai/bounded-http/pull/2).
-The current pin passed Baz’s native Linux, macOS, and Windows x64 verification,
+That pin passed Baz’s native Linux, macOS, and Windows x64 verification,
 App/example suites, all 14 streaming groups, and Windows shard/shutdown checks.
 The [streaming receipt](../reports/2026-09-06-streaming.md) preserves those results
 and the separate engine gates. PR #3 merged as `86e8ec2` on 2026-09-06.
@@ -101,3 +101,17 @@ No upstream PR is planned for these changes. Its parser/runtime
 changes and core-spec tests belong in that separate repository. Baz owns startup
 storage limits, response integration, examples, and native HTTP gates.
 See [MUSTACHE.md](MUSTACHE.md) for API, lifetime, output-copy, and feature limits.
+
+## Typed continuation seam
+
+[Engine PR #4](https://github.com/technologylab-ai/bounded-http/pull/4) adds timed
+waits and an opt-in, exactly-once cancellation callback after kernel borrows return.
+Baz retains its typed State, Locals and detached response drafts in an explicitly
+bounded startup pool. `.finish` and `.close` have no extra callback; Baz cleans
+application state before returning them. The immutable candidate and native
+evidence are recorded in [the composition receipt](../reports/2026-09-07-composition.md).
+
+The continuation pin is `6f6af03e828159455b91cece6ba468201651e1f6`, hash
+`bounded_http-0.1.0-N3A1uE6kEQCmFvUqq11r1gzlTXasDkLON2YXT4cUGIl9`. Both the engine
+and Baz passed native Debug/ReleaseSafe and wire gates on Linux, macOS and Windows.
+Engine PR #4 must merge before Baz PR #5; neither is merged in this checkpoint.

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Native CLI correctness checks for the 22 examples and four Baz fixtures.
+"""Native CLI correctness checks for the 23 examples and five Baz fixtures.
 
 Build and install ReleaseSafe binaries first. The caller holds the shared host
 reservation and supplies an overall process-tree watchdog. Help/error processes
@@ -27,9 +27,9 @@ EXAMPLES = (
     "hello", "hello2", "hello_json", "simple_router", "routes", "serve",
     "sendfile", "senderror", "accept", "app_basic", "app_auth", "app_errors",
     "endpoint", "endpoint_auth", "middleware", "middleware_with_endpoint",
-    "userpass_session", "cookies", "http_params", "bindataformpost", "streaming", "mustache",
+    "userpass_session", "cookies", "http_params", "bindataformpost", "streaming", "mustache", "continuations",
 )
-FIXTURES = ("baz", "baz-streaming", "baz-borrow", "baz-cookies")
+FIXTURES = ("baz", "baz-streaming", "baz-borrow", "baz-cookies", "baz-middleware")
 WORKER_EXAMPLES = frozenset(("endpoint", "streaming"))
 EXIT_TIMEOUT = 5
 MAX_TRANSCRIPT = 65536
@@ -204,7 +204,7 @@ def run(directory):
 
     base = ["--port=0", "--connections=4", "--shards=1", "--duration-ms=15000"]
     for name in FIXTURES:
-        workers = 0 if name in ("baz", "baz-cookies") else 2
+        workers = 0 if name in ("baz", "baz-cookies", "baz-middleware") else 2
         startup(name, "fixture execution default", base, workers,
                 "workers" if workers else "inline_event_loop")
 

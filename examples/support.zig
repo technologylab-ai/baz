@@ -52,7 +52,16 @@ pub fn Options(comptime workers_required: bool) type {
 }
 
 fn parseConfig(init: std.process.Init, comptime workers_required: bool) !web.Config {
-    const options = try zli.parseInit(init, Options(workers_required));
+    const options = try parseOptions(init, Options(workers_required));
+    return configFromOptions(options, workers_required);
+}
+
+/// Executable-local option structs can add service configuration explicitly.
+pub fn parseOptions(init: std.process.Init, comptime T: type) !T {
+    return zli.parseInit(init, T);
+}
+
+pub fn configFromOptions(options: anytype, comptime workers_required: bool) !web.Config {
     const result: web.Config = .{
         .port = options.port,
         .duration_ms = options.duration_ms,

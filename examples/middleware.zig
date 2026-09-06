@@ -1,20 +1,23 @@
-//! A fixed middleware chain uses typed callback locals and explicit decisions.
+//! Global and route middleware share typed request locals.
 const std = @import("std");
 const support = @import("example_support");
 const parts = @import("endpoint/middleware_parts.zig");
 
 fn handle(ctx: *parts.Application.Context) !void {
-    var locals: parts.Locals = .{};
-    if (try parts.UserMiddleware.before(ctx, &locals) == .respond) return;
-    if (parts.SessionMiddleware.before(ctx, &locals) == .respond) return;
     try ctx.response.header("X-Middleware-Order", "user, session, response");
-    return parts.render(ctx, &locals);
+    return parts.render(ctx);
 }
 
 pub fn main(init: std.process.Init) !void {
     var shared: parts.Shared = .{};
-    const app = try parts.Application.init(.{ .allocator = init.gpa, .io = init.io, .shared = &shared, .server = try support.config(init) });
+    const app = try parts.Application.init(.{
+        .allocator = init.gpa,
+        .io = init.io,
+        .shared = &shared,
+        .server = try support.config(init),
+        .middleware = &.{parts.user_middleware},
+    });
     defer app.deinit();
-    try app.route("GET", "/", handle);
+    try app.routeWith("GET", "/", handle, .{ .middleware = &.{parts.session_middleware} });
     try support.run(app, init);
 }
