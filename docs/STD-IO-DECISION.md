@@ -157,9 +157,10 @@ types do not statically prevent callers from reaching other vtable methods.
 
 ## Research sequence and decision gates
 
-The entire IO-01–04 sequence below is deferred until after the first API MVP,
-by the user's 2026-09-06 decision. The queued dependencies describe that later
-sequence; none is active work in this implementation session.
+The entire IO-01–04 sequence below remains deferred. The user explicitly kept
+the prototype on the backburner on 2026-09-07 while authorizing notifications,
+SSE and the complete application example. These are future research gates,
+not active implementation work.
 
 | Item | State | Deliverable and acceptance gate |
 | --- | --- | --- |
@@ -180,7 +181,8 @@ the cost (stacks, operation state, shutdown work, CPU/latency and retained input
 Preserve the current engine as the reference until integration gates pass. Use
 the host measurement-lock protocol before any builds/runtime/load, exact
 Debug/ReleaseSafe, and native Linux/macOS receipts. Cross-compilation does not
-establish runtime evidence; Windows HTTP remains deferred.
+establish runtime evidence. Windows x64 HTTP is already supported; any future
+owned-provider prototype needs its own explicit platform scope and evidence.
 
 The first public API design should make room for this direction without
 pretending that `std.Io` support alone supplies a bounded cooperative runtime.

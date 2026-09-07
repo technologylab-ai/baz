@@ -81,6 +81,14 @@ pub fn AppWithLocals(comptime Shared: type, comptime Locals: type) type {
             route_entered: usize = 0,
             route_middleware: []const Middleware = &.{},
 
+            /// Copy this handle into startup-owned producer/subscription storage.
+            /// It carries no request data. Stop and join producers before App.deinit.
+            /// Only retained continuation callbacks may obtain a handle.
+            pub fn notification(self: *const Context) !continuation.Notification {
+                if (self.response.allow_blocking_stream) return error.ContinuationRequired;
+                return self.response.context.?.notification();
+            }
+
             pub fn param(self: *const Context, name: []const u8) ?[]const u8 {
                 return self.captures.get(name);
             }
@@ -526,6 +534,7 @@ pub fn AppWithLocals(comptime Shared: type, comptime Locals: type) type {
             const event: continuation.Event = switch (raw.event) {
                 .flushed => .flushed,
                 .timer => .timer,
+                .notified => .notified,
                 else => unreachable,
             };
             const step = lease.record.route.continuation.?.call_resume(&context, lease.state[0..self.continuation_state_bytes], event) catch |err| {
@@ -562,6 +571,10 @@ pub fn AppWithLocals(comptime Shared: type, comptime Locals: type) type {
                 .wait => |delay_ns| {
                     try context.response.continuationWait();
                     return raw.wait(delay_ns);
+                },
+                .await_notification => |timeout_ns| {
+                    try context.response.continuationWait();
+                    return raw.waitNotification(timeout_ns);
                 },
                 .finish => {
                     try runAfter(context, context.route_middleware[0..context.route_entered]);

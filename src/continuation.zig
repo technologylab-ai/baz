@@ -1,8 +1,10 @@
 //! Bounded storage for application state retained between callback invocations.
 const std = @import("std");
 
-pub const Step = union(enum) { flush, wait: u64, finish };
-pub const Event = enum { flushed, timer };
+/// await_notification optionally includes a heartbeat timeout in nanoseconds.
+pub const Step = union(enum) { flush, wait: u64, await_notification: ?u64, finish };
+pub const Event = enum { flushed, timer, notified };
+pub const Notification = @import("bounded_http").api.Notification;
 
 /// The application must serialize each lease's callbacks and release exactly once.
 /// Records and state cannot back output borrows or survive release.

@@ -1,0 +1,99 @@
+{
+  "bounded-http-macos-latest-34068510490-1": {
+    "environment": [
+      "886b728bec79c36ca1ec69345b609a725617a9ea",
+      "Darwin sjc22-be104-d8941dcb-2101-428d-ae7a-26155672943a-A2961E1681B8.local 25.6.0 Darwin Kernel Version 25.6.0: Fri Jul 31 19:16:43 PDT 2026; root:xnu-12377.161.14~5/RELEASE_ARM64_VMAPPLE arm64",
+      "0.16.0",
+      "Python 3.14.7"
+    ],
+    "verify": {
+      "debug.log": [
+        "Build Summary: 16/16 steps succeeded; 112/116 tests passed (4 skipped)"
+      ],
+      "release-safe.log": [
+        "Build Summary: 16/16 steps succeeded; 112/116 tests passed (4 skipped)"
+      ]
+    },
+    "wire": {
+      "gather_integration": {
+        "ok": true,
+        "passed": 11
+      },
+      "batch_integration": {
+        "ok": true,
+        "passed": 29
+      },
+      "arena_lifecycle_integration": {
+        "ok": true,
+        "passed": 8
+      },
+      "inline_integration": {
+        "ok": true,
+        "passed": 10
+      },
+      "integration": {
+        "ok": true,
+        "passed": 26
+      },
+      "continuation": {
+        "ok": true,
+        "groups": 18,
+        "passed": 16,
+        "skipped": [
+          {
+            "name": "sharded_timers/inline",
+            "skipped": "macOS engine supports one owner"
+          },
+          {
+            "name": "sharded_notifications/inline",
+            "skipped": "macOS engine supports one owner"
+          }
+        ]
+      }
+    }
+  },
+  "bounded-http-ubuntu-latest-34068510490-1": {
+    "environment": [
+      "886b728bec79c36ca1ec69345b609a725617a9ea",
+      "Linux runnervmejwal 6.17.0-1022-azure #22-Ubuntu SMP Mon Jul 27 17:24:03 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux",
+      "0.16.0",
+      "Python 3.12.3"
+    ],
+    "verify": {
+      "debug.log": [
+        "Build Summary: 16/16 steps succeeded; 114/116 tests passed (2 skipped)"
+      ],
+      "release-safe.log": [
+        "Build Summary: 16/16 steps succeeded; 114/116 tests passed (2 skipped)"
+      ]
+    },
+    "wire": {
+      "gather_integration": {
+        "ok": true,
+        "passed": 11
+      },
+      "batch_integration": {
+        "ok": true,
+        "passed": 29
+      },
+      "arena_lifecycle_integration": {
+        "ok": true,
+        "passed": 8
+      },
+      "inline_integration": {
+        "ok": true,
+        "passed": 10
+      },
+      "integration": {
+        "ok": true,
+        "passed": 26
+      },
+      "continuation": {
+        "ok": true,
+        "groups": 18,
+        "passed": 18,
+        "skipped": []
+      }
+    }
+  }
+}

@@ -6,7 +6,9 @@ Run `zig build run-streaming -Doptimize=ReleaseSafe -- --port 8080`, then use
 `curl -N http://127.0.0.1:8080/` in another terminal.
 See the [streaming guide](../docs/STREAMING.md) for its worker and lifetime bounds.
 [continuations.zig](continuations.zig) adds typed callbacks that release the executor
-between flushes and timers. Together with the 21 Zap ports below, there are 23 examples.
+between flushes and timers. [jobs.zig](jobs.zig) combines Mustache, sessions and
+notification-driven SSE. Together with the 21 Zap ports below, there are 24 examples.
+Read the [complete application guide](../docs/JOBS.md) for its explicit limits.
 
 These examples adapt the public behavior of our predecessor
 [Zap](https://github.com/zigzap/zap), using the local Zig 0.16 port at
@@ -39,8 +41,8 @@ before delivery; only terminal shutdown establishes released storage.
 
 ## Typed CLI options with process initialization
 
-All 22 public examples use [zli](https://github.com/renerocksai/zli) through
-[shared executable support](support.zig). The main App demonstration and both
+All 24 public examples use [zli](https://github.com/renerocksai/zli) through
+[shared executable support](support.zig). The main App demonstration and all five
 wire fixtures use the same parser with their own typed option structs. Each
 entry point receives Zig 0.16's `std.process.Init`:
 

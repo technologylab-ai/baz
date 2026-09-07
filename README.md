@@ -2,7 +2,7 @@
 
 **Bounded Async Zap.**
 
-[Website & documentation](https://technologylab-ai.github.io/baz/) · [API guide](docs/APP-API.md) · [23 examples](examples/README.md)
+[Website & documentation](https://technologylab-ai.github.io/baz/) · [API guide](docs/APP-API.md) · [24 examples](examples/README.md)
 
 A **pure Zig** successor to [Zap](https://github.com/zigzap/zap), built in **Zig 0.16.0**
 on [bounded/http](https://technologylab-ai.github.io/bounded-http/). It keeps Zap's typed
@@ -36,6 +36,9 @@ The first implementation provides:
   reserved HTML response storage. See the [guide](docs/MUSTACHE.md) and
   [greeting form and user-card example](examples/mustache.zig).
   [Verified natively on Linux, macOS, and Windows](reports/2026-09-06-mustache.md).
+- **SSE and producer notifications:** encode events into a standard writer,
+  wake retained callbacks, and choose explicit queue and replay limits.
+  [SSE guide](docs/SSE.md) · [complete job application](docs/JOBS.md).
 - **Many waiting streams, few workers:** [typed continuations](docs/CONTINUATIONS.md)
   retain bounded state between flushes and timers, releasing the executor.
 - **Cookies and redirects:** borrowed token views, explicit session/persistent expiry,
@@ -180,7 +183,7 @@ Current deployment is IPv4 loopback, plain HTTP/1.1. TLS is out of scope.
 Mustache uses a [pure Zig library with bounded rendering](docs/MUSTACHE.md).
 WebSockets needs an engine upgrade lifecycle. Native Windows x64 now has its own
 [CI gate](.github/workflows/windows-build.yml), alongside Linux and macOS.
-An owned `std.Io` provider is deferred until after the first API MVP.
+An owned `std.Io` provider and its prototype remain deferred by user decision.
 
 - [Implemented API and migration from Zap](docs/APP-API.md)
 - [API design and predecessor analysis](docs/APP-API-DESIGN.md)

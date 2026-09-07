@@ -214,7 +214,8 @@ Use [streaming responses](STREAMING.md) to write, flush, sleep, and write again
 inside the same fixed worker callback. The returned handle exposes `writer()`,
 `flush()`, and `finish()`. Headers become immutable after the first flush.
 `body_bytes` bounds staging; `server.max_response_bytes` bounds the whole stream.
-Use [typed continuations](CONTINUATIONS.md) to return between flushes and timers,
+Use [typed continuations](CONTINUATIONS.md) to return between flushes, timers and
+[producer notifications](SSE.md),
 sharing a small worker pool or running inline. [Middleware and typed locals](MIDDLEWARE.md)
 retain authentication and request state across these callbacks without replay.
 
