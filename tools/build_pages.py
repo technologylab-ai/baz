@@ -27,6 +27,7 @@ EXAMPLES = [
     ('mustache', 'responses', 'A greeting form and user cards: startup templates, typed data, bounded HTML.'),
     ('continuations', 'responses', 'Many waiting streams, a small worker pool: typed flush, wait, and finish callbacks.'),
     ('streaming', 'responses', 'Write, flush, sleep, and write again through a standard Zig writer.'),
+    ('jobs', 'app', 'A complete application: Mustache, cookie sessions and live job progress over bounded SSE.'),
     ('app_basic', 'app', 'Typed Shared, endpoint state, and instance shutdown.'),
     ('app_errors', 'app', 'Error mapping and discarded private response drafts.'),
     ('endpoint', 'app', 'Bounded user CRUD on explicit application workers.'),
@@ -50,10 +51,10 @@ def documents():
              'reports/2026-09-06-basic-zap.md', 'reports/2026-09-06-app-api.md',
              'reports/2026-09-06-baz-extraction.md', 'reports/2026-09-06-windows-baz.md',
              'reports/2026-09-06-streaming.md', 'reports/2026-09-06-large-borrow.md',
-             'reports/2026-09-06-mustache.md', 'reports/2026-09-07-composition.md',
+             'reports/2026-09-06-mustache.md', 'reports/2026-09-07-composition.md', 'reports/2026-09-07-notifications.md',
              'reports/2026-09-06-basic-zap/PROTOCOL.md',
              'reports/2026-09-06-basic-zap/reproducer/README.md'}
-    for pattern in ('docs/*.md', 'src/*.zig', 'examples/*.zig', 'examples/endpoint/*.zig'):
+    for pattern in ('docs/*.md', 'src/*.zig', 'examples/*.zig', 'examples/endpoint/*.zig', 'examples/assets/jobs*'):
         paths.update(str(p.relative_to(ROOT)) for p in ROOT.glob(pattern))
     return sorted(paths)
 
@@ -102,7 +103,7 @@ def build():
         raise ValueError('Expected a full Git revision.')
     docs = documents()
     assets = ['docs/' + name for name in ('read.html', 'site.css', 'site.js', 'reader.css', 'reader.js', 'highlight-zig.js', 'favicon.svg')]
-    assets.append('docs/assets/mustache-preview.png')
+    assets.extend(['docs/assets/mustache-preview.png', 'docs/assets/jobs-preview.png'])
     assets += [str(path.relative_to(ROOT)) for path in sorted((ROOT / 'docs/diagrams').glob('*.svg'))]
     vendor = json.loads((ROOT / 'docs/vendor/manifest.json').read_text())
     assets.append('docs/vendor/manifest.json')

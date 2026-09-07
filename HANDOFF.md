@@ -1,18 +1,27 @@
-# Active composition work
+# Active notifications and SSE work
 
-`feat/middleware-locals` adds public middleware/locals, bounded reusable sessions
-with fixed expiry and revocation, and typed streaming continuations. Engine
-[PR #4](https://github.com/technologylab-ai/bounded-http/pull/4) must merge first;
-Baz pins candidate `6f6af03e828159455b91cece6ba468201651e1f6` by immutable URL/hash.
-[Baz PR #5](https://github.com/technologylab-ai/baz/pull/5) contains the implementation.
-[The composition receipt](reports/2026-09-07-composition.md) records passing native
-Linux/macOS/Windows gates at `ee36286526c075ad58947619c826885d28d2c765`, with
-161 root tests and five consumer tests per mode, 15 middleware, 17 session and
-20 continuation groups, all old wire suites, and 331 CLI checks. Documentation
-and receipts were finalized afterward; the recorded Zig source hashes are unchanged.
-Neither PR has been merged. Merge the engine first, then Baz.
-The standard caller `std.Io` remains; an owned provider is deferred. No benchmarks
-or JWT policy were added. The earlier merged baseline follows for history.
+Worktree `baz-events`, branch `feat/notifications-sse`, starts from merged Baz
+`c5f4be7a0f185c262e26338d5084ebe784503923`. Engine PR #4 merged first as
+`165450e10d0f5571ecbc3b4f5e8c13b653d6d8d6`, then Baz PR #5. Both passed CI;
+the published site was checked against the Baz merge's publication manifest.
+[The composition receipt](reports/2026-09-07-composition.md) preserves the exact
+native implementation evidence (161 root and five consumer tests per mode).
+
+Current implementation: bounded producer notifications, a fixed-capacity mailbox,
+SSE encoding and a complete authenticated Mustache + live-job example.
+[Baz PR #6](https://github.com/technologylab-ai/baz/pull/6) depends on
+[engine PR #5](https://github.com/technologylab-ai/bounded-http/pull/5), pinned at
+`886b728bec79c36ca1ec69345b609a725617a9ea`. Engine native gates passed.
+Baz local and hosted Linux/macOS/Windows Debug/ReleaseSafe gates passed:
+189 root + five consumer tests per mode, 343 CLI checks, all prior wire suites,
+21 macOS / 22 Linux-Windows job/SSE groups and three Windows shard cases.
+Chrome 152 passed ten real-application and 17 website groups, including native
+reconnect after the ten-second request deadline with Last-Event-ID and all events.
+[The notification receipt](reports/2026-09-07-notifications.md) preserves exact
+revisions, platforms and limitations. Neither new PR is merged. Merge engine #5
+before Baz #6 once their final checks pass.
+The user explicitly deferred the custom `std.Io` prototype on 2026-09-07.
+Standard caller `std.Io` and the engine's existing native backends remain in use.
 
 # Baz handoff — 2026-09-06
 
@@ -28,7 +37,7 @@ The public API now includes borrowed request cookie views, duplicate-rejecting
 `cookie(name)`, `setCookie`, `deleteCookie` and `redirect`. See [COOKIES.md](docs/COOKIES.md).
 Session/persistent lifetimes are explicit; JWT interpretation remains application
 work. Cookie and login examples use these APIs and separate styled page assets.
-CI includes the cookie wire/session suite. Public middleware/locals and bounded expiring sessions are being verified in feat/middleware-locals.
+CI includes the cookie wire/session suite. Public middleware/locals and bounded expiring sessions merged through Baz PR #5.
 
 ## Integrated Mustache templates
 

@@ -70,6 +70,7 @@ jobs:
           python3 tests/middleware_integration.py --json "$packet/middleware.json" 2>&1 | tee "$packet/middleware.log"
           python3 tests/session_integration.py --json "$packet/sessions.json" 2>&1 | tee "$packet/sessions.log"
           python3 tests/continuations_integration.py --json "$packet/continuations.json" 2>&1 | tee "$packet/continuations.log"
+          python3 tests/jobs_integration.py --json "$packet/jobs.json" 2>&1 | tee "$packet/jobs.log"
           python3 tests/mustache_integration.py --json "$packet/mustache.json" 2>&1 | tee "$packet/mustache.log"
 
       - name: Upload verification logs

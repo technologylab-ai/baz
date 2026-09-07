@@ -13,8 +13,8 @@
             .hash = "zli-0.1.1-pechgr4WAQBsw7p7JPU-GHHZ5xsBpEdfCRNpNtnQYnBz",
         },
         .bounded_http = .{
-            .url = "https://github.com/technologylab-ai/bounded-http/archive/6f6af03e828159455b91cece6ba468201651e1f6.tar.gz",
-            .hash = "bounded_http-0.1.0-N3A1uE6kEQCmFvUqq11r1gzlTXasDkLON2YXT4cUGIl9",
+            .url = "https://github.com/technologylab-ai/bounded-http/archive/886b728bec79c36ca1ec69345b609a725617a9ea.tar.gz",
+            .hash = "bounded_http-0.1.0-N3A1uB4HEgAhXPoOmXYv6DaPKLMYITEZJSk0kIsjrpMn",
         },
     },
     .paths = .{ "build.zig", "build.zig.zon", ".zig-version", "src", "tests", "tools", "examples", "docs", "reports", ".github", "LICENSE", "README.md", "ROADMAP.md", "HANDOFF.md", "AGENTS.md" },

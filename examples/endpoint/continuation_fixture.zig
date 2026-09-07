@@ -174,6 +174,7 @@ fn advance(ctx: *Context, state: *State, event: Event) !Step {
     if (state.address != @intFromPtr(state)) _ = record.bad_address.fetchAdd(1, .monotonic);
     _ = record.resumes.fetchAdd(1, .monotonic);
     switch (event) {
+        .notified => return error.UnexpectedNotification, // This fixture only arms timer waits.
         .flushed => {
             _ = record.flushed.fetchAdd(1, .monotonic);
             if (state.mode == .error_after) return error.AfterPublication;

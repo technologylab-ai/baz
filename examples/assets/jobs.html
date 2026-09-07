@@ -1,0 +1,6 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Your studio · Baz jobs</title><link rel="stylesheet" href="/jobs.css"><script src="/jobs.js" defer></script></head>
+<body><main><header><a class="brand" href="/">baz<span> / job studio</span></a><form action="/logout" method="post"><span class="username">{{username}}</span><button class="quiet">Sign out</button></form></header>
+<section class="hero"><p class="eyebrow">SIGNED IN. CONNECTED. READY.</p><h1>Small steps.<br>Live progress.</h1><p class="intro">Start a background job. Your page updates as the server sends each step, without polling.</p><button id="start">Start a new job <span aria-hidden="true">↗</span></button><p id="notice" role="status" aria-live="polite"></p></section>
+<section id="jobs" class="jobs" aria-label="Your jobs"><div id="empty" class="empty">Your next little project starts here.</div></section>
+<footer><p>This studio holds eight jobs for one minute. Each job keeps its latest eight events. A replay gap requires a fresh job.</p><p>Sessions expire on the server. Each stream checks its session when a callback resumes.</p><p>Pure Zig. Built with Baz and <a href="https://technologylab-ai.github.io/bounded-http/">bounded/http</a>.</p></footer></main></body></html>

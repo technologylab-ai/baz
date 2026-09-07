@@ -1,7 +1,7 @@
 # Typed continuations
 
 Many waiting responses can share a small worker pool. A typed continuation returns
-between snapshots and timers, keeping its bounded State and request locals alive
+between snapshots, timers and producer notifications, keeping its bounded State and request locals alive
 without retaining a worker stack. It also works on the inline executor.
 
 ```zig
@@ -40,6 +40,7 @@ curl -N http://localhost:8080/stream
 | --- | --- |
 | `.flush` | Publish the staged bytes, release the executor, and receive `.flushed` after local output borrows return. An empty flush can publish headers. |
 | `.{ .wait = nanoseconds }` | Release the executor without publishing. Receive `.timer` when the delay is due. Pending body bytes must be flushed first. |
+| `.{ .await_notification = timeout_ns }` | Wait for a producer signal (`.notified`) or optional timeout (`.timer`). Null disables the heartbeat timeout, but the original request deadline still applies. |
 | `.finish` | Run reverse after hooks once, publish final staged bytes and framing, clean up, and release the continuation slot. There is no extra success callback. |
 
 A wait can precede the first response, including after adding unpublished headers.
@@ -97,7 +98,7 @@ from error mappers. Eligible immutable server-lifetime assets or original reques
 input remain valid whole-body choices when returning finish. A borrowed body
 cannot be inserted into a snapshot stream; see [response ownership](OWNERSHIP.md).
 
-This API schedules timers and output completion. It does not spawn background
+This API schedules timers, output completion and [bounded application notifications](SSE.md). It does not spawn background
 tasks, provide arbitrary I/O futures, or isolate unbounded application code.
 Blocking service calls on workers still occupy those workers. For linear handlers
 that deliberately retain a worker through each wait, use [worker streaming](STREAMING.md).

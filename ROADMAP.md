@@ -12,13 +12,15 @@ provide bounded tasks, acceptance gates, ownership, and resume instructions.
 | Track | State | Next work |
 | --- | --- | --- |
 | App, routing, request/form views, multipart, responses | First implementation | Preserve bounded ownership while extending composition. |
-| Zap examples | 21 supported ports plus worker streaming | Keep native behavior coverage and record semantic differences. |
+| Zap examples | 21 supported ports plus worker streaming and continuations | Keep native behavior coverage and record semantic differences. |
 | External dependency | Baz imports `bounded_http` | Maintain an immutable engine pin and upstream generic engine changes. |
 | Cookies and redirects | Public helpers implemented | Preserve raw views, explicit lifetimes and [cookie/session gates](docs/COOKIES.md). |
 | Middleware and locals | Implemented; native gates passed | Public copied hooks and typed locals; [guide](docs/MIDDLEWARE.md). |
 | Resumable endpoints | Implemented; native gates passed | Typed callbacks release workers between flushes/timers; [guide](docs/CONTINUATIONS.md). |
 | Standalone repository | Published GitHub repository and Pages, MIT licensed | Maintain package, documentation and native CI. |
-| Owned `std.Io` | Deferred | Revisit after the first API MVP. |
+| Notifications and SSE | Implemented; native gates passed | Fixed wake-up storage, bounded messages and explicit event/replay semantics; [guide](docs/SSE.md). |
+| Complete application | Implemented; native and browser gates passed | Mustache, sessions and live background-job progress; bounded replay and revocation. |
+| Owned `std.Io` | Deferred by user on 2026-09-07 | Keep the prototype on the backburner. |
 | Mustache | Implemented; native Linux/macOS/Windows gates passed | Maintain the Baz-specific pure Zig fork, explicit template bounds and [compatibility/ownership coverage](reports/2026-09-06-mustache.md). |
 | WebSockets | Deferred | First define the engine upgrade lifecycle. |
 | Windows x64 | Supported natively, including Mustache and streaming | Preserve CI, shard handoff and shutdown coverage; performance remains deferred. |

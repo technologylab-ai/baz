@@ -114,4 +114,20 @@ evidence are recorded in [the composition receipt](../reports/2026-09-07-composi
 The continuation pin is `6f6af03e828159455b91cece6ba468201651e1f6`, hash
 `bounded_http-0.1.0-N3A1uE6kEQCmFvUqq11r1gzlTXasDkLON2YXT4cUGIl9`. Both the engine
 and Baz passed native Debug/ReleaseSafe and wire gates on Linux, macOS and Windows.
-Engine PR #4 must merge before Baz PR #5; neither is merged in this checkpoint.
+Engine PR #4 merged first as `165450e10d0f5571ecbc3b4f5e8c13b653d6d8d6`;
+Baz PR #5 then merged as `c5f4be7a0f185c262e26338d5084ebe784503923`.
+The pinned engine head and its merge have identical trees.
+
+## Producer notification seam
+
+[Engine PR #5](https://github.com/technologylab-ai/bounded-http/pull/5) adds
+`Context.notification()`, `waitNotification(?u64)` and `.notified`, backed by one
+startup-reserved atomic cell per connection. Handles coalesce signals and reject
+stale request generations; applications still synchronize their own payloads.
+Producers must stop and join before engine/App teardown. The existing owner
+poll observes signals; this is not a new platform event loop or std.Io provider.
+
+This branch pins immutable candidate `886b728bec79c36ca1ec69345b609a725617a9ea`,
+package hash `bounded_http-0.1.0-N3A1uB4HEgAhXPoOmXYv6DaPKLMYITEZJSk0kIsjrpMn`.
+The notification PR must land before the Baz feature PR. Native engine and Baz
+gates remain separate. See [SSE and notification ownership](SSE.md).

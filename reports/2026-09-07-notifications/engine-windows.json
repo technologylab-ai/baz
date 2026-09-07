@@ -1,0 +1,338 @@
+{
+  "environment": {
+    "repository_commit": "886b728bec79c36ca1ec69345b609a725617a9ea",
+    "workflow_run": "34068532335",
+    "workflow_attempt": "1",
+    "runner_image": "win25-vs2026",
+    "runner_image_version": "20260824.214.3",
+    "os_caption": "Microsoft Windows Server 2025 Datacenter",
+    "os_version": "10.0.26100",
+    "os_architecture": "X64",
+    "windows_full_build": "26100.33296",
+    "windows_display_version": "24H2",
+    "powershell_version": "7.6.5",
+    "python": "Python 3.12.10",
+    "zig_version": "0.16.0",
+    "compiler_execution": "native x64",
+    "http_execution": "native x64 Windows IOCP; not cross-compilation evidence",
+    "processors": [
+      {
+        "Name": "AMD EPYC 7763 64-Core Processor                ",
+        "NumberOfCores": 2,
+        "NumberOfLogicalProcessors": 4
+      }
+    ],
+    "memory_bytes": 17178693632,
+    "logical_disks": [
+      {
+        "DeviceID": "C:",
+        "FileSystem": "NTFS",
+        "Size": 160467759104
+      },
+      {
+        "DeviceID": "D:",
+        "FileSystem": "NTFS",
+        "Size": 161059172352
+      }
+    ]
+  },
+  "runtime": {
+    "schema_version": 1,
+    "tool": "bounded-http-windows-runtime",
+    "ok": true,
+    "started_utc": "2026-09-07T00:03:22.339367+00:00",
+    "execution": "native x64 Windows compiler and HTTP executable",
+    "timed_comparison": false,
+    "phases": [
+      {
+        "name": "verify-debug",
+        "arguments": [
+          "zig",
+          "build",
+          "verify",
+          "--summary",
+          "all"
+        ],
+        "timeout_seconds": 300,
+        "started_utc": "2026-09-07T00:03:22.696768+00:00",
+        "log": "verify-debug.log",
+        "exit_code": 0,
+        "seconds": 148.282
+      },
+      {
+        "name": "verify-release-safe",
+        "arguments": [
+          "zig",
+          "build",
+          "verify",
+          "-Doptimize=ReleaseSafe",
+          "--summary",
+          "all"
+        ],
+        "timeout_seconds": 300,
+        "started_utc": "2026-09-07T00:05:50.982362+00:00",
+        "log": "verify-release-safe.log",
+        "exit_code": 0,
+        "seconds": 76.593
+      },
+      {
+        "name": "build-release-safe",
+        "arguments": [
+          "zig",
+          "build",
+          "-Doptimize=ReleaseSafe"
+        ],
+        "timeout_seconds": 300,
+        "started_utc": "2026-09-07T00:07:07.571335+00:00",
+        "log": "build-release-safe.log",
+        "exit_code": 0,
+        "seconds": 0.11
+      },
+      {
+        "name": "comparator-receipts",
+        "arguments": [
+          "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+          "tests/test_compare.py",
+          "-v"
+        ],
+        "timeout_seconds": 30,
+        "started_utc": "2026-09-07T00:07:07.694516+00:00",
+        "log": "comparator-receipts.log",
+        "exit_code": 0,
+        "seconds": 0.266
+      },
+      {
+        "name": "arena_lifecycle_integration",
+        "arguments": [
+          "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+          "tests/arena_lifecycle_integration.py",
+          "--server",
+          "D:\\a\\bounded-http\\bounded-http\\zig-out\\bin\\bounded-http.exe",
+          "--timeout",
+          "120",
+          "--json",
+          "D:\\a\\_temp\\bounded-http-windows-runtime\\arena_lifecycle_integration.json"
+        ],
+        "timeout_seconds": 150,
+        "started_utc": "2026-09-07T00:07:07.968180+00:00",
+        "log": "arena_lifecycle_integration.log",
+        "exit_code": 0,
+        "seconds": 0.391
+      },
+      {
+        "name": "batch_integration",
+        "arguments": [
+          "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+          "tests/batch_integration.py",
+          "--server",
+          "D:\\a\\bounded-http\\bounded-http\\zig-out\\bin\\bounded-http.exe",
+          "--timeout",
+          "120",
+          "--json",
+          "D:\\a\\_temp\\bounded-http-windows-runtime\\batch_integration.json"
+        ],
+        "timeout_seconds": 150,
+        "started_utc": "2026-09-07T00:07:08.357647+00:00",
+        "log": "batch_integration.log",
+        "exit_code": 0,
+        "seconds": 4.828
+      },
+      {
+        "name": "gather_integration",
+        "arguments": [
+          "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+          "tests/gather_integration.py",
+          "--server",
+          "D:\\a\\bounded-http\\bounded-http\\zig-out\\bin\\bounded-http.exe",
+          "--timeout",
+          "120",
+          "--json",
+          "D:\\a\\_temp\\bounded-http-windows-runtime\\gather_integration.json"
+        ],
+        "timeout_seconds": 150,
+        "started_utc": "2026-09-07T00:07:13.195712+00:00",
+        "log": "gather_integration.log",
+        "exit_code": 0,
+        "seconds": 1.766
+      },
+      {
+        "name": "inline_integration",
+        "arguments": [
+          "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+          "tests/inline_integration.py",
+          "--server",
+          "D:\\a\\bounded-http\\bounded-http\\zig-out\\bin\\bounded-http.exe",
+          "--timeout",
+          "120",
+          "--json",
+          "D:\\a\\_temp\\bounded-http-windows-runtime\\inline_integration.json"
+        ],
+        "timeout_seconds": 150,
+        "started_utc": "2026-09-07T00:07:14.962706+00:00",
+        "log": "inline_integration.log",
+        "exit_code": 0,
+        "seconds": 0.594
+      },
+      {
+        "name": "integration",
+        "arguments": [
+          "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+          "tests/integration.py",
+          "--server",
+          "D:\\a\\bounded-http\\bounded-http\\zig-out\\bin\\bounded-http.exe",
+          "--timeout",
+          "120",
+          "--json",
+          "D:\\a\\_temp\\bounded-http-windows-runtime\\integration.json"
+        ],
+        "timeout_seconds": 150,
+        "started_utc": "2026-09-07T00:07:15.565812+00:00",
+        "log": "integration.log",
+        "exit_code": 0,
+        "seconds": 4.375
+      },
+      {
+        "name": "continuation-integration",
+        "arguments": [
+          "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+          "tests/continuation_integration.py",
+          "--server",
+          "D:\\a\\bounded-http\\bounded-http\\zig-out\\bin\\bounded-http.exe",
+          "--json",
+          "D:\\a\\_temp\\bounded-http-windows-runtime\\continuation-integration.json"
+        ],
+        "timeout_seconds": 150,
+        "started_utc": "2026-09-07T00:07:19.942589+00:00",
+        "log": "continuation-integration.log",
+        "exit_code": 0,
+        "seconds": 17.219
+      },
+      {
+        "name": "windows-shards-integration",
+        "arguments": [
+          "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+          "tests/windows_shards_integration.py",
+          "--server",
+          "D:\\a\\bounded-http\\bounded-http\\zig-out\\bin\\bounded-http.exe",
+          "--timeout",
+          "120",
+          "--json",
+          "D:\\a\\_temp\\bounded-http-windows-runtime\\windows-shards-integration.json"
+        ],
+        "timeout_seconds": 150,
+        "started_utc": "2026-09-07T00:07:37.165314+00:00",
+        "log": "windows-shards-integration.log",
+        "exit_code": 0,
+        "seconds": 0.953
+      },
+      {
+        "name": "smoke",
+        "arguments": [
+          "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+          "tools/smoke.py",
+          "--server",
+          "D:\\a\\bounded-http\\bounded-http\\zig-out\\bin\\bounded-http.exe",
+          "--timeout",
+          "150",
+          "--json",
+          "D:\\a\\_temp\\bounded-http-windows-runtime\\smoke.json"
+        ],
+        "timeout_seconds": 180,
+        "started_utc": "2026-09-07T00:07:38.128863+00:00",
+        "log": "smoke.log",
+        "exit_code": 0,
+        "seconds": 4.0
+      }
+    ],
+    "exclusions": [
+      "Four batch maximum-cell fixtures need POSIX SIGSTOP/SIGCONT",
+      "POSIX-only transport fixtures remain explicit skips",
+      "CTRL_BREAK shutdown only; console-close, logoff and service control remain unqualified",
+      "No ARM64, WOW64, device, production-load or latency qualification"
+    ],
+    "zig_version": "0.16.0",
+    "repository_commit": "886b728bec79c36ca1ec69345b609a725617a9ea",
+    "input_status": "",
+    "source_hashes": {
+      ".zig-version": "aa037454b5e8320521a32b278a3f4aff05fc79009ab5503f5d4a1b9a33b38c47",
+      "build.zig": "d157b7d3ada0c6c492909eb306b80cafa32070aebdaa30ed5a504a465c9f6720",
+      "build.zig.zon": "a13bde1e68cf1a76a00768687d22fcd0108b812d9a4947157c09ad09c4b91681",
+      "examples/embedding/build.zig": "b8e63c0a8a381135cd707706503eb0e66124017c6ea9babf1c086a146257d2e7",
+      "examples/embedding/build.zig.zon": "bc2add5d57c4388f4f3a019b1bb5ee473d45b5df03140aacd9d8deb18b8bf1e8",
+      "examples/embedding/src/main.zig": "213b6f0d3363e9e67b307e79016570b838f41cc8a0b3c8c3c1aa9cc41a284cff",
+      "src/api.zig": "6661635bbd7a6a43a6ca4f4af3c632a8385c0af8ddcd5ba40ed8bec46922db2c",
+      "src/budget.zig": "1a1f2dc2ac3418289590ed8868e588df6039e9fe69ff52412bec368ebfb4dcc9",
+      "src/handoff.zig": "c3ebaf9d03c588924b7e2c73a9ddb83e37b86da0afc0f5477044b97d5c54adad",
+      "src/http.zig": "9f54c8bc607da60294ac042ec90f93642e67f5acbef7b5e1dceebba6e41f6a4f",
+      "src/main.zig": "259c86abaaca597a913ce75e3eaa939b7ade11eeb90d9b73c38d371caf94697f",
+      "src/server.zig": "59aedf628a9f6ac65a0f89b6b5f07e0fa2cf9c6ab4be515ea8d8c8f48731516e",
+      "src/transport.zig": "32df36b321cb21e7d22f4b4d966bd2b408edeb4a3ceb6370eaf322afa7ba82c3",
+      "src/transport_linux.zig": "5dfe71c3cb3fd3fd275dae1c729e5cfc175ce4b6ee4f8d5f3ec6ec8bee1ce2c9",
+      "src/transport_macos.zig": "2a1b2ad432a143079c0cfc7bf860e50fb2cbb0f56dd9a4ac571bb7512b45578a",
+      "src/transport_windows.zig": "ab81126dbb4ca33a508cacc9b130aa5b802fc77bf75fd8d90a0729216d81ae1e",
+      "tests/arena_lifecycle_integration.py": "f49eeee1facd65ac3177a2eb2f5adf9229d238b96c8f98dd1208478f4d29b7b2",
+      "tests/batch_integration.py": "8ddd43fb69895435ff10b87ea00b9e6f6ff677e5c0422d079d1a41413bdc093d",
+      "tests/continuation_integration.py": "a749f8c709c8739a616112064d07080a61bfee0e3a5deb48222be93f948d6271",
+      "tests/gather_integration.py": "4a5d23e294d54dceb4a5f4b41c20d43de785856d78534d04f9ef65ed34ce12ea",
+      "tests/inline_integration.py": "2be5fb87a332b95247f793898244d11658096af5119fad3dbe41f822c786884a",
+      "tests/integration.py": "d247985bd80a8b9250588bfd5d67f8652011239a0215b959b364b7de6bd7cf50",
+      "tests/test_compare.py": "570c929017b880c2c248b48e63fd5bc2ba726508fc1a2fac5df2e6bfe57c4ad6",
+      "tests/windows_shards_integration.py": "3004d4cc14be69b813e95d96be0022cb9d1baa3a5e953e46b96a3135a9824056",
+      "tools/benchmark.py": "ee6cef296e4b602c2e41eae636ae1c2f8ead1f62850fd87bace0d6af1df037cb",
+      "tools/check_embedding.py": "46cb597d03081ec859952da5b9c6d86b5934bd0b164e4d113a4a2070a4de2395",
+      "tools/compare.py": "58b9c814cfdb17ed6c19e9787344b89943b156324b4a79519b73d6d9ab1e4207",
+      "tools/smoke.py": "0b881063f6592629e404a3267afad05b7b5756c060c934f359331b7eb2e80b6b",
+      "tools/verify_windows.py": "256a29c785cb3cb76cfa5ee0d9cde7029859b44356fccc8690b491e60026dac0"
+    },
+    "binary": {
+      "path": "D:\\a\\bounded-http\\bounded-http\\zig-out\\bin\\bounded-http.exe",
+      "sha256": "e76a8085e0864ffa6bcf459d42bb69a2f122aeec5a8ec17e1d7279f81d6503b6",
+      "pe_machine": "8664",
+      "optimize": "ReleaseSafe",
+      "target": "x86_64-windows"
+    },
+    "output_status": "",
+    "finished_utc": "2026-09-07T00:07:42.167857+00:00"
+  },
+  "verify": {
+    "verify-debug.log": [
+      "Build Summary: 16/16 steps succeeded; 127/131 tests passed (4 skipped)"
+    ],
+    "verify-release-safe.log": [
+      "Build Summary: 16/16 steps succeeded; 127/131 tests passed (4 skipped)"
+    ]
+  },
+  "repository_status": "\n",
+  "wire": {
+    "continuation-integration": {
+      "ok": true,
+      "groups": 18,
+      "passed": 18,
+      "skipped": []
+    },
+    "gather_integration": {
+      "ok": true,
+      "passed": 11
+    },
+    "batch_integration": {
+      "ok": true,
+      "passed": 25
+    },
+    "arena_lifecycle_integration": {
+      "ok": true,
+      "passed": 8
+    },
+    "windows-shards-integration": {
+      "ok": true,
+      "passed": 9
+    },
+    "inline_integration": {
+      "ok": true,
+      "passed": 10
+    },
+    "integration": {
+      "ok": true,
+      "passed": 26
+    }
+  }
+}

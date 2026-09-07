@@ -1,9 +1,10 @@
 # Baz implementation roadmap
 
-Status: first implementation, 21 example ports plus worker streaming, published pure Zig package/site, and native Windows x64/Linux/macOS support, 2026-09-06.
+Status: composition MVP merged and natively qualified; bounded notifications, SSE
+and a complete application are natively qualified candidates, 2026-09-07.
 Exact target: Zig 0.16.0. See the [implemented API](APP-API.md),
 [21 example ports](../examples/README.md), and
-[current native receipt](../reports/2026-09-06-streaming.md) for exact evidence and limits.
+[composition native receipt](../reports/2026-09-07-composition.md) for exact evidence and limits.
 
 Build Baz (Bounded Async Zap) with Zap's typed App/endpoint ergonomics, borrowed-byte
 request APIs, modern Zig capabilities, and the external [bounded/http](https://technologylab-ai.github.io/bounded-http/) engine.
@@ -33,7 +34,11 @@ tracks transport reliability, performance, and platform work. Its
 - API-06 and API-07 now pass native gates: public middleware/locals, reusable
   expiring sessions and typed continuations with timed waits.
   Baz now consumes an external engine package; repository and Pages publication are complete.
-  IO-01–04 remains deferred until after the first API MVP by user decision.
+  IO-01–04 remains deferred, explicitly reaffirmed by the user on 2026-09-07.
+- API-10/11 pass native gates: bounded producer notifications, SSE and the complete
+  live-job application. [Receipt](../reports/2026-09-07-notifications.md);
+  [engine PR #5](https://github.com/technologylab-ai/bounded-http/pull/5) must merge
+  before [Baz PR #6](https://github.com/technologylab-ai/baz/pull/6).
 - Consult the receipt/session ledger for native gates and cleanup state. The
   separate [basic Zap comparison](../reports/2026-09-06-basic-zap.md) records
   native ReleaseSafe results at 1 and 32 connections; it does not isolate API
@@ -59,7 +64,7 @@ Inspect Git state before editing; do not overwrite another session's work.
 | Bodies/forms | Contiguous form parsers; explicit logical-body copy for segmented input. Flat multipart Part iterator. No implicit disk writes or receive streaming. |
 | Responses | One-shot handlers with capacity secured before execution; same-handler streaming through std.Io.Writer on fixed workers. Typed continuations release the executor between flushes and timers. Never replay application side effects. |
 | std.Io now | Inject caller capabilities; standard bounded Reader/Writer interoperability; explicit workers for blocking services. |
-| std.Io provider | IO-01–04 deferred until after the first API MVP by user decision (2026-09-06); an optional bounded cooperative provider remains a candidate. |
+| std.Io provider | IO-01–04 remains deferred by user decision (reaffirmed 2026-09-07); an optional bounded cooperative provider remains a candidate. |
 | Memory | Framework storage reserved at startup; fixed buffers/reservations and optional bounded locals/scratch, no growable request arena or hidden heap fallback. |
 | Ownership | Input/output/task borrows survive until their real terminal transitions; scratch cannot become a dynamic output borrow without a later lease protocol. |
 
@@ -81,9 +86,11 @@ Split implementation across sessions at its named gate and record exact state.
 | API-05 | implemented; scoped receipt | Flat multipart fields/files over retained input. | API-04 | APP-MULTIPART |
 | API-06 | implemented; native gates passed | Typed locals, middleware and authentication composition: [guide](MIDDLEWARE.md). Public cookie/redirect helpers: [guide](COOKIES.md). | API-02, API-03 | APP-MIDDLEWARE |
 | API-07 | typed continuations implemented; native gates passed | Typed start/resume callbacks, timed waits, startup State/Locals/draft pool; [guide](CONTINUATIONS.md). | API-03, API-06 | APP-RESUME |
-| API-08 | partial: 21 ports, streaming example and external package | Finish remaining migration examples and successor MVP qualification; repository and Pages publication are integrated. | API-01–07 | APP-NATIVE |
+| API-08 | composition MVP qualified and merged | 21 supported ports, worker streaming and typed continuations, standalone package and Pages; explicit exclusions below. | API-01–07 | APP-NATIVE |
 | API-09 | implemented; native gates passed | Pure Zig Mustache: startup template/partial ownership, bounded typed rendering into reserved HTML, original Zap compatibility and official core fixtures. | API-02, API-03 | APP-MUSTACHE |
-| IO-01–04 | deferred | Owned std.Io feasibility, isolated prototype, HTTP integration and adoption decision. | First API MVP; see STD-IO-DECISION | STDIO-PROTOTYPE, STDIO-HTTP-OWNERSHIP, STDIO-ADOPTION |
+| API-10 | implemented; native gates passed | Bounded producer notifications, fixed mailboxes and SSE encoding; explicit saturation, lifetime and replay policy. | API-07 | APP-NOTIFICATIONS, APP-SSE |
+| API-11 | implemented; native and browser gates passed | Complete Mustache/session/live-job application with fixed jobs and replay, revocation, slow clients and disconnects. | API-09, API-10 | APP-JOBS |
+| IO-01–04 | deferred by user on 2026-09-07 | Owned std.Io feasibility, isolated prototype, HTTP integration and adoption decision. | First API MVP; see STD-IO-DECISION | STDIO-PROTOTYPE, STDIO-HTTP-OWNERSHIP, STDIO-ADOPTION |
 
 API-01 and API-02 can proceed independently after agreeing on module exports.
 API-04 and API-06 can proceed independently after API-03. The user selected the
@@ -287,6 +294,23 @@ new completion paths are introduced.
 
 ### API-08 — migration examples and successor MVP qualification
 
+The composition MVP is complete at merged Baz `c5f4be7`, with its exact native
+[composition receipt](../reports/2026-09-07-composition.md). This reconciles the
+original checklist; newer additions below still need their own qualification.
+
+| Original checklist | Landed evidence / boundary |
+| --- | --- |
+| Independent package, pinned engine, MIT and Pages | Published; [dependency guide](DEPENDENCY.md) and [repository record](REPOSITORY.md). |
+| App, endpoints, routing, raw parameters/forms/uploads, JSON | Supported example ports and [API receipt](../reports/2026-09-06-app-api.md). |
+| Cookies, redirects, middleware, auth, locals | [Cookies](COOKIES.md), [middleware](MIDDLEWARE.md), native composition receipt. |
+| Explicit resumable output | Worker streaming and typed continuations; native composition receipt. |
+| Templating | Pure Zig Mustache fork; [native Mustache receipt](../reports/2026-09-06-mustache.md). |
+| Blocking service example | Worker-only bounded CRUD endpoint. No general asynchronous outbound-service runtime is claimed. |
+| Migration and deliberate differences | [Migration guide](APP-API.md#from-zap) and [example inventory](../examples/README.md). |
+| Native verification | Exact Debug/ReleaseSafe Linux, macOS and Windows x64 receipts; Windows performance remains deferred. |
+| Deliberate exclusions | TLS out of scope; WebSockets awaits engine upgrade lifecycle; custom std.Io deferred. These are not unfinished supported ports. |
+
+
 Baz now imports the separate engine through its public `bounded_http` module.
 The [dependency record](DEPENDENCY.md) documents the immutable URL/hash pin and upstream PR.
 App, routing, forms, responses, examples, and application tests remain in Baz.
@@ -311,7 +335,7 @@ request data, particularly duplicates, raw escape spelling and copy lifetimes.
 List unsupported old features and actual deployment limits.
 
 Gate APP-NATIVE runs all relevant checks below on exact recorded native
-Linux/macOS environments and the final source identity. Each advertised feature
+Linux, macOS and Windows x64 environments and the final source identity. Each advertised feature
 must have its named gate passed. Keep the framework experimental until then;
 passing this MVP gate is not arbitrary application isolation or full production
 qualification. Record framework memory and optional controlled low-level versus
@@ -431,3 +455,4 @@ partials and implicit filesystem lookup remain outside this slice.
 | --- | --- | --- | --- |
 | 2026-09-06: Mustache pages | API-09: pure Zig fork, bounded cached rendering, startup owners, reserved HTML response helper, concise real page and partial, documentation/preview. Dependency PR #1 and Baz PR #3 merged in order. | [Native receipt](../reports/2026-09-06-mustache.md): 136 core cases at two capacities, four Zap cases, 346 library tests; Baz 90 root/two consumer tests per mode, 12 Mustache groups and existing suites on Linux/macOS/Windows. Five example-browser and 17 site-browser groups. | API-06 composition; retain fork ownership and explicit template limits. |
 | 2026-09-07: composition and continuations | Public middleware/locals, reusable sessions with expiry and revocation, typed start/resume handlers and bounded retained storage. | [Composition receipt](../reports/2026-09-07-composition.md): Debug/ReleaseSafe, 161 root and five consumer tests per mode on Linux/macOS/Windows; 15 middleware, 17 session, 20 continuation and all existing wire groups. | APP-MIDDLEWARE and APP-RESUME passed; own std.Io remains deferred. |
+| 2026-09-07: notifications, SSE and complete application | Generation-safe producer signals, fixed Mailbox, SSE encoder, authenticated Mustache/live-job application, explicit replay and bounded reconnects. API-08 checklist reconciled. | [Notification receipt](../reports/2026-09-07-notifications.md): 189 root + five consumer tests per mode/platform, 343 CLI checks, all prior suites, 21 macOS / 22 Linux-Windows job groups; 10 application and 17 website browser groups. | Merge engine #5 before Baz #6. Custom std.Io remains deferred by user decision. |
