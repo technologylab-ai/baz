@@ -7,10 +7,19 @@ the published site was checked against the Baz merge's publication manifest.
 [The composition receipt](reports/2026-09-07-composition.md) preserves the exact
 native implementation evidence (161 root and five consumer tests per mode).
 
-Current scope: bounded producer notifications, a fixed-capacity mailbox, SSE
-encoding and a complete authenticated Mustache + live-job example. New native
-gates are pending; prior receipts do not qualify these additions. Engine
-notification changes belong in its separate `feat/application-notifications` PR.
+Current implementation: bounded producer notifications, a fixed-capacity mailbox,
+SSE encoding and a complete authenticated Mustache + live-job example.
+[Baz PR #6](https://github.com/technologylab-ai/baz/pull/6) depends on
+[engine PR #5](https://github.com/technologylab-ai/bounded-http/pull/5), pinned at
+`886b728bec79c36ca1ec69345b609a725617a9ea`. Engine native gates passed.
+Baz local and hosted Linux/macOS/Windows Debug/ReleaseSafe gates passed:
+189 root + five consumer tests per mode, 343 CLI checks, all prior wire suites,
+21 macOS / 22 Linux-Windows job/SSE groups and three Windows shard cases.
+Chrome 152 passed ten real-application and 17 website groups, including native
+reconnect after the ten-second request deadline with Last-Event-ID and all events.
+[The notification receipt](reports/2026-09-07-notifications.md) preserves exact
+revisions, platforms and limitations. Neither new PR is merged. Merge engine #5
+before Baz #6 once their final checks pass.
 The user explicitly deferred the custom `std.Io` prototype on 2026-09-07.
 Standard caller `std.Io` and the engine's existing native backends remain in use.
 

@@ -38,7 +38,8 @@ The first implementation provides:
   [Verified natively on Linux, macOS, and Windows](reports/2026-09-06-mustache.md).
 - **SSE and producer notifications:** encode events into a standard writer,
   wake retained callbacks, and choose explicit queue and replay limits.
-  [SSE guide](docs/SSE.md) · [complete job application](docs/JOBS.md).
+  [SSE guide](docs/SSE.md) · [complete job application](docs/JOBS.md) ·
+  [native and browser evidence](reports/2026-09-07-notifications.md).
 - **Many waiting streams, few workers:** [typed continuations](docs/CONTINUATIONS.md)
   retain bounded state between flushes and timers, releasing the executor.
 - **Cookies and redirects:** borrowed token views, explicit session/persistent expiry,

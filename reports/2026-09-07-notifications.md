@@ -30,9 +30,38 @@ wire suites pass, as do 21 new macOS [job/SSE groups](2026-09-07-notifications/l
 and 343 CLI checks across 29 executables. Real kernel backpressure remains
 covered by the existing 14-group streaming suite.
 
-Hosted Baz native and browser gates are pending at this checkpoint. The
-[code/input hashes](2026-09-07-notifications/code-sha256.json) identify the source
-being qualified. Engine native evidence is preserved for
+Chrome 152 passes ten [real application groups](2026-09-07-notifications/browser-jobs.json)
+and 17 [website/reader groups](2026-09-07-notifications/browser-site.json), including
+1440/390/320 px layouts and the browser's actual deadline-triggered reconnect
+with `Last-Event-ID: 9`, followed by the remaining events in order.
+
+Native Baz gates passed on implementation commit
+`24f3ebc4d0c5fc2d0e693b7227d5bbdbda0d9219`:
+[Linux/macOS](https://github.com/technologylab-ai/baz/actions/runs/34069183444) and
+[Windows](https://github.com/technologylab-ai/baz/actions/runs/34069183452).
+The [native receipt](2026-09-07-notifications/native.json) and
+[downloaded-packet hashes](2026-09-07-notifications/native-packet-sha256.json)
+preserve exact environments and results. Later changes add documentation,
+preview images and the corrected optional browser harness; all Zig, application
+assets and Python runtime test inputs remain identical to that commit.
+
+| Gate | Linux x64 | macOS ARM64 | Windows x64 |
+| --- | --- | --- | --- |
+| Debug / ReleaseSafe | 189 root + 5 consumer tests each | 189 + 5 each | 189 + 5 each |
+| CLI | 343 checks / 29 binaries | 343 / 29 | 343 / 29 |
+| New job/SSE groups | 22 | 21 | 22 |
+| Previous App / ports / streaming / borrowed bodies | 14 / 20 / 14 / 9 | 14 / 20 / 14 / 9 | 14 / 20 / 14 / 9 |
+| Cookies / middleware / sessions / continuations / Mustache | 14 / 15 / 17 / 20 / 12 | 14 / 15 / 17 / 20 / 12 | 14 / 15 / 17 / 20 / 12 |
+| Additional Windows handoff/shutdown | — | — | Three native cases with 2 / 3 / 3 owners |
+
+Linux used kernel 6.17.0-1022-azure; hosted macOS used Darwin 25.5.0; Windows
+used Server 2025 x64, image win25-vs2026 20260824.214.3. Mac has one HTTP owner;
+its multi-shard case is explicitly excluded. Worker execution uses one shard on
+all platforms. The new suite separately exercises two workers, and three inline
+owners on Linux/Windows.
+
+The [code/input hashes](2026-09-07-notifications/code-sha256.json) identify the
+final candidate's code, application assets, harnesses and build inputs. Engine native evidence is preserved for
 [Linux/macOS](2026-09-07-notifications/engine-posix.json) and
 [Windows](2026-09-07-notifications/engine-windows.json).
 

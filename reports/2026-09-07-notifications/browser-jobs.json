@@ -1,0 +1,341 @@
+{
+  "base": "http://127.0.0.1:53994/",
+  "browser": "Chrome/152.0.7977.76",
+  "cases": [
+    {
+      "name": "login-1440",
+      "ok": true,
+      "evidence": {
+        "width": 1440,
+        "renderedIdentity": "zap",
+        "httpOnly": true,
+        "sessionCookie": true
+      }
+    },
+    {
+      "name": "native-event-source-1440",
+      "ok": true,
+      "evidence": {
+        "width": 1440,
+        "nativeEvents": 11,
+        "ids": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10",
+          "11"
+        ],
+        "reconnect": {
+          "trigger": "request deadline",
+          "acknowledged": "1",
+          "requests": [
+            {
+              "requestId": "89193.12",
+              "url": "http://127.0.0.1:53994/jobs/0-1/events",
+              "lastEventId": "9"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "logout-1440",
+      "ok": true,
+      "evidence": {
+        "cookieDeleted": true
+      }
+    },
+    {
+      "name": "login-390",
+      "ok": true,
+      "evidence": {
+        "width": 390,
+        "renderedIdentity": "zap",
+        "httpOnly": true,
+        "sessionCookie": true
+      }
+    },
+    {
+      "name": "native-event-source-390",
+      "ok": true,
+      "evidence": {
+        "width": 390,
+        "nativeEvents": 11,
+        "ids": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10",
+          "11"
+        ],
+        "reconnect": null
+      }
+    },
+    {
+      "name": "logout-390",
+      "ok": true,
+      "evidence": {
+        "cookieDeleted": true
+      }
+    },
+    {
+      "name": "login-320",
+      "ok": true,
+      "evidence": {
+        "width": 320,
+        "renderedIdentity": "zap",
+        "httpOnly": true,
+        "sessionCookie": true
+      }
+    },
+    {
+      "name": "native-event-source-320",
+      "ok": true,
+      "evidence": {
+        "width": 320,
+        "nativeEvents": 11,
+        "ids": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10",
+          "11"
+        ],
+        "reconnect": null
+      }
+    },
+    {
+      "name": "logout-320",
+      "ok": true,
+      "evidence": {
+        "cookieDeleted": true
+      }
+    },
+    {
+      "name": "no-script-errors-or-external-requests",
+      "ok": true,
+      "evidence": {
+        "requests": 37,
+        "exceptions": 0
+      }
+    }
+  ],
+  "exceptions": [],
+  "events": [
+    {
+      "eventName": "progress",
+      "eventId": "1",
+      "data": "{\"progress\":0,\"done\":false}"
+    },
+    {
+      "eventName": "progress",
+      "eventId": "2",
+      "data": "{\"progress\":10,\"done\":false}"
+    },
+    {
+      "eventName": "progress",
+      "eventId": "3",
+      "data": "{\"progress\":20,\"done\":false}"
+    },
+    {
+      "eventName": "progress",
+      "eventId": "4",
+      "data": "{\"progress\":30,\"done\":false}"
+    },
+    {
+      "eventName": "progress",
+      "eventId": "5",
+      "data": "{\"progress\":40,\"done\":false}"
+    },
+    {
+      "eventName": "progress",
+      "eventId": "6",
+      "data": "{\"progress\":50,\"done\":false}"
+    },
+    {
+      "eventName": "progress",
+      "eventId": "7",
+      "data": "{\"progress\":60,\"done\":false}"
+    },
+    {
+      "eventName": "progress",
+      "eventId": "8",
+      "data": "{\"progress\":70,\"done\":false}"
+    },
+    {
+      "eventName": "progress",
+      "eventId": "9",
+      "data": "{\"progress\":80,\"done\":false}"
+    },
+    {
+      "eventName": "progress",
+      "eventId": "10",
+      "data": "{\"progress\":90,\"done\":false}"
+    },
+    {
+      "eventName": "done",
+      "eventId": "11",
+      "data": "{\"progress\":100,\"done\":true}"
+    },
+    {
+      "eventName": "progress",
+      "eventId": "1",
+      "data": "{\"progress\":0,\"done\":false}"
+    },
+    {
+      "eventName": "progress",
+      "eventId": "2",
+      "data": "{\"progress\":10,\"done\":false}"
+    },
+    {
+      "eventName": "progress",
+      "eventId": "3",
+      "data": "{\"progress\":20,\"done\":false}"
+    },
+    {
+      "eventName": "progress",
+      "eventId": "4",
+      "data": "{\"progress\":30,\"done\":false}"
+    },
+    {
+      "eventName": "progress",
+      "eventId": "5",
+      "data": "{\"progress\":40,\"done\":false}"
+    },
+    {
+      "eventName": "progress",
+      "eventId": "6",
+      "data": "{\"progress\":50,\"done\":false}"
+    },
+    {
+      "eventName": "progress",
+      "eventId": "7",
+      "data": "{\"progress\":60,\"done\":false}"
+    },
+    {
+      "eventName": "progress",
+      "eventId": "8",
+      "data": "{\"progress\":70,\"done\":false}"
+    },
+    {
+      "eventName": "progress",
+      "eventId": "9",
+      "data": "{\"progress\":80,\"done\":false}"
+    },
+    {
+      "eventName": "progress",
+      "eventId": "10",
+      "data": "{\"progress\":90,\"done\":false}"
+    },
+    {
+      "eventName": "done",
+      "eventId": "11",
+      "data": "{\"progress\":100,\"done\":true}"
+    },
+    {
+      "eventName": "progress",
+      "eventId": "1",
+      "data": "{\"progress\":0,\"done\":false}"
+    },
+    {
+      "eventName": "progress",
+      "eventId": "2",
+      "data": "{\"progress\":10,\"done\":false}"
+    },
+    {
+      "eventName": "progress",
+      "eventId": "3",
+      "data": "{\"progress\":20,\"done\":false}"
+    },
+    {
+      "eventName": "progress",
+      "eventId": "4",
+      "data": "{\"progress\":30,\"done\":false}"
+    },
+    {
+      "eventName": "progress",
+      "eventId": "5",
+      "data": "{\"progress\":40,\"done\":false}"
+    },
+    {
+      "eventName": "progress",
+      "eventId": "6",
+      "data": "{\"progress\":50,\"done\":false}"
+    },
+    {
+      "eventName": "progress",
+      "eventId": "7",
+      "data": "{\"progress\":60,\"done\":false}"
+    },
+    {
+      "eventName": "progress",
+      "eventId": "8",
+      "data": "{\"progress\":70,\"done\":false}"
+    },
+    {
+      "eventName": "progress",
+      "eventId": "9",
+      "data": "{\"progress\":80,\"done\":false}"
+    },
+    {
+      "eventName": "progress",
+      "eventId": "10",
+      "data": "{\"progress\":90,\"done\":false}"
+    },
+    {
+      "eventName": "done",
+      "eventId": "11",
+      "data": "{\"progress\":100,\"done\":true}"
+    }
+  ],
+  "eventRequests": [
+    {
+      "requestId": "89193.11",
+      "url": "http://127.0.0.1:53994/jobs/0-1/events",
+      "lastEventId": null
+    },
+    {
+      "requestId": "89193.12",
+      "url": "http://127.0.0.1:53994/jobs/0-1/events",
+      "lastEventId": "9"
+    },
+    {
+      "requestId": "89193.25",
+      "url": "http://127.0.0.1:53994/jobs/1-1/events",
+      "lastEventId": null
+    },
+    {
+      "requestId": "89193.26",
+      "url": "http://127.0.0.1:53994/jobs/1-1/events",
+      "lastEventId": "9"
+    },
+    {
+      "requestId": "89193.39",
+      "url": "http://127.0.0.1:53994/jobs/2-1/events",
+      "lastEventId": null
+    },
+    {
+      "requestId": "89193.40",
+      "url": "http://127.0.0.1:53994/jobs/2-1/events",
+      "lastEventId": "9"
+    }
+  ]
+}

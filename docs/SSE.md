@@ -99,6 +99,7 @@ cookie sessions, a startup producer and notification-driven SSE progress. Read
 [its application guide](JOBS.md) for the exact job, replay, session and client
 policies. It keeps markup and browser code in separate assets.
 
-New notification/SSE/application native qualification is pending on this branch.
-The [composition receipt](../reports/2026-09-07-composition.md) qualifies the prior
-timer/flush API only; it is not evidence for these additions.
+The [notification/SSE receipt](../reports/2026-09-07-notifications.md) records
+current local and hosted qualification, exact inputs and remaining limits.
+The [composition receipt](../reports/2026-09-07-composition.md) separately qualifies
+the prior timer/flush API.

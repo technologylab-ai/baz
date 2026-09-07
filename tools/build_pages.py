@@ -103,7 +103,7 @@ def build():
         raise ValueError('Expected a full Git revision.')
     docs = documents()
     assets = ['docs/' + name for name in ('read.html', 'site.css', 'site.js', 'reader.css', 'reader.js', 'highlight-zig.js', 'favicon.svg')]
-    assets.append('docs/assets/mustache-preview.png')
+    assets.extend(['docs/assets/mustache-preview.png', 'docs/assets/jobs-preview.png'])
     assets += [str(path.relative_to(ROOT)) for path in sorted((ROOT / 'docs/diagrams').glob('*.svg'))]
     vendor = json.loads((ROOT / 'docs/vendor/manifest.json').read_text())
     assets.append('docs/vendor/manifest.json')

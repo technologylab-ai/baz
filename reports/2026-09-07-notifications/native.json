@@ -1,0 +1,234 @@
+{
+  "source_revision": "24f3ebc4d0c5fc2d0e693b7227d5bbdbda0d9219",
+  "zig_version": "0.16.0",
+  "runtime_optimization": "ReleaseSafe",
+  "platforms": {
+    "macos": {
+      "run_id": 34069183444,
+      "workflow_url": "https://github.com/technologylab-ai/baz/actions/runs/34069183444",
+      "environment": [
+        "24f3ebc4d0c5fc2d0e693b7227d5bbdbda0d9219",
+        "Darwin sat12-dp153-280427fc-45d0-4b1c-8a1e-5682c8a20e41-FAE507D1E6BE.local 25.5.0 Darwin Kernel Version 25.5.0: Tue Jun  9 22:26:00 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_VMAPPLE arm64",
+        "0.16.0",
+        "Python 3.14.6"
+      ],
+      "verify": {
+        "Debug": {
+          "root_tests_passed": 189,
+          "consumer_tests_passed": 5,
+          "summaries": [
+            "Build Summary: 4/4 steps succeeded; 5/5 tests passed",
+            "Build Summary: 68/68 steps succeeded; 189/189 tests passed"
+          ]
+        },
+        "ReleaseSafe": {
+          "root_tests_passed": 189,
+          "consumer_tests_passed": 5,
+          "summaries": [
+            "Build Summary: 4/4 steps succeeded; 5/5 tests passed",
+            "Build Summary: 68/68 steps succeeded; 189/189 tests passed"
+          ]
+        }
+      },
+      "wire": {
+        "app": {
+          "passed": 14
+        },
+        "examples": {
+          "passed": 20
+        },
+        "streaming": {
+          "passed": 14,
+          "performance_comparison": false
+        },
+        "borrow": {
+          "passed": 9,
+          "performance_comparison": false
+        },
+        "cookies": {
+          "passed": 14
+        },
+        "middleware": {
+          "passed": 15
+        },
+        "sessions": {
+          "passed": 17
+        },
+        "continuations": {
+          "passed": 20
+        },
+        "mustache": {
+          "passed": 12
+        },
+        "cli": {
+          "passed": 343,
+          "executables": 29,
+          "performance_comparison": false
+        },
+        "jobs": {
+          "passed": 21,
+          "unsupported_topologies": [
+            "workers with multiple shards",
+            "multiple macOS shards"
+          ],
+          "concurrent_topology_cases": 1
+        }
+      }
+    },
+    "linux": {
+      "run_id": 34069183444,
+      "workflow_url": "https://github.com/technologylab-ai/baz/actions/runs/34069183444",
+      "environment": [
+        "24f3ebc4d0c5fc2d0e693b7227d5bbdbda0d9219",
+        "Linux runnervmejwal 6.17.0-1022-azure #22-Ubuntu SMP Mon Jul 27 17:24:03 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux",
+        "0.16.0",
+        "Python 3.12.3"
+      ],
+      "verify": {
+        "Debug": {
+          "root_tests_passed": 189,
+          "consumer_tests_passed": 5,
+          "summaries": [
+            "Build Summary: 4/4 steps succeeded; 5/5 tests passed",
+            "Build Summary: 68/68 steps succeeded; 189/189 tests passed"
+          ]
+        },
+        "ReleaseSafe": {
+          "root_tests_passed": 189,
+          "consumer_tests_passed": 5,
+          "summaries": [
+            "Build Summary: 4/4 steps succeeded; 5/5 tests passed",
+            "Build Summary: 68/68 steps succeeded; 189/189 tests passed"
+          ]
+        }
+      },
+      "wire": {
+        "app": {
+          "passed": 14
+        },
+        "examples": {
+          "passed": 20
+        },
+        "streaming": {
+          "passed": 14,
+          "performance_comparison": false
+        },
+        "borrow": {
+          "passed": 9,
+          "performance_comparison": false
+        },
+        "cookies": {
+          "passed": 14
+        },
+        "middleware": {
+          "passed": 15
+        },
+        "sessions": {
+          "passed": 17
+        },
+        "continuations": {
+          "passed": 20
+        },
+        "mustache": {
+          "passed": 12
+        },
+        "cli": {
+          "passed": 343,
+          "executables": 29,
+          "performance_comparison": false
+        },
+        "jobs": {
+          "passed": 22,
+          "unsupported_topologies": [
+            "workers with multiple shards"
+          ],
+          "concurrent_topology_cases": 2
+        }
+      }
+    },
+    "windows": {
+      "run_id": 34069183452,
+      "workflow_url": "https://github.com/technologylab-ai/baz/actions/runs/34069183452",
+      "environment": [
+        "commit=24f3ebc4d0c5fc2d0e693b7227d5bbdbda0d9219 image=win25-vs2026 version=20260824.214.3 zig=0.16.0",
+        "{",
+        "  \"Caption\": \"Microsoft Windows Server 2025 Datacenter\",",
+        "  \"Version\": \"10.0.26100\",",
+        "  \"BuildNumber\": \"26100\",",
+        "  \"OSArchitecture\": \"64-bit\"",
+        "}"
+      ],
+      "verify": {
+        "Debug": {
+          "root_tests_passed": 189,
+          "consumer_tests_passed": 5,
+          "summaries": [
+            "Build Summary: 4/4 steps succeeded; 5/5 tests passed",
+            "Build Summary: 68/68 steps succeeded; 189/189 tests passed"
+          ]
+        },
+        "ReleaseSafe": {
+          "root_tests_passed": 189,
+          "consumer_tests_passed": 5,
+          "summaries": [
+            "Build Summary: 4/4 steps succeeded; 5/5 tests passed",
+            "Build Summary: 68/68 steps succeeded; 189/189 tests passed"
+          ]
+        }
+      },
+      "wire": {
+        "app": {
+          "passed": 14
+        },
+        "examples": {
+          "passed": 20
+        },
+        "streaming": {
+          "passed": 14,
+          "performance_comparison": false
+        },
+        "borrow": {
+          "passed": 9,
+          "performance_comparison": false
+        },
+        "cookies": {
+          "passed": 14
+        },
+        "middleware": {
+          "passed": 15
+        },
+        "sessions": {
+          "passed": 17
+        },
+        "continuations": {
+          "passed": 20
+        },
+        "mustache": {
+          "passed": 12
+        },
+        "cli": {
+          "passed": 343,
+          "executables": 29,
+          "performance_comparison": false
+        },
+        "jobs": {
+          "passed": 22,
+          "unsupported_topologies": [
+            "workers with multiple shards"
+          ],
+          "concurrent_topology_cases": 2
+        },
+        "windows_smoke": {
+          "passed": 3,
+          "execution": "native Windows IOCP",
+          "performance_comparison": false,
+          "shards": [
+            2,
+            3,
+            3
+          ]
+        }
+      }
+    }
+  }
+}

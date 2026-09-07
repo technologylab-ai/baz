@@ -12,6 +12,8 @@ start a job, and watch its progress arrive through the browser's `EventSource`.
 These are public demo credentials for two separate identities. The application
 also runs with inline callbacks. Its background producer is a separate startup
 thread; waiting HTTP streams retain bounded state and release the callback executor.
+Worker execution currently uses one HTTP shard. Linux and Windows also support
+multiple shards with inline callbacks; macOS uses one shard.
 
 The [server source](../examples/jobs.zig) keeps routing, auth and stream policy
 together. [Job storage](../examples/endpoint/job_store.zig) and
@@ -21,6 +23,16 @@ services. [Page markup](../examples/assets/jobs.html),
 [styles](../examples/assets/jobs.css) and [browser code](../examples/assets/jobs.js)
 live in separate files. Mustache parses the page once at startup; each render
 uses typed data and reserved response storage.
+
+## Rendered example
+
+![The Baz job studio: a signed-in user and a completed live progress card](assets/jobs-preview.png)
+
+Captured from the running ReleaseSafe application in Chrome 152. The browser
+gate also exercises 390 px and 320 px layouts, sign-in/out, all eleven events,
+and native reconnect with `Last-Event-ID` after the fixed request deadline.
+To see a reconnect yourself, add `--tick-ms 1200` to the startup command: the
+job then outlasts one ten-second response and resumes on a new connection.
 
 ## Deliberate limits
 
@@ -105,4 +117,5 @@ including reconnects, auth, capacity, delayed readers, disconnect and shutdown.
 The eleven small progress events can fit in kernel socket buffers: delayed-reader
 coverage here does **not** prove transport saturation. The maintained streaming
 wire suite covers transport backpressure separately. No performance result is
-claimed for this demonstration. New native gates are pending on this branch.
+claimed for this demonstration. See the [qualification receipt](../reports/2026-09-07-notifications.md)
+for current native platforms, source identity and browser evidence.

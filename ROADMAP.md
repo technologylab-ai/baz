@@ -18,8 +18,8 @@ provide bounded tasks, acceptance gates, ownership, and resume instructions.
 | Middleware and locals | Implemented; native gates passed | Public copied hooks and typed locals; [guide](docs/MIDDLEWARE.md). |
 | Resumable endpoints | Implemented; native gates passed | Typed callbacks release workers between flushes/timers; [guide](docs/CONTINUATIONS.md). |
 | Standalone repository | Published GitHub repository and Pages, MIT licensed | Maintain package, documentation and native CI. |
-| Notifications and SSE | In development; new native gates pending | Fixed wake-up storage, bounded messages and explicit event/replay semantics; [guide](docs/SSE.md). |
-| Complete application | In development | Mustache, sessions and live background-job progress; bounded replay and revocation. |
+| Notifications and SSE | Implemented; native gates passed | Fixed wake-up storage, bounded messages and explicit event/replay semantics; [guide](docs/SSE.md). |
+| Complete application | Implemented; native and browser gates passed | Mustache, sessions and live background-job progress; bounded replay and revocation. |
 | Owned `std.Io` | Deferred by user on 2026-09-07 | Keep the prototype on the backburner. |
 | Mustache | Implemented; native Linux/macOS/Windows gates passed | Maintain the Baz-specific pure Zig fork, explicit template bounds and [compatibility/ownership coverage](reports/2026-09-06-mustache.md). |
 | WebSockets | Deferred | First define the engine upgrade lifecycle. |

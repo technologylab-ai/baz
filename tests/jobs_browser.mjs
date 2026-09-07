@@ -1,4 +1,5 @@
 // Optional native Chrome application gate. The caller owns the ReleaseSafe server and host reservation.
+// Start the fixture with --tick-ms 1200. Its job exceeds the fixed ten-second request deadline.
 // Usage: node tests/jobs_browser.mjs http://127.0.0.1:PORT/ OUTPUT_DIRECTORY
 import assert from 'node:assert/strict';
 import {spawn} from 'node:child_process';
@@ -13,7 +14,7 @@ if (base.protocol !== 'http:' || !['127.0.0.1', 'localhost', '[::1]'].includes(b
 const output = path.resolve(outputArgument);
 const executable = process.env.BROWSER || (process.platform === 'darwin'
   ? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' : '/usr/bin/chromium');
-const cases = [], exceptions = [], events = [], requests = [], eventRequests = [], pending = new Map();
+const cases = [], exceptions = [], events = [], requests = [], eventRequests = [], extraHeaders = new Map(), pending = new Map();
 let browser, socket, session, sequence = 0, version;
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 async function until(fn, description, timeout = 12000) {
@@ -100,12 +101,22 @@ try {
       if (events.length < 128) events.push({eventName,eventId,data});
       else exceptions.push({error:'Browser event evidence exceeded its bound'});
     }
+    if (message.method === 'Network.requestWillBeSentExtraInfo') {
+      const {requestId,headers} = message.params;
+      const header = Object.entries(headers).find(([name]) => name.toLowerCase() === 'last-event-id');
+      if (header) {
+        if (extraHeaders.size < 256) extraHeaders.set(requestId,header[1]);
+        for (const request of eventRequests)
+          if (request.requestId === requestId) request.lastEventId = header[1];
+      }
+    }
     if (message.method === 'Network.requestWillBeSent' && requests.length < 256) {
       const request = message.params.request;
       requests.push(request.url);
       if (/\/jobs\/[0-9]+-[0-9]+\/events$/.test(request.url)) {
         const header = Object.entries(request.headers).find(([name]) => name.toLowerCase() === 'last-event-id');
-        eventRequests.push({url:request.url,lastEventId:header?.[1] ?? null});
+        eventRequests.push({requestId:message.params.requestId,url:request.url,
+          lastEventId:header?.[1] ?? extraHeaders.get(message.params.requestId) ?? null});
       }
     }
     if (!job) return;
@@ -160,21 +171,15 @@ try {
         await until(() => events.length > firstEvent, 'Native EventSource did not deliver its initial event');
         const acknowledged = events.at(-1).eventId;
         const firstRequest = eventRequests.length;
-        try {
-          await send('Network.emulateNetworkConditions',
-            {offline:true,latency:0,downloadThroughput:-1,uploadThroughput:-1});
-          await delay(300);
-        } finally {
-          await send('Network.emulateNetworkConditions',
-            {offline:false,latency:0,downloadThroughput:-1,uploadThroughput:-1});
-        }
+        // The real server deadline closes this response before the twelve-second job ends.
+        // Native EventSource must reconnect and carry its acknowledged cursor automatically.
         await until(() => eventRequests.slice(firstRequest).some(request => request.lastEventId !== null),
-          'Native EventSource did not reconnect with Last-Event-ID');
-        reconnect = {acknowledged,requests:eventRequests.slice(firstRequest)};
+          'Native EventSource did not reconnect after the request deadline with Last-Event-ID', 20000);
+        reconnect = {trigger:'request deadline',acknowledged,requests:eventRequests.slice(firstRequest)};
         assert(reconnect.requests.some(request => Number(request.lastEventId) >= Number(acknowledged)));
       }
       await until(() => evaluate('document.querySelector("article.job .tag")?.textContent === "Complete"'),
-        'Browser EventSource did not deliver job completion');
+        'Browser EventSource did not deliver job completion', 20000);
       assert.equal(await evaluate('document.querySelector("article.job h2").textContent'),'100%');
       assert.equal(await evaluate('document.querySelector("article.job progress").value'),100);
       const received = events.slice(firstEvent);
