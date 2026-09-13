@@ -205,14 +205,14 @@ until their owners finish. Application services and the caller's I/O provider
 have their own resource responsibilities. Read the ownership contract before
 retaining slices or introducing asynchronous work.
 
-## License
-
-Baz is [MIT licensed](LICENSE). The adapted Zap examples retain their
-[original copyright and license notice](examples/LICENSE-ZAP).
-
 ### Migration conveniences
 
 [The migration guide](docs/MIGRATION-HELPERS.md) includes runnable LAN binding,
 runtime file downloads with `Stream.copyFrom`, caller-allocator decoded field
 iteration, and `defaultErrorStatus` for custom error hooks. The same guide is
 available from the website's Examples section.
+
+## License
+
+Baz is [MIT licensed](LICENSE). The adapted Zap examples retain their
+[original copyright and license notice](examples/LICENSE-ZAP).
