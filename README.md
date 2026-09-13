@@ -205,9 +205,9 @@ until their owners finish. Application services and the caller's I/O provider
 have their own resource responsibilities. Read the ownership contract before
 retaining slices or introducing asynchronous work.
 
-### Migration conveniences
+### Application recipes
 
-[The migration guide](docs/MIGRATION-HELPERS.md) includes runnable LAN binding,
+[Application recipes](docs/APPLICATION-RECIPES.md) covers runnable LAN binding,
 runtime file downloads with `Stream.copyFrom`, caller-allocator decoded field
 iteration, and `defaultErrorStatus` for custom error hooks. The same guide is
 available from the website's Examples section.

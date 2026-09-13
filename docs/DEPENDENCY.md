@@ -66,7 +66,7 @@ The [repository record](REPOSITORY.md) describes branches and publication.
 The current pin adopts configurable IPv4 binding from [engine PR #6](https://github.com/technologylab-ai/bounded-http/pull/6).
 Merge that engine PR before the Baz adoption PR. The immutable source and package
 hash remain explicit in `build.zig.zon`. Baz exposes the engine's `Config.bind_address`
-and `Config.parseBindAddress` directly. The [migration guide](MIGRATION-HELPERS.md)
+and `Config.parseBindAddress` directly. The [application recipes guide](APPLICATION-RECIPES.md)
 shows LAN startup alongside the Baz-owned reader, form, and error conveniences.
 
 ## Future updates

@@ -328,21 +328,21 @@ try {
     await noOverflow();
     return {desktop:1440,mobile:390,clientSource:true};
   });
-  await check('migration-helpers-walkthrough', async () => {
+  await check('application-recipes-walkthrough', async () => {
     await send('Emulation.setDeviceMetricsOverride',{width:1440,height:1040,deviceScaleFactor:1,mobile:false});
     await navigate('#examples');
-    const selector = '#examples a[href="docs/read.html?file=docs/MIGRATION-HELPERS.md"]';
+    const selector = '#examples a[href="docs/read.html?file=docs/APPLICATION-RECIPES.md"]';
     await evaluate('document.querySelector('+JSON.stringify(selector)+').scrollIntoView({behavior:"instant",block:"center"})');
     await delay(300);
     await click(selector);
-    await until(() => evaluate('document.documentElement.dataset.readerReady === "true"'), 'Migration guide did not load');
-    assert.equal(await evaluate('document.querySelector("#document h1").textContent'),'From migration friction to everyday APIs');
-    await noOverflow(); await screenshot('baz-migration-helpers-desktop');
+    await until(() => evaluate('document.documentElement.dataset.readerReady === "true"'), 'Application recipes did not load');
+    assert.equal(await evaluate('document.querySelector("#document h1").textContent'),'Application recipes');
+    await noOverflow(); await screenshot('baz-application-recipes-desktop');
     for (const file of ['runtime_file', 'decoded_forms']) {
       assert(await evaluate('[...document.querySelectorAll("#document a")].some(a => new URL(a.href).searchParams.get("file") === "examples/'+file+'.zig")'));
     }
     await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:false});
-    await noOverflow(); await screenshot('baz-migration-helpers-mobile');
+    await noOverflow(); await screenshot('baz-application-recipes-mobile');
     return {desktop:1440,mobile:390,mainPageNavigation:true,examples:2};
   });
   await check('all-published-documents-render', async () => {

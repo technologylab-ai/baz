@@ -32,6 +32,7 @@ The website worktree is only a branch of Baz, not another project or repository.
 | Landing-page prose | [index.template.html](index.template.html) |
 | Limits and backpressure | The `#limits` chapter and [flow diagram](diagrams/backpressure.svg), with the [limits guide](LIMITS.md) and [pipelining assessment](PIPELINING.md) in the HTML reader |
 | Connection-limit walkthrough | [Two slots. Three clients.](CONNECTION-LIMIT-WALKTHROUGH.md), with its [slot diagram](diagrams/connection-slots.svg) and interactive [Python client](../examples/connection_limit.py); linked from the limits guide and examples catalog |
+| Application recipes | [Application recipes](APPLICATION-RECIPES.md), linked from the examples chapter, reader navigation, and API guides; the former guide URL retains a forwarding link |
 | Native HTTP backend specs | Linux/io_uring, macOS/kqueue, and Windows x64/IOCP appear in the hero and README, attributed to the [bounded/http](https://technologylab-ai.github.io/bounded-http/) engine |
 | App excerpt | `Hello` in [app_demo.zig](../src/app_demo.zig), extracted at build time |
 | Streaming excerpt | `progress` in [streaming.zig](../examples/streaming.zig), extracted at build time |

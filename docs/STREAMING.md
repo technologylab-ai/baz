@@ -27,7 +27,7 @@ work; `Stream` also provides convenience `writeAll`, `print`, and `flush` method
 `copyFrom(reader, scratch)` copies a standard reader to the stream using explicit
 caller scratch. The raw writer has no writable destination buffer; Zig 0.16.0
 file-reader `streamRemaining` can fail with `WriterBufferUnavailable`. Use
-`copyFrom` for that path. See the [runtime download walkthrough](MIGRATION-HELPERS.md#copy-a-runtime-file-into-a-response)
+`copyFrom` for that path. See the [runtime download walkthrough](APPLICATION-RECIPES.md#copy-a-runtime-file-into-a-response)
 for the runnable example, source diagnostics, HEAD, and file lifetimes.
 
 Every write copies input bytes before returning. Stack buffers are valid sources.

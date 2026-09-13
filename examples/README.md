@@ -152,11 +152,11 @@ The [framework roadmap](../docs/APP-API-ROADMAP.md) tracks repository publicatio
 with a pinned [bounded/http](https://technologylab-ai.github.io/bounded-http/) dependency, public middleware/resumable API work and
 remaining qualification. The engine remains a standalone case study.
 
-## Migration conveniences
+## Application recipes
 
 - `zig build runtime_file -Doptimize=ReleaseSafe`: runtime downloads at `/download`, selected with `--file PATH`.
 - `zig build decoded_forms -Doptimize=ReleaseSafe`: ordered decoded form fields using a caller-owned arena on workers.
 - `hello --bind-address 0.0.0.0`: explicit IPv4 LAN binding with the usual connection limits.
 - `app_errors`: custom error presentation using `web.defaultErrorStatus` for other failures.
 
-Follow the [walkthrough](../docs/MIGRATION-HELPERS.md) for commands, lifetimes, and expected behavior.
+Follow the [walkthrough](../docs/APPLICATION-RECIPES.md) for commands, lifetimes, and expected behavior.

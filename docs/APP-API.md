@@ -298,5 +298,5 @@ and `-fno-sanitize=undefined` C flags. Bodies were checked before and after timi
 not individually throughout the load. The [full receipt](../reports/2026-09-06-basic-zap.md)
 contains all ranges, source identities, commands, raw trials and cleanup records.
 
-See the [migration conveniences guide](MIGRATION-HELPERS.md) for allocator/result
+See the [application recipes guide](APPLICATION-RECIPES.md) for allocator/result
 lifetimes, runtime file copying, custom errors, and IPv4 listener configuration.
