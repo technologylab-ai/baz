@@ -538,6 +538,9 @@ pub const Stream = struct {
         .buffer = &.{},
     },
 
+    /// Unbuffered writer: operations requiring writable destination capacity,
+    /// including File.Reader.streamRemaining's fallback, are unsupported.
+    /// Use copyFrom with separate caller-owned scratch to transfer a reader.
     pub fn writer(self: *Stream) *std.Io.Writer {
         return &self.interface;
     }
@@ -548,6 +551,39 @@ pub const Stream = struct {
 
     pub fn writeAll(self: *Stream, bytes: []const u8) !void {
         self.interface.writeAll(bytes) catch |err| return self.failure() orelse err;
+    }
+
+    /// Copy until EOF through fixed caller-owned scratch, returning bytes copied.
+    /// Does not finish the stream. Scratch must be nonempty and must not overlap
+    /// the reader's buffer or response storage. Retain the reader and scratch
+    /// until this call returns; accepted bytes are copied into response storage.
+    /// Source and destination errors are sticky. Reader-specific diagnostics
+    /// remain on the source (for example File.Reader.err for ReadFailed).
+    /// Cancellation is checked before each read call, but cannot interrupt an
+    /// arbitrary source operation already in progress. Runtime file I/O belongs
+    /// on an application worker. Existing response limits and flush waits apply.
+    pub fn copyFrom(self: *Stream, reader: *std.Io.Reader, scratch: []u8) !usize {
+        errdefer |err| {
+            if (self.response.stream_error == null) self.response.stream_error = err;
+        }
+        try self.response.checkStream();
+        if (scratch.len == 0) return error.EmptyScratchBuffer;
+        if (overlap(scratch, reader.buffer) or overlap(scratch, self.response.storage))
+            return error.OverlappingBuffers;
+        var copied: usize = 0;
+        while (true) {
+            try self.response.checkStream();
+            var slices: [1][]u8 = .{scratch};
+            const n = reader.readVec(&slices) catch |err| switch (err) {
+                error.EndOfStream => return copied,
+                error.ReadFailed => return error.ReadFailed,
+            };
+            // A reader may buffer input internally and report zero progress.
+            if (n == 0) continue;
+            const next = std.math.add(usize, copied, n) catch return error.ResponseLimit;
+            try self.writeAll(scratch[0..n]);
+            copied = next;
+        }
     }
 
     pub fn print(self: *Stream, comptime format: []const u8, args: anytype) !void {
@@ -810,6 +846,199 @@ test "stream writer preserves vector order and makes a length error sticky" {
     // replace this wholly private response with its normal error policy.
     try testing.expectEqual(api.Action.finish, try response.errorResponse(500));
     try testing.expectEqualStrings("Internal Server Error", writer.committed());
+}
+
+const CopyReaderFixture = struct {
+    interface: std.Io.Reader = .{
+        .vtable = &.{ .stream = read },
+        .buffer = &.{},
+        .seek = 0,
+        .end = 0,
+    },
+    bytes: []const u8 = "",
+    offset: usize = 0,
+    calls: usize = 0,
+    fail_at_end: bool = false,
+    zero_first: bool = false,
+    cancel_on_zero: ?*std.atomic.Value(bool) = null,
+
+    fn read(reader: *std.Io.Reader, out: *std.Io.Writer, limit: std.Io.Limit) std.Io.Reader.StreamError!usize {
+        const self: *CopyReaderFixture = @fieldParentPtr("interface", reader);
+        self.calls += 1;
+        if (self.zero_first and self.calls == 1) {
+            if (self.cancel_on_zero) |cancelled| cancelled.store(true, .release);
+            return 0;
+        }
+        if (self.offset == self.bytes.len) {
+            if (self.fail_at_end) return error.ReadFailed;
+            return error.EndOfStream;
+        }
+        const n = try out.write(limit.sliceConst(self.bytes[self.offset..]));
+        self.offset += n;
+        return n;
+    }
+};
+
+test "stream copyFrom preserves binary bytes with tiny scratch and continues after EOF" {
+    for ([_]usize{ 1, 8 }) |scratch_len| {
+        var fixture: SnapshotFixture = .{};
+        try fixture.init(16, 16);
+        fixture.response.allow_blocking_stream = true;
+        var stream = try fixture.response.stream(200, "application/octet-stream", .{ .content_length = 6 });
+        var scratch: [8]u8 = undefined;
+        var empty: std.Io.Reader = .fixed("");
+        try testing.expectEqual(@as(usize, 0), try stream.copyFrom(&empty, scratch[0..scratch_len]));
+        var source: CopyReaderFixture = .{ .bytes = "\x00\xffa\r\n", .zero_first = true };
+        try testing.expectEqual(@as(usize, 5), try stream.copyFrom(&source.interface, scratch[0..scratch_len]));
+        try stream.writeAll("!");
+        try stream.finish();
+        try testing.expectEqualStrings("\x00\xffa\r\n!", fixture.response.bodyStorage()[0..fixture.response.body_len]);
+        try testing.expectEqual(@as(usize, if (scratch_len == 1) 7 else 3), source.calls);
+        try testing.expect(stream.failure() == null);
+        try testing.expectEqual(@as(usize, 0), fixture.blocking_calls);
+    }
+}
+
+test "stream copyFrom rejects invalid scratch and completed streams without consuming input" {
+    for (0..4) |case| {
+        var fixture: SnapshotFixture = .{};
+        try fixture.init(16, 16);
+        fixture.response.allow_blocking_stream = true;
+        var stream = try fixture.response.stream(200, "text/plain", .{});
+        var source_bytes = "input".*;
+        var source: std.Io.Reader = .fixed(&source_bytes);
+        var scratch: [4]u8 = undefined;
+        const expected = switch (case) {
+            0 => error.EmptyScratchBuffer,
+            1, 2 => error.OverlappingBuffers,
+            3 => error.InvalidState,
+            else => unreachable,
+        };
+        const target: []u8 = switch (case) {
+            0 => &.{},
+            1 => &source_bytes,
+            2 => fixture.response.bodyStorage()[0..4],
+            3 => &scratch,
+            else => unreachable,
+        };
+        if (case == 3) try stream.finish();
+        try testing.expectError(expected, stream.copyFrom(&source, target));
+        try testing.expectEqual(expected, stream.failure().?);
+        try testing.expectEqual(@as(usize, 0), source.seek);
+        try testing.expectEqual(@as(usize, 0), fixture.response.body_len);
+        try testing.expectError(expected, fixture.response.finish());
+    }
+}
+
+test "stream copyFrom checks cancellation before initial and zero-progress reads" {
+    for ([_]bool{ false, true }) |during_read| {
+        var fixture: SnapshotFixture = .{};
+        try fixture.init(16, 16);
+        fixture.response.allow_blocking_stream = true;
+        var stream = try fixture.response.stream(200, "text/plain", .{});
+        var source: CopyReaderFixture = .{
+            .bytes = "unread",
+            .zero_first = during_read,
+            .cancel_on_zero = &fixture.cancelled,
+        };
+        var scratch: [2]u8 = undefined;
+        if (!during_read) fixture.cancelled.store(true, .release);
+        try testing.expectError(error.Cancelled, stream.copyFrom(&source.interface, &scratch));
+        try testing.expectEqual(@as(usize, @intFromBool(during_read)), source.calls);
+        try testing.expectEqual(@as(usize, 0), source.offset);
+        try testing.expectEqual(error.Cancelled, stream.failure().?);
+        try testing.expectEqual(@as(usize, 0), fixture.response.body_len);
+    }
+}
+
+test "stream copyFrom source failures are sticky and cannot finish a truncated response" {
+    for ([_][]const u8{ "", "ab" }) |prefix| {
+        var fixture: SnapshotFixture = .{};
+        try fixture.init(16, 16);
+        fixture.response.allow_blocking_stream = true;
+        var stream = try fixture.response.stream(200, "text/plain", .{});
+        var source: CopyReaderFixture = .{ .bytes = prefix, .fail_at_end = true };
+        var scratch: [1]u8 = undefined;
+        try testing.expectError(error.ReadFailed, stream.copyFrom(&source.interface, &scratch));
+        try testing.expectEqualStrings(prefix, fixture.response.bodyStorage()[0..fixture.response.body_len]);
+        try testing.expectEqual(error.ReadFailed, stream.failure().?);
+        const calls = source.calls;
+        try testing.expectError(error.ReadFailed, stream.copyFrom(&source.interface, &scratch));
+        try testing.expectEqual(calls, source.calls);
+        try testing.expectError(error.ReadFailed, stream.finish());
+        try testing.expectError(error.ReadFailed, fixture.response.finish());
+        try testing.expect(!fixture.response.published);
+    }
+}
+
+test "stream copyFrom retains total and declared response length bounds" {
+    const CompletedFlush = struct {
+        fixture: *SnapshotFixture,
+        bytes: [16]u8 = undefined,
+        len: usize = 0,
+
+        fn flush(pointer: *anyopaque) api.FlushError!void {
+            const self: *@This() = @ptrCast(@alignCast(pointer));
+            const committed = self.fixture.writer.committed();
+            std.debug.assert(committed.len <= self.bytes.len - self.len);
+            @memcpy(self.bytes[self.len..][0..committed.len], committed);
+            self.len += committed.len;
+            self.fixture.blocking_calls += 1;
+            self.fixture.drained();
+        }
+    };
+    for (0..3) |case| {
+        var fixture: SnapshotFixture = .{};
+        try fixture.init(if (case == 0) 2 else 16, if (case == 0) 3 else 16);
+        var completed: CompletedFlush = .{ .fixture = &fixture };
+        fixture.context.blocking_flush = .{ .context = &completed, .flush = CompletedFlush.flush };
+        fixture.response.allow_blocking_stream = true;
+        var stream = try fixture.response.stream(200, "text/plain", .{
+            .content_length = if (case == 0) null else if (case == 1) 2 else 4,
+        });
+        var source: std.Io.Reader = .fixed(if (case == 0) "abcd" else "abc");
+        var scratch: [1]u8 = undefined;
+        if (case == 2) {
+            try testing.expectEqual(@as(usize, 3), try stream.copyFrom(&source, &scratch));
+            try testing.expectError(error.ResponseLengthMismatch, stream.finish());
+        } else {
+            const expected = if (case == 0) error.ResponseLimit else error.ResponseLengthMismatch;
+            try testing.expectError(expected, stream.copyFrom(&source, &scratch));
+            try testing.expectEqualStrings(if (case == 0) "c" else "ab", fixture.response.bodyStorage()[0..fixture.response.body_len]);
+            try testing.expectEqual(expected, stream.failure().?);
+        }
+        try testing.expectEqualStrings(if (case == 0) "ab" else "", completed.bytes[0..completed.len]);
+        try testing.expectEqual(@as(usize, if (case == 0) 1 else 0), fixture.blocking_calls);
+        if (case == 0) {
+            try testing.expectEqual(@as(usize, 3), fixture.response.stream_written);
+            try testing.expectError(error.ResponseLimit, stream.finish());
+            try testing.expect(fixture.response.published);
+        }
+    }
+}
+
+test "stream copyFrom preserves flush failures and unsupported raw writer diagnostics" {
+    var fixture: SnapshotFixture = .{};
+    try fixture.init(2, 16);
+    fixture.response.allow_blocking_stream = true;
+    var stream = try fixture.response.stream(200, "text/plain", .{});
+    var source: CopyReaderFixture = .{ .bytes = "abcd" };
+    var scratch: [1]u8 = undefined;
+    try testing.expectError(error.InvalidState, stream.copyFrom(&source.interface, &scratch));
+    try testing.expectEqual(@as(usize, 1), fixture.blocking_calls);
+    try testing.expectEqual(@as(usize, 3), source.offset);
+    try testing.expectEqual(error.InvalidState, stream.failure().?);
+    try testing.expect(fixture.response.published);
+
+    var raw: SnapshotFixture = .{};
+    try raw.init(16, 16);
+    raw.response.allow_blocking_stream = true;
+    var unsupported = try raw.response.stream(200, "text/plain", .{});
+    try testing.expectError(error.WriteFailed, unsupported.writer().writableSliceGreedy(1));
+    try testing.expectEqual(error.WriterBufferUnavailable, unsupported.failure().?);
+    var unread: CopyReaderFixture = .{ .bytes = "unread" };
+    try testing.expectError(error.WriterBufferUnavailable, unsupported.copyFrom(&unread.interface, &scratch));
+    try testing.expectEqual(@as(usize, 0), unread.calls);
 }
 
 test "draft copies stack metadata and body and preserves earlier frozen bytes" {

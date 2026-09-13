@@ -1,4 +1,5 @@
-//! Ordered borrowed query/form pairs and explicit byte decoding. No allocator.
+//! Ordered borrowed query/form pairs and explicit byte decoding. Raw iteration
+//! needs no allocator; decoded iteration uses an explicit caller allocator.
 const std = @import("std");
 
 pub const Limits = struct {
@@ -10,11 +11,34 @@ pub const Limits = struct {
 
 pub const Error = error{ ParamsTooLarge, TooManyParams, NameTooLarge, ValueTooLarge };
 pub const DecodeError = error{ InvalidEscape, NoSpaceLeft, OverlappingBuffers };
+pub const AllocDecodeError = std.mem.Allocator.Error || error{InvalidEscape};
+
+pub const Encoding = enum {
+    /// Percent-decode bytes, preserving raw '+'.
+    percent,
+    /// Percent-decode bytes and replace raw '+' with SP.
+    form,
+};
 
 pub const Param = struct {
     name_raw: []const u8,
     value_raw: []const u8,
     has_equals: bool,
+};
+
+/// Owned decoded bytes, independent of the input and other iterator results.
+/// Release with deinit() using the iterator's allocator, or reset its arena
+/// after every retained result is no longer needed. Do not free field subslices.
+pub const DecodedParam = struct {
+    name: []const u8,
+    value: []const u8,
+    has_equals: bool,
+    storage: []u8,
+
+    pub fn deinit(self: *DecodedParam, allocator: std.mem.Allocator) void {
+        allocator.free(self.storage);
+        self.* = undefined;
+    }
 };
 
 /// Construct with parse(). Views borrow the supplied bytes without decoding.
@@ -38,6 +62,19 @@ pub const Params = struct {
 
     pub fn iterator(self: Params) Iterator {
         return .{ .raw = self.raw };
+    }
+
+    /// Decode each pair on demand with caller-owned allocation. The iterator
+    /// borrows the original input; each returned pair independently owns its
+    /// decoded bytes until deinit() or allocator arena reset. Wire order,
+    /// duplicates, and bare keys are preserved. Bytes are not UTF-8 validated,
+    /// normalized, or coerced. Encoding explicitly chooses the '+' policy.
+    ///
+    /// parse() limits still bound raw input and pairs; decoding never expands
+    /// fields. Allocator bookkeeping and retained results belong to the caller's
+    /// memory budget. Use application workers for arbitrary allocator work.
+    pub fn decodedIterator(self: Params, allocator: std.mem.Allocator, encoding: Encoding) DecodedIterator {
+        return .{ .pairs = self.iterator(), .allocator = allocator, .encoding = encoding };
     }
 
     /// Exact raw-name comparison. A present bare key is still a Param.
@@ -83,6 +120,38 @@ pub const MatchingIterator = struct {
     }
 };
 
+pub const DecodedIterator = struct {
+    pairs: Iterator,
+    allocator: std.mem.Allocator,
+    encoding: Encoding,
+
+    /// Allocates one owned byte buffer per pair. Neither errors nor allocation
+    /// failure advance the iterator. The iterator owns no returned storage and
+    /// requires no deinit(); callers release each successful result themselves.
+    pub fn next(self: *DecodedIterator) AllocDecodeError!?DecodedParam {
+        var next_pairs = self.pairs;
+        const pair = next_pairs.next() orelse {
+            self.pairs = next_pairs;
+            return null;
+        };
+        const name_len = try decodedLength(pair.name_raw);
+        const value_len = try decodedLength(pair.value_raw);
+        // Both lengths are bounded by disjoint slices of the same input pair.
+        const storage_len = std.math.add(usize, name_len, value_len) catch return error.OutOfMemory;
+        const storage = try self.allocator.alloc(u8, storage_len);
+        const plus_as_space = self.encoding == .form;
+        decodeValidated(pair.name_raw, storage[0..name_len], plus_as_space);
+        decodeValidated(pair.value_raw, storage[name_len..], plus_as_space);
+        self.pairs = next_pairs;
+        return .{
+            .name = storage[0..name_len],
+            .value = storage[name_len..],
+            .has_equals = pair.has_equals,
+            .storage = storage,
+        };
+    }
+};
+
 pub const parse = Params.parse;
 
 /// Decode once into caller storage; '+' remains a plus. On any error destination
@@ -99,6 +168,13 @@ pub fn formDecodeInto(source: []const u8, destination: []u8) DecodeError![]u8 {
 
 fn decodeInto(source: []const u8, destination: []u8, plus_as_space: bool) DecodeError![]u8 {
     if (overlap(source, destination)) return error.OverlappingBuffers;
+    const count = try decodedLength(source);
+    if (count > destination.len) return error.NoSpaceLeft;
+    decodeValidated(source, destination[0..count], plus_as_space);
+    return destination[0..count];
+}
+
+fn decodedLength(source: []const u8) error{InvalidEscape}!usize {
     var input: usize = 0;
     var count: usize = 0;
     while (input < source.len) {
@@ -109,8 +185,12 @@ fn decodeInto(source: []const u8, destination: []u8, plus_as_space: bool) Decode
         } else input += 1;
         count += 1;
     }
-    if (count > destination.len) return error.NoSpaceLeft;
-    input = 0;
+    return count;
+}
+
+/// Source has passed decodedLength(); destination has exactly that length.
+fn decodeValidated(source: []const u8, destination: []u8, plus_as_space: bool) void {
+    var input: usize = 0;
     var output: usize = 0;
     while (input < source.len) : (output += 1) {
         const byte = source[input];
@@ -122,7 +202,6 @@ fn decodeInto(source: []const u8, destination: []u8, plus_as_space: bool) Decode
             input += 1;
         }
     }
-    return destination[0..count];
 }
 
 fn hex(byte: u8) ?u8 {
@@ -197,4 +276,103 @@ test "explicit decoders preserve source, decode once and publish only on success
     try std.testing.expectError(error.OverlappingBuffers, percentDecodeInto(&same, same[1..]));
     try std.testing.expectEqualStrings("%20", &same);
     try std.testing.expectEqualStrings(source, "%26%3D%2520%2B+x%00%ff");
+}
+
+test "decoded pairs preserve wire order, decoded duplicates, bare and empty fields" {
+    const pairs = try parse("&&name=Alice&%6eame=Bob&flag&flag=&=x&=&", .{});
+    var it = pairs.decodedIterator(std.testing.allocator, .form);
+    const expected = [_]struct { name: []const u8, value: []const u8, has_equals: bool }{
+        .{ .name = "name", .value = "Alice", .has_equals = true },
+        .{ .name = "name", .value = "Bob", .has_equals = true },
+        .{ .name = "flag", .value = "", .has_equals = false },
+        .{ .name = "flag", .value = "", .has_equals = true },
+        .{ .name = "", .value = "x", .has_equals = true },
+        .{ .name = "", .value = "", .has_equals = true },
+    };
+    for (expected) |item| {
+        var pair = (try it.next()).?;
+        defer pair.deinit(std.testing.allocator);
+        try std.testing.expectEqualStrings(item.name, pair.name);
+        try std.testing.expectEqualStrings(item.value, pair.value);
+        try std.testing.expectEqual(item.has_equals, pair.has_equals);
+    }
+    try std.testing.expectEqual(null, try it.next());
+    try std.testing.expectEqual(null, try it.next());
+    try std.testing.expectEqualStrings("Bob", pairs.firstRaw("%6eame").?.value_raw);
+}
+
+test "decoded iterator chooses plus policy explicitly and preserves arbitrary bytes" {
+    const pairs = try parse("a+b=%26%3D%2520%2B+x%00%ff", .{});
+    var percent = pairs.decodedIterator(std.testing.allocator, .percent);
+    var form = pairs.decodedIterator(std.testing.allocator, .form);
+    var percent_pair = (try percent.next()).?;
+    defer percent_pair.deinit(std.testing.allocator);
+    var form_pair = (try form.next()).?;
+    defer form_pair.deinit(std.testing.allocator);
+    try std.testing.expectEqualStrings("a+b", percent_pair.name);
+    try std.testing.expectEqualStrings("&=%20++x\x00\xff", percent_pair.value);
+    try std.testing.expectEqualStrings("a b", form_pair.name);
+    try std.testing.expectEqualStrings("&=%20+ x\x00\xff", form_pair.value);
+}
+
+test "decoded results outlive advancing the iterator and its source bytes" {
+    var source = "a=first&b=second".*;
+    const pairs = try parse(&source, .{});
+    var it = pairs.decodedIterator(std.testing.allocator, .form);
+    var first = (try it.next()).?;
+    defer first.deinit(std.testing.allocator);
+    var second = (try it.next()).?;
+    defer second.deinit(std.testing.allocator);
+    try std.testing.expectEqual(null, try it.next());
+    @memset(&source, 'x');
+    try std.testing.expectEqualStrings("a", first.name);
+    try std.testing.expectEqualStrings("first", first.value);
+    try std.testing.expectEqualStrings("b", second.name);
+    try std.testing.expectEqualStrings("second", second.value);
+}
+
+test "decoded iterator validates both fields before allocation and retains failed position" {
+    for ([_][]const u8{ "%=valid", "valid=%", "%GG=x", "a=%2", "a=x%4Z" }) |bad| {
+        var failing = std.testing.FailingAllocator.init(std.testing.allocator, .{ .fail_index = 0 });
+        const pairs = try parse(bad, .{});
+        var it = pairs.decodedIterator(failing.allocator(), .form);
+        try std.testing.expectError(error.InvalidEscape, it.next());
+        try std.testing.expectError(error.InvalidEscape, it.next());
+        try std.testing.expectEqual(@as(usize, 0), it.pairs.offset);
+        try std.testing.expectEqual(@as(usize, 0), failing.allocations);
+        try std.testing.expect(!failing.has_induced_failure);
+    }
+}
+
+test "decoded iterator allocation failure preserves position and previous owned results" {
+    var failing = std.testing.FailingAllocator.init(std.testing.allocator, .{ .fail_index = 1 });
+    const allocator = failing.allocator();
+    const pairs = try parse("a=first&%62=second", .{});
+    var it = pairs.decodedIterator(allocator, .form);
+    var first = (try it.next()).?;
+    defer first.deinit(allocator);
+    const offset = it.pairs.offset;
+    try std.testing.expectError(error.OutOfMemory, it.next());
+    try std.testing.expectEqual(offset, it.pairs.offset);
+    try std.testing.expectEqualStrings("first", first.value);
+    failing.fail_index = std.math.maxInt(usize);
+    var second = (try it.next()).?;
+    defer second.deinit(allocator);
+    try std.testing.expectEqualStrings("b", second.name);
+    try std.testing.expectEqualStrings("second", second.value);
+    try std.testing.expectEqual(null, try it.next());
+}
+
+test "decoded fields fit raw parse bounds and exact caller allocation budget" {
+    const pairs = try parse("%61=%62", .{ .max_bytes = 7, .max_pairs = 1, .max_name_bytes = 3, .max_value_bytes = 3 });
+    var scratch: [2]u8 = undefined;
+    var fixed = std.heap.FixedBufferAllocator.init(&scratch);
+    var it = pairs.decodedIterator(fixed.allocator(), .form);
+    var pair = (try it.next()).?;
+    defer pair.deinit(fixed.allocator());
+    try std.testing.expectEqualStrings("a", pair.name);
+    try std.testing.expectEqualStrings("b", pair.value);
+    try std.testing.expectEqual(@as(usize, 2), fixed.end_index);
+    try std.testing.expectError(error.NameTooLarge, parse("%61=%62", .{ .max_name_bytes = 2 }));
+    try std.testing.expectError(error.ValueTooLarge, parse("%61=%62", .{ .max_value_bytes = 2 }));
 }

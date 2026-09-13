@@ -12,7 +12,8 @@ Run `zig build run-streaming -Doptimize=ReleaseSafe -- --port 8080`, then use
 See the [streaming guide](../docs/STREAMING.md) for its worker and lifetime bounds.
 [continuations.zig](continuations.zig) adds typed callbacks that release the executor
 between flushes and timers. [jobs.zig](jobs.zig) combines Mustache, sessions and
-notification-driven SSE. Together with the 21 Zap ports below, there are 24 examples.
+notification-driven SSE. The runtime download and decoded form examples bring
+the catalog to 26 examples, including the 21 Zap ports below.
 Read the [complete application guide](../docs/JOBS.md) for its explicit limits.
 
 These examples adapt the public behavior of our predecessor
@@ -150,3 +151,12 @@ pure Zig alternatives, and the independent original-Zap and official-core tests.
 The [framework roadmap](../docs/APP-API-ROADMAP.md) tracks repository publication
 with a pinned [bounded/http](https://technologylab-ai.github.io/bounded-http/) dependency, public middleware/resumable API work and
 remaining qualification. The engine remains a standalone case study.
+
+## Migration conveniences
+
+- `zig build runtime_file -Doptimize=ReleaseSafe`: runtime downloads at `/download`, selected with `--file PATH`.
+- `zig build decoded_forms -Doptimize=ReleaseSafe`: ordered decoded form fields using a caller-owned arena on workers.
+- `hello --bind-address 0.0.0.0`: explicit IPv4 LAN binding with the usual connection limits.
+- `app_errors`: custom error presentation using `web.defaultErrorStatus` for other failures.
+
+Follow the [walkthrough](../docs/MIGRATION-HELPERS.md) for commands, lifetimes, and expected behavior.

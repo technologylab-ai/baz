@@ -6,6 +6,20 @@ const responses = @import("response.zig");
 const routing = @import("router.zig");
 const continuation = @import("continuation.zig");
 
+/// Default classification for errors that reach an App handler or middleware.
+/// Custom on_error hooks can reuse it and override application-specific errors.
+/// Engine framing failures occur before dispatch. Published responses cannot
+/// be replaced, regardless of the status this function returns.
+pub fn defaultErrorStatus(err: anyerror) u16 {
+    return switch (err) {
+        error.InvalidEscape, error.InvalidMetadata, error.DuplicateMetadataParameter, error.InvalidBoundary, error.InvalidMultipart, error.MissingBoundary, error.InvalidQuotedPair, error.AmbiguousContentType, error.MalformedCookie, error.MalformedHeaders, error.DuplicateCookie => 400,
+        error.CookiesTooLarge, error.TooManyCookies => 431,
+        error.ParamsTooLarge, error.TooManyParams, error.NameTooLarge, error.ValueTooLarge, error.MultipartTooLarge, error.TooManyParts, error.PartTooLarge, error.PartHeadersTooLarge, error.MetadataTooLarge, error.TooManyMetadataParameters => 413,
+        error.MissingContentType, error.UnsupportedMediaType, error.UnsupportedContentEncoding, error.UnsupportedMultipartEncoding => 415,
+        else => 500,
+    };
+}
+
 pub fn App(comptime Shared: type) type {
     return AppWithLocals(Shared, struct {});
 }
@@ -664,14 +678,7 @@ pub fn AppWithLocals(comptime Shared: type, comptime Locals: type) type {
                 self.validateContinuationBorrow(context.response) catch return context.response.errorResponse(500) catch .close;
                 return context.response.finish() catch context.response.errorResponse(500) catch .close;
             }
-            const status: u16 = switch (err) {
-                error.InvalidEscape, error.InvalidMetadata, error.DuplicateMetadataParameter, error.InvalidBoundary, error.InvalidMultipart, error.MissingBoundary, error.InvalidQuotedPair, error.AmbiguousContentType, error.MalformedCookie, error.MalformedHeaders, error.DuplicateCookie => 400,
-                error.CookiesTooLarge, error.TooManyCookies => 431,
-                error.ParamsTooLarge, error.TooManyParams, error.NameTooLarge, error.ValueTooLarge, error.MultipartTooLarge, error.TooManyParts, error.PartTooLarge, error.PartHeadersTooLarge, error.MetadataTooLarge, error.TooManyMetadataParameters => 413,
-                error.MissingContentType, error.UnsupportedMediaType, error.UnsupportedContentEncoding, error.UnsupportedMultipartEncoding => 415,
-                else => 500,
-            };
-            return context.response.errorResponse(status) catch .close;
+            return context.response.errorResponse(defaultErrorStatus(err)) catch .close;
         }
 
         fn handle(self: *Self, context: *Context) !void {
@@ -931,4 +938,13 @@ test "typed locals, middleware unwinding, early responses and error cleanup run 
         try std.testing.expectEqual(@as(u16, if (mode == 0 or mode == 8) 200 else if (mode == 2) 401 else 500), writer.status);
         writer.release();
     }
+}
+
+test "default error classification is reusable without mapping application errors" {
+    try std.testing.expectEqual(@as(u16, 400), defaultErrorStatus(error.MissingBoundary));
+    try std.testing.expectEqual(@as(u16, 413), defaultErrorStatus(error.TooManyParams));
+    try std.testing.expectEqual(@as(u16, 415), defaultErrorStatus(error.UnsupportedMediaType));
+    try std.testing.expectEqual(@as(u16, 431), defaultErrorStatus(error.TooManyCookies));
+    try std.testing.expectEqual(@as(u16, 500), defaultErrorStatus(error.OutOfMemory));
+    try std.testing.expectEqual(@as(u16, 500), defaultErrorStatus(error.Overflow));
 }
