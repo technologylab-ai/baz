@@ -137,7 +137,7 @@ def build():
     results, chart = benchmark()
     replacements = {'HELLO': html.escape(snippet.group(0)), 'STREAMING': html.escape(streaming.group(0)), 'BORROWED': html.escape(borrowed.group(0).strip()), 'EXAMPLES': '\n'.join(cards),
                     'RESULTS': results, 'PERFORMANCE': scroll_diagram(chart)}
-    for token, name in [('PARAMETERS', 'parameters'), ('LAYERS', 'layers'), ('LIFETIME', 'lifetime')]:
+    for token, name in [('PARAMETERS', 'parameters'), ('LAYERS', 'layers'), ('LIFETIME', 'lifetime'), ('BACKPRESSURE', 'backpressure')]:
         replacements[token] = scroll_diagram((ROOT / ('docs/diagrams/' + name + '.svg')).read_text())
     page = (ROOT / 'docs/index.template.html').read_text()
     for key, value in replacements.items():

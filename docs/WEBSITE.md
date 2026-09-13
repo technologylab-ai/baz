@@ -30,6 +30,7 @@ The website worktree is only a branch of Baz, not another project or repository.
 | Content | Maintained source |
 | --- | --- |
 | Landing-page prose | [index.template.html](index.template.html) |
+| Limits and backpressure | The `#limits` chapter and [flow diagram](diagrams/backpressure.svg), with the [limits guide](LIMITS.md) and [pipelining assessment](PIPELINING.md) in the HTML reader |
 | Native HTTP backend specs | Linux/io_uring, macOS/kqueue, and Windows x64/IOCP appear in the hero and README, attributed to the [bounded/http](https://technologylab-ai.github.io/bounded-http/) engine |
 | App excerpt | `Hello` in [app_demo.zig](../src/app_demo.zig), extracted at build time |
 | Streaming excerpt | `progress` in [streaming.zig](../examples/streaming.zig), extracted at build time |

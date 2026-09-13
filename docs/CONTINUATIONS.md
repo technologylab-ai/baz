@@ -1,5 +1,9 @@
 # Typed continuations
 
+See [limits and backpressure](LIMITS.md) for how connection admission, workers,
+and retained state fit together. A waiting continuation releases its executor,
+but later pipelined requests on that same HTTP/1.1 connection still wait.
+
 Many waiting responses can share a small worker pool. A typed continuation returns
 between snapshots, timers and producer notifications, keeping its bounded State and request locals alive
 without retaining a worker stack. It also works on the inline executor.

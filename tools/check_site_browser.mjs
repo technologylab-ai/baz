@@ -129,7 +129,7 @@ try {
   await check('desktop-landing', async () => {
     await navigate();
     const state = await evaluate(`({title:document.title,headline:document.querySelector('h1').textContent,diagrams:document.querySelectorAll('svg[role="img"]').length,examples:document.querySelectorAll('.example-card').length,highlight:!!document.querySelector('.hljs-keyword')})`);
-    assert.equal(state.title,'Baz — Bounded Async Zap'); assert.equal(state.diagrams,4); assert.equal(state.examples,24); assert(state.highlight);
+    assert.equal(state.title,'Baz — Bounded Async Zap'); assert.equal(state.diagrams,5); assert.equal(state.examples,24); assert(state.highlight);
     await noOverflow(); await screenshot('baz-desktop'); return state;
   });
   await check('maintained-source-excerpt', async () => {
@@ -288,6 +288,27 @@ try {
     } finally { interceptedBody=null; await send('Fetch.disable'); }
   });
 
+  await check('limits-chapter-and-guides', async () => {
+    await send('Emulation.setDeviceMetricsOverride',{width:1440,height:1100,deviceScaleFactor:1,mobile:false});
+    await navigate('#limits');
+    await evaluate("document.querySelector('#limits').scrollIntoView({behavior:'instant'})");
+    await delay(500); await noOverflow(); await screenshot('baz-limits-desktop');
+    await evaluate("document.querySelector('#limits figure').scrollIntoView({behavior:'instant'})");
+    await delay(500); await screenshot('baz-backpressure-diagram');
+    for (const file of ['LIMITS', 'PIPELINING']) {
+      await navigate('docs/read.html?file=docs/'+file+'.md','reader');
+      assert.equal(await evaluate('document.documentElement.dataset.readerReady'),'true');
+      await noOverflow(); await screenshot('baz-'+file.toLowerCase()+'-guide');
+      await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:false});
+      await noOverflow(); await screenshot('baz-'+file.toLowerCase()+'-mobile');
+      await send('Emulation.setDeviceMetricsOverride',{width:1440,height:1100,deviceScaleFactor:1,mobile:false});
+    }
+    await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:false});
+    await navigate('#limits');
+    await until(() => evaluate("Math.abs(document.querySelector('#limits').getBoundingClientRect().top - parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop)) < 2"), 'Mobile limits deep link did not settle');
+    await noOverflow(); await screenshot('baz-limits-chapter-mobile');
+    return {guides:2, desktop:1440, mobile:390};
+  });
   await check('all-published-documents-render', async () => {
     await navigate('docs/read.html','reader');
     const files = await evaluate('window.DOC_SITE.documents');

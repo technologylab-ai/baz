@@ -33,6 +33,10 @@ loopback and serves plain HTTP/1.1; inherited deployment limits remain in
 
 ## App and endpoint composition
 
+Before choosing startup settings, read [limits and backpressure](LIMITS.md).
+Connections, workers, response storage, and continuation slots bound different
+resources; the guide explains when Baz waits and when it rejects work.
+
 The core shape below is exercised by the maintained example:
 
 ```zig

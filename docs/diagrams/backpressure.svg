@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 282" class="diagram diagram-wide" role="img" aria-labelledby="pressure-title pressure-desc">
+<title id="pressure-title">A fixed buffer connects a fast producer to a slow reader</title>
+<desc id="pressure-desc">The streaming handler writes into reserved output storage. The transport sends to the client. When output cannot drain, the handler waits. Local transmission completion returns the storage and lets the handler continue. The I/O owner keeps running.</desc>
+<g font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" fill="#172f3e">
+<rect x="1" y="20" width="250" height="133" fill="#172f3e"/>
+<g fill="#efeee6" stroke="#cdd3d0"><rect x="326" y="20" width="248" height="133"/><rect x="649" y="20" width="250" height="133"/></g>
+<g font-family="ui-monospace, monospace" font-size="12"><text x="21" y="47" fill="#f4ad90">01 / PRODUCE</text><text x="346" y="47" fill="#bc3c20">02 / RETAIN</text><text x="669" y="47" fill="#bc3c20">03 / DRAIN</text></g>
+<g font-size="22"><text x="21" y="82" fill="#f8f7f1">Streaming handler</text><text x="346" y="82">Fixed output storage</text><text x="669" y="82">Transport → client</text></g>
+<g font-size="14"><text x="21" y="115" fill="#d6dedb">Write while space is available.</text><text x="346" y="115" fill="#4e6370">Flush keeps these bytes frozen.</text><text x="669" y="115" fill="#4e6370">A slow reader can stall output.</text></g>
+<g fill="none" stroke="#9caaa9" stroke-width="2"><path d="M252 86h67m-8-6 8 6-8 6M575 86h67m-8-6 8 6-8 6"/></g>
+<g fill="none" stroke="#bc3c20" stroke-width="2"><path d="M774 154v37H126v-30m-6 8 6-8 6 8"/></g>
+<text x="450" y="220" text-anchor="middle" fill="#bc3c20" font-size="15">Output blocked → handler waits. Storage returned → handler continues.</text>
+<path d="M1 244h898" stroke="#cdd3d0"/>
+<text x="450" y="272" text-anchor="middle" fill="#4e6370" font-family="ui-monospace, monospace" font-size="12">THE WORKER WAITS · THE HTTP I/O OWNER KEEPS RUNNING · THE DEADLINE STILL APPLIES</text>
+</g></svg>

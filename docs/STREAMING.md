@@ -1,5 +1,9 @@
 # Streaming responses
 
+For the connection ceiling, output pressure, and overload behavior, start with
+[limits and backpressure](LIMITS.md). Streaming waits retain one worker;
+continuation waits release the executor while retaining the connection.
+
 Baz can send response bytes while a handler remains active. Write through a
 standard `std.Io.Writer`, flush, do finite work or sleep, then write again.
 The [runnable example](../examples/streaming.zig) sends three updates:

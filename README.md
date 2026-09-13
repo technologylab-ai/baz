@@ -23,6 +23,12 @@ or rejects work instead of growing without bounds. These guarantees cover the
 framework's resources; application code still owns its memory use and must
 cooperate with cancellation.
 
+The [limits and backpressure guide](docs/LIMITS.md) explains connection admission,
+worker concurrency, slow readers, and rejection, with a
+[visual website walkthrough](https://technologylab-ai.github.io/baz/#limits).
+See the [pipelining assessment](docs/PIPELINING.md) for browser asset downloads,
+ordered HTTP/1.1 responses, and current scheduling tradeoffs.
+
 **Native HTTP backends: Linux · io_uring, macOS · kqueue, Windows · IOCP.**
 Baz uses these transports directly through [bounded/http](https://technologylab-ai.github.io/bounded-http/),
 alongside your application's caller-supplied `std.Io`.

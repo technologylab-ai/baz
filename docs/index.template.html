@@ -26,9 +26,9 @@
   <nav id="navigation" aria-label="Page sections">
     <a href="#idea"><b>01</b> The idea</a><a href="#app"><b>02</b> An ordinary Zig App</a>
     <a href="#data"><b>03</b> Data stays data</a><a href="#engine"><b>04</b> HTTP engine</a>
-    <a href="#start"><b>05</b> Get started</a><a href="#examples"><b>06</b> Explore the examples</a>
-    <a href="#performance"><b>07</b> Measured results</a><a href="#next"><b>08</b> What comes next</a>
-    <a href="#docs"><b>09</b> Read further</a>
+    <a href="#limits"><b>05</b> Limits &amp; backpressure</a><a href="#start"><b>06</b> Get started</a>
+    <a href="#examples"><b>07</b> Explore the examples</a><a href="#performance"><b>08</b> Measured results</a>
+    <a href="#next"><b>09</b> What comes next</a><a href="#docs"><b>10</b> Read further</a>
   </nav>
   <div class="rail-note">ZIG 0.16.0 · MIT<br>LINUX · MACOS<br>WINDOWS x64<br>EXPERIMENTAL FRAMEWORK<br><a href="docs/read.html?file=docs/APP-API.md">API guide ↗</a><br><a href="https://github.com/technologylab-ai/baz">View on GitHub ↗</a></div>
 </aside>
@@ -38,7 +38,7 @@
     <p class="eyebrow">A modern successor to Zap</p>
     <h1 id="headline">Familiar to write.<br><em>Explicit by design.</em></h1>
     <p class="lede">Meet <strong>Baz — Bounded Async Zap.</strong> A pure Zig web framework on <a href="https://technologylab-ai.github.io/bounded-http/">bounded/http</a>. Typed applications, streaming responses, and memory boundaries you can reason about.</p>
-    <p class="intro">Its foundation, <a href="https://technologylab-ai.github.io/bounded-http/">bounded/http</a>, takes inspiration from <a href="https://tigerstyle.dev">TigerStyle</a>: set explicit limits, reserve resources up front, and check ownership invariants. Connections, buffers, queues, and workers have fixed capacities; request sizes, response sizes, and I/O deadlines have enforced limits. When capacity runs out, the engine applies backpressure or rejects work instead of growing without bounds. These guarantees cover the framework’s resources; application code still owns its memory use and must cooperate with cancellation.</p>
+    <p class="intro">Its foundation, <a href="https://technologylab-ai.github.io/bounded-http/">bounded/http</a>, takes inspiration from <a href="https://tigerstyle.dev">TigerStyle</a>: set explicit limits, reserve resources up front, and check ownership invariants. Connections, buffers, queues, and workers have fixed capacities; request sizes, response sizes, and I/O deadlines have enforced limits. When capacity runs out, the engine applies backpressure or rejects work instead of growing without bounds. <a href="#limits">See how limits and backpressure fit together →</a> These guarantees cover the framework’s resources; application code still owns its memory use and must cooperate with cancellation.</p>
     <dl class="transport-specs" aria-label="Native HTTP backends"><div><dt>Linux</dt><dd>io_uring</dd></div><div><dt>macOS</dt><dd>kqueue</dd></div><div><dt>Windows x64</dt><dd>IOCP</dd></div></dl>
     <p class="transport-credit">Native HTTP I/O powered by <a href="https://technologylab-ai.github.io/bounded-http/">bounded/http</a>.</p>
     <div class="actions"><a class="button primary" href="#start">Build your first App <span aria-hidden="true">↗</span></a><a class="button" href="#streaming">See streaming <span aria-hidden="true">↓</span></a></div>
@@ -115,8 +115,20 @@
     <figure>@@LIFETIME@@<figcaption>Output pressure can delay dispatch. It does not replay your one-shot handler. Storage is reusable only after all application and kernel borrows return.</figcaption></figure>
     <div class="actions"><a class="button" href="https://technologylab-ai.github.io/bounded-http/">Explore bounded/http <span aria-hidden="true">↗</span></a><a class="button" href="https://github.com/technologylab-ai/bounded-http">Engine source <span aria-hidden="true">↗</span></a></div>
   </section>
+  <section class="chapter" id="limits">
+    <p class="eyebrow">05 / Limits &amp; backpressure</p><h2>Set the capacity.<br>Let progress set the pace.</h2>
+    <p class="intro">A limit says how much Baz can hold. Backpressure makes a producer wait when the next stage cannot keep up. Even one connection can fill its output buffer if its client reads slowly.</p>
+    <div class="principles">
+      <div><span class="number">01 — ADMISSION</span><h3>Room for a connection.</h3><p>The connection ceiling counts admitted sockets across the cluster. Idle connections count too. When all slots are occupied, an extra accepted socket is closed; a 503 response is not guaranteed.</p></div>
+      <div><span class="number">02 — EXECUTION</span><h3>Room to run.</h3><p>Workers and connection slots have separate limits. A busy worker makes its assigned requests wait. Continuations release the executor between steps while keeping bounded request state alive.</p></div>
+      <div><span class="number">03 — OUTPUT</span><h3>Room to write.</h3><p>A full streaming buffer flushes before accepting more bytes. The worker waits for that storage to return. The I/O owner keeps running, and the original request deadline still applies.</p></div>
+    </div>
+    <figure>@@BACKPRESSURE@@<figcaption>Backpressure follows the slow reader back to the producer. Waiting reuses fixed storage; it does not increase capacity or reset the deadline.</figcaption></figure>
+    <div class="columns"><div><h3>One connection. Many requests.</h3><p class="note">Baz supports HTTP/1.1 pipelining: requests run in order, and finished responses can share a send batch. It reserves output before each handler starts. If earlier responses occupy that space, they drain first.</p></div><div><h3>One page. Several downloads.</h3><p class="note">Browsers normally use several HTTP/1.1 connections for parallel asset downloads. Interleaving responses on one connection is HTTP/2 or HTTP/3 multiplexing. Baz’s current engine serves HTTP/1.1.</p></div></div>
+    <div class="actions"><a class="button primary" href="docs/read.html?file=docs/LIMITS.md">Understand the limits <span aria-hidden="true">↗</span></a><a class="button" href="docs/read.html?file=docs/PIPELINING.md">Read the pipelining assessment <span aria-hidden="true">↗</span></a></div>
+  </section>
   <section class="chapter" id="start">
-    <p class="eyebrow">05 / Get started</p><h2>A working App in one command.</h2>
+    <p class="eyebrow">06 / Get started</p><h2>A working App in one command.</h2>
     <p class="intro">Use exact <strong>Zig 0.16.0</strong> and Python 3. Clone Baz, then start the demo. The pinned HTTP engine is fetched automatically.</p>
     <div class="codebox"><div class="codehead"><span>01 · Start the App</span><button class="copy" type="button" hidden aria-label="Copy startup commands">Copy</button></div><pre tabindex="0"><code class="language-bash">git clone https://github.com/technologylab-ai/baz.git
 cd baz
@@ -127,7 +139,7 @@ curl -F 'files[]=@.zig-version' http://127.0.0.1:8080/upload</code></pre></div>
     <p class="note">The current executable serves IPv4 loopback over plain HTTP/1.1. Stop it with Ctrl-C. On Windows, use <code>curl.exe</code>; executables have an <code>.exe</code> suffix. For embedding Baz in your own project, follow the <a href="docs/read.html?file=docs/DEPENDENCY.md">package guide</a> and <a href="docs/read.html?file=examples/embedding/build.zig">independent consumer fixture</a>.</p>
   </section>
   <section class="chapter" id="examples">
-    <p class="eyebrow">06 / Explore the examples</p><h2>Examples you can run.</h2>
+    <p class="eyebrow">07 / Explore the examples</p><h2>Examples you can run.</h2>
     <p class="intro">Twenty Zap ports and a new streaming example, using Baz’s public API. Every card opens maintained source in the reader. Pick a small example, then follow its types.</p>
     <p class="intro">Build real pages with <a href="docs/read.html?file=docs/MUSTACHE.md">Mustache templates</a>: a greeting form, typed user cards, and reusable partials. Parse once at startup and render straight into reserved HTML storage. <a href="docs/read.html?file=examples/mustache.zig">The complete Zig example is just 52 lines →</a> <a href="docs/read.html?file=docs/MUSTACHE.md#rendered-example">See the rendered preview →</a></p>
     <div class="filter-bar" role="group" aria-label="Filter examples" hidden>
@@ -139,7 +151,7 @@ zig build run-http_params -Doptimize=ReleaseSafe -- --port 8080</code></pre></di
     <p class="note"><a href="docs/read.html?file=docs/COOKIES.md">Cookies and redirects are public APIs</a>, with explicit expiry and a local login/logout example. Middleware, authentication policy and session storage remain explicit application code. <a href="docs/read.html?file=examples/README.md">Read the complete catalog and its deliberate adaptations →</a></p>
   </section>
   <section class="chapter" id="performance">
-    <p class="eyebrow">07 / Measured results</p><h2>A first comparison.<br>The conditions included.</h2>
+    <p class="eyebrow">08 / Measured results</p><h2>A first comparison.<br>The conditions included.</h2>
     <p class="intro">A basic same-host loopback comparison with <a href="https://github.com/zigzap/zap">Zap</a>, measured on 6 September 2026. These results describe the initial Baz prototype <code>c152e59</code>, before package extraction.</p>
     <div class="legend" aria-hidden="true"><span>Baz prototype</span><span>Zap (Zig 0.16 port)</span></div>
     <figure>@@PERFORMANCE@@<figcaption>Median requests per second at 32 connections / 2 client threads. Bar lengths share a zero baseline. Compare implementations within each host.</figcaption></figure>
@@ -150,16 +162,16 @@ zig build run-http_params -Doptimize=ReleaseSafe -- --port 8080</code></pre></di
     <a class="button" href="docs/read.html?file=reports/2026-09-06-basic-zap.md">Read the experiment and raw evidence <span aria-hidden="true">→</span></a>
   </section>
   <section class="chapter" id="next">
-    <p class="eyebrow">08 / What comes next</p><h2>A useful first slice.<br>A visible roadmap.</h2>
+    <p class="eyebrow">09 / What comes next</p><h2>A useful first slice.<br>A visible roadmap.</h2>
     <p class="intro">Baz supports native Windows x64, Linux, and macOS. All three have passed Debug/ReleaseSafe verification, package checks, all 20 ported-example groups, and all 14 streaming groups. Windows also passed shard-handoff and console-shutdown cases. Baz remains experimental; these are correctness gates, not production qualification.</p>
     <div class="status-grid"><div class="status-card"><p class="eyebrow">Implemented</p><h3>The streaming App.</h3><ul><li>Typed App, routes, and endpoint methods</li><li>Raw query and form views; explicit codecs</li><li>Flat multipart parsing</li><li>Reserved response drafts and JSON</li><li><a href="docs/read.html?file=docs/COOKIES.md">Cookies, explicit expiry, and redirects</a></li><li><a href="docs/read.html?file=docs/MUSTACHE.md">Mustache templates with bounded rendering</a></li><li>Streaming with a standard Zig writer</li><li><a href="docs/read.html?file=docs/CONTINUATIONS.md">Typed continuations: many streams, few workers</a></li><li><a href="docs/read.html?file=docs/MIDDLEWARE.md">Public middleware and typed request locals</a></li><li>Reusable sessions with server expiry and revocation</li><li><a href="docs/read.html?file=docs/SSE.md">SSE encoding and bounded producer notifications</a></li><li><a href="docs/read.html?file=docs/JOBS.md">A complete live-job application</a></li><li>Caller std.Io and fixed worker services</li><li>Native Windows x64, Linux, and macOS</li></ul></div><div class="status-card"><p class="eyebrow">Next API work</p><h3>More ways to compose.</h3><ul><li>Further response-copy reduction with explicit stream borrows</li><li>Broader asynchronous service integration</li></ul></div><div class="status-card"><p class="eyebrow">Deferred / out of scope</p><h3>Keep the scope honest.</h3><ul><li>WebSockets: needs an upgrade lifecycle</li><li>An owned std.Io provider and prototype: deferred</li><li>TLS: out of scope</li></ul></div></div>
     <p class="callout">The framework reserves its own storage at startup. Application code and the caller’s I/O provider have separate resource responsibilities. Fixed workers do not provide arbitrary application isolation.</p>
     <a href="docs/read.html?file=docs/APP-API-ROADMAP.md">Follow the multi-session roadmap →</a>
   </section>
   <section class="chapter" id="docs">
-    <p class="eyebrow">09 / Read further</p><h2>From first route<br>to the ownership details.</h2>
+    <p class="eyebrow">10 / Read further</p><h2>From first route<br>to the ownership details.</h2>
     <p class="intro">Guides stay as Markdown in the repository. The browser reader adds a table of contents, highlighted source, raw-file access, and print support.</p>
-    <div class="resource-links"><a href="docs/read.html?file=docs/COOKIES.md">Cookies, redirects &amp; session lifetimes <span>↗</span></a><a href="docs/read.html?file=docs/MUSTACHE.md">Mustache: real pages, explicit limits <span>↗</span></a><a href="docs/read.html?file=docs/APP-API.md">API guide &amp; Zap migration <span>↗</span></a><a href="docs/read.html?file=docs/OWNERSHIP.md">Ownership contract <span>↗</span></a><a href="docs/read.html?file=docs/DEPENDENCY.md">Packages &amp; embedding <span>↗</span></a><a href="docs/read.html?file=docs/STD-IO-DECISION.md">The std.Io decision <span>↗</span></a><a href="docs/read.html?file=docs/APP-API-DESIGN.md">API design &amp; predecessor analysis <span>↗</span></a><a href="docs/read.html?file=docs/APP-API-ROADMAP.md">Roadmap &amp; session ledger <span>↗</span></a><a href="docs/read.html?file=reports/2026-09-06-streaming.md">Streaming on Windows, Linux &amp; macOS <span>↗</span></a><a href="https://technologylab-ai.github.io/bounded-http/">bounded/http engineering paper <span>↗</span></a></div>
+    <div class="resource-links"><a href="docs/read.html?file=docs/LIMITS.md">Limits &amp; backpressure <span>↗</span></a><a href="docs/read.html?file=docs/PIPELINING.md">Pipelining &amp; browser downloads <span>↗</span></a><a href="docs/read.html?file=docs/COOKIES.md">Cookies, redirects &amp; session lifetimes <span>↗</span></a><a href="docs/read.html?file=docs/MUSTACHE.md">Mustache: real pages, explicit limits <span>↗</span></a><a href="docs/read.html?file=docs/APP-API.md">API guide &amp; Zap migration <span>↗</span></a><a href="docs/read.html?file=docs/OWNERSHIP.md">Ownership contract <span>↗</span></a><a href="docs/read.html?file=docs/DEPENDENCY.md">Packages &amp; embedding <span>↗</span></a><a href="docs/read.html?file=docs/STD-IO-DECISION.md">The std.Io decision <span>↗</span></a><a href="docs/read.html?file=docs/APP-API-DESIGN.md">API design &amp; predecessor analysis <span>↗</span></a><a href="docs/read.html?file=docs/APP-API-ROADMAP.md">Roadmap &amp; session ledger <span>↗</span></a><a href="docs/read.html?file=reports/2026-09-06-streaming.md">Streaming on Windows, Linux &amp; macOS <span>↗</span></a><a href="https://technologylab-ai.github.io/bounded-http/">bounded/http engineering paper <span>↗</span></a></div>
   </section>
   <footer><div>BAZ · BOUNDED ASYNC ZAP<br>By Rene Schallner · Technology Lab<span id="print-source" hidden><br>https://technologylab-ai.github.io/baz/</span></div><div class="footer-links"><a href="https://github.com/technologylab-ai/baz">GitHub ↗</a><a href="docs/read.html?file=LICENSE">MIT license</a><a href="https://github.com/zigzap/zap">Predecessor: Zap ↗</a></div></footer>
 </main>
