@@ -309,6 +309,25 @@ try {
     await noOverflow(); await screenshot('baz-limits-chapter-mobile');
     return {guides:2, desktop:1440, mobile:390};
   });
+  await check('connection-limit-walkthrough', async () => {
+    await send('Emulation.setDeviceMetricsOverride',{width:1440,height:1040,deviceScaleFactor:1,mobile:false});
+    await navigate('docs/read.html?file=docs/LIMITS.md','reader');
+    assert(await evaluate('[...document.querySelectorAll("#document a")].some(a => new URL(a.href).searchParams.get("file") === "docs/CONNECTION-LIMIT-WALKTHROUGH.md")'));
+    await navigate('docs/read.html?file=docs/CONNECTION-LIMIT-WALKTHROUGH.md','reader');
+    assert.equal(await evaluate('document.querySelector("#document h1").textContent'),'Two slots. Three clients.');
+    await until(() => evaluate('[...document.querySelectorAll("#document img")].every(img => img.complete && img.naturalWidth > 0)'), 'Walkthrough diagram did not load');
+    await noOverflow(); await screenshot('baz-connection-walkthrough');
+    await navigate('docs/read.html?file=docs/CONNECTION-LIMIT-WALKTHROUGH.md#4-try-the-third-connection','reader');
+    assert(await evaluate('Math.abs(document.getElementById("4-try-the-third-connection").getBoundingClientRect().top) < 200'));
+    await noOverflow(); await screenshot('baz-connection-walkthrough-step');
+    await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:false});
+    await navigate('docs/read.html?file=docs/CONNECTION-LIMIT-WALKTHROUGH.md','reader');
+    await noOverflow(); await screenshot('baz-connection-walkthrough-mobile');
+    await navigate('docs/read.html?file=examples/connection_limit.py','reader');
+    assert(await evaluate('document.querySelector("#document code").textContent.includes("def walkthrough(port):")'));
+    await noOverflow();
+    return {desktop:1440,mobile:390,clientSource:true};
+  });
   await check('all-published-documents-render', async () => {
     await navigate('docs/read.html','reader');
     const files = await evaluate('window.DOC_SITE.documents');

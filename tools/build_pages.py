@@ -44,7 +44,7 @@ EXAMPLES = [
 
 def documents():
     paths = {'README.md', 'ROADMAP.md', 'LICENSE', '.zig-version', 'build.zig', 'build.zig.zon',
-             'examples/README.md', 'examples/LICENSE-ZAP',
+             'examples/README.md', 'examples/LICENSE-ZAP', 'examples/connection_limit.py',
              'examples/assets/session_login.html', 'examples/assets/session_home.html',
              'examples/assets/mustache.html', 'examples/assets/mustache-user.html', 'examples/embedding/build.zig',
              'examples/embedding/build.zig.zon', 'examples/embedding/src/main.zig',

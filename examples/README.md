@@ -1,5 +1,10 @@
 # Baz examples and Zap ports
 
+For a guided exercise, open [Two slots. Three clients.](../docs/CONNECTION-LIMIT-WALKTHROUGH.md).
+Run the existing App demo with two connection slots, then use the interactive
+[Python client](connection_limit.py) to fill them, observe refusal, and retry
+after releasing a slot. The walkthrough explains each action and expected result.
+
 [streaming.zig](streaming.zig) demonstrates Baz's incremental response writer.
 It writes, flushes, sleeps, and writes again before the handler returns.
 Run `zig build run-streaming -Doptimize=ReleaseSafe -- --port 8080`, then use

@@ -5,6 +5,10 @@ stage wait when the next stage cannot make progress. Rejection refuses work
 that cannot be admitted. Baz needs all three: a connection ceiling alone cannot
 stop one fast handler from filling its output buffer behind one slow client.
 
+**Try it yourself:** [Two slots. Three clients.](CONNECTION-LIMIT-WALKTHROUGH.md)
+walks you through filling the connection limit, observing refusal, and releasing
+capacity. You control each step in your terminal.
+
 Baz configures the [bounded/http](https://technologylab-ai.github.io/bounded-http/)
 engine through `App.init`'s `server` options, and adds response and continuation
 limits of its own. Storage and workers are reserved before request processing.
