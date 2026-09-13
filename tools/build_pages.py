@@ -21,6 +21,8 @@ EXAMPLES = [
     ('simple_router', 'routing', 'Functions, stateful routes, and a synchronized counter.'),
     ('routes', 'routing', 'Static and dynamic responses in one router.'),
     ('serve', 'responses', 'Serve immutable embedded assets through explicit routes.'),
+    ('runtime_file', 'responses', 'Download a runtime-opened file using fixed copy scratch on application workers.'),
+    ('decoded_forms', 'data', 'An allocator-backed iterator: decoded names and values, ordered duplicates, explicit lifetimes.'),
     ('sendfile', 'responses', 'File content as an embedded asset; no sendfile syscall.'),
     ('senderror', 'responses', 'Controlled errors, with no client-visible stack trace.'),
     ('accept', 'responses', 'Explicit, bounded content negotiation.'),

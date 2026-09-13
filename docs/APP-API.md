@@ -28,7 +28,7 @@ On Windows, use `zig-out/bin/baz.exe` and `curl.exe`.
 The upload example has an 8 KiB body limit; choose a smaller file if needed.
 It returns part metadata, lengths and byte sums, and does not save files.
 `zig build run-app -- --port 8080` also runs the example. It binds IPv4
-loopback and serves plain HTTP/1.1; inherited deployment limits remain in
+loopback by default and serves plain HTTP/1.1; inherited deployment limits remain in
 [README](../README.md). Public module exports are in [web.zig](../src/web.zig).
 
 ## App and endpoint composition
@@ -94,7 +94,9 @@ OPTIONS and method failures supply `Allow`; OPTIONS `*` lists App methods.
 Unknown paths get 404 and unsupported methods on known paths get 405. An App
 can supply `not_found` and `on_error` handlers. Error hooks receive the same typed
 context after discarding the unpublished draft; failure in a hook produces a
-bounded generic 500. CONNECT is currently 501.
+bounded generic 500. Use `web.defaultErrorStatus(err)` inside a custom hook to
+retain Baz's existing classifications while customizing presentation or adding
+application-specific errors. CONNECT is currently 501.
 
 ## Borrowed request bytes
 
@@ -113,6 +115,7 @@ part in a background task.
 | `try request.query()` | Bounded, validated pair view with default limits. |
 | `queryWithLimits(limits)` | Caller-selected byte/pair/name/value limits. |
 | `fields.iterator()` | Ordered `name_raw`, `value_raw`, `has_equals`. |
+| `fields.decodedIterator(allocator, encoding)` | Owned decoded `name`, `value`, `has_equals`; explicit `.percent` or `.form` policy, ordered duplicates. |
 | `fields.firstRaw(name)` / `allRaw(name)` | Exact raw-name matching; returns the first pair / an iterator over repeats. |
 | `params.percentDecodeInto(raw, dst)` | Strict percent decoding; literal `+` stays `+`. |
 | `params.formDecodeInto(raw, dst)` | Strict percent decoding plus `+` → space. |
@@ -294,3 +297,6 @@ overhead. wrk revisions differ across hosts; Zap retains its inherited `-Os`
 and `-fno-sanitize=undefined` C flags. Bodies were checked before and after timing,
 not individually throughout the load. The [full receipt](../reports/2026-09-06-basic-zap.md)
 contains all ranges, source identities, commands, raw trials and cleanup records.
+
+See the [migration conveniences guide](MIGRATION-HELPERS.md) for allocator/result
+lifetimes, runtime file copying, custom errors, and IPv4 listener configuration.

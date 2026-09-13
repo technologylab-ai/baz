@@ -24,6 +24,11 @@ They return between flushes and timed waits; the linear API below retains one wo
 Call `ctx.response.stream(status, content_type, options)` to obtain a `baz.Stream`.
 Its `writer()` returns `*std.Io.Writer`. Standard `writeAll`, `print`, and `flush`
 work; `Stream` also provides convenience `writeAll`, `print`, and `flush` methods.
+`copyFrom(reader, scratch)` copies a standard reader to the stream using explicit
+caller scratch. The raw writer has no writable destination buffer; Zig 0.16.0
+file-reader `streamRemaining` can fail with `WriterBufferUnavailable`. Use
+`copyFrom` for that path. See the [runtime download walkthrough](MIGRATION-HELPERS.md#copy-a-runtime-file-into-a-response)
+for the runnable example, source diagnostics, HEAD, and file lifetimes.
 
 Every write copies input bytes before returning. Stack buffers are valid sources.
 Writes use the connection's startup-reserved staging buffer. Payload bytes then

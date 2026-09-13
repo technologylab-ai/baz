@@ -129,7 +129,7 @@ try {
   await check('desktop-landing', async () => {
     await navigate();
     const state = await evaluate(`({title:document.title,headline:document.querySelector('h1').textContent,diagrams:document.querySelectorAll('svg[role="img"]').length,examples:document.querySelectorAll('.example-card').length,highlight:!!document.querySelector('.hljs-keyword')})`);
-    assert.equal(state.title,'Baz — Bounded Async Zap'); assert.equal(state.diagrams,5); assert.equal(state.examples,24); assert(state.highlight);
+    assert.equal(state.title,'Baz — Bounded Async Zap'); assert.equal(state.diagrams,5); assert.equal(state.examples,26); assert(state.highlight);
     await noOverflow(); await screenshot('baz-desktop'); return state;
   });
   await check('maintained-source-excerpt', async () => {
@@ -199,12 +199,12 @@ try {
   });
   await check('example-filters', async () => {
     await evaluate('document.querySelector("#examples").scrollIntoView({behavior:"instant"})');
-    for (const [group,count] of [['data',2],['composition',6],['app',4],['routing',5],['responses',7],['all',24]]) {
+    for (const [group,count] of [['data',3],['composition',6],['app',4],['routing',5],['responses',8],['all',26]]) {
       await click(`button[data-filter="${group}"]`);
       assert.equal(await evaluate('document.querySelectorAll(".example-card:not([hidden])").length'),count);
-      assert.equal(await evaluate('document.querySelector("#example-count").textContent'),`${count} of 24 examples`);
+      assert.equal(await evaluate('document.querySelector("#example-count").textContent'),`${count} of 26 examples`);
     }
-    return {groups:6,total:24};
+    return {groups:6,total:26};
   });
   await check('desktop-diagrams-and-benchmark', async () => {
     await evaluate('document.querySelector("#engine").scrollIntoView({behavior:"instant"})'); await screenshot('baz-engine');
@@ -328,6 +328,23 @@ try {
     await noOverflow();
     return {desktop:1440,mobile:390,clientSource:true};
   });
+  await check('migration-helpers-walkthrough', async () => {
+    await send('Emulation.setDeviceMetricsOverride',{width:1440,height:1040,deviceScaleFactor:1,mobile:false});
+    await navigate('#examples');
+    const selector = '#examples a[href="docs/read.html?file=docs/MIGRATION-HELPERS.md"]';
+    await evaluate('document.querySelector('+JSON.stringify(selector)+').scrollIntoView({behavior:"instant",block:"center"})');
+    await delay(300);
+    await click(selector);
+    await until(() => evaluate('document.documentElement.dataset.readerReady === "true"'), 'Migration guide did not load');
+    assert.equal(await evaluate('document.querySelector("#document h1").textContent'),'From migration friction to everyday APIs');
+    await noOverflow(); await screenshot('baz-migration-helpers-desktop');
+    for (const file of ['runtime_file', 'decoded_forms']) {
+      assert(await evaluate('[...document.querySelectorAll("#document a")].some(a => new URL(a.href).searchParams.get("file") === "examples/'+file+'.zig")'));
+    }
+    await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:false});
+    await noOverflow(); await screenshot('baz-migration-helpers-mobile');
+    return {desktop:1440,mobile:390,mainPageNavigation:true,examples:2};
+  });
   await check('all-published-documents-render', async () => {
     await navigate('docs/read.html','reader');
     const files = await evaluate('window.DOC_SITE.documents');
@@ -348,10 +365,10 @@ try {
     await writeFile(path.join(output,'baz-print.pdf'),Buffer.from(pdf.data,'base64'));
     await send('Emulation.setEmulatedMedia',{media:''}); await send('Emulation.setScriptExecutionDisabled',{value:true});
     await navigate();
-    assert.equal(await evaluate('document.querySelectorAll(".example-card:not([hidden])").length'),24);
+    assert.equal(await evaluate('document.querySelectorAll(".example-card:not([hidden])").length'),26);
     assert(await evaluate('document.querySelector(".language-zig").textContent.includes("percentDecodeInto")'));
     assert(await evaluate('[...document.querySelectorAll("[role=tabpanel]")].every(panel => !panel.hidden && getComputedStyle(panel).display !== "none")'));
-    await send('Emulation.setScriptExecutionDisabled',{value:false}); return {printBytes:Buffer.from(pdf.data,'base64').length,noJsExamples:24};
+    await send('Emulation.setScriptExecutionDisabled',{value:false}); return {printBytes:Buffer.from(pdf.data,'base64').length,noJsExamples:26};
   });
   await check('no-unexpected-network-or-errors', async () => {
     assert.equal(exceptions.length,0,JSON.stringify(exceptions));

@@ -186,7 +186,7 @@ The [package receipt](reports/2026-09-06-baz-extraction.md) records external-dep
 verification and source identity. The [prototype receipt](reports/2026-09-06-app-api.md)
 preserves the earlier combined engine/framework gates.
 
-Current deployment is IPv4 loopback, plain HTTP/1.1. TLS is out of scope.
+The listener defaults to IPv4 loopback; an explicit IPv4 address supports LAN clients over plain HTTP/1.1. TLS is out of scope.
 Mustache uses a [pure Zig library with bounded rendering](docs/MUSTACHE.md).
 WebSockets needs an engine upgrade lifecycle. Native Windows x64 now has its own
 [CI gate](.github/workflows/windows-build.yml), alongside Linux and macOS.
@@ -209,3 +209,10 @@ retaining slices or introducing asynchronous work.
 
 Baz is [MIT licensed](LICENSE). The adapted Zap examples retain their
 [original copyright and license notice](examples/LICENSE-ZAP).
+
+### Migration conveniences
+
+[The migration guide](docs/MIGRATION-HELPERS.md) includes runnable LAN binding,
+runtime file downloads with `Stream.copyFrom`, caller-allocator decoded field
+iteration, and `defaultErrorStatus` for custom error hooks. The same guide is
+available from the website's Examples section.

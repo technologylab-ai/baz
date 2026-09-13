@@ -3,6 +3,7 @@
 import argparse
 from contextlib import contextmanager
 import json
+import tempfile
 from pathlib import Path
 
 import wire_support as wire
@@ -77,6 +78,46 @@ def run(directory):
                       headers=(("Range", "bytes=0-2"),))
         wire.require(result[1][b"accept-ranges"] == b"none", "file example claimed unsupported ranges")
 
+    with tempfile.TemporaryDirectory(prefix="baz-download-") as temporary:
+        path = Path(temporary) / "runtime.bin"
+        payload = bytes(range(256)) * 257  # Binary data spanning several staging flushes.
+        path.write_bytes(payload)
+        download = ExampleServer(directory / "runtime_file", workers=2)
+        download.options["file"] = str(path)
+        with download as server:
+            response = call(server, "/download", expected=payload)
+            wire.require(int(response[1][b"content-length"]) == len(payload), "runtime file length changed")
+            response = call(server, "/download", method="HEAD", expected=b"")
+            wire.require(int(response[1][b"content-length"]) == len(payload), "runtime HEAD lost representation length")
+            # Reopen the runtime path for each request; no startup embedding/cache.
+            path.write_bytes(b"")
+            call(server, "/download", expected=b"")
+            path.unlink()
+            call(server, "/download", status=500)
+        passed.append("runtime_file")
+        print("PASS runtime_file", flush=True)
+
+    with case("decoded_forms", workers=2) as server:
+        headers = (("Content-Type", "application/x-www-form-urlencoded"),)
+        body = b"name=Alice+Smith&%6eame=Bob%2BJones&flag&empty="
+        expected = {"fields": [
+            {"name": "name", "value": "Alice Smith", "has_equals": True},
+            {"name": "name", "value": "Bob+Jones", "has_equals": True},
+            {"name": "flag", "value": "", "has_equals": False},
+            {"name": "empty", "value": "", "has_equals": True},
+        ]}
+        wire.require(json.loads(call(server, "/?name=query", method="POST", body=body, headers=headers)[2]) == expected,
+                     "decoded iterator merged parameters or lost names/order/duplicates")
+        call(server, method="POST", body=b"name=%GG", headers=headers, status=400)
+        call(server, method="POST", body=b"name=%ff", headers=headers, status=400)
+        call(server, method="POST", body=b"&".join([b"a=1"] * 17), headers=headers, status=413)
+        with server.connect() as sock:
+            sock.sendall(b"POST / HTTP/1.1\r\nHost: localhost\r\nContent-Type: application/x-www-form-urlencoded\r\n"
+                         b"Transfer-Encoding: chunked\r\n\r\n" +
+                         b"".join(b"1\r\n" + bytes([byte]) + b"\r\n" for byte in body) + b"0\r\n\r\n")
+            response = wire.ResponseReader(sock).response()
+            wire.require(response[0] == 200 and json.loads(response[2]) == expected, "segmented decoded form changed")
+
     with case("senderror") as server:
         wire.require(json.loads(call(server, status=500)[2]) == {"error": "request failed"}, "private error leaked")
 
@@ -110,6 +151,14 @@ def run(directory):
             result = call(server, "/error", status=500)
             wire.require(b"x-unpublished" not in result[1] and result[1][b"x-error-handled"] == b"app", "draft rollback lost mapper isolation")
         wire.require(json.loads(call(server, "/state")[2])["errors"] == 2, "error mapper was not instance-owned")
+        call(server, "/upload", method="POST", headers=(("Content-Type", "multipart/form-data"),),
+             body=b"invalid", status=400)
+        call(server, "/form", method="POST", headers=(("Content-Type", "application/x-www-form-urlencoded"),),
+             body=b"a=1&b=2&c=3", status=413)
+        call(server, "/form", method="POST", headers=(("Content-Type", "text/plain"),),
+             body=b"a=1", status=415)
+        wire.require(json.loads(call(server, "/state")[2])["errors"] == 5,
+                     "custom hook did not observe classified form errors")
 
     with case("cookies") as server:
         result = call(server, headers=(("Cookie", 'ZIG_ZAP=a%20+b; other="001"; other=false'),))

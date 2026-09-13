@@ -21,6 +21,7 @@ pub fn workerConfig(init: std.process.Init) !web.Config {
 pub fn Options(comptime workers_required: bool) type {
     return struct {
         port: u16 = 8080,
+        bind_address: []const u8 = "127.0.0.1",
         duration_ms: u32 = 0,
         execution: enum { @"inline", workers } = if (workers_required) .workers else .@"inline",
         workers: ?u16 = null,
@@ -33,6 +34,7 @@ pub fn Options(comptime workers_required: bool) type {
             \\
             \\  -h, --help                    Show this help and exit
             \\  -p, --port N                  Listen port; 0 selects an available port (default: 8080)
+            \\      --bind-address A.B.C.D     IPv4 listener address (default: 127.0.0.1)
             \\      --duration-ms N           Stop after N milliseconds; 0 waits for shutdown
             \\      --execution inline|workers
             \\      --workers N               Worker count (default: 2 for workers, 0 for inline)
@@ -64,6 +66,7 @@ pub fn parseOptions(init: std.process.Init, comptime T: type) !T {
 pub fn configFromOptions(options: anytype, comptime workers_required: bool) !web.Config {
     const result: web.Config = .{
         .port = options.port,
+        .bind_address = if (@hasField(@TypeOf(options), "bind_address")) try web.Config.parseBindAddress(options.bind_address) else .{ 127, 0, 0, 1 },
         .duration_ms = options.duration_ms,
         .execution = if (options.execution == .workers) .workers else .inline_event_loop,
         .workers = options.workers orelse if (options.execution == .workers) @as(u16, 2) else 0,

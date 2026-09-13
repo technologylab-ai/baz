@@ -27,10 +27,10 @@ EXAMPLES = (
     "hello", "hello2", "hello_json", "simple_router", "routes", "serve",
     "sendfile", "senderror", "accept", "app_basic", "app_auth", "app_errors",
     "endpoint", "endpoint_auth", "middleware", "middleware_with_endpoint",
-    "userpass_session", "cookies", "http_params", "bindataformpost", "streaming", "mustache", "continuations", "jobs",
+    "userpass_session", "cookies", "http_params", "bindataformpost", "streaming", "mustache", "continuations", "jobs", "runtime_file", "decoded_forms",
 )
 FIXTURES = ("baz", "baz-streaming", "baz-borrow", "baz-cookies", "baz-middleware")
-WORKER_EXAMPLES = frozenset(("endpoint", "streaming"))
+WORKER_EXAMPLES = frozenset(("endpoint", "streaming", "runtime_file", "decoded_forms"))
 EXIT_TIMEOUT = 5
 MAX_TRANSCRIPT = 65536
 PROBE = b"OPTIONS * HTTP/1.1\r\nHost: localhost\r\n\r\n"
@@ -183,6 +183,11 @@ def run(directory):
         exit_case(name, "worker-required example rejects zero workers", ["--workers=0"],
                   diagnostic="InvalidConfiguration")
 
+    for name in ("hello", "runtime_file", "decoded_forms"):
+        for address in ("localhost", "256.0.0.1", "127.1", "::1"):
+            exit_case(name, "invalid IPv4 listener address", ["--bind-address", address],
+                      diagnostic="InvalidBindAddress")
+
     for option in ("session-ttl-ms", "job-ttl-ms", "tick-ms"):
         exit_case("jobs", "zero " + option, ["--" + option + "=0"], diagnostic="InvalidLifetime")
 
@@ -206,6 +211,10 @@ def run(directory):
                 "workers" if workers else "inline_event_loop")
 
     base = ["--port=0", "--connections=4", "--shards=1", "--duration-ms=15000"]
+    for address in ("0.0.0.0", "127.0.0.1"):
+        startup("hello", "explicit IPv4 binding " + address, base + ["--bind-address", address],
+                0, "inline_event_loop")
+
     for name in FIXTURES:
         workers = 0 if name in ("baz", "baz-cookies", "baz-middleware") else 2
         startup(name, "fixture execution default", base, workers,

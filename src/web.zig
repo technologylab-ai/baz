@@ -1,4 +1,5 @@
 //! Baz: Bounded Async Zap. Experimental application API for exact Zig 0.16.0.
+pub const defaultErrorStatus = @import("App.zig").defaultErrorStatus;
 pub const App = @import("App.zig").App;
 pub const AppWithLocals = @import("App.zig").AppWithLocals;
 pub const Request = @import("request.zig").Request;

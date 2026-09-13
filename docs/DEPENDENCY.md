@@ -61,6 +61,14 @@ records exact source identity, environments, and Windows handoff/shutdown behavi
 The older tested `e52f09f` pin and provisional `bb14d987` draft remain in history.
 The [repository record](REPOSITORY.md) describes branches and publication.
 
+## IPv4 listener configuration
+
+The current pin adopts configurable IPv4 binding from [engine PR #6](https://github.com/technologylab-ai/bounded-http/pull/6).
+Merge that engine PR before the Baz adoption PR. The immutable source and package
+hash remain explicit in `build.zig.zon`. Baz exposes the engine's `Config.bind_address`
+and `Config.parseBindAddress` directly. The [migration guide](MIGRATION-HELPERS.md)
+shows LAN startup alongside the Baz-owned reader, form, and error conveniences.
+
 ## Future updates
 
 Update the engine URL, commit, and package hash together in `build.zig.zon`.
