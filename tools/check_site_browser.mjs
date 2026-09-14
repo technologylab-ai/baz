@@ -345,6 +345,33 @@ try {
     await noOverflow(); await screenshot('baz-application-recipes-mobile');
     return {desktop:1440,mobile:390,mainPageNavigation:true,examples:2};
   });
+  await check('guide-directory-navigation', async () => {
+    const directory = 'a[href="docs/read.html?file=docs/GUIDES.md"]';
+    for (const width of [1440, 390]) {
+      await send('Emulation.setDeviceMetricsOverride',{width,height:1040,deviceScaleFactor:1,mobile:false});
+      await navigate('#docs');
+      await evaluate('document.querySelector("#docs").scrollIntoView({behavior:"instant"})');
+      assert.equal(await evaluate('document.querySelectorAll("#docs .guide-group").length'),4);
+      for (const file of ['STREAMING','CONTINUATIONS','MIDDLEWARE','SSE','JOBS','APPLICATION-RECIPES','CONNECTION-LIMIT-WALKTHROUGH']) {
+        assert(await evaluate('!!document.querySelector(\'#docs a[href="docs/read.html?file=docs/'+file+'.md"]\')'));
+      }
+      await noOverflow(); await screenshot('baz-read-further-'+width);
+      if (width === 390) await click('.mobile-menu');
+      await click('#navigation '+directory);
+      await until(() => evaluate('document.documentElement.dataset.readerReady === "true"'), 'Guide directory did not load');
+      assert.equal(await evaluate('document.querySelector("#document h1").textContent'),'All guides');
+      assert.equal(await evaluate('document.querySelectorAll("#document h2").length'),4);
+      await noOverflow(); await screenshot('baz-all-guides-'+width);
+      const recipe = '#document a[href$="file=docs%2FAPPLICATION-RECIPES.md"]';
+      await evaluate('document.querySelector('+JSON.stringify(recipe)+').scrollIntoView({behavior:"instant",block:"center"})');
+      await click(recipe);
+      await until(() => evaluate('document.querySelector("#document h1")?.textContent === "Application recipes"'), 'Directory recipe link did not load');
+      if (width === 390) await click('.mobile-menu');
+      await click('#navigation a[href="read.html?file=docs/GUIDES.md"]');
+      await until(() => evaluate('document.querySelector("#document h1")?.textContent === "All guides"'), 'Reader directory link did not load');
+    }
+    return {desktop:1440,mobile:390,groups:4,homepageAndReaderNavigation:true};
+  });
   await check('all-published-documents-render', async () => {
     await navigate('docs/read.html','reader');
     const files = await evaluate('window.DOC_SITE.documents');

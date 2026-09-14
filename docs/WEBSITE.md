@@ -29,6 +29,7 @@ The website worktree is only a branch of Baz, not another project or repository.
 
 | Content | Maintained source |
 | --- | --- |
+| Guide directory and Read further | [GUIDES.md](GUIDES.md) supplies the grouped titles, links, and descriptions for both the reader directory and the homepage; All guides is linked in both navigation rails |
 | Landing-page prose | [index.template.html](index.template.html) |
 | Limits and backpressure | The `#limits` chapter and [flow diagram](diagrams/backpressure.svg), with the [limits guide](LIMITS.md) and [pipelining assessment](PIPELINING.md) in the HTML reader |
 | Connection-limit walkthrough | [Two slots. Three clients.](CONNECTION-LIMIT-WALKTHROUGH.md), with its [slot diagram](diagrams/connection-slots.svg) and interactive [Python client](../examples/connection_limit.py); linked from the limits guide and examples catalog |
@@ -41,6 +42,8 @@ The website worktree is only a branch of Baz, not another project or repository.
 | Benchmark chart and table | Original [Mac](../reports/2026-09-06-basic-zap/macos-summary.json) and [Linux](../reports/2026-09-06-basic-zap/linux-summary.json) summaries; medians checked against recorded trial rates |
 | Diagrams | [Raw parameters](diagrams/parameters.svg), [package boundary](diagrams/layers.svg), [response lifetime](diagrams/lifetime.svg) |
 | Reader content | Repository Markdown and source files, copied unchanged from an explicit allowlist |
+
+Keep directory entries in the form `- [Title](relative-path.md) — Description` under `##` group headings. The build rejects unpublished or duplicate targets, empty groups, and any `docs/*.md` document missing from the directory. The directory itself and the old forwarding page have explicit, explained exclusions in `guide_directory()` in [build_pages.py](../tools/build_pages.py); new guides need an entry before they can be published.
 
 The benchmark narrative identifies prototype `c152e59`, before package extraction,
 and links the complete report. Do not replace it with engine measurements or

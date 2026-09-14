@@ -99,6 +99,51 @@ def scroll_diagram(svg):
     return '<div class="image-scroll" tabindex="0" aria-label="Scrollable diagram">' + svg + '</div>'
 
 
+def guide_directory(docs):
+    """Render the maintained Markdown directory and require complete guide coverage."""
+    excluded = {
+        'docs/GUIDES.md': 'The directory does not need to list itself.',
+        'docs/MIGRATION-HELPERS.md': 'Compatibility page forwarding to Application recipes.',
+    }
+    groups = []
+    seen = set()
+    for line in (ROOT / 'docs/GUIDES.md').read_text().splitlines():
+        if line.startswith('## '):
+            groups.append((line[3:], []))
+        elif line.startswith('- '):
+            entry = re.fullmatch(r'- \[([^\]]+)\]\(([^)]+)\) — (.+)', line)
+            if not entry or not groups:
+                raise ValueError('Expected a guide link and description under a heading: ' + line)
+            title, target, description = entry.groups()
+            if target.startswith('https://'):
+                href = target
+            else:
+                source = (ROOT / 'docs' / target).resolve()
+                if not source.is_relative_to(ROOT):
+                    raise ValueError('Guide link escapes repository: ' + target)
+                target = source.relative_to(ROOT).as_posix()
+                if target not in docs:
+                    raise ValueError('Guide is not published: ' + target)
+                href = 'docs/read.html?file=' + target
+            if target in seen:
+                raise ValueError('Duplicate guide entry: ' + target)
+            seen.add(target)
+            groups[-1][1].append(
+                '<a href="{}"><span class="guide-summary"><strong>{}</strong><small>{}</small></span>'
+                '<span aria-hidden="true">↗</span></a>'.format(
+                    html.escape(href, quote=True), html.escape(title), html.escape(description)))
+    expected = {path for path in docs if path.startswith('docs/') and path.endswith('.md')}
+    missing = expected - seen - excluded.keys()
+    if missing:
+        raise ValueError('Guides missing from docs/GUIDES.md: ' + ', '.join(sorted(missing)))
+    if excluded.keys() - expected or excluded.keys() & seen:
+        raise ValueError('Stale or redundant guide directory exclusions.')
+    if not groups or any(not entries for _, entries in groups):
+        raise ValueError('Guide directory groups must contain links.')
+    return '\n'.join('<div class="guide-group"><h3>{}</h3><div class="resource-links">{}</div></div>'.format(
+        html.escape(title), '\n'.join(entries)) for title, entries in groups)
+
+
 def build():
     revision = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
     if not re.fullmatch('[0-9a-f]{40}', revision):
@@ -138,7 +183,7 @@ def build():
         cards.append('<a class="example-card" data-group="{}" href="docs/read.html?file=examples/{}.zig"><strong>{}<span aria-hidden="true">↗</span></strong><p>{}</p></a>'.format(group, name, name, html.escape(description)))
     results, chart = benchmark()
     replacements = {'HELLO': html.escape(snippet.group(0)), 'STREAMING': html.escape(streaming.group(0)), 'BORROWED': html.escape(borrowed.group(0).strip()), 'EXAMPLES': '\n'.join(cards),
-                    'RESULTS': results, 'PERFORMANCE': scroll_diagram(chart)}
+                    'RESULTS': results, 'PERFORMANCE': scroll_diagram(chart), 'GUIDES': guide_directory(docs)}
     for token, name in [('PARAMETERS', 'parameters'), ('LAYERS', 'layers'), ('LIFETIME', 'lifetime'), ('BACKPRESSURE', 'backpressure')]:
         replacements[token] = scroll_diagram((ROOT / ('docs/diagrams/' + name + '.svg')).read_text())
     page = (ROOT / 'docs/index.template.html').read_text()
