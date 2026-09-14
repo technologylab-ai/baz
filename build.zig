@@ -13,15 +13,21 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     }).module("bounded_http");
     const mustache = b.dependency("mustache", .{ .target = target, .optimize = optimize }).module("mustache");
-    const module = b.addModule("baz", .{
+    const module_options: std.Build.Module.CreateOptions = .{
         .root_source_file = b.path("src/baz.zig"),
         .target = target,
         .optimize = optimize,
         .link_libc = true,
         .imports = &.{ .{ .name = "bounded_http", .module = engine }, .{ .name = "mustache_engine", .module = mustache } },
-    });
-    // Generate from the same public module and dependency graph consumers use.
-    const docs_object = b.addObject(.{ .name = "baz", .root_module = module });
+    };
+    const module = b.addModule("baz", module_options);
+    // CLI parsing belongs to executables; the public baz module has no zli import.
+    const zli = b.dependency("zli", .{ .target = target, .optimize = optimize }).module("zli");
+    // Document the public module and the CLI package used by examples, without
+    // extending consumers' import tables or introducing a public baz.zli export.
+    const docs_module = b.createModule(module_options);
+    docs_module.addImport("zli", zli);
+    const docs_object = b.addObject(.{ .name = "baz", .root_module = docs_module });
     const prepare_docs = b.addSystemCommand(&.{"python3"});
     prepare_docs.addFileArg(b.path("tools/prepare_api_docs.py"));
     prepare_docs.addDirectoryArg(docs_object.getEmittedDocs());
@@ -31,6 +37,7 @@ pub fn build(b: *std.Build) void {
         "std/std.zig",
         b.fmt("bounded_http/{s}", .{std.fs.path.basename(engine.root_source_file.?.getPath(b))}),
         b.fmt("mustache_engine/{s}", .{std.fs.path.basename(mustache.root_source_file.?.getPath(b))}),
+        b.fmt("zli/{s}", .{std.fs.path.basename(zli.root_source_file.?.getPath(b))}),
     });
     const install_docs = b.addInstallDirectory(.{
         .source_dir = prepared_docs,
@@ -38,8 +45,6 @@ pub fn build(b: *std.Build) void {
         .install_subdir = "docs/api",
     });
     b.step("docs", "Generate the source-derived API reference").dependOn(&install_docs.step);
-    // CLI parsing belongs to executables; the public baz module has no zli import.
-    const zli = b.dependency("zli", .{ .target = target, .optimize = optimize }).module("zli");
     // Consumers may import the framework and its exact engine module together.
     b.modules.put(b.allocator, b.dupe("bounded_http"), engine) catch @panic("out of memory");
     // Arch's GCC 16 CRT contains .sframe R_X86_64_PC64 relocations which

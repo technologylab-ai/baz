@@ -149,7 +149,8 @@ runtime or performance evidence. Windows platform claims are backed by [Baz’s 
 `zig build docs -Doptimize=ReleaseSafe` installs standalone Zig Autodoc at
 `zig-out/docs/api/`. The website builder runs this step before publishing the
 viewer at `api/index.html`, including its JavaScript, WebAssembly, and source
-archive. The build uses the same public module and dependency graph as consumers.
+archive. The documentation module shares the public module’s source and build options,
+with an additional docs-only zli import for the example CLI reference.
 `src/baz.zig` is the documented package entry point; `@import("baz")` is unchanged.
 
 Zig 0.16.0's `std.Build.Step.Compile.getEmittedDocs()` emits the viewer. Autodoc
@@ -189,3 +190,13 @@ original API vocabulary rather than linking proposed or former Zap APIs to Baz.
 
 App member links use Zig's canonical `baz.App.AppWithLocals` declaration path;
 `App` is a convenience type function whose implementation returns that type.
+
+Related package navigation is maintained in [api-packages.template.html](api-packages.template.html).
+It is collapsed initially to keep the mobile page compact. The explorer includes
+only Baz, the pinned HTTP engine, Mustache, the examples’ zli CLI library, and the
+matching standard library. These references need no separate dependency-site build
+and cannot drift to a dependency’s latest release independently of Baz’s pin.
+The documentation module adds zli without changing the public Baz import table.
+The [zli license notice](vendor/zli-LICENSE) is checksum-verified and published.
+Browser checks exercise package navigation, CLI search and source, and links from
+zli signatures into the standard library, in addition to all prose destinations.

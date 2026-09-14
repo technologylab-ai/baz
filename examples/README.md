@@ -72,7 +72,7 @@ Unknown, missing, and repeated options are errors. Explicit `--workers N` is
 independent of its position relative to `--execution workers`; when omitted,
 the count defaults to two in worker mode and zero in inline mode.
 
-`parseInit` uses the supplied `init.io` for diagnostics and retains normalized
+[`parseInit`](https://technologylab-ai.github.io/baz/api/#zli.parseInit) uses the supplied `init.io` for diagnostics and retains normalized
 arguments in `init.arena` where needed, including on Windows. String options
 borrow that storage until arena reset/deinitialization. CLI work happens at
 startup, before App starts; zli adds no request-loop parsing or allocation.

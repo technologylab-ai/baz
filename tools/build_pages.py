@@ -232,6 +232,7 @@ def api_page(source):
     content += '<a href="../guides.html">Read the guides</a> for walkthroughs and ownership rules.</p>'
     content += '<nav class="api-shortcuts" aria-label="API shortcuts">' + ''.join(
         '<a href="#baz.{0}">{0}</a>'.format(name) for name in ['App', 'Request', 'Response', 'Stream', 'Mailbox', 'sse', 'mustache']) + '</nav>'
+    content += (ROOT / 'docs/api-packages.template.html').read_text()
     content += '<noscript><p class="callout">The API explorer needs JavaScript and WebAssembly. '
     content += '<a href="../docs/read.html?file=src/baz.zig">Read the public source</a> or '
     content += '<a href="../guides.html">browse the guides</a>.</p></noscript>'

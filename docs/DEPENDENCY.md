@@ -65,8 +65,8 @@ The [repository record](REPOSITORY.md) describes branches and publication.
 
 The current pin adopts configurable IPv4 binding from [engine PR #6](https://github.com/technologylab-ai/bounded-http/pull/6).
 Merge that engine PR before the Baz adoption PR. The immutable source and package
-hash remain explicit in `build.zig.zon`. Baz exposes the engine's `Config.bind_address`
-and `Config.parseBindAddress` directly. The [application recipes guide](APPLICATION-RECIPES.md)
+hash remain explicit in `build.zig.zon`. Baz exposes the engine's [`Config.bind_address`](https://technologylab-ai.github.io/baz/api/#bounded_http.Config)
+and [`Config.parseBindAddress`](https://technologylab-ai.github.io/baz/api/#bounded_http.Config.parseBindAddress) directly. The [application recipes guide](APPLICATION-RECIPES.md)
 shows LAN startup alongside the Baz-owned reader, form, and error conveniences.
 
 ## Future updates
@@ -87,7 +87,7 @@ No throughput comparison is rerun solely for package naming or documentation.
 The [zli fork](https://github.com/renerocksai/zli), pinned to
 `4f17b1f1eacda7b87c49461e34b1520c392788b2` from its [Init adapter PR](https://github.com/renerocksai/zli/pull/1), supplies typed command-line
 parsing for all public examples and the App/streaming/borrow fixture executables.
-Its `parseInit(init, Options)` entry point consumes Zig 0.16 `std.process.Init`,
+Its [`parseInit(init, Options)`](https://technologylab-ai.github.io/baz/api/#zli.parseInit) entry point consumes Zig 0.16 `std.process.Init`,
 using the supplied I/O and process arena. The [example guide](../examples/README.md#typed-cli-options-with-process-initialization)
 records syntax, ownership, and startup behavior.
 
@@ -139,3 +139,20 @@ This branch pins immutable candidate `886b728bec79c36ca1ec69345b609a725617a9ea`,
 package hash `bounded_http-0.1.0-N3A1uB4HEgAhXPoOmXYv6DaPKLMYITEZJSk0kIsjrpMn`.
 The notification PR must land before the Baz feature PR. Native engine and Baz
 gates remain separate. See [SSE and notification ownership](SSE.md).
+
+## Dependency API references
+
+The [API explorer](https://technologylab-ai.github.io/baz/api/) includes the exact
+pinned dependency sources alongside Baz. Open “Related package APIs” for the
+[HTTP engine reference](https://technologylab-ai.github.io/baz/api/#bounded_http),
+[Mustache library](https://technologylab-ai.github.io/baz/api/#mustache_engine),
+[zli](https://technologylab-ai.github.io/baz/api/#zli), and
+[Zig standard library](https://technologylab-ai.github.io/baz/api/#std).
+Engine configuration and notification types, Mustache values and rendering limits,
+and the examples’ CLI entry point can all be followed within the same viewer.
+
+zli is added only to the documentation compilation’s import table. The public
+Baz module and its exported declarations are unchanged; this does not require Baz
+applications to import or use zli. The generated source
+archive preserves zli’s original attribution, and the site includes its
+[Apache-2.0 license](vendor/zli-LICENSE).

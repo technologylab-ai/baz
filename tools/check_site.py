@@ -69,6 +69,7 @@ def check(output, documents, document_urls):
         assert next(iter(roots)) == 'baz', 'Wrong default API module'
         assert all(roots[name] == root for name, root in api_manifest['module_roots'].items()), 'Incorrect API module root'
         assert roots['baz'] == 'baz/baz.zig'
+        assert roots['zli'] == 'zli/zli.zig', 'Example CLI reference missing'
     index = (output / 'index.html').read_text()
     examples = (output / 'examples.html').read_text()
     performance = (output / 'performance.html').read_text()

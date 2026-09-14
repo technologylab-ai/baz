@@ -44,14 +44,14 @@ or choose authentication, persistence or reconnect policy.
 
 ## Wake a waiting continuation
 
-During a retained callback, obtain `try ctx.notification()` and copy the handle
+During a retained callback, obtain [`try ctx.notification()`](https://technologylab-ai.github.io/baz/api/#baz.App.AppWithLocals.Context.notification) and copy the handle
 into startup-owned producer/subscription storage. Enqueue or publish the data
-**before** calling `handle.signal()`. Return
+**before** calling [`handle.signal()`](https://technologylab-ai.github.io/baz/api/#bounded_http.api.Notification.signal). Return
 `.{ .await_notification = null }` to wait for producer activity, or
 `.{ .await_notification = 5 * std.time.ns_per_s }` for a heartbeat timeout.
 A signal resumes with `.notified`; timeout resumes with `.timer`.
 
-The handle represents a coalescing wake-up, not a message count. `signal()`
+The handle represents a coalescing wake-up, not a message count. [`signal()`](https://technologylab-ai.github.io/baz/api/#bounded_http.api.Notification.signal)
 returns `notified`, `coalesced`, or `stale`. Repeated signals occupy one pending
 bit per engine connection. A signal arriving before the wait, during a callback
 or while output is flushing remains pending. It is consumed by notification

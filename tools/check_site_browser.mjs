@@ -495,12 +495,44 @@ try {
     }
     return {widths:[320,390,760,820,1440],views:5};
   });
+  await check('api-related-packages-and-cli', async () => {
+    const packages = [['bounded_http','Config'],['mustache_engine','RenderLimits'],['zli','parseInit'],['std','ArrayList']];
+    for (const width of [390,1440]) {
+      await send('Emulation.setDeviceMetricsOverride',{width,height:1040,deviceScaleFactor:1,mobile:false});
+      await api();
+      assert.equal(await evaluate('document.querySelector(".api-packages").open'),false);
+      await click('.api-packages summary');
+      assert.equal(await evaluate('document.querySelector(".api-packages").open'),true);
+      for (const [name,text] of packages) {
+        await click(`.api-packages a[href="#${name}"]`);
+        await until(() => evaluate(`document.querySelector('#listNav a.active')?.getAttribute('href') === ${JSON.stringify('#'+name)}`), 'Package navigation failed: '+name);
+        assert((await evaluate('document.querySelector(".api-viewer").innerText')).includes(text),name);
+        await noOverflow();
+      }
+      await click('.api-packages a[href="#zli.parseInit"]');
+      await until(() => evaluate('document.querySelector("#fnProtoCode").textContent.includes("pub fn parseInit(")'), 'CLI entry point missing');
+      assert((await evaluate('document.querySelector("#tldDocs").textContent')).includes('Returned string fields borrow'));
+      await noOverflow(); await screenshot('api-zli-'+width);
+    }
+    await click('#fnProtoCode a[href="#std.process.Init"]');
+    await until(() => evaluate('document.querySelector("#listNav a.active")?.getAttribute("href") === "#std.process.Init"'), 'CLI signature did not link to standard library');
+    assert(await evaluate('document.querySelector("#status").classList.contains("hidden")'));
+    await click('#search'); await send('Input.insertText',{text:'parseInit'});
+    await until(() => evaluate('!document.querySelector("#sectSearchResults").classList.contains("hidden") && !!document.querySelector(\'#listSearchResults a[href="#zli.parseInit"]\')'), 'CLI search failed');
+    await click('#listSearchResults a[href="#zli.parseInit"]');
+    await until(() => evaluate('document.querySelector("#fnProtoCode").textContent.includes("pub fn parseInit(")'), 'CLI search result failed');
+    await click('#hdrName a');
+    await until(() => evaluate('!document.querySelector("#sectSource").classList.contains("hidden")'), 'CLI source missing');
+    assert((await evaluate('document.querySelector("#sourceText").textContent')).includes('pub fn parseInit(init: std.process.Init'));
+    return {packages:packages.map(p=>p[0]),widths:[390,1440],cliSearch:true,cliSource:true,signatureLink:true};
+  });
   await check('api-links-from-published-prose', async () => {
     await api();
     const targets = await evaluate(`(async () => {
       const root = new URL('../', location.href);
       const manifest = await fetch(new URL('publication.json', root)).then(r => r.json());
       const texts = await Promise.all(Object.keys(manifest.files_sha256).filter(name => /\\.(md|html)$/.test(name)).map(name => fetch(new URL(name, root)).then(r => r.text())));
+      texts.push(document.querySelector('.api-packages').innerHTML.replaceAll('href="#', 'href="api/#'));
       return [...new Set(texts.flatMap(text => [...text.matchAll(/api\\/(?:index\\.html)?#([A-Za-z_][A-Za-z0-9_.]*)/g)].map(match => match[1])))].sort();
     })()`);
     assert(targets.length >= 60, 'Expected the prose sweep to link the documented API');
