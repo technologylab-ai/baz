@@ -21,44 +21,44 @@ They return between flushes and timed waits; the linear API below retains one wo
 
 ## Writer and lifecycle
 
-Call `ctx.response.stream(status, content_type, options)` to obtain a `baz.Stream`.
+Call [`ctx.response.stream(status, content_type, options)`](https://technologylab-ai.github.io/baz/api/#baz.Response.stream) to obtain a [`baz.Stream`](https://technologylab-ai.github.io/baz/api/#baz.Stream).
 Its `writer()` returns `*std.Io.Writer`. Standard `writeAll`, `print`, and `flush`
-work; `Stream` also provides convenience `writeAll`, `print`, and `flush` methods.
-`copyFrom(reader, scratch)` copies a standard reader to the stream using explicit
+work; [`Stream`](https://technologylab-ai.github.io/baz/api/#baz.Stream) also provides convenience `writeAll`, `print`, and `flush` methods.
+[`copyFrom(reader, scratch)`](https://technologylab-ai.github.io/baz/api/#baz.Stream.copyFrom) copies a standard reader to the stream using explicit
 caller scratch. The raw writer has no writable destination buffer; Zig 0.16.0
 file-reader `streamRemaining` can fail with `WriterBufferUnavailable`. Use
-`copyFrom` for that path. See the [runtime download walkthrough](APPLICATION-RECIPES.md#copy-a-runtime-file-into-a-response)
+[`copyFrom`](https://technologylab-ai.github.io/baz/api/#baz.Stream.copyFrom) for that path. See the [runtime download walkthrough](APPLICATION-RECIPES.md#copy-a-runtime-file-into-a-response)
 for the runnable example, source diagnostics, HEAD, and file lifetimes.
 
 Every write copies input bytes before returning. Stack buffers are valid sources.
 Writes use the connection's startup-reserved staging buffer. Payload bytes then
 move once more into the final snapshot layout. See [the copy and borrowing
-contract](OWNERSHIP.md#response-copies-and-borrowing). `borrowBody` is a separate
+contract](OWNERSHIP.md#response-copies-and-borrowing). [`borrowBody`](https://technologylab-ai.github.io/baz/api/#baz.Response.borrowBody) is a separate
 whole-response API for retained assets; it cannot be inserted into a stream.
 Filling the staging buffer automatically flushes it before accepting more data. Explicit `flush()` sends a
 partial buffer and waits for local transmission completion. An empty flush sends
 pending headers but does not terminate a chunked response.
 
-`stream.finish()` ends application writes. App publishes final HTTP framing when
+[`stream.finish()`](https://technologylab-ai.github.io/baz/api/#baz.Stream.finish) ends application writes. App publishes final HTTP framing when
 the handler returns. Returning normally also finishes a healthy open stream.
 Keep the handle and its writer inside the original handler. Do not move the
 handle while a returned writer pointer is in use, or share it with another task.
 
-Headers added with `ctx.response.header` stay editable until the first flush.
+Headers added with [`ctx.response.header`](https://technologylab-ai.github.io/baz/api/#baz.Response.header) stay editable until the first flush.
 After that flush, response metadata is final. An error can close the connection;
 it cannot replace transmitted bytes with a new 500 response. Before publication,
 the normal App error mapper can discard the private draft and replace it.
 
 Errors from this response writer remain recorded even if application code
-catches `WriteFailed`. Inspect `stream.failure()` for the underlying error.
+catches `WriteFailed`. Inspect [`stream.failure()`](https://technologylab-ai.github.io/baz/api/#baz.Stream.failure) for the underlying error.
 The convenience methods return that error directly. Propagate errors from custom
 formatters and source readers used through the raw writer; those errors can occur
 outside the response writer's methods.
 
 ## Current limit: borrowed bodies cannot be inserted into a stream
 
-`response.borrowBody()` selects a complete one-shot response body. It cannot be
-mixed with `response.stream()` on the same active response. This includes the
+[`response.borrowBody()`](https://technologylab-ai.github.io/baz/api/#baz.Response.borrowBody) selects a complete one-shot response body. It cannot be
+mixed with [`response.stream()`](https://technologylab-ai.github.io/baz/api/#baz.Response.stream) on the same active response. This includes the
 sequence **write → flush → borrow a large image → continue writing**. The conflict
 exists as soon as the stream starts, even before its first write or flush.
 Likewise, starting a stream after preparing a borrowed body is unsupported.
@@ -66,7 +66,7 @@ Likewise, starting a stream after preparing a borrowed body is unsupported.
 To place a large image between other output chunks today, pass its bytes to the
 stream writer's `writeAll` and continue writing through that same writer. This
 uses bounded copying and automatic staging flushes. The application supplies any
-required body representation, separators, and content type; `borrowBody` does
+required body representation, separators, and content type; [`borrowBody`](https://technologylab-ai.github.io/baz/api/#baz.Response.borrowBody) does
 not insert multipart parts or choose their encoding.
 
 Headers can be added until the first publication, independently of these body
@@ -102,7 +102,7 @@ writes, flush waits, and sleeps. Other connections assigned to that worker wait.
 The HTTP I/O owner continues processing network events. Baz creates no request
 thread, output allocation, or custom `std.Io` provider for streaming.
 
-`ctx.sleep(duration)` uses the caller's standard `std.Io`. It checks the
+[`ctx.sleep(duration)`](https://technologylab-ai.github.io/baz/api/#baz.App.AppWithLocals.Context.sleep) uses the caller's standard `std.Io`. It checks the
 connection's cancellation flag between waits of at most five milliseconds.
 The provider controls clock and sleep behavior. Arbitrary application work still
 needs its own progress and resource limits.

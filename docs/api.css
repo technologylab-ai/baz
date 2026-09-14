@@ -1,0 +1,40 @@
+/* Zig Autodoc's DOM, styled with the same tokens as every Baz page. */
+.api-intro{margin:24px 0 16px;color:var(--muted);max-width:740px}
+.api-shortcuts{display:flex;flex-wrap:wrap;gap:10px 20px;margin-bottom:30px;font:13px/1.8 var(--mono)}
+.api-viewer{min-width:0;overflow-wrap:anywhere;padding-bottom:40px}
+.api-viewer .hidden{display:none!important}
+.api-viewer label{display:block;font:11px/1.6 var(--mono);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;color:var(--muted)}
+.api-viewer #search{width:100%;border:1px solid var(--line);border-radius:0;background:var(--paper);color:var(--ink);padding:12px 14px;font-size:16px}
+.api-viewer #search:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.api-viewer #listNav{display:flex;flex-wrap:wrap;gap:4px;list-style:none;margin:16px 0 30px;padding:0;font:13px/1.6 var(--mono)}
+.api-viewer #listNav a{display:block;padding:7px 12px;text-decoration:none;border:1px solid var(--line)}
+.api-viewer #listNav a.active{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.api-viewer #listNav a:hover{border-color:var(--accent)}
+.api-viewer #hdrName{font:500 clamp(28px,3vw,40px)/1.25 var(--serif);letter-spacing:-.5px;border-bottom:1px solid var(--line);padding-bottom:16px;margin:24px 0}
+.api-viewer #hdrName a{font:12px/1.6 var(--mono);margin-left:16px;color:var(--accent);white-space:nowrap}
+.api-viewer h2{font-size:26px;letter-spacing:-.4px;margin:32px 0 16px}
+.api-viewer h3{font-size:22px}.api-viewer p{margin:12px 0}
+.api-viewer pre{background:var(--tint);border:1px solid var(--line);margin:12px 0;padding:16px;line-height:1.65}
+.api-viewer :not(pre)>code{white-space:break-spaces}
+.api-viewer code a{color:inherit;text-decoration:underline;text-decoration-color:var(--line)}
+.api-viewer code a:hover{color:var(--accent);text-decoration-color:currentColor}
+.api-viewer ul.columns{display:block;columns:18em;column-gap:32px;margin:16px 0;padding-left:22px}
+.api-viewer li{margin-bottom:6px}.api-viewer li p{margin:0}
+.api-viewer #listFns>div,.api-viewer #listFnErrors>div{border-top:1px solid var(--line);padding:18px 0}
+.api-viewer dd{margin-left:0;color:var(--muted)}
+.api-viewer #listFields>div,.api-viewer #listParams>div{margin:18px 0}
+.api-viewer .fieldDocs{padding:0 16px;border-left:2px solid var(--line)}
+.api-viewer td code{white-space:break-spaces}.api-viewer table{table-layout:fixed}
+.api-viewer .source-code{display:grid;grid-template-columns:auto 1fr;overflow:auto;background:var(--tint);border:1px solid var(--line)}
+.api-viewer .source-code pre{border:0;margin:0;overflow:visible}
+.api-viewer .source-text{min-width:max-content}.api-viewer .source-line-numbers{text-align:right;color:var(--muted)}
+.api-viewer #helpDialog,.api-viewer #errors{position:fixed;z-index:10;inset:15vh auto auto 50%;transform:translateX(-50%);width:min(560px,calc(100vw - 32px));max-height:70vh;overflow:auto;background:var(--paper);color:var(--ink);border:1px solid var(--accent);padding:24px;box-shadow:0 12px 40px #172f3e30}
+.api-viewer #helpDialog h1,.api-viewer #errors h1{font:26px/1.3 var(--serif);margin-top:0}
+.api-viewer #helpDialog dl{display:flex;gap:16px}.api-viewer #helpDialog dt{min-width:44px}
+.api-viewer kbd{font:13px var(--mono);padding:4px 6px;background:var(--tint);border:1px solid var(--line)}
+.api-viewer #listSearchResults .selected{background:var(--tint);outline:2px solid var(--accent)}
+.api-viewer .tok-kw,.api-viewer .tok-null{color:#a43424}
+.api-viewer .tok-str{color:#3b6746}.api-viewer .tok-type,.api-viewer .tok-builtin{color:#265c8c}
+.api-viewer .tok-number{color:#815014}.api-viewer .tok-comment{color:#69757b;font-style:italic}.api-viewer .tok-fn{color:#743c7c}
+@media(max-width:760px){.api-viewer pre{font-size:12px}.api-shortcuts{gap:8px 16px}.api-viewer #hdrName{font-size:30px}.api-viewer #listNav{margin-bottom:20px}}
+@media print{.api-shortcuts,.api-viewer #navWrap,.api-viewer #helpDialog,.api-viewer #errors{display:none!important}.api-viewer .source-code{display:block;overflow:visible}.api-viewer .source-line-numbers{display:none}.api-viewer .source-text{min-width:0}.api-viewer pre{white-space:pre-wrap;overflow-wrap:anywhere;overflow:visible}.api-viewer #hdrName a{display:none}}

@@ -21,14 +21,16 @@ PAGES = {
     'examples': ('Examples', 'Learn from working code', 'Explore all 26 maintained Baz examples, from a first route to a complete live application.', []),
     'performance': ('Performance', 'Measurements with context', 'The original Baz prototype and Zap comparison, including every profile, condition, and evidence link.', []),
     'roadmap': ('Roadmap', 'Where Baz stands', 'Implemented features, native correctness gates, planned API work, and deferred capabilities.', []),
-    'guides': ('Guides', 'Guides & API reference', 'Every Baz guide, grouped by application building, streaming, ownership, and project evidence.', []),
+    'guides': ('Guides', 'Guides & recipes', 'Every Baz guide, grouped by application building, streaming, ownership, and project evidence.', []),
 }
 
 
 def navigation(current, prefix=''):
-    return '\n'.join('<a href="{}{}.html"{}>{}</a>'.format(
-        prefix, name, ' aria-current="page"' if current == name else '', html.escape(meta[0]))
-        for name, meta in PAGES.items())
+    entries = [(name, name + '.html', meta[0]) for name, meta in PAGES.items()]
+    entries.insert(2, ('api', 'api/index.html', 'API reference'))
+    return '\n'.join('<a href="{}{}"{}>{}</a>'.format(
+        prefix, path, ' aria-current="page"' if current == name else '', html.escape(label))
+        for name, path, label in entries)
 
 
 def render_pages(replacements):
@@ -210,12 +212,49 @@ def guide_directory(docs):
         html.escape(title), '\n'.join(entries)) for title, entries in groups)
 
 
+def api_page(source):
+    """Retain Zig's viewer DOM and renderer, using Baz's shared shell and theme."""
+    generated = (source / 'index.html').read_text()
+    match = re.search(r'<div id="navWrap">(.*?)<script src="main.js"></script>', generated, re.S)
+    if not match:
+        raise ValueError('Zig Autodoc markup changed; review the API integration')
+    viewer = '<div id="navWrap">' + match[1]
+    viewer = viewer.replace('<input type="search"', '<label for="search">Search the API</label><input type="search"')
+    viewer = viewer.replace('<h1 id="hdrName"', '<h2 id="hdrName"').replace('[src]</a></h1>', '[src]</a></h2>')
+    shell = (ROOT / 'docs/page.template.html').read_text()
+    shell = re.sub(r'(href|src)="(docs/|index.html)', r'\1="../\2', shell)
+    # Only the API viewer needs WebAssembly compilation. No eval or inline scripts.
+    shell = shell.replace("script-src 'self';", "script-src 'self' 'wasm-unsafe-eval';")
+    shell = shell.replace('</head>', '<link rel="stylesheet" href="../docs/api.css">\n'
+                          '<script defer src="main.js"></script>\n<script defer src="../docs/api.js"></script>\n</head>')
+    intro = '<header class="page-intro"><p class="eyebrow">Baz / Reference</p><h1>API reference</h1></header>'
+    content = '<p class="api-intro">Types, functions, and source, generated with Zig 0.16.0. '
+    content += '<a href="../guides.html">Read the guides</a> for walkthroughs and ownership rules.</p>'
+    content += '<nav class="api-shortcuts" aria-label="API shortcuts">' + ''.join(
+        '<a href="#baz.{0}">{0}</a>'.format(name) for name in ['App', 'Request', 'Response', 'Stream', 'Mailbox', 'sse', 'mustache']) + '</nav>'
+    content += '<noscript><p class="callout">The API explorer needs JavaScript and WebAssembly. '
+    content += '<a href="../docs/read.html?file=src/baz.zig">Read the public source</a> or '
+    content += '<a href="../guides.html">browse the guides</a>.</p></noscript>'
+    content += '<div class="api-viewer">' + viewer + '</div>'
+    values = {'TITLE': 'API reference · Baz', 'DESCRIPTION': 'Source-generated Baz types, functions, and documentation for Zig 0.16.0.',
+              'CANONICAL': 'https://technologylab-ai.github.io/baz/api/', 'PAGE_CLASS': 'topic-page api-page',
+              'NAVIGATION': navigation('api', '../'), 'PAGE_INTRO': intro, 'CONTENT': content, 'LEGACY_SCRIPT': ''}
+    for key, value in values.items():
+        shell = shell.replace('@@' + key + '@@', value)
+    return shell
+
+
 def build():
+    version = subprocess.check_output(['zig', 'version'], text=True).strip()
+    if version != (ROOT / '.zig-version').read_text().strip() or version != '0.16.0':
+        raise ValueError('The API reference requires exact Zig 0.16.0')
+    subprocess.run(['zig', 'build', 'docs', '-Doptimize=ReleaseSafe', '-j2'], cwd=ROOT, check=True)
+    api_source = ROOT / 'zig-out/docs/api'
     revision = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
     if not re.fullmatch('[0-9a-f]{40}', revision):
         raise ValueError('Expected a full Git revision.')
     docs = documents()
-    assets = ['docs/' + name for name in ('read.html', 'site.css', 'site.js', 'reader.css', 'reader.js', 'highlight-zig.js', 'favicon.svg')]
+    assets = ['docs/' + name for name in ('read.html', 'site.css', 'site.js', 'reader.css', 'reader.js', 'api.css', 'api.js', 'highlight-zig.js', 'favicon.svg')]
     assets.extend(['docs/assets/mustache-preview.png', 'docs/assets/jobs-preview.png'])
     assets += [str(path.relative_to(ROOT)) for path in sorted((ROOT / 'docs/diagrams').glob('*.svg'))]
     vendor = json.loads((ROOT / 'docs/vendor/manifest.json').read_text())
@@ -253,10 +292,12 @@ def build():
     for token, name in [('PARAMETERS', 'parameters'), ('LAYERS', 'layers'), ('LIFETIME', 'lifetime'), ('BACKPRESSURE', 'backpressure')]:
         replacements[token] = scroll_diagram((ROOT / ('docs/diagrams/' + name + '.svg')).read_text())
     pages, legacy = render_pages(replacements)
+    pages['api/index.html'] = api_page(api_source)
+    api_assets = ['api/' + name for name in ('main.js', 'main.wasm', 'sources.tar', 'api-build.json')]
     tracked = subprocess.check_output(['git', 'ls-files', '--cached', '--others', '--exclude-standard'], cwd=ROOT, text=True).splitlines()
     directories = sorted({str(parent) for file in tracked for parent in Path(file).parents if str(parent) != '.'})
     config = {'documents': docs, 'documentUrls': DOCUMENT_URLS,
-              'assets': assets + list(pages), 'directories': directories,
+              'assets': assets + api_assets + list(pages), 'directories': directories,
               'repository': REPOSITORY + '/blob/' + revision + '/'}
     if OUTPUT.exists():
         shutil.rmtree(OUTPUT)
@@ -266,7 +307,12 @@ def build():
         destination.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(ROOT / name, destination)
     (OUTPUT / 'docs/site-config.js').write_text('window.DOC_SITE = ' + json.dumps(config) + ';\n')
+    for name in api_assets:
+        destination = OUTPUT / name
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(api_source / destination.name, destination)
     for name, page in pages.items():
+        (OUTPUT / name).parent.mkdir(parents=True, exist_ok=True)
         (OUTPUT / name).write_text(page)
     reader = (OUTPUT / 'docs/read.html').read_text().replace('@@NAVIGATION@@', navigation('guides', '../'))
     (OUTPUT / 'docs/read.html').write_text(reader)

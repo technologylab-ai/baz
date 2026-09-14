@@ -10,7 +10,7 @@ walks you through filling the connection limit, observing refusal, and releasing
 capacity. You control each step in your terminal.
 
 Baz configures the [bounded/http](https://technologylab-ai.github.io/bounded-http/)
-engine through `App.init`'s `server` options, and adds response and continuation
+engine through [`App.init`](https://technologylab-ai.github.io/baz/api/#baz.App.AppWithLocals.init)'s `server` options, and adds response and continuation
 limits of its own. Storage and workers are reserved before request processing.
 The settings below describe the [pinned dependency](../build.zig.zon); examples
 can override the defaults.

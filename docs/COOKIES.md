@@ -26,12 +26,12 @@ Enclosing value quotes are excluded as a borrowed sub-slice; `quoted` records th
 Names follow HTTP token syntax, so a bracketed name is invalid. Empty values are
 valid. Empty fields, malformed pairs, comma-joined cookies, and trailing separators
 are errors. No implicit URL decoding, splitting token claims, or JSON conversion.
-Use `web.params.percentDecodeInto` explicitly if your application's cookie format
+Use [`web.params.percentDecodeInto`](https://technologylab-ai.github.io/baz/api/#baz.params.percentDecodeInto) explicitly if your application's cookie format
 requires it; cookie `+` is not a form-space convention.
 
-`firstRaw(name)` selects the first descriptor, `allRaw(name)` iterates matches,
-and `uniqueRaw(name)` returns an optional value or `DuplicateCookie`.
-`request.cookie(name)` is the duplicate-rejecting shortcut with default limits.
+[`firstRaw(name)`](https://technologylab-ai.github.io/baz/api/#baz.cookies.Cookies.firstRaw) selects the first descriptor, [`allRaw(name)`](https://technologylab-ai.github.io/baz/api/#baz.cookies.Cookies.allRaw) iterates matches,
+and [`uniqueRaw(name)`](https://technologylab-ai.github.io/baz/api/#baz.cookies.Cookies.uniqueRaw) returns an optional value or `DuplicateCookie`.
+[`request.cookie(name)`](https://technologylab-ai.github.io/baz/api/#baz.Request.cookie) is the duplicate-rejecting shortcut with default limits.
 Cookies with the same name can originate from different browser paths or domains;
 the request contains no scope attributes that let Baz distinguish them reliably.
 For authentication, choosing one silently is usually the wrong policy.
@@ -41,7 +41,7 @@ and 4,096 bytes per value**. The byte bound includes field whitespace after the
 colon, across all Cookie fields. Header syntax and all other request headers are
 already bounded by the HTTP engine. Parsing adds no per-pair metadata allocation
 or hidden fixed array. Keep the source immutable for the active callback.
-Standalone `web.cookies.parse` and `parseHeaders` use the same rules.
+Standalone [`web.cookies.parse`](https://technologylab-ai.github.io/baz/api/#baz.cookies.parse) and [`parseHeaders`](https://technologylab-ai.github.io/baz/api/#baz.cookies.parseHeaders) use the same rules.
 
 Uncaught malformed/duplicate cookie errors map to 400. Cookie byte/count bounds
 map to 431; the shared name/value size errors retain Baz's 413 mapping. Examples
@@ -63,7 +63,7 @@ try ctx.response.deleteCookie("sid", .{});
 | Persistent, relative | `max_age = positive_seconds` | `Max-Age` counts from receipt. |
 | Persistent, absolute | `expires = unix_seconds` | An IMF-fixdate in GMT is emitted. |
 | Both attributes | Set both explicitly | The browser gives `Max-Age` precedence. Baz does not reconcile them. |
-| Delete | `deleteCookie(name, original_options)` | Empty value, `Max-Age=0`, epoch-zero `Expires`; original scope/flags retained. |
+| Delete | [`deleteCookie(name, original_options)`](https://technologylab-ai.github.io/baz/api/#baz.Response.deleteCookie) | Empty value, `Max-Age=0`, epoch-zero `Expires`; original scope/flags retained. |
 | Raw immediate expiry | `max_age <= 0`, or past `expires` without positive Max-Age | Requests removal. Empty value alone does not delete. |
 
 `max_age` is `?i64`; **null and zero mean different things**. `expires` is `?u64`
@@ -81,7 +81,7 @@ closing a window is not a reliable server-side logout or expiry mechanism.
 
 ## Scope and browser flags
 
-`web.cookies.Options` defaults to `Path=/`, no Domain, no expiry, `HttpOnly`,
+[`web.cookies.Options`](https://technologylab-ai.github.io/baz/api/#baz.cookies.Options) defaults to `Path=/`, no Domain, no expiry, `HttpOnly`,
 `SameSite=Lax`, and `secure=false` for Baz's local HTTP examples.
 
 | Option | Contract |
@@ -101,14 +101,14 @@ original name, Path and Domain/host-only scope; deleting `/` does not clear `/ap
 
 Values use cookie-octet syntax: no controls, whitespace, quotes, comma, semicolon,
 backslash or non-ASCII bytes. Baz never encodes them automatically. Use an explicit
-application format such as hex or base64url for binary data. Each `setCookie` adds
+application format such as hex or base64url for binary data. Each [`setCookie`](https://technologylab-ai.github.io/baz/api/#baz.Response.setCookie) adds
 an independent field; Baz never comma-folds `Set-Cookie`. There is no automatic
 replacement of another same-name field. Browser cookie-size limits can be lower
 than your configured response header capacity.
 
 This first typed API covers these common attributes. Partitioned/CHIPS, Priority,
 and newer prefix extensions are not typed conveniences yet. The generic validated
-`header` API remains available for application-authored extension fields.
+[`header`](https://technologylab-ai.github.io/baz/api/#baz.Response.header) API remains available for application-authored extension fields.
 
 ## Redirect and response composition
 
@@ -133,7 +133,7 @@ Do not pass arbitrary user-controlled destinations without application validatio
 No URL decoding, redirect following, HTML body or cache policy is implicit.
 
 An existing Location makes `redirect` fail with `DuplicateLocation`. A second body
-choice fails with `InvalidState`. Generic `header` calls remain caller-controlled;
+choice fails with `InvalidState`. Generic [`header`](https://technologylab-ai.github.io/baz/api/#baz.Response.header) calls remain caller-controlled;
 do not append another Location afterward. Validation, capacity and alias errors
 leave cookie/redirect draft bytes and metadata unchanged, so a caught error can
 prepare an alternative. Header inputs may use stack storage: the call copies them.
@@ -142,7 +142,7 @@ Cookies can accompany text, JSON, Mustache, a borrowed body, or a stream. Add th
 before publication; streams freeze headers at their first flush. They cannot be
 sent as new cookies halfway through a flushed response. Redirect is itself the
 whole-body choice, so it cannot be combined with another body or a stream.
-Every field counts against `ResponseLimits.header_bytes` and `max_headers`.
+Every field counts against [`ResponseLimits.header_bytes`](https://technologylab-ai.github.io/baz/api/#baz.ResponseLimits) and `max_headers`.
 Header formatting/copying is separate from the body-copy counter; see
 [ownership and response copies](OWNERSHIP.md#response-copies-and-borrowing).
 

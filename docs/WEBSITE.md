@@ -8,7 +8,8 @@ The overview, guides, diagrams, examples, and measurements are specific to Baz.
 
 ## Build and preview
 
-Use Python 3; no Node package installation or network fetch is needed to build:
+Use Python 3 and exact Zig 0.16.0 from `.zig-version`. The first build fetches
+checksum-pinned Zig dependencies; no Node package installation is needed:
 
 ```sh
 python3 tools/build_pages.py
@@ -18,7 +19,7 @@ python3 -m http.server 8081 --bind 127.0.0.1 --directory .zig-cache/github-pages
 Open `http://127.0.0.1:8081/`. Stop the preview with Ctrl-C.
 The generated artifact is ignored and can be recreated from the repository.
 The overview and topic pages also open from disk, with local styles and assets.
-The Markdown reader uses `fetch`, so preview it over HTTP.
+The Markdown reader and API explorer use `fetch`, so preview them over HTTP.
 
 The [Pages workflow](../.github/workflows/pages.yml) builds and checks pull requests.
 Pushes to Baz’s `main` deploy the artifact through GitHub Actions.
@@ -39,6 +40,7 @@ reader, and identifies the current page. Longer pages also have local section li
 | `examples.html` | All 26 filterable example cards, Mustache introduction, and build commands |
 | `performance.html` | Original comparison, four profiles, chart, methodology, limitations, and evidence |
 | `roadmap.html` | Implemented, planned, and deferred work, with native verification scope |
+| `api/index.html` | Source-generated types, functions, search, and source browser |
 | `guides.html` | Complete grouped directory generated from `GUIDES.md` |
 
 The former Typed / Explicit / Bounded facts and three principle cards are
@@ -120,11 +122,11 @@ Their licenses remain separate from Baz’s MIT license.
 ## Verification
 
 `build_pages.py` runs [static checks](../tools/check_site.py) for artifact links,
-anchors across all seven pages and the reader, current-page navigation, accessible SVG names, example count, all four performance profiles,
+anchors across all seven topic pages, the API reference, and the reader, current-page navigation, accessible SVG names, example count, all four performance profiles,
 allowlist contents, and unchanged copied documents. The workflow also checks
-the authored JavaScript syntax.
+the authored JavaScript syntax and runs the headless browser suite.
 
-The optional [Chromium browser checks](../tools/check_site_browser.mjs) exercise
+The [Chromium browser checks](../tools/check_site_browser.mjs) exercise
 desktop/mobile layouts, keyboard navigation, filters, reader fragments,
 all published documents, rejected paths, sanitized Markdown, printing, legacy
 fragments, and all pages without JavaScript. It checks every page at 320, 390,
@@ -141,3 +143,49 @@ before browser suites. Apply a finite external watchdog, retain the reservation
 through browser and server cleanup, and remove only your own lock.
 Cross-width browser checks qualify the website layout; they are not Baz HTTP
 runtime or performance evidence. Windows platform claims are backed by [Baz’s native receipt](../reports/2026-09-06-windows-baz.md).
+
+## Generated API reference
+
+`zig build docs -Doptimize=ReleaseSafe` installs standalone Zig Autodoc at
+`zig-out/docs/api/`. The website builder runs this step before publishing the
+viewer at `api/index.html`, including its JavaScript, WebAssembly, and source
+archive. The build uses the same public module and dependency graph as consumers.
+`src/baz.zig` is the documented package entry point; `@import("baz")` is unchanged.
+
+Zig 0.16.0's `std.Build.Step.Compile.getEmittedDocs()` emits the viewer. Autodoc
+recognizes `root.zig` or a file matching the module name; otherwise it uses the
+first source archive member for that module (`lib/docs/wasm/main.zig`, `unpack`).
+Baz now follows the name convention. The imported engine and Mustache modules
+have differently named roots, so `tools/prepare_api_docs.py` orders the actual
+build-graph roots first. Every source path and byte is retained; compiler
+JavaScript and WebAssembly are copied unchanged. The preparation fails on a
+missing root or a conflicting filename heuristic. `api-build.json` records roots,
+source hashes, and the original viewer hashes. The publication manifest records
+the final themed HTML and every deployed asset.
+
+`docs/api.css` uses the shared site tokens and `page.template.html` supplies the
+same navigation, typography, and footer. Only the generated logo, inline CSS,
+and outer shell are replaced. `docs/api.js` brands the title and makes scrollable
+code keyboard-focusable. Zig owns search, symbol links, signatures, documentation,
+and source rendering. Only this page permits `wasm-unsafe-eval` in its CSP;
+inline scripts and JavaScript eval remain disallowed. All assets load locally.
+
+Autodoc is experimental and syntax-based. Generic App members are browsable,
+but inferred errors and types may be incomplete; visible struct fields also
+include framework bookkeeping. The source and ownership guides remain necessary
+when a generated entry is ambiguous. The explorer needs JavaScript and WebAssembly;
+a no-JavaScript message links to public source and guides. Browser checks cover
+root selection, generics, dependency roots, search, source links, printing, theme,
+and five viewport widths. API fragments are viewer routes, checked in the browser
+rather than treated as static HTML anchors.
+
+The generated viewer and standard library retain the [Zig MIT notice](vendor/zig-LICENSE);
+bundled Mustache sources retain their [MIT notice](vendor/mustache-LICENSE).
+
+API names in the current prose guides link to their generated reference pages.
+The browser suite resolves every distinct API destination from published Markdown
+and HTML; code blocks remain unchanged. Historical design documents retain their
+original API vocabulary rather than linking proposed or former Zap APIs to Baz.
+
+App member links use Zig's canonical `baz.App.AppWithLocals` declaration path;
+`App` is a convenience type function whose implementation returns that type.

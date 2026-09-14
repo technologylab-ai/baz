@@ -53,15 +53,15 @@ engine owner's monotonic clock and its existing polling cadence (up to 10 ms),
 so they may run late. Zero requests another scheduled callback; it is not recursion.
 The original request deadline stays fixed across all flushes and waits.
 
-`Snapshot.writer()` is a standard `std.Io.Writer`; `writeAll`, `print`, and the
+[`Snapshot.writer()`](https://technologylab-ai.github.io/baz/api/#baz.Snapshot.writer) is a standard `std.Io.Writer`; `writeAll`, `print`, and the
 handle's convenience methods copy into a fixed staging area. Ordinary writer
 `flush()` validates local writer state and **does not send an HTTP snapshot**;
 return `.flush` to publish. A full snapshot fails with a sticky `ResponseLimit`.
 Split larger output across explicit callbacks. There is no automatic blocking
-flush. `failure()` reports the underlying error after `WriteFailed`.
+flush. [`failure()`](https://technologylab-ai.github.io/baz/api/#baz.Snapshot.failure) reports the underlying error after `WriteFailed`.
 
-`StreamOptions.content_length` optionally checks an exact cumulative length;
-default framing is chunked. `ResponseLimits.body_bytes` bounds each snapshot and
+[`StreamOptions.content_length`](https://technologylab-ai.github.io/baz/api/#baz.Response.StreamOptions) optionally checks an exact cumulative length;
+default framing is chunked. [`ResponseLimits.body_bytes`](https://technologylab-ai.github.io/baz/api/#baz.ResponseLimits) bounds each snapshot and
 `server.max_response_bytes` bounds the whole response. Headers become immutable
 at first publication. Before publication errors use the normal mapper; afterward
 they close the connection. Final length and write errors cannot be hidden by

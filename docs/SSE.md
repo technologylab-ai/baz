@@ -1,7 +1,7 @@
 # Server-sent events and application notifications
 
 Baz encodes SSE directly into the existing `std.Io.Writer` response interfaces.
-Use a worker `Stream` for a linear handler, or a continuation `Snapshot` when
+Use a worker [`Stream`](https://technologylab-ai.github.io/baz/api/#baz.Stream) for a linear handler, or a continuation [`Snapshot`](https://technologylab-ai.github.io/baz/api/#baz.Snapshot) when
 many waiting clients should share a small worker pool. No event string allocation
 or automatic flush is hidden in the encoder.
 
@@ -17,14 +17,14 @@ return .flush;
 ```
 
 This is the start of a continuation handler. Register it with
-`routeContinuation`, set `max_continuations`, and use `resumeSnapshot()` on
-subsequent callbacks. With a worker stream, explicitly `flushAndWait()` after
+[`routeContinuation`](https://technologylab-ai.github.io/baz/api/#baz.App.AppWithLocals.routeContinuation), set `max_continuations`, and use [`resumeSnapshot()`](https://technologylab-ai.github.io/baz/api/#baz.Response.resumeSnapshot) on
+subsequent callbacks. With a worker stream, explicitly [`stream.flush()`](https://technologylab-ai.github.io/baz/api/#baz.Stream.flush) after
 writing instead. Ordinary writer `flush()` does not publish a continuation.
 See [typed continuations](CONTINUATIONS.md) and [worker streaming](STREAMING.md).
 
 ## Encoding is explicit
 
-`web.sse.write(writer, Event)` validates UTF-8 and every metadata field before
+[`web.sse.write(writer, Event)`](https://technologylab-ai.github.io/baz/api/#baz.sse.write) validates UTF-8 and every metadata field before
 writing. `data` may contain multiple lines: CRLF, CR and LF become properly
 prefixed data lines. Empty data dispatches an empty event; a trailing newline
 is preserved. Event names reject CR/LF; IDs reject CR/LF/NUL. These are ordinary
@@ -34,8 +34,8 @@ failed response instead of continuing with another event.
 An omitted `event` selects the default browser `message` event. An omitted `id`
 preserves the browser's previous ID; an empty ID resets it. `retry_ms` is an
 explicit unsigned millisecond reconnect hint, including zero. Neither an ID nor
-a retry hint creates a replay queue. `comment(writer, text)` safely prefixes
-every comment line; `heartbeat(writer)` writes `:\n\n` without an application
+a retry hint creates a replay queue. [`comment(writer, text)`](https://technologylab-ai.github.io/baz/api/#baz.sse.comment) safely prefixes
+every comment line; [`heartbeat(writer)`](https://technologylab-ai.github.io/baz/api/#baz.sse.heartbeat) writes `:\n\n` without an application
 event. The application chooses when to send and flush heartbeats.
 
 These helpers implement the [WHATWG event stream format](https://html.spec.whatwg.org/multipage/server-sent-events.html).
@@ -62,7 +62,7 @@ Use the mailbox or explicit application synchronization for those bytes.
 
 Generation checks prevent an old request's handle from waking a reused slot.
 A stale handle is callable only while its engine storage remains alive:
-**stop and join every producer before `App.deinit()`**. Handles own no request
+**stop and join every producer before [`App.deinit()`](https://technologylab-ai.github.io/baz/api/#baz.App.AppWithLocals.deinit)**. Handles own no request
 bytes and do not extend App lifetime. Never pass Context or response-writer
 pointers to producers. Cancellation, fixed request deadlines and output-borrow
 reconciliation retain the same [continuation ownership contract](CONTINUATIONS.md).
@@ -75,9 +75,9 @@ io_uring, kqueue and IOCP transports.
 
 ## Bounded messages
 
-`web.Mailbox(T, capacity)` embeds a fixed FIFO. `tryPush` reports `Full`, `Busy`
-or `Closed`; `tryPop` returns a copied value or null, reports `Busy` on contention,
-and reports `Closed` after queued values drain. `tryClose` rejects further
+[`web.Mailbox(T, capacity)`](https://technologylab-ai.github.io/baz/api/#baz.Mailbox) embeds a fixed FIFO. [`tryPush`](https://technologylab-ai.github.io/baz/api/#baz.Mailbox.tryPush) reports `Full`, `Busy`
+or `Closed`; [`tryPop`](https://technologylab-ai.github.io/baz/api/#baz.Mailbox.tryPop) returns a copied value or null, reports `Busy` on contention,
+and reports `Closed` after queued values drain. [`tryClose`](https://technologylab-ai.github.io/baz/api/#baz.Mailbox.tryClose) rejects further
 pushes while preserving queued values. Operations never wait for a lock,
 allocate, overwrite old messages or silently discard a value.
 

@@ -32,5 +32,21 @@
       "purify-LICENSE": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
       "purify-LICENSE-MPL": "fab3dd6bdab226f1c08630b1dd917e11fcb4ec5e1e020e2c16f83a0a13863e85"
     }
+  },
+  {
+    "name": "Zig Autodoc and standard library",
+    "version": "0.16.0",
+    "source": "https://ziglang.org/download/0.16.0/",
+    "files_sha256": {
+      "zig-LICENSE": "5c537d6853e005298a285d508cff9ac7192cea23576c840d485b2b586a7ff177"
+    }
+  },
+  {
+    "name": "Mustache source archive notice",
+    "revision": "22487e4082537aa5b707dd902def866d990fdea1",
+    "source": "https://github.com/technologylab-ai/mustache-zig/tree/22487e4082537aa5b707dd902def866d990fdea1",
+    "files_sha256": {
+      "mustache-LICENSE": "33f9d4e30896bb820c52d1565f6f38638ea891b0ba95d89c6de1ad7c051984c1"
+    }
   }
 ]

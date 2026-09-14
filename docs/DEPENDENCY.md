@@ -17,7 +17,7 @@ The dependency key and imported engine module are `bounded_http`.
 
 Baz imports the module returned by `dependency.module("bounded_http")`.
 Every Baz module and test uses that same engine module object.
-`baz.engine` reexports the module; the build also exports it for direct consumers.
+[`baz.engine`](https://technologylab-ai.github.io/baz/api/#baz.engine) reexports the module; the build also exports it for direct consumers.
 The [independent consumer](../examples/embedding/build.zig) tests both imports together.
 
 The dependency owns HTTP framing, connection storage, scheduling, transports, and kernel completion handling.
@@ -37,7 +37,7 @@ It does not inspect writer fields or call internal lifecycle methods.
 `beginWithHeaders` validates and copies Content-Type and additional header lines synchronously.
 Generated-body compaction contributes to `Stats.response_draft_copy_bytes`.
 
-App delegates signal stopping to `Cluster.requestStopFromSignal`.
+App delegates signal stopping to [`Cluster.requestStopFromSignal`](https://technologylab-ai.github.io/baz/api/#baz.Cluster.requestStopFromSignal).
 That helper only stores atomic stop flags and performs no wake or other system call.
 The callback-progress and external-watchdog limits still apply.
 
@@ -100,7 +100,7 @@ Baz build graph. No zli code runs on the request I/O loop.
 
 ## Mustache templates
 
-Baz's public `web.mustache` adapter consumes the immutable URL/hash-pinned
+Baz's public [`web.mustache`](https://technologylab-ai.github.io/baz/api/#baz.mustache) adapter consumes the immutable URL/hash-pinned
 [pure Zig Mustache fork](https://github.com/technologylab-ai/mustache-zig). The
 module is imported internally as `mustache_engine`; consumers use Baz's wrapper.
 The library is MIT licensed and requires exact Zig 0.16.0. We maintain this fork

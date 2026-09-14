@@ -16,17 +16,61 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - name: Install exact checksum-verified Zig
+        shell: bash
+        run: |
+          python3 - <<'PYTHON'
+          import hashlib, json, os, pathlib, platform, tarfile, urllib.request
+          version = pathlib.Path('.zig-version').read_text().strip()
+          assert version == '0.16.0', 'Expected exact Zig 0.16.0'
+          architecture = {'x86_64': 'x86_64', 'arm64': 'aarch64', 'aarch64': 'aarch64'}[platform.machine()]
+          system = {'Linux': 'linux', 'Darwin': 'macos'}[platform.system()]
+          with urllib.request.urlopen('https://ziglang.org/download/index.json', timeout=30) as response:
+              artifact = json.load(response)[version][f'{architecture}-{system}']
+          assert artifact['tarball'].startswith('https://ziglang.org/')
+          directory = pathlib.Path(os.environ['RUNNER_TEMP']) / 'baz-zig'
+          directory.mkdir()
+          archive = directory / 'zig.tar.xz'
+          with urllib.request.urlopen(artifact['tarball'], timeout=180) as response:
+              archive.write_bytes(response.read())
+          assert hashlib.sha256(archive.read_bytes()).hexdigest() == artifact['shasum']
+          with tarfile.open(archive) as package:
+              package.extractall(directory, filter='data')
+          compiler, = directory.glob('*/zig')
+          with open(os.environ['GITHUB_PATH'], 'a') as path:
+              path.write(str(compiler.parent) + '\n')
+          PYTHON
+
       - name: Build and check the static site
         run: |
           python3 tools/build_pages.py
-          for script in docs/site.js docs/highlight-zig.js docs/reader.js; do
+          for script in docs/site.js docs/highlight-zig.js docs/reader.js docs/api.js; do
             node --check "$script"
           done
+      - name: Check the website and API in headless Chrome
+        shell: bash
+        run: |
+          set -euo pipefail
+          export BROWSER="$(command -v google-chrome)"
+          python3 -m http.server 8081 --bind 127.0.0.1 --directory .zig-cache/github-pages > "$RUNNER_TEMP/baz-pages-server.log" 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid"; wait "$server_pid" || true' EXIT
+          timeout 360s node tools/check_site_browser.mjs http://127.0.0.1:8081/ .zig-cache/website-qa
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: always()
+        with:
+          name: baz-pages-browser
+          path: |
+            .zig-cache/website-qa/*.json
+            .zig-cache/website-qa/*.png
+            .zig-cache/website-qa/*.pdf
+          if-no-files-found: warn
+          retention-days: 14
       - uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4
         with:
           path: .zig-cache/github-pages
