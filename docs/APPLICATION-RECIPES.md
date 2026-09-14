@@ -31,7 +31,7 @@ zig build hello -Doptimize=ReleaseSafe
 
 Open `http://YOUR-LAN-IP:8080/` on another device. Stop the server with Ctrl-C.
 The shared example CLI accepts four decimal octets; embedded applications can
-use `web.Config.parseBindAddress(text)`. The server still speaks plain HTTP/1.1.
+use [`web.Config.parseBindAddress(text)`](https://technologylab-ai.github.io/baz/api/#bounded_http.Config.parseBindAddress). The server still speaks plain HTTP/1.1.
 
 ## Copy a runtime file into a response
 

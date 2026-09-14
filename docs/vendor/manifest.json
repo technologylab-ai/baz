@@ -48,5 +48,13 @@
     "files_sha256": {
       "mustache-LICENSE": "33f9d4e30896bb820c52d1565f6f38638ea891b0ba95d89c6de1ad7c051984c1"
     }
+  },
+  {
+    "name": "zli source archive notice",
+    "revision": "4f17b1f1eacda7b87c49461e34b1520c392788b2",
+    "source": "https://github.com/renerocksai/zli/tree/4f17b1f1eacda7b87c49461e34b1520c392788b2",
+    "files_sha256": {
+      "zli-LICENSE": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+    }
   }
 ]

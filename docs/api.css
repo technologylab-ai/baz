@@ -38,3 +38,9 @@
 .api-viewer .tok-number{color:#815014}.api-viewer .tok-comment{color:#69757b;font-style:italic}.api-viewer .tok-fn{color:#743c7c}
 @media(max-width:760px){.api-viewer pre{font-size:12px}.api-shortcuts{gap:8px 16px}.api-viewer #hdrName{font-size:30px}.api-viewer #listNav{margin-bottom:20px}}
 @media print{.api-shortcuts,.api-viewer #navWrap,.api-viewer #helpDialog,.api-viewer #errors{display:none!important}.api-viewer .source-code{display:block;overflow:visible}.api-viewer .source-line-numbers{display:none}.api-viewer .source-text{min-width:0}.api-viewer pre{white-space:pre-wrap;overflow-wrap:anywhere;overflow:visible}.api-viewer #hdrName a{display:none}}
+
+.api-packages{margin:0 0 26px;border-block:1px solid var(--line);padding:12px 0;font-size:14px;color:var(--muted)}
+.api-packages summary{cursor:pointer;color:var(--ink)}
+.api-packages summary:focus-visible{outline:3px solid var(--accent);outline-offset:5px}
+.api-packages p{margin:16px 0 10px}.api-packages ul{margin:0;padding-left:22px}.api-packages li{margin:8px 0}
+@media print{.api-packages{display:none}}
