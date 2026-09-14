@@ -14,6 +14,72 @@ OUTPUT = ROOT / '.zig-cache/github-pages'
 REPOSITORY = 'https://github.com/technologylab-ai/baz'
 # Pages does not serve dot-prefixed paths. Keep the reader's canonical file name.
 DOCUMENT_URLS = {'.zig-version': 'docs/zig-version.txt'}
+PAGES = {
+    'index': ('Overview', 'Baz — Bounded Async Zap', 'Pure Zig 0.16.0, typed applications, streaming responses, and explicit memory boundaries.', []),
+    'get-started': ('Get started', 'Build your first App', 'Run Baz, explore a typed endpoint, stream updates, and send borrowed file bodies.', [('start', 'Run the demo'), ('app-example', 'App basics'), ('streaming', 'Streaming'), ('borrowed', 'Avoid body copies')]),
+    'design': ('Design', 'How Baz fits together', 'The Zap heritage, HTTP engine, request data, ownership, limits, and backpressure.', [('idea', 'The idea'), ('engine', 'HTTP engine'), ('data', 'Request data'), ('limits', 'Limits & backpressure')]),
+    'examples': ('Examples', 'Learn from working code', 'Explore all 26 maintained Baz examples, from a first route to a complete live application.', []),
+    'performance': ('Performance', 'Measurements with context', 'The original Baz prototype and Zap comparison, including every profile, condition, and evidence link.', []),
+    'roadmap': ('Roadmap', 'Where Baz stands', 'Implemented features, native correctness gates, planned API work, and deferred capabilities.', []),
+    'guides': ('Guides', 'Guides & API reference', 'Every Baz guide, grouped by application building, streaming, ownership, and project evidence.', []),
+}
+
+
+def navigation(current, prefix=''):
+    return '\n'.join('<a href="{}{}.html"{}>{}</a>'.format(
+        prefix, name, ' aria-current="page"' if current == name else '', html.escape(meta[0]))
+        for name, meta in PAGES.items())
+
+
+def render_pages(replacements):
+    """Share the shell, keep each chapter in one source, and retain old bookmarks."""
+    from check_site import Page
+    contents = {name: (ROOT / ('docs/' + name + '.template.html')).read_text() for name in PAGES}
+    for key, value in replacements.items():
+        token = '@@' + key + '@@'
+        if sum(content.count(token) for content in contents.values()) != 1:
+            raise ValueError('Expected one content slot across pages: ' + key)
+        contents = {name: content.replace(token, value) for name, content in contents.items()}
+    legacy = {}
+    for name, content in contents.items():
+        if name != 'index':
+            for anchor in sorted(Page(content).ids):
+                if anchor in legacy:
+                    raise ValueError('Ambiguous legacy anchor: ' + anchor)
+                legacy[anchor] = name + '.html#' + anchor
+    fallback = '<noscript><section class="chapter"><h2>Looking for an old section?</h2><p>The sections now have their own pages.</p><ul>'
+    for anchor in ['idea', 'start', 'app', 'app-example', 'streaming', 'borrowed', 'engine', 'data', 'limits', 'examples', 'performance', 'next', 'docs']:
+        fallback += '<li id="{}"><a href="{}">{}</a></li>'.format(anchor, legacy[anchor], html.escape(anchor.replace('-', ' ').title()))
+    fallback += '</ul></section></noscript>'
+    contents['index'] = contents['index'].replace('@@LEGACY_FALLBACK@@', fallback)
+    # All authored cross-page links go straight to their destination, even without JS.
+    for name, content in contents.items():
+        contents[name] = re.sub(r'href="#([^"]+)"', lambda match:
+            'href="' + (legacy[match[1]] if match[1] in legacy and not legacy[match[1]].startswith(name + '.html#') else '#' + match[1]) + '"', content)
+    shell = (ROOT / 'docs/page.template.html').read_text()
+    pages = {}
+    for name, (label, title, description, sections) in PAGES.items():
+        intro = ''
+        if name != 'index':
+            intro = '<header class="page-intro"><p class="eyebrow">Baz / {}</p><h1>{}</h1>'.format(html.escape(label), html.escape(title))
+            if sections:
+                intro += '<nav class="page-contents" aria-label="On this page">' + ''.join(
+                    '<a href="#{}">{}</a>'.format(anchor, html.escape(text)) for anchor, text in sections) + '</nav>'
+            intro += '</header>'
+        values = {'TITLE': title + ' · Baz' if name != 'index' else title, 'DESCRIPTION': description,
+                  'CANONICAL': 'https://technologylab-ai.github.io/baz/' + (name + '.html' if name != 'index' else ''),
+                  'PAGE_CLASS': 'home' if name == 'index' else 'topic-page' + ('' if sections else ' single-topic'), 'NAVIGATION': navigation(name),
+                  'PAGE_INTRO': intro, 'CONTENT': contents[name],
+                  'LEGACY_SCRIPT': '<script defer src="docs/legacy-links.js"></script>' if name == 'index' else ''}
+        page = shell
+        for key, value in values.items():
+            page = page.replace('@@' + key + '@@', html.escape(value, quote=True) if key in ['TITLE', 'DESCRIPTION', 'CANONICAL'] else value)
+        if re.search(r'@@[A-Z_]+@@', page):
+            raise ValueError('Unfilled template slot: ' + name)
+        pages[name + '.html'] = page
+    return pages, legacy
+
+
 EXAMPLES = [
     ('hello', 'routing', 'A minimal HTML response and an explicit route.'),
     ('hello2', 'routing', 'Inspect methods, raw queries, headers, and bounded bodies.'),
@@ -140,7 +206,7 @@ def guide_directory(docs):
         raise ValueError('Stale or redundant guide directory exclusions.')
     if not groups or any(not entries for _, entries in groups):
         raise ValueError('Guide directory groups must contain links.')
-    return '\n'.join('<div class="guide-group"><h3>{}</h3><div class="resource-links">{}</div></div>'.format(
+    return '\n'.join('<div class="guide-group"><h2>{}</h2><div class="resource-links">{}</div></div>'.format(
         html.escape(title), '\n'.join(entries)) for title, entries in groups)
 
 
@@ -186,17 +252,11 @@ def build():
                     'RESULTS': results, 'PERFORMANCE': scroll_diagram(chart), 'GUIDES': guide_directory(docs)}
     for token, name in [('PARAMETERS', 'parameters'), ('LAYERS', 'layers'), ('LIFETIME', 'lifetime'), ('BACKPRESSURE', 'backpressure')]:
         replacements[token] = scroll_diagram((ROOT / ('docs/diagrams/' + name + '.svg')).read_text())
-    page = (ROOT / 'docs/index.template.html').read_text()
-    for key, value in replacements.items():
-        if page.count('@@' + key + '@@') != 1:
-            raise ValueError('Expected one template slot: ' + key)
-        page = page.replace('@@' + key + '@@', value)
-    if re.search(r'@@[A-Z]+@@', page):
-        raise ValueError('Unfilled template slot.')
+    pages, legacy = render_pages(replacements)
     tracked = subprocess.check_output(['git', 'ls-files', '--cached', '--others', '--exclude-standard'], cwd=ROOT, text=True).splitlines()
     directories = sorted({str(parent) for file in tracked for parent in Path(file).parents if str(parent) != '.'})
     config = {'documents': docs, 'documentUrls': DOCUMENT_URLS,
-              'assets': assets + ['index.html'], 'directories': directories,
+              'assets': assets + list(pages), 'directories': directories,
               'repository': REPOSITORY + '/blob/' + revision + '/'}
     if OUTPUT.exists():
         shutil.rmtree(OUTPUT)
@@ -206,7 +266,15 @@ def build():
         destination.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(ROOT / name, destination)
     (OUTPUT / 'docs/site-config.js').write_text('window.DOC_SITE = ' + json.dumps(config) + ';\n')
-    (OUTPUT / 'index.html').write_text(page)
+    for name, page in pages.items():
+        (OUTPUT / name).write_text(page)
+    reader = (OUTPUT / 'docs/read.html').read_text().replace('@@NAVIGATION@@', navigation('guides', '../'))
+    (OUTPUT / 'docs/read.html').write_text(reader)
+    (OUTPUT / 'docs/legacy-links.js').write_text(
+        '/* Preserve bookmarks from the former single-page site. */\n(() => {\n  const destinations = ' + json.dumps(legacy, sort_keys=True) + ';\n'
+        '  function redirect() {\n    const target = destinations[location.hash.slice(1)];\n'
+        '    if (typeof target === "string") location.replace(new URL(target, location.href).href);\n  }\n'
+        '  window.addEventListener("hashchange", redirect);\n  redirect();\n})();\n')
     (OUTPUT / '.nojekyll').write_text('')
     hashes = {str(p.relative_to(OUTPUT)): hashlib.sha256(p.read_bytes()).hexdigest()
               for p in sorted(OUTPUT.rglob('*')) if p.is_file()}

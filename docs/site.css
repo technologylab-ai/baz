@@ -13,4 +13,25 @@
 @media screen and (max-width:480px){.transport-specs{grid-template-columns:1fr}.transport-specs>div{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 16px;border-right:0;border-bottom:1px solid var(--line)}.transport-specs>div:last-child{border-bottom:0}.transport-specs dd{margin:0;font-size:22px}}
 
 /* Shared guide directory: descriptions stay with their destination links. */
-.guide-group{margin-top:42px}.guide-group h3{margin-bottom:0}.guide-group .resource-links{margin-top:12px;gap:0 40px}.resource-links .guide-summary{color:var(--ink)}.guide-summary strong{font-weight:500}.guide-summary small{display:block;color:var(--muted);font-size:13px;line-height:1.65;margin-top:6px}.guide-group .resource-links a:hover strong{text-decoration:underline;text-underline-offset:4px}
+.guide-group{margin-top:42px}.guide-group h2{font-size:25px;letter-spacing:0;margin-bottom:0}.guide-group .resource-links{margin-top:12px;gap:0 40px}.resource-links .guide-summary{color:var(--ink)}.guide-summary strong{font-weight:500}.guide-summary small{display:block;color:var(--muted);font-size:13px;line-height:1.65;margin-top:6px}.guide-group .resource-links a:hover strong{text-decoration:underline;text-underline-offset:4px}
+
+/* Topic pages share a compact introduction and local section navigation. */
+.page-intro{padding:48px 0 28px;border-bottom:1px solid var(--line)}
+.page-intro h1{font:500 clamp(38px,4.8vw,64px)/1.1 var(--serif);letter-spacing:-2px;margin:0;max-width:900px}
+.page-intro .eyebrow{margin-bottom:16px}
+.page-contents{display:flex;flex-wrap:wrap;gap:10px 24px;margin-top:24px;font-size:14px}
+.rail nav a[aria-current=page]{font-weight:600}
+.home .hero{padding-top:54px}.home .tags{margin-bottom:0}
+.home .principles a{font-size:14px}.home .chapter{padding:44px 0}
+@media(max-width:760px){
+  .page-intro{padding:32px 0 24px}.page-intro h1{letter-spacing:-1.3px}
+  .page-contents{gap:10px 20px}.home .hero{padding-top:36px}
+  html:not(.site-ready) .rail{position:relative;flex-wrap:wrap;gap:18px}
+  html:not(.site-ready) .rail nav{display:grid;position:static;width:100%;grid-template-columns:1fr 1fr;padding:0;border:0;max-height:none;gap:14px}
+  html:not(.site-ready) .mobile-menu{display:none}
+}
+@media print{.page-contents{display:none}.page-intro{padding-top:0}.page-intro h1{font-size:32pt}}
+
+.single-topic .page-intro{border-bottom:0;padding-bottom:0}.single-topic section.chapter{padding-top:24px}
+
+.status-card h2{font-size:23px;letter-spacing:0;margin:0 0 12px}

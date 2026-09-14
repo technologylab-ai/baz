@@ -1,0 +1,41 @@
+<section class="chapter" id="idea">
+    <p class="eyebrow">The idea</p><h2>The good parts of Zap.<br>A fresh foundation.</h2>
+    <p class="intro"><a href="https://github.com/zigzap/zap">Zap</a> made building Zig web applications approachable. Baz carries forward its App and endpoint ergonomics, with a new API and a separate, bounded HTTP engine underneath.</p>
+    <p class="intro">The framework and its HTTP engine are written in Zig. Baz replaces Zap’s facil.io C foundation with <a href="https://technologylab-ai.github.io/bounded-http/">bounded/http</a>.</p>
+    <p class="platform-note"><strong>Native Windows support, too.</strong> Baz runs on Linux, macOS, and Windows x64—an addition to <a href="https://github.com/zigzap/zap/blob/master/README.md">Zap’s platform support</a>. <a href="docs/read.html?file=reports/2026-09-06-windows-baz.md">Read the native evidence →</a></p>
+
+    <p class="note">Baz is a new framework, with its own package and API. The <a href="docs/read.html?file=docs/APP-API.md#from-zap">migration guide</a> maps familiar Zap concepts to their Baz equivalents.</p>
+  </section>
+<section class="chapter" id="engine">
+    <p class="eyebrow">Built on <a href="https://technologylab-ai.github.io/bounded-http/">bounded/http</a></p><h2>Application ergonomics above.<br>HTTP ownership underneath.</h2>
+    <p class="intro">Its foundation, <a href="https://technologylab-ai.github.io/bounded-http/">bounded/http</a>, takes inspiration from <a href="https://tigerstyle.dev">TigerStyle</a>: set explicit limits, reserve resources up front, and check ownership invariants. Connections, buffers, queues, and workers have fixed capacities; request sizes, response sizes, and I/O deadlines have enforced limits. When capacity runs out, the engine applies backpressure or rejects work instead of growing without bounds. <a href="#limits">See how limits and backpressure fit together →</a> These guarantees cover the framework’s resources; application code still owns its memory use and must cooperate with cancellation.</p>
+    <p class="intro">Baz imports <code>bounded_http</code> as a pinned external dependency. The engine stays independently usable. Baz supplies the application layer: routing, request views, endpoint composition, and responses.</p>
+    <figure>@@LAYERS@@<figcaption>Two packages, one explicit boundary. Baz uses the engine’s public embedding API; transport and scheduler changes belong upstream.</figcaption></figure>
+    <div class="columns"><div><h3>Use Zig’s std.Io today.</h3><p class="note">Pass your caller’s <code>std.Io</code> at initialization. Standard memory readers and writers work inline. Finite blocking services require explicit fixed workers; the provider’s resource use remains the application’s responsibility.</p></div><div><h3>Keep the engine’s transports.</h3><p class="note">Baz supports Linux with io_uring, macOS with kqueue, and native Windows x64 with IOCP. HTTP transport uses the engine directly. A Baz-owned <code>std.Io</code> implementation is a later design step.</p></div></div>
+    <figure>@@LIFETIME@@<figcaption>Output pressure can delay dispatch. It does not replay your one-shot handler. Storage is reusable only after all application and kernel borrows return.</figcaption></figure>
+    <div class="actions"><a class="button" href="https://technologylab-ai.github.io/bounded-http/">Explore bounded/http <span aria-hidden="true">↗</span></a><a class="button" href="https://github.com/technologylab-ai/bounded-http">Engine source <span aria-hidden="true">↗</span></a></div>
+  </section>
+<section class="chapter" id="data">
+    <p class="eyebrow">Data stays data</p><h2>No guessing what<br>your parameters mean.</h2>
+    <p class="intro">Query parameters and URL-encoded forms are ordered lists of raw text slices. Decode when needed, into a buffer you supply. Repeated fields remain repeated fields; <code>files[]</code> is simply a name.</p>
+    <figure>@@PARAMETERS@@<figcaption>A raw query keeps spelling and ordering. The selected decoder determines how <code>+</code> is treated.</figcaption></figure>
+    <div class="table-scroll" tabindex="0" aria-label="Scrollable decoding reference"><table><thead><tr><th>Input</th><th>Raw value</th><th>Explicit operation</th><th>Result</th></tr></thead><tbody>
+      <tr><td><code>id=001</code></td><td><code>001</code></td><td>Read the slice</td><td>Text, including leading zeros</td></tr>
+      <tr><td><code>enabled=false</code></td><td><code>false</code></td><td>Read the slice</td><td>Text; no boolean conversion</td></tr>
+      <tr><td><code>q=a+b%2Bc</code></td><td><code>a+b%2Bc</code></td><td><code>percentDecodeInto</code></td><td><code>a+b+c</code></td></tr>
+      <tr><td><code>q=a+b%2Bc</code></td><td><code>a+b%2Bc</code></td><td><code>formDecodeInto</code></td><td><code>a b+c</code></td></tr>
+    </tbody></table></div>
+    <div class="columns"><div><h3>One multipart iterator.</h3><p class="note">Fields and files share the same flat representation: a raw name, optional filename and content type, and borrowed bytes. One file or several files use the same loop. Baz never saves an upload implicitly.</p><a href="docs/read.html?file=examples/bindataformpost.zig">Read the upload example →</a></div><div><h3>Copies have a place.</h3><p class="note">Multipart parsing validates the complete supported body before iteration. If HTTP chunks split a body, request a bounded copy into caller storage before parsing a contiguous form. Application access to borrowed views ends with the callback.</p><a href="docs/read.html?file=docs/OWNERSHIP.md">Read the ownership contract →</a></div></div>
+  </section>
+<section class="chapter" id="limits">
+    <p class="eyebrow">Limits &amp; backpressure</p><h2>Set the capacity.<br>Let progress set the pace.</h2>
+    <p class="intro">A limit says how much Baz can hold. Backpressure makes a producer wait when the next stage cannot keep up. Even one connection can fill its output buffer if its client reads slowly.</p>
+    <div class="principles">
+      <div><span class="number">01 — ADMISSION</span><h3>Room for a connection.</h3><p>The connection ceiling counts admitted sockets across the cluster. Idle connections count too. When all slots are occupied, an extra accepted socket is closed; a 503 response is not guaranteed.</p></div>
+      <div><span class="number">02 — EXECUTION</span><h3>Room to run.</h3><p>Workers and connection slots have separate limits. A busy worker makes its assigned requests wait. Continuations release the executor between steps while keeping bounded request state alive.</p></div>
+      <div><span class="number">03 — OUTPUT</span><h3>Room to write.</h3><p>A full streaming buffer flushes before accepting more bytes. The worker waits for that storage to return. The I/O owner keeps running, and the original request deadline still applies.</p></div>
+    </div>
+    <figure>@@BACKPRESSURE@@<figcaption>Backpressure follows the slow reader back to the producer. Waiting reuses fixed storage; it does not increase capacity or reset the deadline.</figcaption></figure>
+    <div class="columns"><div><h3>One connection. Many requests.</h3><p class="note">Baz supports HTTP/1.1 pipelining: requests run in order, and finished responses can share a send batch. It reserves output before each handler starts. If earlier responses occupy that space, they drain first.</p></div><div><h3>One page. Several downloads.</h3><p class="note">Browsers normally use several HTTP/1.1 connections for parallel asset downloads. Interleaving responses on one connection is HTTP/2 or HTTP/3 multiplexing. Baz’s current engine serves HTTP/1.1.</p></div></div>
+    <div class="actions"><a class="button primary" href="docs/read.html?file=docs/LIMITS.md">Understand the limits <span aria-hidden="true">↗</span></a><a class="button" href="docs/read.html?file=docs/PIPELINING.md">Read the pipelining assessment <span aria-hidden="true">↗</span></a></div>
+  </section>

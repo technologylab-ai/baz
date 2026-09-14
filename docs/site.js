@@ -74,15 +74,6 @@
       document.querySelector('#example-count').textContent = count + ' of ' + document.querySelectorAll('.example-card').length + ' examples';
     });
   }
-  if ('IntersectionObserver' in window && document.querySelector('.hero')) {
-    const observer = new IntersectionObserver(entries => {
-      for (const entry of entries) if (entry.isIntersecting) {
-        nav.querySelectorAll('a').forEach(link => {
-          if (link.hash === '#' + entry.target.id) link.setAttribute('aria-current', 'location');
-          else link.removeAttribute('aria-current');
-        });
-      }
-    }, {rootMargin: '-10% 0px -60% 0px'});
-    document.querySelectorAll('section[id]').forEach(section => observer.observe(section));
-  }
+  // Without JavaScript the mobile navigation remains visible.
+  document.documentElement.classList.add('site-ready');
 })();

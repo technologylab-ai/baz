@@ -1,0 +1,10 @@
+<section class="chapter" id="performance">
+    <p class="intro">A basic same-host loopback comparison with <a href="https://github.com/zigzap/zap">Zap</a>, measured on 6 September 2026. These results describe the initial Baz prototype <code>c152e59</code>, before package extraction.</p>
+    <div class="legend" aria-hidden="true"><span>Baz prototype</span><span>Zap (Zig 0.16 port)</span></div>
+    <figure>@@PERFORMANCE@@<figcaption>Median requests per second at 32 connections / 2 client threads. Bar lengths share a zero baseline. Compare implementations within each host.</figcaption></figure>
+    <div class="table-scroll" tabindex="0" aria-label="All four benchmark profiles"><table class="benchmark-table"><thead><tr><th>Host</th><th>Conn. / threads</th><th>Baz req/s</th><th>Zap req/s</th><th>Baz / Zap</th></tr></thead><tbody>@@RESULTS@@</tbody></table></div>
+    <p class="note">macOS: Apple M3 Max. Linux: Intel Core Ultra 7 258V. Three paired trials per profile; one-second warmup and three-second measurements. ReleaseSafe with Zig assertions enabled, one server thread, 128 connection slots, a 13-byte response, keep-alive, no pipelining, and no CPU affinity.</p>
+    <div class="callout"><p>The Mac’s one-connection result is lower than Zap’s. These short trials establish neither production capacity nor latency guarantees, and do not isolate Baz’s API overhead. The hosts used different wrk revisions; Zap retained its inherited C optimization and sanitizer settings.</p></div>
+    <p class="note">All 24 measured trials completed with zero wrk-reported socket or non-2xx/3xx errors. Exact responses were checked before and after timing, rather than for every timed response. The report preserves ranges, versions, commands, raw results, and cleanup evidence.</p>
+    <a class="button" href="docs/read.html?file=reports/2026-09-06-basic-zap.md">Read the experiment and raw evidence <span aria-hidden="true">→</span></a>
+  </section>

@@ -1,182 +1,27 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Baz — Bounded Async Zap. Pure Zig 0.16.0, streaming responses, and native io_uring on Linux, kqueue on macOS, and IOCP on Windows through bounded/http.">
-<meta name="theme-color" content="#f8f7f1">
-<meta property="og:title" content="Baz — Bounded Async Zap">
-<meta property="og:description" content="Pure Zig. Streaming responses. Native io_uring, kqueue, and IOCP through bounded/http.">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://technologylab-ai.github.io/baz/">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'none'; form-action 'none'">
-<link rel="canonical" href="https://technologylab-ai.github.io/baz/">
-<link rel="icon" href="docs/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="docs/site.css">
-<script defer src="docs/vendor/highlight.js"></script>
-<script defer src="docs/highlight-zig.js"></script>
-<script defer src="docs/site.js"></script>
-<title>Baz — Bounded Async Zap</title>
-</head>
-<body>
-<a class="skip" href="#main">Skip to content</a>
-<aside class="rail">
-  <a class="brand" href="#top" aria-label="Baz home">baz<span>.</span><small>BOUNDED ASYNC ZAP</small></a>
-  <button class="mobile-menu" aria-expanded="false" aria-controls="navigation" type="button">Explore +</button>
-  <nav id="navigation" aria-label="Page sections">
-    <a href="#idea"><b>01</b> The idea</a><a href="#app"><b>02</b> An ordinary Zig App</a>
-    <a href="#data"><b>03</b> Data stays data</a><a href="#engine"><b>04</b> HTTP engine</a>
-    <a href="#limits"><b>05</b> Limits &amp; backpressure</a><a href="#start"><b>06</b> Get started</a>
-    <a href="#examples"><b>07</b> Explore the examples</a><a href="#performance"><b>08</b> Measured results</a>
-    <a href="#next"><b>09</b> What comes next</a><a href="#docs"><b>10</b> Read further</a>
-    <a href="docs/read.html?file=docs/GUIDES.md">All guides ↗</a>
-  </nav>
-  <div class="rail-note">ZIG 0.16.0 · MIT<br>LINUX · MACOS<br>WINDOWS x64<br>EXPERIMENTAL FRAMEWORK<br><a href="docs/read.html?file=docs/APP-API.md">API guide ↗</a><br><a href="https://github.com/technologylab-ai/baz">View on GitHub ↗</a></div>
-</aside>
-<main class="page" id="main" tabindex="-1">
-  <header class="topline" id="top"><span class="lab">TECHNOLOGY LAB <span class="desktop-label">· SYSTEMS ENGINEERING</span></span><div class="project-links"><a href="https://technologylab-ai.github.io/bounded-http/">BOUNDED/HTTP ↗</a><a href="https://github.com/technologylab-ai/baz">GITHUB ↗</a></div></header>
   <section class="hero" aria-labelledby="headline">
     <p class="eyebrow">A modern successor to Zap</p>
     <h1 id="headline">Familiar to write.<br><em>Explicit by design.</em></h1>
     <p class="lede">Meet <strong>Baz — Bounded Async Zap.</strong> A pure Zig web framework on <a href="https://technologylab-ai.github.io/bounded-http/">bounded/http</a>. Typed applications, streaming responses, and memory boundaries you can reason about.</p>
-    <p class="intro">Its foundation, <a href="https://technologylab-ai.github.io/bounded-http/">bounded/http</a>, takes inspiration from <a href="https://tigerstyle.dev">TigerStyle</a>: set explicit limits, reserve resources up front, and check ownership invariants. Connections, buffers, queues, and workers have fixed capacities; request sizes, response sizes, and I/O deadlines have enforced limits. When capacity runs out, the engine applies backpressure or rejects work instead of growing without bounds. <a href="#limits">See how limits and backpressure fit together →</a> These guarantees cover the framework’s resources; application code still owns its memory use and must cooperate with cancellation.</p>
+    <div class="actions"><a class="button primary" href="get-started.html">Build your first App <span aria-hidden="true">↗</span></a><a class="button" href="get-started.html#streaming">See streaming <span aria-hidden="true">↗</span></a></div>
     <dl class="transport-specs" aria-label="Native HTTP backends"><div><dt>Linux</dt><dd>io_uring</dd></div><div><dt>macOS</dt><dd>kqueue</dd></div><div><dt>Windows x64</dt><dd>IOCP</dd></div></dl>
     <p class="transport-credit">Native HTTP I/O powered by <a href="https://technologylab-ai.github.io/bounded-http/">bounded/http</a>.</p>
-    <div class="actions"><a class="button primary" href="#start">Build your first App <span aria-hidden="true">↗</span></a><a class="button" href="#streaming">See streaming <span aria-hidden="true">↓</span></a></div>
     <div class="tags"><span>PURE ZIG · EXACT 0.16.0</span><span>CALLER-SUPPLIED std.Io</span><span>MIT LICENSE</span></div>
-    <div class="facts"><div class="fact"><strong>Typed.</strong><p>App state and endpoint methods.<br>Ordinary Zig composition.</p></div><div class="fact"><strong>Explicit.</strong><p>Borrowed bytes in.<br>Decoding when you ask.</p></div><div class="fact"><strong>Bounded.</strong><p>Framework capacity at startup.<br>Output reserved before dispatch.</p></div></div>
   </section>
-  <section class="chapter" id="idea">
-    <p class="eyebrow">01 / The idea</p><h2>The good parts of Zap.<br>A fresh foundation.</h2>
-    <p class="intro"><a href="https://github.com/zigzap/zap">Zap</a> made building Zig web applications approachable. Baz carries forward its App and endpoint ergonomics, with a new API and a separate, bounded HTTP engine underneath.</p>
-    <p class="intro">The framework and its HTTP engine are written in Zig. Baz replaces Zap’s facil.io C foundation with <a href="https://technologylab-ai.github.io/bounded-http/">bounded/http</a>.</p>
-    <p class="platform-note"><strong>Native Windows support, too.</strong> Baz runs on Linux, macOS, and Windows x64—an addition to <a href="https://github.com/zigzap/zap/blob/master/README.md">Zap’s platform support</a>. <a href="docs/read.html?file=reports/2026-09-06-windows-baz.md">Read the native evidence →</a></p>
+  <section class="chapter" id="features" aria-labelledby="features-title">
+    <p class="eyebrow">Build with Baz</p><h2 id="features-title">An App with room to grow.</h2>
     <div class="principles">
-      <div><span class="number">01 — COMPOSITION</span><h3>Your types, your App.</h3><p>Use <code>App(Shared)</code>, ordinary structs, and one router. Each App owns its lifecycle; your shared state remains explicit.</p></div>
-      <div><span class="number">02 — REQUEST DATA</span><h3>Keep the original bytes.</h3><p><code>001</code> is text. So is <code>false</code>. Duplicate fields keep their order, and <code>files[]</code> is simply a name.</p></div>
-      <div><span class="number">03 — OWNERSHIP</span><h3>Know what stays alive.</h3><p>Read borrowed input during the callback. Decode into your own buffer. Build a private response in capacity reserved before your handler runs.</p></div>
+      <div><h3>Your types, your App.</h3><p>Ordinary Zig structs, endpoint methods, and explicit shared state. Borrow request bytes and decode into your own storage.</p><a href="get-started.html#app">Meet the API →</a></div>
+      <div><h3>Stream as you work.</h3><p>Write and flush with a standard Zig writer. Use typed continuations and SSE for live updates with a small worker pool.</p><a href="get-started.html#streaming">Explore streaming →</a></div>
+      <div><h3>Capacity you can name.</h3><p>Reserve framework resources at startup, with bounded output and backpressure. Application memory and cancellation remain your responsibility.</p><a href="design.html#limits">Understand the limits →</a></div>
     </div>
-    <p class="note">Baz is a new framework, with its own package and API. The <a href="docs/read.html?file=docs/APP-API.md#from-zap">migration guide</a> maps familiar Zap concepts to their Baz equivalents.</p>
   </section>
-  <section class="chapter" id="app">
-    <p class="eyebrow">02 / An ordinary Zig App</p><h2>A struct. A method.<br>A clear place for everything.</h2>
-    <p class="intro">Define your shared state, choose <code>App(Shared)</code>, and register an endpoint. The context gives you the request, your state, route captures, and a bounded response draft.</p>
-    <div class="example-tabs" role="tablist" aria-label="Application examples" hidden>
-      <button type="button" role="tab" id="basics-tab" aria-controls="app-example" aria-selected="true" data-panel="app-example">App basics</button>
-      <button type="button" role="tab" id="streaming-tab" aria-controls="streaming" aria-selected="false" tabindex="-1" data-panel="streaming">Streaming response <span aria-hidden="true">↗</span></button>
-      <button type="button" role="tab" id="borrowed-tab" aria-controls="borrowed" aria-selected="false" tabindex="-1" data-panel="borrowed">Avoid body copies <span aria-hidden="true">↗</span></button>
+  <section class="chapter" id="explore" aria-labelledby="explore-title">
+    <p class="eyebrow">Find your next step</p><h2 id="explore-title">Go straight to the details.</h2>
+    <div class="resource-links">
+      <a href="examples.html"><span class="guide-summary"><strong>26 runnable examples</strong><small>Routing, forms, templates, authentication, and a complete live-job application.</small></span><span aria-hidden="true">→</span></a>
+      <a href="guides.html"><span class="guide-summary"><strong>Guides &amp; API reference</strong><small>Every guide, grouped by what you want to build or understand.</small></span><span aria-hidden="true">→</span></a>
+      <a href="performance.html"><span class="guide-summary"><strong>Measured results</strong><small>The initial prototype’s Zap comparison, with conditions and raw evidence.</small></span><span aria-hidden="true">→</span></a>
+      <a href="roadmap.html"><span class="guide-summary"><strong>Status &amp; roadmap</strong><small>Implemented features, native verification, and the work ahead. Baz remains experimental.</small></span><span aria-hidden="true">→</span></a>
     </div>
-    <div id="app-example" role="tabpanel" aria-labelledby="basics-tab" tabindex="0">
-    <div class="codebox"><div class="codehead"><a href="docs/read.html?file=src/app_demo.zig">src/app_demo.zig · maintained example</a><button class="copy" type="button" hidden aria-label="Copy Hello endpoint">Copy</button></div><pre tabindex="0" aria-label="Hello endpoint source"><code class="language-zig">@@HELLO@@</code></pre></div>
-    <p class="note">This excerpt uses <code>Context = web.App(Shared).Context</code>. Register it with <code>try app.endpoint("/hello", &amp;hello)</code>. See the <a href="docs/read.html?file=examples/app_basic.zig">complete App example</a> for initialization, stable state, and shutdown.</p>
-    <div class="columns"><div><h3>Start with explicit state.</h3><p class="note">Shared state and endpoint instances stay at stable addresses through App destruction. Register routes before startup. Synchronize mutable state used by concurrent callbacks.</p></div><div><h3>Return a finished response.</h3><p class="note">Text, bytes, copied headers, JSON, and standard formatting all use bounded output. A failed handler discards its private draft before error mapping.</p></div></div>
-    <p class="annotation"><b>OWNERSHIP</b><span>This name is temporary, so <code>response.text</code> copies it. For retained input and immutable startup assets, <code>borrowBody</code> borrows the payload independently of staging capacity, within the total response limit. <a href="docs/read.html?file=docs/OWNERSHIP.md#response-copies-and-borrowing">See the copy paths and limits →</a> <a href="#borrowed">See a complete file-response handler →</a></span></p>
-    </div>
-    <div id="streaming" role="tabpanel" aria-labelledby="streaming-tab" tabindex="0">
-      <h3>Send the first bytes. Keep working.</h3>
-      <p class="intro">Write a little. Flush it to the client. Pause, then send the next update—all inside the same handler.</p>
-      <div class="codebox"><div class="codehead"><a href="docs/read.html?file=examples/streaming.zig">examples/streaming.zig · runnable example</a><button class="copy" type="button" hidden aria-label="Copy streaming endpoint">Copy</button></div><pre tabindex="0" aria-label="Streaming endpoint source"><code class="language-zig">@@STREAMING@@</code></pre></div>
-      <p class="annotation"><b>STREAMING</b><span><code>out</code> is a standard <code>std.Io.Writer</code>. Each <code>flush()</code> sends the current bytes before the handler continues.</span></p>
-      <div class="columns"><div><h3>Updates as they happen.</h3><p class="note">Progress reports, generated text, and incremental output can reach clients before the handler returns. Use <code>curl -N</code> to watch the example arrive in three parts.</p></div><div><h3>Bounded while you wait.</h3><p class="note">A stream uses one existing application worker and fixed output storage. A slow reader applies backpressure; cancellation releases the waiting handler safely. The HTTP I/O loop keeps running.</p></div></div>
-      <p class="note">The complete example selects fixed workers. Headers are final after the first flush, and response size and request time remain bounded. <a href="docs/read.html?file=docs/STREAMING.md">Read the streaming guide →</a> <a href="docs/read.html?file=reports/2026-09-06-streaming.md">Native streaming evidence →</a></p>
-      <h3>Many waiting streams. A small worker pool.</h3><p class="note">For higher concurrency, <a href="docs/read.html?file=examples/continuations.zig">typed continuations</a> return <code>flush</code>, <code>wait</code>, or <code>finish</code>. Waiting releases the executor while bounded typed state stays alive. Middleware runs once; completion, timeout, and disconnect clean up that state. Works inline or with fixed workers. <a href="docs/read.html?file=docs/CONTINUATIONS.md">Read the continuation guide →</a></p>
-      <p class="note"><strong>Current limit:</strong> stream writes copy bytes. You cannot insert a <code>borrowBody()</code> call between flushes. <a href="docs/read.html?file=docs/OWNERSHIP.md#one-complete-body-or-a-stream">See the response combination rules →</a></p>
-    </div>
-    <div id="borrowed" role="tabpanel" aria-labelledby="borrowed-tab" tabindex="0">
-      <h3>Send a file. Skip the body copy.</h3>
-      <p class="intro">Already have a large image or file in memory? <code>borrowBody()</code> lets Baz send those existing bytes directly, avoiding a copy into its response buffer. A 5 MiB file stays in its original storage instead of being copied into another 5 MiB framework buffer.</p>
-      <p class="note">This complete handler shows the API with an embedded HTML file: <code>GET /</code> returns the file’s contents as the entire response body. Use the same call with your image bytes and content type. Small bodies below the default 256-byte threshold—including this tiny HTML file—may still be copied.</p>
-      <div class="codebox"><div class="codehead"><a href="docs/read.html?file=examples/serve.zig">examples/serve.zig · complete file handler</a><button class="copy" type="button" hidden aria-label="Copy file response handler">Copy</button></div><pre tabindex="0" aria-label="File response handler source"><code class="language-zig">@@BORROWED@@</code></pre></div>
-      <p class="note">Here <code>web = @import("baz")</code>. The complete example registers <code>try app.route("GET", "/", index)</code>. <code>@embedFile</code> includes the file at compile time, so this handler performs no filesystem I/O. Run it with <code>zig build run-serve -Doptimize=ReleaseSafe -- --port 8080</code>.</p>
-      <p class="annotation"><b>FEWER COPIES</b><span><code>response.bytes()</code> copies your body into bounded staging. <code>borrowBody()</code> avoids that payload copy for large retained bodies; a large file can use a small output arena. Headers and normal kernel transfers still have copying costs. <a href="docs/read.html?file=docs/OWNERSHIP.md#response-copies-and-borrowing">See exactly where copies happen →</a></span></p>
-      <p class="note"><code>borrowBody()</code> prepares one complete body. When this handler returns successfully, App publishes status 200, HTTP headers, and the file bytes. There is no body prefix or suffix. The embedded bytes stay alive for transmission.</p>
-      <div class="columns"><div><h3>Headers and handler work still fit.</h3><p class="note">Authenticate, choose an asset, and add response headers in your handler. Headers can be added before or after <code>borrowBody()</code> while the response is unpublished. A large immutable file can use a small output arena; the total response limit still applies.</p></div><div><h3>Streaming + borrowing: not yet.</h3><p class="note">Writing and flushing a prefix, calling <code>borrowBody()</code> with an image, then continuing the stream is currently unsupported. Borrowing the whole body and starting a stream are separate choices—even before the first flush. Use the stream writer’s <code>writeAll(image)</code> to put image bytes between other streamed chunks; that path copies through bounded staging.</p></div></div>
-      <p class="note">Verified on native Linux, macOS, and Windows: the separate 5 MiB fixture sends the original payload with a 4 KiB arena and no framework payload copy. <a href="docs/read.html?file=reports/2026-09-06-large-borrow.md">Read the copy-counter and ownership evidence →</a> <a href="docs/read.html?file=docs/OWNERSHIP.md#one-complete-body-or-a-stream">Read what can be combined →</a></p>
-    </div>
-    <h3>From a background job to a live page.</h3>
-    <p class="note">The <a href="docs/read.html?file=examples/jobs.zig">complete jobs example</a> puts Mustache, cookie sessions and SSE together. A startup producer publishes progress; bounded notifications wake waiting streams while their workers remain available. Event IDs support explicit, finite replay, and each resumed callback checks the session again. <a href="docs/read.html?file=docs/JOBS.md">Run the application →</a> <a href="docs/read.html?file=docs/JOBS.md#rendered-example">See the job studio →</a> <a href="docs/read.html?file=docs/SSE.md">Read the SSE and notification API →</a></p>
   </section>
-  <section class="chapter" id="data">
-    <p class="eyebrow">03 / Data stays data</p><h2>No guessing what<br>your parameters mean.</h2>
-    <p class="intro">Query parameters and URL-encoded forms are ordered lists of raw text slices. Decode when needed, into a buffer you supply. Repeated fields remain repeated fields.</p>
-    <figure>@@PARAMETERS@@<figcaption>A raw query keeps spelling and ordering. The selected decoder determines how <code>+</code> is treated.</figcaption></figure>
-    <div class="table-scroll" tabindex="0" aria-label="Scrollable decoding reference"><table><thead><tr><th>Input</th><th>Raw value</th><th>Explicit operation</th><th>Result</th></tr></thead><tbody>
-      <tr><td><code>id=001</code></td><td><code>001</code></td><td>Read the slice</td><td>Text, including leading zeros</td></tr>
-      <tr><td><code>enabled=false</code></td><td><code>false</code></td><td>Read the slice</td><td>Text; no boolean conversion</td></tr>
-      <tr><td><code>q=a+b%2Bc</code></td><td><code>a+b%2Bc</code></td><td><code>percentDecodeInto</code></td><td><code>a+b+c</code></td></tr>
-      <tr><td><code>q=a+b%2Bc</code></td><td><code>a+b%2Bc</code></td><td><code>formDecodeInto</code></td><td><code>a b+c</code></td></tr>
-    </tbody></table></div>
-    <div class="columns"><div><h3>One multipart iterator.</h3><p class="note">Fields and files share the same flat representation: a raw name, optional filename and content type, and borrowed bytes. One file or several files use the same loop. Baz never saves an upload implicitly.</p><a href="docs/read.html?file=examples/bindataformpost.zig">Read the upload example →</a></div><div><h3>Copies have a place.</h3><p class="note">Multipart parsing validates the complete supported body before iteration. If HTTP chunks split a body, request a bounded copy into caller storage before parsing a contiguous form. Application access to borrowed views ends with the callback.</p><a href="docs/read.html?file=docs/OWNERSHIP.md">Read the ownership contract →</a></div></div>
-  </section>
-  <section class="chapter" id="engine">
-    <p class="eyebrow">04 / Built on <a href="https://technologylab-ai.github.io/bounded-http/">bounded/http</a></p><h2>Application ergonomics above.<br>HTTP ownership underneath.</h2>
-    <p class="intro">Baz imports <code>bounded_http</code> as a pinned external dependency. The engine stays independently usable. Baz supplies the application layer: routing, request views, endpoint composition, and responses.</p>
-    <figure>@@LAYERS@@<figcaption>Two packages, one explicit boundary. Baz uses the engine’s public embedding API; transport and scheduler changes belong upstream.</figcaption></figure>
-    <div class="columns"><div><h3>Use Zig’s std.Io today.</h3><p class="note">Pass your caller’s <code>std.Io</code> at initialization. Standard memory readers and writers work inline. Finite blocking services require explicit fixed workers; the provider’s resource use remains the application’s responsibility.</p></div><div><h3>Keep the engine’s transports.</h3><p class="note">Baz supports Linux with io_uring, macOS with kqueue, and native Windows x64 with IOCP. HTTP transport uses the engine directly. A Baz-owned <code>std.Io</code> implementation is a later design step.</p></div></div>
-    <figure>@@LIFETIME@@<figcaption>Output pressure can delay dispatch. It does not replay your one-shot handler. Storage is reusable only after all application and kernel borrows return.</figcaption></figure>
-    <div class="actions"><a class="button" href="https://technologylab-ai.github.io/bounded-http/">Explore bounded/http <span aria-hidden="true">↗</span></a><a class="button" href="https://github.com/technologylab-ai/bounded-http">Engine source <span aria-hidden="true">↗</span></a></div>
-  </section>
-  <section class="chapter" id="limits">
-    <p class="eyebrow">05 / Limits &amp; backpressure</p><h2>Set the capacity.<br>Let progress set the pace.</h2>
-    <p class="intro">A limit says how much Baz can hold. Backpressure makes a producer wait when the next stage cannot keep up. Even one connection can fill its output buffer if its client reads slowly.</p>
-    <div class="principles">
-      <div><span class="number">01 — ADMISSION</span><h3>Room for a connection.</h3><p>The connection ceiling counts admitted sockets across the cluster. Idle connections count too. When all slots are occupied, an extra accepted socket is closed; a 503 response is not guaranteed.</p></div>
-      <div><span class="number">02 — EXECUTION</span><h3>Room to run.</h3><p>Workers and connection slots have separate limits. A busy worker makes its assigned requests wait. Continuations release the executor between steps while keeping bounded request state alive.</p></div>
-      <div><span class="number">03 — OUTPUT</span><h3>Room to write.</h3><p>A full streaming buffer flushes before accepting more bytes. The worker waits for that storage to return. The I/O owner keeps running, and the original request deadline still applies.</p></div>
-    </div>
-    <figure>@@BACKPRESSURE@@<figcaption>Backpressure follows the slow reader back to the producer. Waiting reuses fixed storage; it does not increase capacity or reset the deadline.</figcaption></figure>
-    <div class="columns"><div><h3>One connection. Many requests.</h3><p class="note">Baz supports HTTP/1.1 pipelining: requests run in order, and finished responses can share a send batch. It reserves output before each handler starts. If earlier responses occupy that space, they drain first.</p></div><div><h3>One page. Several downloads.</h3><p class="note">Browsers normally use several HTTP/1.1 connections for parallel asset downloads. Interleaving responses on one connection is HTTP/2 or HTTP/3 multiplexing. Baz’s current engine serves HTTP/1.1.</p></div></div>
-    <div class="actions"><a class="button primary" href="docs/read.html?file=docs/LIMITS.md">Understand the limits <span aria-hidden="true">↗</span></a><a class="button" href="docs/read.html?file=docs/PIPELINING.md">Read the pipelining assessment <span aria-hidden="true">↗</span></a></div>
-  </section>
-  <section class="chapter" id="start">
-    <p class="eyebrow">06 / Get started</p><h2>A working App in one command.</h2>
-    <p class="intro">Use exact <strong>Zig 0.16.0</strong> and Python 3. Clone Baz, then start the demo. The pinned HTTP engine is fetched automatically.</p>
-    <div class="codebox"><div class="codehead"><span>01 · Start the App</span><button class="copy" type="button" hidden aria-label="Copy startup commands">Copy</button></div><pre tabindex="0"><code class="language-bash">git clone https://github.com/technologylab-ai/baz.git
-cd baz
-zig build run-app -Doptimize=ReleaseSafe -- --port 8080</code></pre></div>
-    <div class="codebox"><div class="codehead"><span>02 · In another terminal, from the Baz directory</span><button class="copy" type="button" hidden aria-label="Copy request commands">Copy</button></div><pre tabindex="0"><code class="language-bash">curl 'http://127.0.0.1:8080/hello?name=Hello%20Zig'
-curl --data 'value=x+y%2Bz' http://127.0.0.1:8080/form
-curl -F 'files[]=@.zig-version' http://127.0.0.1:8080/upload</code></pre></div>
-    <p class="note">The current executable defaults to IPv4 loopback over plain HTTP/1.1. Stop it with Ctrl-C. On Windows, use <code>curl.exe</code>; executables have an <code>.exe</code> suffix. For embedding Baz in your own project, follow the <a href="docs/read.html?file=docs/DEPENDENCY.md">package guide</a> and <a href="docs/read.html?file=examples/embedding/build.zig">independent consumer fixture</a>.</p>
-  </section>
-  <section class="chapter" id="examples">
-    <p class="eyebrow">07 / Explore the examples</p><h2>Examples you can run.</h2>
-    <p class="intro">Twenty-six examples, from Zap ports to streaming and service composition, using Baz’s public API. Every card opens maintained source in the reader. Pick a small example, then follow its types.</p>
-    <p class="note"><a href="docs/read.html?file=docs/APPLICATION-RECIPES.md">Application recipes →</a> LAN binding, runtime downloads, decoded field iteration, and custom errors.</p>
-    <p class="intro">Build real pages with <a href="docs/read.html?file=docs/MUSTACHE.md">Mustache templates</a>: a greeting form, typed user cards, and reusable partials. Parse once at startup and render straight into reserved HTML storage. <a href="docs/read.html?file=examples/mustache.zig">The complete Zig example is just 52 lines →</a> <a href="docs/read.html?file=docs/MUSTACHE.md#rendered-example">See the rendered preview →</a></p>
-    <div class="filter-bar" role="group" aria-label="Filter examples" hidden>
-      <button type="button" data-filter="all" aria-pressed="true">All 26</button><button type="button" data-filter="routing" aria-pressed="false">Routing</button><button type="button" data-filter="responses" aria-pressed="false">Responses</button><button type="button" data-filter="app" aria-pressed="false">App &amp; endpoints</button><button type="button" data-filter="composition" aria-pressed="false">Composition</button><button type="button" data-filter="data" aria-pressed="false">Forms &amp; uploads</button>
-    </div><p id="example-count" class="result-count" aria-live="polite">26 of 26 examples</p>
-    <div class="examples-grid">@@EXAMPLES@@</div>
-    <div class="codebox"><div class="codehead"><span>Build all examples, or run one</span><button class="copy" type="button" hidden aria-label="Copy example commands">Copy</button></div><pre tabindex="0"><code class="language-bash">zig build examples -Doptimize=ReleaseSafe
-zig build run-http_params -Doptimize=ReleaseSafe -- --port 8080</code></pre></div>
-    <p class="note"><a href="docs/read.html?file=docs/COOKIES.md">Cookies and redirects are public APIs</a>, with explicit expiry and a local login/logout example. Middleware, authentication policy and session storage remain explicit application code. <a href="docs/read.html?file=examples/README.md">Read the complete catalog and its deliberate adaptations →</a></p>
-  </section>
-  <section class="chapter" id="performance">
-    <p class="eyebrow">08 / Measured results</p><h2>A first comparison.<br>The conditions included.</h2>
-    <p class="intro">A basic same-host loopback comparison with <a href="https://github.com/zigzap/zap">Zap</a>, measured on 6 September 2026. These results describe the initial Baz prototype <code>c152e59</code>, before package extraction.</p>
-    <div class="legend" aria-hidden="true"><span>Baz prototype</span><span>Zap (Zig 0.16 port)</span></div>
-    <figure>@@PERFORMANCE@@<figcaption>Median requests per second at 32 connections / 2 client threads. Bar lengths share a zero baseline. Compare implementations within each host.</figcaption></figure>
-    <div class="table-scroll" tabindex="0" aria-label="All four benchmark profiles"><table class="benchmark-table"><thead><tr><th>Host</th><th>Conn. / threads</th><th>Baz req/s</th><th>Zap req/s</th><th>Baz / Zap</th></tr></thead><tbody>@@RESULTS@@</tbody></table></div>
-    <p class="note">macOS: Apple M3 Max. Linux: Intel Core Ultra 7 258V. Three paired trials per profile; one-second warmup and three-second measurements. ReleaseSafe with Zig assertions enabled, one server thread, 128 connection slots, a 13-byte response, keep-alive, no pipelining, and no CPU affinity.</p>
-    <div class="callout"><p>The Mac’s one-connection result is lower than Zap’s. These short trials establish neither production capacity nor latency guarantees, and do not isolate Baz’s API overhead. The hosts used different wrk revisions; Zap retained its inherited C optimization and sanitizer settings.</p></div>
-    <p class="note">All 24 measured trials completed with zero wrk-reported socket or non-2xx/3xx errors. Exact responses were checked before and after timing, rather than for every timed response. The report preserves ranges, versions, commands, raw results, and cleanup evidence.</p>
-    <a class="button" href="docs/read.html?file=reports/2026-09-06-basic-zap.md">Read the experiment and raw evidence <span aria-hidden="true">→</span></a>
-  </section>
-  <section class="chapter" id="next">
-    <p class="eyebrow">09 / What comes next</p><h2>A useful first slice.<br>A visible roadmap.</h2>
-    <p class="intro">Baz supports native Windows x64, Linux, and macOS. All three have passed Debug/ReleaseSafe verification, package checks, all 20 ported-example groups, and all 14 streaming groups. Windows also passed shard-handoff and console-shutdown cases. Baz remains experimental; these are correctness gates, not production qualification.</p>
-    <div class="status-grid"><div class="status-card"><p class="eyebrow">Implemented</p><h3>The streaming App.</h3><ul><li>Typed App, routes, and endpoint methods</li><li>Raw query and form views; explicit codecs</li><li>Flat multipart parsing</li><li>Reserved response drafts and JSON</li><li><a href="docs/read.html?file=docs/COOKIES.md">Cookies, explicit expiry, and redirects</a></li><li><a href="docs/read.html?file=docs/MUSTACHE.md">Mustache templates with bounded rendering</a></li><li>Streaming with a standard Zig writer</li><li><a href="docs/read.html?file=docs/CONTINUATIONS.md">Typed continuations: many streams, few workers</a></li><li><a href="docs/read.html?file=docs/MIDDLEWARE.md">Public middleware and typed request locals</a></li><li>Reusable sessions with server expiry and revocation</li><li><a href="docs/read.html?file=docs/SSE.md">SSE encoding and bounded producer notifications</a></li><li><a href="docs/read.html?file=docs/JOBS.md">A complete live-job application</a></li><li>Caller std.Io and fixed worker services</li><li>Native Windows x64, Linux, and macOS</li></ul></div><div class="status-card"><p class="eyebrow">Next API work</p><h3>More ways to compose.</h3><ul><li>Further response-copy reduction with explicit stream borrows</li><li>Broader asynchronous service integration</li></ul></div><div class="status-card"><p class="eyebrow">Deferred / out of scope</p><h3>Keep the scope honest.</h3><ul><li>WebSockets: needs an upgrade lifecycle</li><li>An owned std.Io provider and prototype: deferred</li><li>TLS: out of scope</li></ul></div></div>
-    <p class="callout">The framework reserves its own storage at startup. Application code and the caller’s I/O provider have separate resource responsibilities. Fixed workers do not provide arbitrary application isolation.</p>
-    <a href="docs/read.html?file=docs/APP-API-ROADMAP.md">Follow the multi-session roadmap →</a>
-  </section>
-  <section class="chapter" id="docs">
-    <p class="eyebrow">10 / Read further</p><h2>From first route<br>to the ownership details.</h2>
-    <p class="intro">Choose a guide by what you want to do: build an application, send live updates, or understand its capacity.</p>
-    <p><a href="docs/read.html?file=docs/GUIDES.md">Browse all guides →</a></p>
-    @@GUIDES@@
-  </section>
-  <footer><div>BAZ · BOUNDED ASYNC ZAP<br>By Rene Schallner · Technology Lab<span id="print-source" hidden><br>https://technologylab-ai.github.io/baz/</span></div><div class="footer-links"><a href="https://github.com/technologylab-ai/baz">GitHub ↗</a><a href="docs/read.html?file=LICENSE">MIT license</a><a href="https://github.com/zigzap/zap">Predecessor: Zap ↗</a></div></footer>
-</main>
-</body>
-</html>
+  @@LEGACY_FALLBACK@@

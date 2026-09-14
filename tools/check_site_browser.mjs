@@ -49,7 +49,7 @@ async function navigate(query = '', kind = 'paper') {
   await send('Page.navigate', {url: new URL(query, base).href});
   const expression = kind === 'reader'
     ? '["true","error"].includes(document.documentElement.dataset.readerReady)'
-    : 'document.readyState === "complete" && !!document.querySelector(".hero")';
+    : 'document.readyState === "complete" && !!document.querySelector(".page")' + (query.startsWith('#') ? ' && document.body.classList.contains("topic-page")' : '');
   await until(() => evaluate(expression), 'Page failed to load');
 }
 async function screenshot(name) {
@@ -129,10 +129,13 @@ try {
   await check('desktop-landing', async () => {
     await navigate();
     const state = await evaluate(`({title:document.title,headline:document.querySelector('h1').textContent,diagrams:document.querySelectorAll('svg[role="img"]').length,examples:document.querySelectorAll('.example-card').length,highlight:!!document.querySelector('.hljs-keyword')})`);
-    assert.equal(state.title,'Baz — Bounded Async Zap'); assert.equal(state.diagrams,5); assert.equal(state.examples,26); assert(state.highlight);
+    assert.equal(state.title,'Baz — Bounded Async Zap'); assert.equal(state.diagrams,0); assert.equal(state.examples,0);
+    assert.equal(await evaluate('document.querySelectorAll(".chapter").length'),2);
+    assert.equal(await evaluate('document.querySelectorAll("#navigation a[aria-current=page]").length'),1);
     await noOverflow(); await screenshot('baz-desktop'); return state;
   });
   await check('maintained-source-excerpt', async () => {
+    await navigate('get-started.html');
     const source = await readFile(new URL('../src/app_demo.zig', import.meta.url),'utf8');
     const excerpt = source.match(/^const Hello = struct \{\n[\s\S]*?^\};/m)[0];
     assert.equal(await evaluate('document.querySelector(".language-zig").textContent'),excerpt); return {exactSource:true};
@@ -164,7 +167,7 @@ try {
   await check('borrowed-example-source-tabs-and-deep-link', async () => {
     const source = await readFile(new URL('../examples/serve.zig', import.meta.url), 'utf8');
     const excerpt = source.match(/^const Shared = struct \{\};\n.*?^fn index\(.*?^}/ms)[0];
-    await navigate();
+    await navigate('get-started.html');
     assert.equal(await evaluate('document.querySelectorAll(".example-tabs [role=tab]").length'), 3);
     assert.equal(await evaluate('document.querySelector("#borrowed code.language-zig").textContent'), excerpt);
     await evaluate('document.querySelector("#borrowed-tab").scrollIntoView({behavior:"instant",block:"start"})');
@@ -186,7 +189,8 @@ try {
     await send('Emulation.setDeviceMetricsOverride', {width:1440,height:1040,deviceScaleFactor:1,mobile:false});
     await evaluate('document.querySelector("#basics-tab").scrollIntoView({behavior:"instant",block:"start"})');
     await click('#basics-tab');
-    await click('a[href="#borrowed"]');
+    await evaluate('document.querySelector(\'#app-example a[href="#borrowed"]\').scrollIntoView({behavior:"instant",block:"center"})');
+    await click('#app-example a[href="#borrowed"]');
     assert(await evaluate('!document.querySelector("#borrowed").hidden'));
     return {exactSource:true, keyboard:true, deepLink:true, repeatedDeepLink:true, mobileWidths:[390,320]};
   });
@@ -198,6 +202,7 @@ try {
     assert.equal(await evaluate('document.activeElement.id'),'main'); return {skipFocus:'main'};
   });
   await check('example-filters', async () => {
+    await navigate('examples.html');
     await evaluate('document.querySelector("#examples").scrollIntoView({behavior:"instant"})');
     for (const [group,count] of [['data',3],['composition',6],['app',4],['routing',5],['responses',8],['all',26]]) {
       await click(`button[data-filter="${group}"]`);
@@ -207,7 +212,9 @@ try {
     return {groups:6,total:26};
   });
   await check('desktop-diagrams-and-benchmark', async () => {
+    await navigate('design.html');
     await evaluate('document.querySelector("#engine").scrollIntoView({behavior:"instant"})'); await screenshot('baz-engine');
+    await navigate('performance.html');
     await evaluate('document.querySelector("#performance").scrollIntoView({behavior:"instant"})'); await screenshot('baz-performance');
     const rows = await evaluate('Array.from(document.querySelectorAll(".benchmark-table tbody tr"),row=>row.innerText)');
     assert.equal(rows.length,4); assert(rows.some(row=>row.includes('0.629×'))); return {rows};
@@ -217,9 +224,10 @@ try {
     await noOverflow(); await screenshot('baz-mobile');
     await click('.mobile-menu'); assert.equal(await evaluate('document.querySelector(".mobile-menu").getAttribute("aria-expanded")'),'true');
     await key('Escape'); assert.equal(await evaluate('document.querySelector(".mobile-menu").getAttribute("aria-expanded")'),'false');
-    await click('.mobile-menu'); await click('#navigation a[href="#examples"]');
+    await click('.mobile-menu'); await click('#navigation a[href="examples.html"]');
+    await until(()=>evaluate('location.pathname.endsWith("/examples.html") && document.readyState === "complete"'),'Page navigation did not finish');
     assert.equal(await evaluate('document.querySelector(".mobile-menu").getAttribute("aria-expanded")'),'false');
-    await until(()=>evaluate('location.hash === "#examples"'),'Section navigation did not update hash');
+    await navigate('design.html#data');
     await evaluate('document.querySelector("#data").scrollIntoView({behavior:"instant"})'); await screenshot('baz-mobile-data');
     for (const width of [320,760,820,1024,1440]) {
       await send('Emulation.setDeviceMetricsOverride',{width,height:1000,deviceScaleFactor:1,mobile:false}); await noOverflow();
@@ -346,7 +354,7 @@ try {
     return {desktop:1440,mobile:390,mainPageNavigation:true,examples:2};
   });
   await check('guide-directory-navigation', async () => {
-    const directory = 'a[href="docs/read.html?file=docs/GUIDES.md"]';
+    const directory = '#docs a[href="docs/read.html?file=docs/GUIDES.md"]';
     for (const width of [1440, 390]) {
       await send('Emulation.setDeviceMetricsOverride',{width,height:1040,deviceScaleFactor:1,mobile:false});
       await navigate('#docs');
@@ -356,8 +364,8 @@ try {
         assert(await evaluate('!!document.querySelector(\'#docs a[href="docs/read.html?file=docs/'+file+'.md"]\')'));
       }
       await noOverflow(); await screenshot('baz-read-further-'+width);
-      if (width === 390) await click('.mobile-menu');
-      await click('#navigation '+directory);
+      await evaluate('document.querySelector('+JSON.stringify(directory)+').scrollIntoView({behavior:"instant",block:"center"})');
+      await click(directory);
       await until(() => evaluate('document.documentElement.dataset.readerReady === "true"'), 'Guide directory did not load');
       assert.equal(await evaluate('document.querySelector("#document h1").textContent'),'All guides');
       assert.equal(await evaluate('document.querySelectorAll("#document h2").length'),4);
@@ -367,8 +375,9 @@ try {
       await click(recipe);
       await until(() => evaluate('document.querySelector("#document h1")?.textContent === "Application recipes"'), 'Directory recipe link did not load');
       if (width === 390) await click('.mobile-menu');
-      await click('#navigation a[href="read.html?file=docs/GUIDES.md"]');
-      await until(() => evaluate('document.querySelector("#document h1")?.textContent === "All guides"'), 'Reader directory link did not load');
+      await click('#navigation a[href="../guides.html"]');
+      await until(() => evaluate('location.pathname.endsWith("/guides.html") && document.readyState === "complete"'), 'Reader directory link did not load');
+      assert.equal(await evaluate('document.querySelectorAll(".guide-group").length'),4);
     }
     return {desktop:1440,mobile:390,groups:4,homepageAndReaderNavigation:true};
   });
@@ -384,18 +393,58 @@ try {
     return {documents:files.length};
   });
   await check('print-and-no-javascript', async () => {
-    await send('Emulation.setDeviceMetricsOverride',{width:1440,height:1040,deviceScaleFactor:1,mobile:false}); await navigate();
+    await send('Emulation.setDeviceMetricsOverride',{width:1440,height:1040,deviceScaleFactor:1,mobile:false}); await navigate('get-started.html');
     await send('Emulation.setEmulatedMedia',{media:'print'});
     assert.equal(await evaluate('getComputedStyle(document.querySelector(".rail")).display'),'none');
     assert(await evaluate('[...document.querySelectorAll("[role=tabpanel]")].every(panel => getComputedStyle(panel).display !== "none")'));
     const pdf = await send('Page.printToPDF',{printBackground:true,preferCSSPageSize:true});
     await writeFile(path.join(output,'baz-print.pdf'),Buffer.from(pdf.data,'base64'));
     await send('Emulation.setEmulatedMedia',{media:''}); await send('Emulation.setScriptExecutionDisabled',{value:true});
-    await navigate();
+    await navigate('examples.html');
     assert.equal(await evaluate('document.querySelectorAll(".example-card:not([hidden])").length'),26);
+    await navigate('get-started.html');
     assert(await evaluate('document.querySelector(".language-zig").textContent.includes("percentDecodeInto")'));
     assert(await evaluate('[...document.querySelectorAll("[role=tabpanel]")].every(panel => !panel.hidden && getComputedStyle(panel).display !== "none")'));
     await send('Emulation.setScriptExecutionDisabled',{value:false}); return {printBytes:Buffer.from(pdf.data,'base64').length,noJsExamples:26};
+  });
+  await check('all-pages-mobile-desktop-and-legacy-links', async () => {
+    const names = ['index','get-started','design','examples','performance','roadmap','guides'];
+    const heights = {};
+    for (const width of [320,390,760,820,1440]) {
+      await send('Emulation.setDeviceMetricsOverride',{width,height:844,deviceScaleFactor:1,mobile:false});
+      for (const name of names) {
+        await navigate(name+'.html');
+        await noOverflow();
+        assert.equal(await evaluate('document.querySelectorAll("h1").length'),1);
+        assert.equal(await evaluate('document.querySelector("#navigation [aria-current=page]").getAttribute("href")'),name+'.html');
+        if (width === 390 || width === 1440) await screenshot('page-'+name+'-'+width);
+        if (name === 'index') heights[width] = await evaluate('document.documentElement.scrollHeight');
+      }
+    }
+    const destinations = {idea:'design',app:'get-started',data:'design',engine:'design',limits:'design',start:'get-started',examples:'examples',performance:'performance',next:'roadmap',docs:'guides',streaming:'get-started',borrowed:'get-started'};
+    for (const [anchor, page] of Object.entries(destinations)) {
+      await navigate('#'+anchor);
+      assert.equal(await evaluate('location.pathname'),new URL(page+'.html',base).pathname);
+      assert.equal(await evaluate('location.hash'),'#'+anchor);
+    }
+    for (const anchor of ['unknown-section','toString','__proto__']) {
+      await navigate('index.html#'+anchor);
+      assert.equal(await evaluate('location.pathname'),new URL('index.html',base).pathname);
+      assert.equal(await evaluate('location.hash'),'#'+anchor);
+    }
+    await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:false});
+    await send('Emulation.setScriptExecutionDisabled',{value:true});
+    try {
+      for (const name of names) {
+        await navigate(name+'.html');
+        assert.equal(await evaluate('getComputedStyle(document.querySelector("#navigation")).display'),'grid');
+        await noOverflow();
+      }
+      await navigate();
+      assert(await evaluate('[...document.querySelectorAll("noscript a")].some(a => a.getAttribute("href") === "get-started.html#streaming")'));
+      await screenshot('no-js-mobile-navigation');
+    } finally { await send('Emulation.setScriptExecutionDisabled',{value:false}); }
+    return {pages:7,widths:[320,390,760,820,1440],legacyLinks:12,homeHeights:heights,noJsMobileNavigation:true};
   });
   await check('no-unexpected-network-or-errors', async () => {
     assert.equal(exceptions.length,0,JSON.stringify(exceptions));

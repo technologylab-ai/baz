@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="@@DESCRIPTION@@">
+<meta name="theme-color" content="#f8f7f1">
+<meta property="og:title" content="@@TITLE@@">
+<meta property="og:description" content="@@DESCRIPTION@@">
+<meta property="og:type" content="website">
+<meta property="og:url" content="@@CANONICAL@@">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="canonical" href="@@CANONICAL@@">
+<link rel="icon" href="docs/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="docs/site.css">
+<script defer src="docs/vendor/highlight.js"></script>
+<script defer src="docs/highlight-zig.js"></script>
+@@LEGACY_SCRIPT@@
+<script defer src="docs/site.js"></script>
+<title>@@TITLE@@</title>
+</head>
+<body class="@@PAGE_CLASS@@">
+<a class="skip" href="#main">Skip to content</a>
+<aside class="rail">
+  <a class="brand" href="index.html" aria-label="Baz home">baz<span>.</span><small>BOUNDED ASYNC ZAP</small></a>
+  <button class="mobile-menu" aria-expanded="false" aria-controls="navigation" type="button">Explore +</button>
+  <nav id="navigation" aria-label="Main navigation">@@NAVIGATION@@</nav>
+  <div class="rail-note">ZIG 0.16.0 · MIT<br>LINUX · MACOS<br>WINDOWS x64<br>EXPERIMENTAL FRAMEWORK<br><a href="docs/read.html?file=docs/APP-API.md">API guide ↗</a><br><a href="https://github.com/technologylab-ai/baz">View on GitHub ↗</a></div>
+</aside>
+<main class="page" id="main" tabindex="-1">
+  <header class="topline" id="top"><span class="lab">TECHNOLOGY LAB <span class="desktop-label">· SYSTEMS ENGINEERING</span></span><div class="project-links"><a href="https://technologylab-ai.github.io/bounded-http/">BOUNDED/HTTP ↗</a><a href="https://github.com/technologylab-ai/baz">GITHUB ↗</a></div></header>
+@@PAGE_INTRO@@
+@@CONTENT@@
+  <footer><div>BAZ · BOUNDED ASYNC ZAP<br>By Rene Schallner · Technology Lab<span id="print-source" hidden><br>@@CANONICAL@@</span></div><div class="footer-links"><a href="https://github.com/technologylab-ai/baz">GitHub ↗</a><a href="docs/read.html?file=LICENSE">MIT license</a><a href="https://github.com/zigzap/zap">Predecessor: Zap ↗</a></div></footer>
+</main>
+</body>
+</html>
