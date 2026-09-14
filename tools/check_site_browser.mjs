@@ -446,6 +446,92 @@ try {
     } finally { await send('Emulation.setScriptExecutionDisabled',{value:false}); }
     return {pages:7,widths:[320,390,760,820,1440],legacyLinks:12,homeHeights:heights,noJsMobileNavigation:true};
   });
+  async function api(fragment = '') {
+    await navigate('api/index.html' + fragment);
+    await until(() => evaluate('!!window.wasm && document.getElementById("status").classList.contains("hidden")'), 'API viewer did not become ready');
+  }
+  await check('api-root-generics-and-dependencies', async () => {
+    await send('Emulation.setDeviceMetricsOverride',{width:1440,height:1040,deviceScaleFactor:1,mobile:false});
+    for (const [fragment, text] of [['','Bounded Async Zap'], ['#baz.App','Options'], ['#baz.AppWithLocals','Locals'], ['#baz.Response.borrowBody','borrowBody'], ['#baz.Stream','flush'], ['#baz.engine','Cluster'], ['#mustache_engine','Template'], ['#std','ArrayList']]) {
+      await api(fragment);
+      assert((await evaluate('document.querySelector(".api-viewer").innerText')).includes(text), fragment);
+      assert.equal(await evaluate('document.querySelector("#errors").classList.contains("hidden")'),true);
+    }
+    await api(); await screenshot('api-desktop');
+    await key('Tab');
+    assert.equal(await evaluate('document.activeElement.className'), 'skip');
+    await send('Input.dispatchKeyEvent',{type:'keyDown',key:'Enter',code:'Enter',windowsVirtualKeyCode:13});
+    await send('Input.dispatchKeyEvent',{type:'keyUp',key:'Enter',code:'Enter',windowsVirtualKeyCode:13});
+    assert.equal(await evaluate('document.activeElement.id'), 'main');
+    assert.equal(await evaluate('location.hash'), '');
+    assert.equal(await evaluate('getComputedStyle(document.body).backgroundColor'),'rgb(248, 247, 241)');
+    assert.equal(await evaluate('getComputedStyle(document.body).color'),'rgb(23, 47, 62)');
+    assert.equal(await evaluate('document.querySelector("#navigation [aria-current]").textContent'),'API reference');
+    return {root:'baz/baz.zig',generics:true,dependencyRoots:true,sharedTheme:true};
+  });
+  await check('api-search-and-source', async () => {
+    await api(); await click('#search'); await send('Input.insertText',{text:'borrowBody'});
+    await until(() => evaluate('!document.querySelector("#sectSearchResults").classList.contains("hidden") && document.querySelector("#listSearchResults a")'), 'Search results missing');
+    assert((await evaluate('document.querySelector("#listSearchResults").innerText')).includes('borrowBody'));
+    await click('#listSearchResults a');
+    await until(() => evaluate('document.querySelector("#fnProtoCode").textContent.includes("borrowBody")'), 'Search result did not open');
+    await click('#hdrName a');
+    await until(() => evaluate('!document.querySelector("#sectSource").classList.contains("hidden")'), 'Source link did not open');
+    assert((await evaluate('document.querySelector("#sourceText").textContent')).includes('pub fn borrowBody'));
+    await screenshot('api-source');
+    return {search:true,source:true};
+  });
+  await check('api-responsive-layout', async () => {
+    for (const width of [320,390,760,820,1440]) {
+      await send('Emulation.setDeviceMetricsOverride',{width,height:1040,deviceScaleFactor:1,mobile:false});
+      for (const fragment of ['', '#baz.App', '#baz.Response.borrowBody', '#src/baz/response.zig', '#?borrowBody']) {
+        await api(fragment); await noOverflow();
+      }
+      if (width === 390) {
+        await api(); await screenshot('api-mobile');
+        await click('.mobile-menu'); await click('#navigation a[href="../guides.html"]');
+        await until(() => evaluate('location.pathname.endsWith("/guides.html")'), 'API mobile navigation failed');
+      }
+    }
+    return {widths:[320,390,760,820,1440],views:5};
+  });
+  await check('api-links-from-published-prose', async () => {
+    await api();
+    const targets = await evaluate(`(async () => {
+      const root = new URL('../', location.href);
+      const manifest = await fetch(new URL('publication.json', root)).then(r => r.json());
+      const texts = await Promise.all(Object.keys(manifest.files_sha256).filter(name => /\\.(md|html)$/.test(name)).map(name => fetch(new URL(name, root)).then(r => r.text())));
+      return [...new Set(texts.flatMap(text => [...text.matchAll(/api\\/(?:index\\.html)?#([A-Za-z_][A-Za-z0-9_.]*)/g)].map(match => match[1])))].sort();
+    })()`);
+    assert(targets.length >= 60, 'Expected the prose sweep to link the documented API');
+    const failed = [];
+    for (const target of targets) {
+      await evaluate(`new Promise(resolve => {
+        if (location.hash === '#' + ${JSON.stringify(target)}) return resolve();
+        window.addEventListener('hashchange', () => requestAnimationFrame(() => resolve()), {once:true});
+        location.hash = ${JSON.stringify(target)};
+      })`);
+      if (!await evaluate('document.querySelector("#status").classList.contains("hidden")')) failed.push(target);
+    }
+    assert.deepEqual(failed, [], 'Unresolved API links in prose');
+    return {targets:targets.length};
+  });
+  await check('api-print-and-no-javascript', async () => {
+    await api('#baz.Response.borrowBody');
+    await send('Emulation.setEmulatedMedia',{media:'print'});
+    assert.equal(await evaluate('getComputedStyle(document.querySelector("#navWrap")).display'),'none');
+    const pdf = await send('Page.printToPDF',{printBackground:true,preferCSSPageSize:true});
+    await writeFile(path.join(output,'api-print.pdf'),Buffer.from(pdf.data,'base64'));
+    await send('Emulation.setEmulatedMedia',{media:''});
+    await send('Emulation.setScriptExecutionDisabled',{value:true});
+    try {
+      await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:false});
+      await navigate('api/index.html'); await noOverflow();
+      assert((await evaluate('document.querySelector("noscript").textContent')).includes('Read the public source'));
+      assert.equal(await evaluate('getComputedStyle(document.querySelector("#navigation")).display'),'grid');
+    } finally { await send('Emulation.setScriptExecutionDisabled',{value:false}); }
+    return {print:true,noJsFallback:true};
+  });
   await check('no-unexpected-network-or-errors', async () => {
     assert.equal(exceptions.length,0,JSON.stringify(exceptions));
     const external = requests.filter(url=>url.startsWith('http') && !url.startsWith(base.origin+'/'));

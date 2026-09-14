@@ -1,7 +1,7 @@
 # Middleware and typed request locals
 
-`AppWithLocals(Shared, Locals)` gives each request default-initialized typed state
-at a stable address. `App(Shared)` remains the shortcut with empty locals. Locals
+[`AppWithLocals(Shared, Locals)`](https://technologylab-ai.github.io/baz/api/#baz.AppWithLocals) gives each request default-initialized typed state
+at a stable address. [`App(Shared)`](https://technologylab-ai.github.io/baz/api/#baz.App) remains the shortcut with empty locals. Locals
 must be a struct with field defaults, at most 4,096 bytes and alignment at most 64.
 Synchronous handlers retain their locals through worker stream flushes.
 [Typed continuations](CONTINUATIONS.md) reserve locals in startup pool records,
@@ -32,9 +32,9 @@ executor's blocking and allocation constraints. Runnable examples are
 
 ## Order and ownership
 
-The application copies global `Options.middleware` and per-route descriptors into
+The application copies global [`Options.middleware`](https://technologylab-ai.github.io/baz/api/#baz.App.AppWithLocals.Options) and per-route descriptors into
 startup storage. `max_middleware` bounds their combined count, default 128 and
-maximum 4,096. `routeWith`, `bindWith`, and `endpointWith` accept `RouteOptions`;
+maximum 4,096. [`routeWith`](https://technologylab-ai.github.io/baz/api/#baz.App.AppWithLocals.routeWith), [`bindWith`](https://technologylab-ai.github.io/baz/api/#baz.App.AppWithLocals.bindWith), and [`endpointWith`](https://technologylab-ai.github.io/baz/api/#baz.App.AppWithLocals.endpointWith) accept [`RouteOptions`](https://technologylab-ai.github.io/baz/api/#baz.App.AppWithLocals.RouteOptions);
 endpoint registration copies its chain per method and rolls back atomically on
 failure. Bound instances and shared services remain borrowed through App teardown.
 

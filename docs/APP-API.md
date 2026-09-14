@@ -29,7 +29,7 @@ The upload example has an 8 KiB body limit; choose a smaller file if needed.
 It returns part metadata, lengths and byte sums, and does not save files.
 `zig build run-app -- --port 8080` also runs the example. It binds IPv4
 loopback by default and serves plain HTTP/1.1; inherited deployment limits remain in
-[README](../README.md). Public module exports are in [web.zig](../src/web.zig).
+[README](../README.md). Public module exports are in [baz.zig](../src/baz.zig).
 
 ## App and endpoint composition
 
@@ -61,26 +61,26 @@ const Hello = struct {
 
 In `main(init: std.process.Init)`, initialize an App with
 `.allocator = init.gpa`, `.io = init.io`, `.shared = &shared`, and optional
-`.server` / `.response` limits. Register with `try app.endpoint("/hello", &hello)`
-or `try app.route("GET", "/path", handler)`. `bind` registers an arbitrary
+`.server` / `.response` limits. Register with [`try app.endpoint("/hello", &hello)`](https://technologylab-ai.github.io/baz/api/#baz.App.AppWithLocals.endpoint)
+or [`try app.route("GET", "/path", handler)`](https://technologylab-ai.github.io/baz/api/#baz.App.AppWithLocals.route). `bind` registers an arbitrary
 stateful method. `endpoint` recognizes public `get`, `post`, `put`, `delete`,
 `patch`, `head` and `options` methods; failed registration rolls back atomically.
 
 `init` returns a stable, owned App pointer. Registration copies method/path
 bytes into startup storage. Shared and endpoint instances are borrowed and must
-remain at stable addresses through `deinit`. There is no global per-type App.
+remain at stable addresses through [`deinit`](https://technologylab-ai.github.io/baz/api/#baz.App.AppWithLocals.deinit). There is no global per-type App.
 Independent instances of the same type can use distinct state, ports and stop
 flags. State shared between callbacks must be immutable or synchronized.
 
-Lifecycle is `init → register → start → run → deinit`. `start` prepares the
-engine behind its startup gate and seals the framework allocator; `run` begins
-admission. Registration is closed after `start`. `requestStop` requests a drain;
+Lifecycle is `init → register → start → run → deinit`. [`start`](https://technologylab-ai.github.io/baz/api/#baz.App.AppWithLocals.start) prepares the
+engine behind its startup gate and seals the framework allocator; [`run`](https://technologylab-ai.github.io/baz/api/#baz.App.AppWithLocals.run) begins
+admission. Registration is closed after [`start`](https://technologylab-ai.github.io/baz/api/#baz.App.AppWithLocals.start). [`requestStop`](https://technologylab-ai.github.io/baz/api/#baz.App.AppWithLocals.requestStop) requests a drain;
 the signal-specific helper only sets atomic stop flags. Signal installation
-belongs in the executable. A failed `run` may leave application/kernel owners
+belongs in the executable. A failed [`run`](https://technologylab-ai.github.io/baz/api/#baz.App.AppWithLocals.run) may leave application/kernel owners
 outstanding: the example terminates with `engine.failFast(70)` and does not free borrowed
-storage. The normal `deinit` path waits for clean terminal ownership.
+storage. The normal [`deinit`](https://technologylab-ai.github.io/baz/api/#baz.App.AppWithLocals.deinit) path waits for clean terminal ownership.
 
-Use `ctx.param("id")` for a raw capture from `/users/:id`. Matching preserves
+Use [`ctx.param("id")`](https://technologylab-ai.github.io/baz/api/#baz.App.AppWithLocals.Context.param) for a raw capture from `/users/:id`. Matching preserves
 case, trailing slash, repeated slash and percent spelling; `%2F` remains inside
 one segment. Earlier static segments outrank captures, independently of
 registration order. The winning path family determines method selection;
@@ -94,13 +94,13 @@ OPTIONS and method failures supply `Allow`; OPTIONS `*` lists App methods.
 Unknown paths get 404 and unsupported methods on known paths get 405. An App
 can supply `not_found` and `on_error` handlers. Error hooks receive the same typed
 context after discarding the unpublished draft; failure in a hook produces a
-bounded generic 500. Use `web.defaultErrorStatus(err)` inside a custom hook to
+bounded generic 500. Use [`web.defaultErrorStatus(err)`](https://technologylab-ai.github.io/baz/api/#baz.defaultErrorStatus) inside a custom hook to
 retain Baz's existing classifications while customizing presentation or adding
 application-specific errors. CONNECT is currently 501.
 
 ## Borrowed request bytes
 
-`Request` is a view of the complete validated engine request. No helper performs
+[`Request`](https://technologylab-ai.github.io/baz/api/#baz.Request) is a view of the complete validated engine request. No helper performs
 socket I/O or allocates a parameter map. Application access to borrowed slices
 ends when the callback returns. The engine may retain storage longer to finish
 an explicit response borrow; that does not permit later application access.
@@ -109,16 +109,16 @@ part in a background task.
 
 | Access | Semantics |
 | --- | --- |
-| `request.method()` | Raw method token. |
-| `request.target()` | Distinguishes origin, absolute, authority and asterisk forms; raw target, optional path/query/authority slices. |
-| `request.header(name)` / `headers()` | Case-insensitive first lookup or ordered repeated headers. Values remain borrowed. |
-| `try request.query()` | Bounded, validated pair view with default limits. |
-| `queryWithLimits(limits)` | Caller-selected byte/pair/name/value limits. |
-| `fields.iterator()` | Ordered `name_raw`, `value_raw`, `has_equals`. |
-| `fields.decodedIterator(allocator, encoding)` | Owned decoded `name`, `value`, `has_equals`; explicit `.percent` or `.form` policy, ordered duplicates. |
-| `fields.firstRaw(name)` / `allRaw(name)` | Exact raw-name matching; returns the first pair / an iterator over repeats. |
-| `params.percentDecodeInto(raw, dst)` | Strict percent decoding; literal `+` stays `+`. |
-| `params.formDecodeInto(raw, dst)` | Strict percent decoding plus `+` → space. |
+| [`request.method()`](https://technologylab-ai.github.io/baz/api/#baz.Request.method) | Raw method token. |
+| [`request.target()`](https://technologylab-ai.github.io/baz/api/#baz.Request.target) | Distinguishes origin, absolute, authority and asterisk forms; raw target, optional path/query/authority slices. |
+| [`request.header(name)`](https://technologylab-ai.github.io/baz/api/#baz.Request.header) / [`headers()`](https://technologylab-ai.github.io/baz/api/#baz.Request.headers) | Case-insensitive first lookup or ordered repeated headers. Values remain borrowed. |
+| [`try request.query()`](https://technologylab-ai.github.io/baz/api/#baz.Request.query) | Bounded, validated pair view with default limits. |
+| [`queryWithLimits(limits)`](https://technologylab-ai.github.io/baz/api/#baz.Request.queryWithLimits) | Caller-selected byte/pair/name/value limits. |
+| [`fields.iterator()`](https://technologylab-ai.github.io/baz/api/#baz.params.Params.iterator) | Ordered `name_raw`, `value_raw`, `has_equals`. |
+| [`fields.decodedIterator(allocator, encoding)`](https://technologylab-ai.github.io/baz/api/#baz.params.Params.decodedIterator) | Owned decoded `name`, `value`, `has_equals`; explicit `.percent` or `.form` policy, ordered duplicates. |
+| [`fields.firstRaw(name)`](https://technologylab-ai.github.io/baz/api/#baz.params.Params.firstRaw) / [`allRaw(name)`](https://technologylab-ai.github.io/baz/api/#baz.params.Params.allRaw) | Exact raw-name matching; returns the first pair / an iterator over repeats. |
+| [`params.percentDecodeInto(raw, dst)`](https://technologylab-ai.github.io/baz/api/#baz.params.percentDecodeInto) | Strict percent decoding; literal `+` stays `+`. |
+| [`params.formDecodeInto(raw, dst)`](https://technologylab-ai.github.io/baz/api/#baz.params.formDecodeInto) | Strict percent decoding plus `+` → space. |
 
 `x=001&x=false&a[]=1&a[]=2` stays four text pairs. There are no automatic
 numbers, booleans, JSON values, objects or arrays. A bare `x` differs from `x=`
@@ -130,22 +130,22 @@ belongs to the caller.
 
 ## Bodies, forms and uploads
 
-`request.body().iterator()` yields logical payload spans without chunk framing
-or trailers. `contiguous()` returns a single borrowed payload when possible.
-`copyTo(destination)` explicitly joins spans into caller storage. `reader()`
+[`request.body().iterator()`](https://technologylab-ai.github.io/baz/api/#baz.Request.body) yields logical payload spans without chunk framing
+or trailers. [`contiguous()`](https://technologylab-ai.github.io/baz/api/#baz.request.Body.contiguous) returns a single borrowed payload when possible.
+[`copyTo(destination)`](https://technologylab-ai.github.io/baz/api/#baz.request.Body.copyTo) explicitly joins spans into caller storage. [`reader()`](https://technologylab-ai.github.io/baz/api/#baz.request.Body.reader)
 returns a fixed `std.Io.Reader` for contiguous payloads and otherwise returns
 `BodyNotContiguous`; it never reads from the network. Make an explicit copy
 first when a library needs a contiguous standard reader.
 
-`request.formUrlEncoded(limits)` checks Content-Type and Content-Encoding before
+[`request.formUrlEncoded(limits)`](https://technologylab-ai.github.io/baz/api/#baz.Request.formUrlEncoded) checks Content-Type and Content-Encoding before
 returning a raw pair view. It does not merge query parameters into body fields.
-For segmented bodies, explicitly copy and call `web.form.parse(bytes, limits)`;
+For segmented bodies, explicitly copy and call [`web.form.parse(bytes, limits)`](https://technologylab-ai.github.io/baz/api/#baz.form.parse);
 the compiled example demonstrates that fallback. Parsing preserves `%` escapes
-and `+` until `formDecodeInto` is called.
+and `+` until [`formDecodeInto`](https://technologylab-ai.github.io/baz/api/#baz.params.formDecodeInto) is called.
 
-`request.formMultipart(limits)` validates the entire contiguous body, then
-returns a view with a flat `.iterator()`. For segmented bodies, use `multipartBoundaryInto(dst)`,
-an explicit body copy, and `web.multipart.parse(body, boundary, limits)`.
+[`request.formMultipart(limits)`](https://technologylab-ai.github.io/baz/api/#baz.Request.formMultipart) validates the entire contiguous body, then
+returns a view with a flat `.iterator()`. For segmented bodies, use [`multipartBoundaryInto(dst)`](https://technologylab-ai.github.io/baz/api/#baz.Request.multipartBoundaryInto),
+an explicit body copy, and [`web.multipart.parse(body, boundary, limits)`](https://technologylab-ai.github.io/baz/api/#baz.multipart.parse).
 Boundaries are copied into a fixed 70-byte parser record; fields and file data
 remain slices of the original input or the explicit caller copy.
 
@@ -155,7 +155,7 @@ names and literal `[]` suffixes keep their wire order and spelling. Missing
 filename and empty filename are distinct; classification is an application
 decision. Surrounding quotes are removed from `name_raw` and `filename_raw`,
 while quoted-pair escapes remain. `content_type_raw` retains the complete raw
-Content-Type value. Use `form.unquoteInto` explicitly to interpret names and
+Content-Type value. Use [`form.unquoteInto`](https://technologylab-ai.github.io/baz/api/#baz.form.unquoteInto) explicitly to interpret names and
 filenames when needed.
 
 The supported profile is bounded modern `multipart/form-data`: no
@@ -168,25 +168,25 @@ the validated iterator. Neither form helper receives streams or writes to disk.
 
 ## Responses and capacity
 
-`ctx.response` begins as an unpublished draft backed by the connection's
+[`ctx.response`](https://technologylab-ai.github.io/baz/api/#baz.Response) begins as an unpublished draft backed by the connection's
 startup output arena. The scheduler secures its entire configured reservation
 before invoking a handler. If older output fills the arena it drains that output
 first, preserving the request and running application side effects once.
 
 | Method | Behavior |
 | --- | --- |
-| `setCookie(name, value, options)` / `deleteCookie(name, scope)` | Validated cookie fields in reserved headers, explicit lifetimes and scope. [Guide](COOKIES.md). |
-| `redirect(status, location)` | Selects an empty 301/302/303/307/308 response with copied Location. |
-| `header(name, value)` | Validates and copies a header immediately; ordered repeats remain separate. |
-| `text(status, bytes)` / `bytes(status, content_type, bytes)` | Copies caller data immediately, including stack data. |
-| `jsonBytes(status, encoded)` | Copies pre-encoded JSON. |
-| `mustache(status, template, data)` | Renders typed Mustache data into the reserved HTML draft. [Startup setup and bounds](MUSTACHE.md). |
-| `jsonValue(status, value)` | Serializes once into a bounded fixed standard writer. |
-| `print(status, content_type, format, args)` | Standard formatting into the reserved body. |
-| `borrowBody(status, content_type, bytes)` | Selects the entire body from retained input or an immutable server-lifetime asset; bounded by server.max_response_bytes rather than staging. Cannot be mixed with stream/body helpers. |
-| `stream(status, content_type, options)` | Worker response with a standard writer, incremental flushes, and bounded staging. |
+| [`setCookie(name, value, options)`](https://technologylab-ai.github.io/baz/api/#baz.Response.setCookie) / [`deleteCookie(name, scope)`](https://technologylab-ai.github.io/baz/api/#baz.Response.deleteCookie) | Validated cookie fields in reserved headers, explicit lifetimes and scope. [Guide](COOKIES.md). |
+| [`redirect(status, location)`](https://technologylab-ai.github.io/baz/api/#baz.Response.redirect) | Selects an empty 301/302/303/307/308 response with copied Location. |
+| [`header(name, value)`](https://technologylab-ai.github.io/baz/api/#baz.Response.header) | Validates and copies a header immediately; ordered repeats remain separate. |
+| [`text(status, bytes)`](https://technologylab-ai.github.io/baz/api/#baz.Response.text) / [`bytes(status, content_type, bytes)`](https://technologylab-ai.github.io/baz/api/#baz.Response.bytes) | Copies caller data immediately, including stack data. |
+| [`jsonBytes(status, encoded)`](https://technologylab-ai.github.io/baz/api/#baz.Response.jsonBytes) | Copies pre-encoded JSON. |
+| [`mustache(status, template, data)`](https://technologylab-ai.github.io/baz/api/#baz.Response.mustache) | Renders typed Mustache data into the reserved HTML draft. [Startup setup and bounds](MUSTACHE.md). |
+| [`jsonValue(status, value)`](https://technologylab-ai.github.io/baz/api/#baz.Response.jsonValue) | Serializes once into a bounded fixed standard writer. |
+| [`print(status, content_type, format, args)`](https://technologylab-ai.github.io/baz/api/#baz.Response.print) | Standard formatting into the reserved body. |
+| [`borrowBody(status, content_type, bytes)`](https://technologylab-ai.github.io/baz/api/#baz.Response.borrowBody) | Selects the entire body from retained input or an immutable server-lifetime asset; bounded by server.max_response_bytes rather than staging. Cannot be mixed with stream/body helpers. |
+| [`stream(status, content_type, options)`](https://technologylab-ai.github.io/baz/api/#baz.Response.stream) | Worker response with a standard writer, incremental flushes, and bounded staging. |
 
-`borrowBody` is a whole-body choice, not an append or stream-write operation.
+[`borrowBody`](https://technologylab-ai.github.io/baz/api/#baz.Response.borrowBody) is a whole-body choice, not an append or stream-write operation.
 You may add headers before or after it while the draft is private. You cannot
 write/flush a stream, borrow an image, and resume the stream; even starting a
 stream before borrowing is a conflict. For mixed output today, send all body
@@ -214,9 +214,9 @@ for each path, asset lifetimes, and how to serve a large retained asset with a
 small output arena.
 
 Content-Length, Transfer-Encoding and other canonical framing fields belong to
-the engine. Public `setCookie`, `deleteCookie` and `redirect` helpers use the same
-reserved header space. Request `cookies()` preserves borrowed pairs and
-`cookie(name)` rejects duplicates; see [cookies and redirects](COOKIES.md).
+the engine. Public [`setCookie`](https://technologylab-ai.github.io/baz/api/#baz.Response.setCookie), [`deleteCookie`](https://technologylab-ai.github.io/baz/api/#baz.Response.deleteCookie) and [`redirect`](https://technologylab-ai.github.io/baz/api/#baz.Response.redirect) helpers use the same
+reserved header space. Request [`cookies()`](https://technologylab-ai.github.io/baz/api/#baz.Request.cookies) preserves borrowed pairs and
+[`cookie(name)`](https://technologylab-ai.github.io/baz/api/#baz.Request.cookie) rejects duplicates; see [cookies and redirects](COOKIES.md).
 Use [streaming responses](STREAMING.md) to write, flush, sleep, and write again
 inside the same fixed worker callback. The returned handle exposes `writer()`,
 `flush()`, and `finish()`. Headers become immutable after the first flush.
@@ -228,8 +228,8 @@ retain authentication and request state across these callbacks without replay.
 
 ## std.Io and resource boundaries
 
-`App.Options.io` stores the caller's implementation. Standard memory readers and
-writers work inline without I/O. `ctx.serviceIo()` is available only when the
+[`App.Options.io`](https://technologylab-ai.github.io/baz/api/#baz.App.AppWithLocals.Options) stores the caller's implementation. Standard memory readers and
+writers work inline without I/O. [`ctx.serviceIo()`](https://technologylab-ai.github.io/baz/api/#baz.App.AppWithLocals.Context.serviceIo) is available only when the
 App explicitly selects fixed workers; it returns `IoRequiresWorkers` inline.
 The example `/service` uses finite `io.sleep` under
 `--execution workers --workers 2 --shards 1`.
@@ -259,16 +259,16 @@ Baz additionally supports native Windows x64, with [its own native gate](../repo
 | Old API concept | Current replacement |
 | --- | --- |
 | facil.io C HTTP foundation; no native Windows | Zig framework and HTTP engine; native Windows x64, Linux, and macOS support. |
-| `App.Create(...)`, registration globals | Instance `web.App(Shared)`, borrowed typed Shared and endpoints. |
-| Embedded endpoint base/path/error fields | Plain endpoint struct; `app.endpoint(path, &instance)`; App error hook. |
+| `App.Create(...)`, registration globals | Instance [`web.App(Shared)`](https://technologylab-ai.github.io/baz/api/#baz.App), borrowed typed Shared and endpoints. |
+| Embedded endpoint base/path/error fields | Plain endpoint struct; [`app.endpoint(path, &instance)`](https://technologylab-ai.github.io/baz/api/#baz.App.AppWithLocals.endpoint); App error hook. |
 | `parseQuery`, `getParamSlice`, typed param variants | `query`, raw pair iterators, explicit decode and caller interpretation. |
 | Merged `parseBody` parameter bag | Explicit URL-encoded or multipart parser, separate from query/JSON. |
 | One-file-versus-array upload representation | Flat ordered parts, optional filename, borrowed payload. |
-| `sendBody` / `sendJson` | Copying `text`/`bytes`, distinct `jsonBytes` and `jsonValue`. |
-| Borrowing an arbitrary response slice | `borrowBody` restricted to retained input or server-lifetime assets. |
+| `sendBody` / `sendJson` | Copying [`text`](https://technologylab-ai.github.io/baz/api/#baz.Response.text)/[`bytes`](https://technologylab-ai.github.io/baz/api/#baz.Response.bytes), distinct [`jsonBytes`](https://technologylab-ai.github.io/baz/api/#baz.Response.jsonBytes) and [`jsonValue`](https://technologylab-ai.github.io/baz/api/#baz.Response.jsonValue). |
+| Borrowing an arbitrary response slice | [`borrowBody`](https://technologylab-ai.github.io/baz/api/#baz.Response.borrowBody) restricted to retained input or server-lifetime assets. |
 | Global start/stop | App instance lifecycle on the existing Cluster. |
-| Incremental response output | `response.stream()` and `std.Io.Writer`, on fixed workers. |
-| Public authentication middleware / typed continuation | `AppWithLocals`, copied hooks, `routeContinuation`; see [composition](MIDDLEWARE.md) and [continuations](CONTINUATIONS.md). |
+| Incremental response output | [`response.stream()`](https://technologylab-ai.github.io/baz/api/#baz.Response.stream) and `std.Io.Writer`, on fixed workers. |
+| Public authentication middleware / typed continuation | [`AppWithLocals`](https://technologylab-ai.github.io/baz/api/#baz.AppWithLocals), copied hooks, [`routeContinuation`](https://technologylab-ai.github.io/baz/api/#baz.App.AppWithLocals.routeContinuation); see [composition](MIDDLEWARE.md) and [continuations](CONTINUATIONS.md). |
 
 Use the [roadmap](APP-API-ROADMAP.md) for the next session and named verification
 gates. The [20 supported Zap example ports](../examples/README.md) are implemented.

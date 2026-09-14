@@ -104,7 +104,7 @@ a production identity service.
 Subscriber cleanup uses an atomic release on all terminal paths. Generation-safe
 notification handles can become stale between producer publication and signalling.
 That is an ordinary result. Startup teardown stops and joins the producer before
-`App.deinit` releases its notification cells; no producer retains Context or writer
+[`App.deinit`](https://technologylab-ai.github.io/baz/api/#baz.App.AppWithLocals.deinit) releases its notification cells; no producer retains Context or writer
 pointers. Request deadlines, disconnects and shutdown release continuation state
 only after the engine reconciles its outstanding borrows.
 

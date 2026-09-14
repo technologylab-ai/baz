@@ -1,5 +1,6 @@
 # All guides
 
+Look up types, functions, and their source in the [generated API reference](https://technologylab-ai.github.io/baz/api/).
 Choose a guide by what you want to do. Start with the API guide for your first
 App, or explore a complete example to see the pieces working together.
 

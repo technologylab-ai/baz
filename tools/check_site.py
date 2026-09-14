@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Check the generated site's links, anchors, allowlist, and source fidelity."""
 from html.parser import HTMLParser
+import hashlib
+import tarfile
 import json
 from pathlib import Path
 import re
@@ -29,7 +31,7 @@ class Page(HTMLParser):
 
 
 def check(output, documents, document_urls):
-    pages = {name: Page((output / name).read_text()) for name in [p.relative_to(output).as_posix() for p in output.glob('*.html')] + ['docs/read.html']}
+    pages = {name: Page((output / name).read_text()) for name in [p.relative_to(output).as_posix() for p in output.glob('*.html')] + ['docs/read.html', 'api/index.html']}
     for name, page in pages.items():
         for href in page.links:
             link = urlsplit(href)
@@ -43,13 +45,30 @@ def check(output, documents, document_urls):
             if target.name == 'read.html' and link.query:
                 file = parse_qs(link.query).get('file', [''])[0]
                 assert file in documents, 'Reader target not published: ' + file
-            elif link.fragment and str(target.relative_to(output.resolve())) in pages:
+            elif link.fragment and str(target.relative_to(output.resolve())) in pages and target != (output / 'api/index.html').resolve():
                 assert unquote(link.fragment) in pages[str(target.relative_to(output.resolve()))].ids, 'Missing anchor: ' + href
     for path in (output / 'docs/diagrams').glob('*.svg'):
         ET.parse(path)
     manifest = json.loads((output / 'publication.json').read_text())
     actual = {str(path.relative_to(output)) for path in output.rglob('*') if path.is_file()}
     assert actual == set(manifest['files_sha256']) | {'publication.json'}, 'Unexpected artifact files'
+    api_manifest = json.loads((output / 'api/api-build.json').read_text())
+    for name in ['main.js', 'main.wasm', 'sources.tar']:
+        assert hashlib.sha256((output / 'api' / name).read_bytes()).hexdigest() == api_manifest['files_sha256'][name], 'Changed compiler artifact: ' + name
+    with tarfile.open(output / 'api/sources.tar') as archive:
+        digests, roots = {}, {}
+        for member in archive:
+            data = archive.extractfile(member).read()
+            digests[member.name] = hashlib.sha256(data).hexdigest()
+            module, _, filename = member.name.partition('/')
+            if module not in roots or filename in ('root.zig', module + '.zig'):
+                roots[module] = member.name
+            if module == 'baz':
+                assert data == (Path(__file__).resolve().parents[1] / 'src' / filename).read_bytes(), 'Changed Baz API source: ' + filename
+        assert digests == api_manifest['sources_sha256'], 'API source archive changed'
+        assert next(iter(roots)) == 'baz', 'Wrong default API module'
+        assert all(roots[name] == root for name, root in api_manifest['module_roots'].items()), 'Incorrect API module root'
+        assert roots['baz'] == 'baz/baz.zig'
     index = (output / 'index.html').read_text()
     examples = (output / 'examples.html').read_text()
     performance = (output / 'performance.html').read_text()
@@ -59,7 +78,7 @@ def check(output, documents, document_urls):
     for name in pages:
         source = (output / name).read_text()
         assert source.count('aria-current="page"') == 1, name
-    assert len(pages) == 8, 'Expected seven topic pages and the reader'
+    assert len(pages) == 9, 'Expected seven topic pages, the reader, and the API reference'
     assert all(text in performance for text in ['1.038×', '1.771×', '0.629×', '1.025×'])
     assert all((output / document_urls.get(name, name)).read_bytes() == (Path(__file__).resolve().parents[1] / name).read_bytes() for name in documents), 'Copied document changed'
     print('Site checks passed: links, anchors, diagrams, 26 examples, four benchmark profiles, and document identity.')

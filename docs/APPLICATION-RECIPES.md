@@ -70,7 +70,7 @@ The raw stream writer has no writable destination buffer. Consequently,
 `WriterBufferUnavailable` in Zig 0.16.0's file-reader fallback. Use `copyFrom` for
 that transfer. Standard writer `writeAll`, `print`, and `flush` remain available.
 
-Source and sink failures are sticky: `stream.failure()` retains the error, and
+Source and sink failures are sticky: [`stream.failure()`](https://technologylab-ai.github.io/baz/api/#baz.Stream.failure) retains the error, and
 `copyFrom` returns it. A generic reader reports `ReadFailed`; its concrete file
 reader retains the underlying diagnostic in `reader.err`. The complete example
 shows how to propagate that diagnostic. An error before publication can become

@@ -20,6 +20,9 @@ pub fn defaultErrorStatus(err: anyerror) u16 {
     };
 }
 
+/// Build an instance-owned application type with shared state and empty request locals.
+/// Register routes and endpoints before startup. Handlers run on application workers;
+/// request input and response reservations remain borrowed for their documented lifetimes.
 pub fn App(comptime Shared: type) type {
     return AppWithLocals(Shared, struct {});
 }

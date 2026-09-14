@@ -1,4 +1,16 @@
-//! Baz: Bounded Async Zap. Experimental application API for exact Zig 0.16.0.
+//! Baz — Bounded Async Zap. Experimental application API for exact Zig 0.16.0.
+//!
+//! Start with `App(Shared)` for typed routes and endpoints, or `AppWithLocals`
+//! for middleware with request-local state. `Request` borrows request input;
+//! `Response` builds bounded output on application workers.
+//!
+//! Use `Stream` and `continuation` for incremental responses, `Mailbox` for
+//! bounded notifications, and `sse` for server-sent event encoding. Request,
+//! response and borrowed-body storage must remain valid for their documented
+//! lifetimes. Capacity and ownership rules are part of the API contract.
+//!
+//! The `engine` export is the same dependency module used by Baz; its types
+//! retain their identity when used alongside framework types.
 pub const defaultErrorStatus = @import("App.zig").defaultErrorStatus;
 pub const App = @import("App.zig").App;
 pub const AppWithLocals = @import("App.zig").AppWithLocals;

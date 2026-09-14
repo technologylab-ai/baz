@@ -2,7 +2,7 @@
 
 **Bounded Async Zap.**
 
-[Website & documentation](https://technologylab-ai.github.io/baz/) · [All guides](docs/GUIDES.md) · [API guide](docs/APP-API.md) · [26 examples](examples/README.md)
+[Website & documentation](https://technologylab-ai.github.io/baz/) · [API reference](https://technologylab-ai.github.io/baz/api/) · [All guides](docs/GUIDES.md) · [API guide](docs/APP-API.md) · [26 examples](examples/README.md)
 
 A **pure Zig** successor to [Zap](https://github.com/zigzap/zap), built in **Zig 0.16.0**
 on [bounded/http](https://technologylab-ai.github.io/bounded-http/). It keeps Zap's typed
@@ -51,7 +51,7 @@ The first implementation provides:
 - **Cookies and redirects:** borrowed token views, explicit session/persistent expiry,
   scoped deletion, and empty redirects. See [the guide](docs/COOKIES.md) and
   [local login/logout example](examples/userpass_session.zig).
-- Real `App(Shared)` instances, plain endpoint structs and one router.
+- Real [`App(Shared)`](https://technologylab-ai.github.io/baz/api/#baz.App) instances, plain endpoint structs and one router.
 - Borrowed query and form text, ordered duplicates and explicit decoding into
   caller buffers. Values such as `001` and `false`, and names such as `a[]`,
   keep their spelling.
@@ -208,8 +208,8 @@ retaining slices or introducing asynchronous work.
 ### Application recipes
 
 [Application recipes](docs/APPLICATION-RECIPES.md) covers runnable LAN binding,
-runtime file downloads with `Stream.copyFrom`, caller-allocator decoded field
-iteration, and `defaultErrorStatus` for custom error hooks. The same guide is
+runtime file downloads with [`Stream.copyFrom`](https://technologylab-ai.github.io/baz/api/#baz.Stream.copyFrom), caller-allocator decoded field
+iteration, and [`defaultErrorStatus`](https://technologylab-ai.github.io/baz/api/#baz.defaultErrorStatus) for custom error hooks. The same guide is
 available from the website's Examples section.
 
 ## License

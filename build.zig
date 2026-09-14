@@ -14,12 +14,30 @@ pub fn build(b: *std.Build) void {
     }).module("bounded_http");
     const mustache = b.dependency("mustache", .{ .target = target, .optimize = optimize }).module("mustache");
     const module = b.addModule("baz", .{
-        .root_source_file = b.path("src/web.zig"),
+        .root_source_file = b.path("src/baz.zig"),
         .target = target,
         .optimize = optimize,
         .link_libc = true,
         .imports = &.{ .{ .name = "bounded_http", .module = engine }, .{ .name = "mustache_engine", .module = mustache } },
     });
+    // Generate from the same public module and dependency graph consumers use.
+    const docs_object = b.addObject(.{ .name = "baz", .root_module = module });
+    const prepare_docs = b.addSystemCommand(&.{"python3"});
+    prepare_docs.addFileArg(b.path("tools/prepare_api_docs.py"));
+    prepare_docs.addDirectoryArg(docs_object.getEmittedDocs());
+    const prepared_docs = prepare_docs.addOutputDirectoryArg("api");
+    prepare_docs.addArgs(&.{
+        b.fmt("baz/{s}", .{std.fs.path.basename(module.root_source_file.?.getPath(b))}),
+        "std/std.zig",
+        b.fmt("bounded_http/{s}", .{std.fs.path.basename(engine.root_source_file.?.getPath(b))}),
+        b.fmt("mustache_engine/{s}", .{std.fs.path.basename(mustache.root_source_file.?.getPath(b))}),
+    });
+    const install_docs = b.addInstallDirectory(.{
+        .source_dir = prepared_docs,
+        .install_dir = .prefix,
+        .install_subdir = "docs/api",
+    });
+    b.step("docs", "Generate the source-derived API reference").dependOn(&install_docs.step);
     // CLI parsing belongs to executables; the public baz module has no zli import.
     const zli = b.dependency("zli", .{ .target = target, .optimize = optimize }).module("zli");
     // Consumers may import the framework and its exact engine module together.
@@ -151,7 +169,7 @@ pub fn build(b: *std.Build) void {
         if (std.mem.eql(u8, step, "test")) verify.dependOn(&consumer.step) else check.dependOn(&consumer.step);
     }
     const test_step = b.step("test", "Run framework unit tests");
-    for ([_][]const u8{ "examples/endpoint/session_store.zig", "examples/endpoint/session_options.zig", "src/continuation.zig", "src/mailbox.zig", "src/sse.zig", "examples/endpoint/job_store.zig", "examples/jobs.zig", "src/params.zig", "src/form.zig", "src/cookies.zig", "src/request.zig", "src/multipart.zig", "src/response.zig", "src/router.zig", "src/mustache.zig", "src/App.zig", "src/web.zig" }) |path| {
+    for ([_][]const u8{ "examples/endpoint/session_store.zig", "examples/endpoint/session_options.zig", "src/continuation.zig", "src/mailbox.zig", "src/sse.zig", "examples/endpoint/job_store.zig", "examples/jobs.zig", "src/params.zig", "src/form.zig", "src/cookies.zig", "src/request.zig", "src/multipart.zig", "src/response.zig", "src/router.zig", "src/mustache.zig", "src/App.zig", "src/baz.zig" }) |path| {
         const tests = b.addTest(.{ .use_llvm = if (target.result.os.tag == .linux and optimize == .Debug) true else null, .use_lld = if (target.result.os.tag == .linux and optimize == .Debug) true else null, .root_module = b.createModule(.{
             .root_source_file = b.path(path),
             .target = target,

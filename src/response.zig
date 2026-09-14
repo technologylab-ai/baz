@@ -33,6 +33,10 @@ pub const Limits = struct {
     }
 };
 
+/// A bounded response draft owned exclusively by the current application callback.
+/// Use the methods to set metadata, write or borrow a body, and start a stream.
+/// Storage and lifecycle fields are framework bookkeeping; mutating them directly
+/// bypasses validation. Published output cannot be replaced by a later error response.
 pub const Response = struct {
     writer: *api.Writer,
     storage: []u8,

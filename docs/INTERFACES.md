@@ -6,7 +6,7 @@ The [API guide](APP-API.md) describes those contracts.
 The [ownership guide](OWNERSHIP.md) describes their lifetimes.
 
 Baz imports the external `bounded_http` module.
-`baz.engine` exposes that same module.
+[`baz.engine`](https://technologylab-ai.github.io/baz/api/#baz.engine) exposes that same module.
 The build also exports `bounded_http` for consumers that need both interfaces.
 The independent [consumer fixture](../examples/embedding/src/main.zig) verifies shared engine type identity.
 
