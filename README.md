@@ -83,6 +83,11 @@ Both the framework and its [bounded/http](https://technologylab-ai.github.io/bou
 | macOS | **kqueue** |
 | Windows x64 | **IOCP** |
 
+**No libc on Linux.** Neither Baz nor its engine forces a libc. On Linux the engine makes
+direct system calls unless your application links libc, so a Baz application builds as one
+static executable with no interpreter and no shared libraries, for the native target,
+`-Dtarget=x86_64-linux-musl` or `-linux-none`. macOS links libSystem; Windows uses Win32.
+
 All three platforms passed Debug and ReleaseSafe verification, the independent
 package consumer, all 14 App groups, all 20 ported-example groups, and all 14
 streaming groups—including the runnable example—plus nine large-borrow groups.
