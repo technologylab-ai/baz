@@ -142,6 +142,20 @@ def run(binary):
         passed("route timeout outlives the server deadline and preserves keep-alive in " + execution, server)
 
         with ContinuationServer(binary, execution, workers) as server:
+            with server.connect(timeout=10) as sock:
+                reader = StreamReader(sock)
+                ping(sock, reader)
+                # 2.5 s idle + a 1 s stream exceeds the 3 s default only if idle time counts.
+                time.sleep(2.5)
+                sock.sendall(request_bytes("/stream"))
+                status, _ = reader.head()
+                wire.require(status == 200, "stream after idle keep-alive did not start")
+                wire.require(reader.chunk() == "Starting…\n".encode(), "first snapshot after idle changed")
+                wire.require(reader.chunk() == b"Completed step 1 of 2\n", "idle time shortened the request deadline")
+                wire.require(reader.chunk() == b"Done.\n" and reader.chunk() is None, "stream after idle did not finish")
+        passed("idle keep-alive time does not shorten the next request deadline in " + execution, server)
+
+        with ContinuationServer(binary, execution, workers) as server:
             with server.connect() as sock:
                 reader = StreamReader(sock)
                 normal(sock, reader, 0)

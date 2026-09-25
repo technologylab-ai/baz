@@ -41,7 +41,8 @@ bounded state. A blocked callback delays other connections assigned to its worke
 | `server.max_response_bytes` | 16 MiB | Total logical body of a response, including all streaming writes or a borrowed body. |
 | `server.response_batch_limit` | 128 inline; effectively 1 with workers | Finished responses retained per connection before a drain. Available arena space can force an earlier drain. This is not a client pipeline-depth limit. |
 | `max_continuations` | 0 | Concurrent retained continuation states. Routes using continuations must opt into storage. Ordinary routes consume no continuation slots. |
-| `server.timeout_ms` | 5000 ms | Request-cycle deadline, including input, execution waits, and output. Streaming flushes and continuation waits do not reset it. |
+| `server.timeout_ms` | 5000 ms | Request deadline from the request's first byte, including input, execution waits, and output. Streaming flushes and continuation waits do not reset it. |
+| `server.idle_timeout_ms` | 0, same as `timeout_ms` | Wait for a request's first byte: after accept and between keep-alive requests. Idle time does not shorten the next request's deadline. |
 | `server.max_timeout_ms` | 0, disabled | Upper bound for a route's `RouteOptions.timeout_ms`, such as a long SSE stream. At least `timeout_ms`, at most one day. |
 
 Request header/body bounds and `server.memory_budget_bytes` are separate checks.

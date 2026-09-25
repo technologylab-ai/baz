@@ -71,9 +71,10 @@ shows LAN startup alongside the Baz-owned reader, form, and error conveniences.
 
 ## Per-route request deadlines
 
-The current pin is `96c249bce01e95ae7d6d6ff6b3bc1b9f3e5c0724` from
+The current pin is `38070603b7a8515374c24fb710242e5ad43d598a` from
 [engine PR #7](https://github.com/technologylab-ai/bounded-http/pull/7).
-The engine adds `Config.max_timeout_ms` and `Context.setRequestTimeout`.
+The engine adds `Config.max_timeout_ms`, `Config.idle_timeout_ms` and `Context.setRequestTimeout`.
+A request deadline now starts at the request's first byte, not after the preceding response.
 Baz exposes them as `RouteOptions.timeout_ms`, validated at registration.
 Merge engine PR #7 before the Baz adoption PR, then update the pin to the merge if its tree changes.
 

@@ -86,7 +86,9 @@ try app.routeContinuation("GET", "/events", State, start, advance, .{ .timeout_m
 Ordinary routes keep the short default, so a stalled request cannot hold a
 connection for minutes. Registration rejects a route timeout above
 `server.max_timeout_ms` with `error.InvalidRouteTimeout`. The deadline counts
-from the request start; the next request on the connection uses the default again.
+from the request's first byte, so idle keep-alive time before the request does not
+shorten it. `server.idle_timeout_ms` bounds that idle wait separately. The next
+request on the connection uses the default again.
 When the deadline expires, the engine closes the stream; browsers reconnect with
 `Last-Event-ID`. To end the stream cleanly, finish it before the deadline.
 
