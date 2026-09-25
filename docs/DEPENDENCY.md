@@ -69,6 +69,14 @@ hash remain explicit in `build.zig.zon`. Baz exposes the engine's [`Config.bind_
 and [`Config.parseBindAddress`](https://technologylab-ai.github.io/baz/api/#bounded_http.Config.parseBindAddress) directly. The [application recipes guide](APPLICATION-RECIPES.md)
 shows LAN startup alongside the Baz-owned reader, form, and error conveniences.
 
+## Per-route request deadlines
+
+The current pin is `96c249bce01e95ae7d6d6ff6b3bc1b9f3e5c0724` from
+[engine PR #7](https://github.com/technologylab-ai/bounded-http/pull/7).
+The engine adds `Config.max_timeout_ms` and `Context.setRequestTimeout`.
+Baz exposes them as `RouteOptions.timeout_ms`, validated at registration.
+Merge engine PR #7 before the Baz adoption PR, then update the pin to the merge if its tree changes.
+
 ## Future updates
 
 Update the engine URL, commit, and package hash together in `build.zig.zon`.

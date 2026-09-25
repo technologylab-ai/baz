@@ -73,6 +73,23 @@ immediate OS wake-up. No custom `std.Io` provider is involved; Baz keeps caller
 `std.Io` and the [bounded/http](https://technologylab-ai.github.io/bounded-http/)
 io_uring, kqueue and IOCP transports.
 
+## Long streams and the request deadline
+
+`server.timeout_ms` bounds every request, including an event stream.
+Give a stream route its own deadline instead of raising the global one:
+
+```zig
+// Server options: .timeout_ms = 5000, .max_timeout_ms = 10 * 60 * 1000
+try app.routeContinuation("GET", "/events", State, start, advance, .{ .timeout_ms = 10 * 60 * 1000 });
+```
+
+Ordinary routes keep the short default, so a stalled request cannot hold a
+connection for minutes. Registration rejects a route timeout above
+`server.max_timeout_ms` with `error.InvalidRouteTimeout`. The deadline counts
+from the request start; the next request on the connection uses the default again.
+When the deadline expires, the engine closes the stream; browsers reconnect with
+`Last-Event-ID`. To end the stream cleanly, finish it before the deadline.
+
 ## Bounded messages
 
 [`web.Mailbox(T, capacity)`](https://technologylab-ai.github.io/baz/api/#baz.Mailbox) embeds a fixed FIFO. [`tryPush`](https://technologylab-ai.github.io/baz/api/#baz.Mailbox.tryPush) reports `Full`, `Busy`

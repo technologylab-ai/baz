@@ -127,6 +127,21 @@ def run(binary):
         passed("public example flushes three snapshots and preserves keep-alive in " + execution, server)
 
         with ContinuationServer(binary, execution, workers) as server:
+            with server.connect(timeout=10) as sock:
+                started = time.monotonic()
+                sock.sendall(request_bytes("/long-stream"))
+                reader = StreamReader(sock)
+                status, headers = reader.head()
+                wire.require(status == 200, "long stream did not start")
+                wire.require(reader.chunk() == "Starting…\n".encode(), "long stream first snapshot changed")
+                wire.require(reader.chunk() == b"Completed step 1 of 2\n", "long stream timer update changed")
+                wire.require(reader.chunk() == b"Done.\n" and reader.chunk() is None, "route timeout did not outlive the server deadline")
+                elapsed = time.monotonic() - started
+                wire.require(elapsed >= 3.5, f"long stream finished before the default deadline: {elapsed:.3f}s")
+                ping(sock, reader)
+        passed("route timeout outlives the server deadline and preserves keep-alive in " + execution, server)
+
+        with ContinuationServer(binary, execution, workers) as server:
             with server.connect() as sock:
                 reader = StreamReader(sock)
                 normal(sock, reader, 0)
