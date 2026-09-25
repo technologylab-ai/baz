@@ -78,9 +78,8 @@ the preceding response. Baz exposes them as `RouteOptions.timeout_ms`, validated
 
 ## No libc on Linux
 
-The current pin is `2067d9438ec6d5a240b6acdce81c04f5c434bec3`, the branch of
-[engine PR #8](https://github.com/technologylab-ai/bounded-http/pull/8); re-pin to the engine's
-merged `main` after it lands. The engine no longer forces libc: on Linux it makes direct system
+The current pin is `bb9a5bf04802a15026f967b4e50ff843a91516a3`, the engine's `main` after
+[engine PR #8](https://github.com/technologylab-ai/bounded-http/pull/8) merged. The engine no longer forces libc: on Linux it makes direct system
 calls unless the application links libc. Baz does not force libc either, so a Linux application
 builds as one static executable without an interpreter or shared libraries. macOS links libSystem.
 
