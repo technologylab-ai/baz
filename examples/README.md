@@ -12,9 +12,12 @@ Run `zig build run-streaming -Doptimize=ReleaseSafe -- --port 8080`, then use
 See the [streaming guide](../docs/STREAMING.md) for its worker and lifetime bounds.
 [continuations.zig](continuations.zig) adds typed callbacks that release the executor
 between flushes and timers. [jobs.zig](jobs.zig) combines Mustache, sessions and
-notification-driven SSE. The runtime download and decoded form examples bring
-the catalog to 26 examples, including the 21 Zap ports below.
-Read the [complete application guide](../docs/JOBS.md) for its explicit limits.
+notification-driven SSE; read the [complete application guide](../docs/JOBS.md)
+for its explicit limits. [tailscale_https.zig](tailscale_https.zig) serves a loopback
+App over HTTPS through `tailscale serve`, admitting one tailnet login through an
+identity middleware; see the [HTTPS guide](../docs/HTTPS.md). The runtime download
+and decoded form examples bring the catalog to 27 examples, including the 21 Zap
+ports below.
 
 These examples adapt the public behavior of our predecessor
 [Zap](https://github.com/zigzap/zap), using the local Zig 0.16 port at
@@ -47,7 +50,7 @@ before delivery; only terminal shutdown establishes released storage.
 
 ## Typed CLI options with process initialization
 
-All 24 public examples use [zli](https://github.com/renerocksai/zli) through
+All 27 public examples use [zli](https://github.com/renerocksai/zli) through
 [shared executable support](support.zig). The main App demonstration and all five
 wire fixtures use the same parser with their own typed option structs. Each
 entry point receives Zig 0.16's `std.process.Init`:
@@ -139,7 +142,7 @@ Two original targets are deliberately absent:
 
 | Target | Disposition |
 | --- | --- |
-| `https` | TLS is out of scope by user decision. |
+| `https` | TLS stays out of Baz. [tailscale_https.zig](tailscale_https.zig) serves HTTPS through `tailscale serve` instead; see the [HTTPS guide](../docs/HTTPS.md). |
 | `websockets` | Requires HTTP upgrade and WebSocket connection/message ownership, absent from the current engine; queued separately. |
 
 Mustache also passed its [native three-platform gate](../reports/2026-09-06-mustache.md),
