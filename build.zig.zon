@@ -13,7 +13,7 @@
             .hash = "zli-0.1.1-pechgr4WAQBsw7p7JPU-GHHZ5xsBpEdfCRNpNtnQYnBz",
         },
         .bounded_http = .{
-            .url = "https://github.com/technologylab-ai/bounded-http/archive/dae89611a150b977ba7cac55d0ed27e48b6a4d26.tar.gz",
+            .url = "https://github.com/technologylab-ai/bounded-http/archive/874a8f3d9092984447ec090da4d69439e4754013.tar.gz",
             .hash = "bounded_http-0.1.0-N3A1uHB-EgBYr9gR1xBDyUb-IALtMRqJRuLOud9SclGd",
         },
     },
