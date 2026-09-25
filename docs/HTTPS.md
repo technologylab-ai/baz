@@ -62,16 +62,16 @@ ticks, well before its deadline, so the response terminates cleanly; the browser
 that a reconnect is harmless: resume from an ID, never from "whatever the client
 saw last".
 
-**Current limit:** on a kept-alive connection, the next request's deadline also
-includes the time the connection waited idle before that request arrived.
-`tailscale serve` pools its backend connections, so a stream that starts on a
-connection idle for eight seconds ends about eight seconds early (measured: with a
-15-second `timeout_ms`, 6 of 10 ticks after an 8-second idle gap, 2 of 10 after
-12 seconds), and the response is closed without its final chunk. Browsers
-reconnect with `Last-Event-ID` as usual. Non-browser clients should treat an
-unclean end of an event stream as "reconnect", which they must do for network
-drops anyway. The [verification receipt](../reports/2026-09-25-tailscale-https.md)
-records the measurements.
+**Idle connections:** `tailscale serve` pools its backend connections, so a
+stream often starts on a connection that waited idle. A request deadline starts at
+the request's first byte, so that idle time does not shorten the stream.
+`server.idle_timeout_ms` bounds the idle wait separately (zero selects `timeout_ms`).
+Before [bounded/http PR #7](https://github.com/technologylab-ai/bounded-http/pull/7),
+idle time counted: with a 15-second `timeout_ms`, a stream after an 8-second idle gap
+delivered 6 of 10 ticks, and after 12 seconds 2 of 10. The
+[verification receipt](../reports/2026-09-25-tailscale-https.md) records those
+measurements. To give only the stream route a longer deadline, use
+`RouteOptions.timeout_ms` (see [SSE](SSE.md#long-streams-and-the-request-deadline)).
 
 ## First request and certificates
 
