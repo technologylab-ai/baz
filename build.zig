@@ -17,7 +17,6 @@ pub fn build(b: *std.Build) void {
         .root_source_file = b.path("src/baz.zig"),
         .target = target,
         .optimize = optimize,
-        .link_libc = true,
         .imports = &.{ .{ .name = "bounded_http", .module = engine }, .{ .name = "mustache_engine", .module = mustache } },
     };
     const module = b.addModule("baz", module_options);
@@ -58,7 +57,6 @@ pub fn build(b: *std.Build) void {
             .root_source_file = b.path("src/app_demo.zig"),
             .target = target,
             .optimize = optimize,
-            .link_libc = true,
             .imports = &.{ .{ .name = "baz", .module = module }, .{ .name = "zli", .module = zli } },
         }),
     });
@@ -77,7 +75,6 @@ pub fn build(b: *std.Build) void {
             .root_source_file = b.path("src/streaming_demo.zig"),
             .target = target,
             .optimize = optimize,
-            .link_libc = true,
             .imports = &.{ .{ .name = "baz", .module = module }, .{ .name = "zli", .module = zli } },
         }),
     });
@@ -100,7 +97,6 @@ pub fn build(b: *std.Build) void {
             .root_source_file = b.path("src/borrow_demo.zig"),
             .target = target,
             .optimize = optimize,
-            .link_libc = true,
             .imports = &.{ .{ .name = "baz", .module = module }, .{ .name = "example_support", .module = example_support }, .{ .name = "zli", .module = zli } },
         }),
     });
@@ -115,7 +111,6 @@ pub fn build(b: *std.Build) void {
             .root_source_file = b.path("examples/cookie_fixture.zig"),
             .target = target,
             .optimize = optimize,
-            .link_libc = true,
             .imports = &.{ .{ .name = "baz", .module = module }, .{ .name = "example_support", .module = example_support }, .{ .name = "zli", .module = zli } },
         }),
     });
@@ -130,7 +125,6 @@ pub fn build(b: *std.Build) void {
             .root_source_file = b.path("examples/middleware_fixture.zig"),
             .target = target,
             .optimize = optimize,
-            .link_libc = true,
             .imports = &.{ .{ .name = "baz", .module = module }, .{ .name = "example_support", .module = example_support }, .{ .name = "zli", .module = zli } },
         }),
     });
@@ -147,7 +141,6 @@ pub fn build(b: *std.Build) void {
                 .root_source_file = b.path(b.fmt("examples/{s}.zig", .{name})),
                 .target = target,
                 .optimize = optimize,
-                .link_libc = true,
                 .imports = &.{ .{ .name = "baz", .module = module }, .{ .name = "example_support", .module = example_support } },
             }),
         });
@@ -179,7 +172,6 @@ pub fn build(b: *std.Build) void {
             .root_source_file = b.path(path),
             .target = target,
             .optimize = optimize,
-            .link_libc = true,
             .imports = if (std.mem.eql(u8, path, "examples/jobs.zig"))
                 &.{ .{ .name = "baz", .module = module }, .{ .name = "example_support", .module = example_support } }
             else
