@@ -118,6 +118,25 @@ def run(directory):
             response = wire.ResponseReader(sock).response()
             wire.require(response[0] == 200 and json.loads(response[2]) == expected, "segmented decoded form changed")
 
+    identity = ExampleServer(directory / "tailscale_https")
+    identity.options.update(login="alice@example.com", tick_ms=20)
+    with identity as server:
+        alice = (("Tailscale-User-Login", "alice@example.com"), ("Tailscale-User-Name", "Alice"))
+        call(server, "/whoami", status=403)
+        call(server, "/whoami", status=403, headers=(("Tailscale-User-Login", "mallory@example.com"),))
+        wire.require(json.loads(call(server, "/whoami", headers=alice)[2]) == {"login": "alice@example.com", "name": "Alice"},
+                     "identity locals changed the tailnet login")
+        wire.require(b"EventSource" in call(server, headers=alice)[2], "page missing")
+        call(server, "/events", status=403)
+        stream = call(server, "/events", headers=alice + (("Last-Event-ID", "41"),))
+        wire.require(stream[1][b"content-type"].startswith(b"text/event-stream"), "event stream type missing")
+        ids = [int(line[4:]) for line in stream[2].split(b"\n") if line.startswith(b"id: ")]
+        wire.require(ids == list(range(42, 52)), "stream did not resume after Last-Event-ID or end after ten ticks")
+        call(server, "/events", status=400, headers=alice + (("Last-Event-ID", "x"),))
+        call(server, "/events", status=400, headers=alice + (("Last-Event-ID", "18446744073709551615"),))
+    passed.append("tailscale_https")
+    print("PASS tailscale_https", flush=True)
+
     with case("senderror") as server:
         wire.require(json.loads(call(server, status=500)[2]) == {"error": "request failed"}, "private error leaked")
 

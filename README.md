@@ -2,7 +2,7 @@
 
 **Bounded Async Zap.**
 
-[Website & documentation](https://technologylab-ai.github.io/baz/) · [API reference](https://technologylab-ai.github.io/baz/api/) · [All guides](docs/GUIDES.md) · [API guide](docs/APP-API.md) · [26 examples](examples/README.md)
+[Website & documentation](https://technologylab-ai.github.io/baz/) · [API reference](https://technologylab-ai.github.io/baz/api/) · [All guides](docs/GUIDES.md) · [API guide](docs/APP-API.md) · [27 examples](examples/README.md)
 
 A **pure Zig** successor to [Zap](https://github.com/zigzap/zap), built in **Zig 0.16.0**
 on [bounded/http](https://technologylab-ai.github.io/bounded-http/). It keeps Zap's typed
@@ -186,7 +186,8 @@ The [package receipt](reports/2026-09-06-baz-extraction.md) records external-dep
 verification and source identity. The [prototype receipt](reports/2026-09-06-app-api.md)
 preserves the earlier combined engine/framework gates.
 
-The listener defaults to IPv4 loopback; an explicit IPv4 address supports LAN clients over plain HTTP/1.1. TLS is out of scope.
+The listener defaults to IPv4 loopback; an explicit IPv4 address supports LAN clients over plain HTTP/1.1. TLS is out of scope;
+[serve HTTPS through `tailscale serve`](docs/HTTPS.md) or another TLS reverse proxy.
 Mustache uses a [pure Zig library with bounded rendering](docs/MUSTACHE.md).
 WebSockets needs an engine upgrade lifecycle. Native Windows x64 now has its own
 [CI gate](.github/workflows/windows-build.yml), alongside Linux and macOS.

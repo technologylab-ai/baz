@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Native CLI correctness checks for the 24 examples and five Baz fixtures.
+"""Native CLI correctness checks for the 27 examples and five Baz fixtures.
 
 Build and install ReleaseSafe binaries first. The caller holds the shared host
 reservation and supplies an overall process-tree watchdog. Help/error processes
@@ -27,7 +27,7 @@ EXAMPLES = (
     "hello", "hello2", "hello_json", "simple_router", "routes", "serve",
     "sendfile", "senderror", "accept", "app_basic", "app_auth", "app_errors",
     "endpoint", "endpoint_auth", "middleware", "middleware_with_endpoint",
-    "userpass_session", "cookies", "http_params", "bindataformpost", "streaming", "mustache", "continuations", "jobs", "runtime_file", "decoded_forms",
+    "userpass_session", "cookies", "http_params", "bindataformpost", "streaming", "mustache", "continuations", "jobs", "runtime_file", "decoded_forms", "tailscale_https",
 )
 FIXTURES = ("baz", "baz-streaming", "baz-borrow", "baz-cookies", "baz-middleware")
 WORKER_EXAMPLES = frozenset(("endpoint", "streaming", "runtime_file", "decoded_forms"))
@@ -190,6 +190,8 @@ def run(directory):
 
     for option in ("session-ttl-ms", "job-ttl-ms", "tick-ms"):
         exit_case("jobs", "zero " + option, ["--" + option + "=0"], diagnostic="InvalidLifetime")
+    exit_case("tailscale_https", "zero tick-ms", ["--tick-ms=0"], diagnostic="InvalidLifetime")
+    exit_case("tailscale_https", "no public bind address", ["--bind-address", "0.0.0.0"], diagnostic="bind-address")
 
     def startup(name, label, arguments, workers, execution):
         with CliServer(binaries[name], arguments, workers, execution) as server:
