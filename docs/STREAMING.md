@@ -88,7 +88,8 @@ empty output; a borrowed one-shot body can use zero staging. Large writes may pu
 prefixes before encountering an error; they are not transactional.
 
 Flushes retain the original request deadline. Repeated writes or sleeps cannot
-extend `server.timeout_ms`. A flush completes after the local transport releases
+extend `server.timeout_ms`. A route that streams for longer selects its own
+deadline with `RouteOptions.timeout_ms`, bounded by `server.max_timeout_ms`. A flush completes after the local transport releases
 its output borrow; it does not prove peer receipt or application processing.
 
 ## Workers, sleep, and cancellation

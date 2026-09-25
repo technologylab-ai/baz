@@ -44,7 +44,13 @@ pub fn AppWithLocals(comptime Shared: type, comptime Locals: type) type {
             /// releases application resources; it must not change the response.
             cleanup: ?*const fn (*Context) void = null,
         };
-        pub const RouteOptions = struct { middleware: []const Middleware = &.{} };
+        pub const RouteOptions = struct {
+            middleware: []const Middleware = &.{},
+            /// Deadline for this route's requests in place of `server.timeout_ms`,
+            /// counted from the request start. Use it for long streams such as SSE.
+            /// Registration requires `server.max_timeout_ms` to cover the value.
+            timeout_ms: ?u32 = null,
+        };
         const BoundHandler = *const fn (?*anyopaque, *Context) anyerror!void;
         const Continuation = struct {
             initialize: *const fn ([]align(64) u8) void,
@@ -145,6 +151,7 @@ pub fn AppWithLocals(comptime Shared: type, comptime Locals: type) type {
             allow: []const u8 = "",
             middleware: []const Middleware = &.{},
             continuation: ?Continuation = null,
+            timeout_ms: ?u32 = null,
         };
 
         // init returns a stable allocation; all callbacks retain this address.
@@ -332,6 +339,9 @@ pub fn AppWithLocals(comptime Shared: type, comptime Locals: type) type {
             if (self.phase != .registration) return error.RegistrationClosed;
             if (!routing.validMethod(method)) return error.InvalidMethod;
             try validateMiddleware(options.middleware);
+            if (options.timeout_ms) |ms| {
+                if (ms == 0 or ms > self.config.max_timeout_ms) return error.InvalidRouteTimeout;
+            }
             if (options.middleware.len > self.middleware.len - self.middleware_len) return error.TooManyMiddleware;
             const rank = try routing.validate(path);
             for (self.routes[0..self.routes_len]) |other| {
@@ -349,7 +359,7 @@ pub fn AppWithLocals(comptime Shared: type, comptime Locals: type) type {
             self.names_len += path.len;
             const chain = self.middleware[self.middleware_len..][0..options.middleware.len];
             @memcpy(chain, options.middleware);
-            self.routes[self.routes_len] = .{ .method = method_copy, .pattern = path_copy, .rank = rank, .instance = instance, .call = call, .middleware = chain };
+            self.routes[self.routes_len] = .{ .method = method_copy, .pattern = path_copy, .rank = rank, .instance = instance, .call = call, .middleware = chain, .timeout_ms = options.timeout_ms };
             self.middleware_len += chain.len;
             self.routes_len += 1;
         }
@@ -530,6 +540,7 @@ pub fn AppWithLocals(comptime Shared: type, comptime Locals: type) type {
 
         fn startContinuation(self: *Self, context: *Context, entry: *const Route, state: []align(64) u8) !continuation.Step {
             if (context.cancelled.load(.acquire)) return error.Cancelled;
+            try applyRouteTimeout(context, entry);
             if (self.init_locals) |call| try call(context);
             if (context.response.prepared) return error.InvalidMiddlewareResponse;
             if (try runBefore(context, self.middleware[0..self.global_middleware_len], &context.global_entered) == .respond) return .finish;
@@ -667,7 +678,15 @@ pub fn AppWithLocals(comptime Shared: type, comptime Locals: type) type {
             try runAfter(context, self.middleware[0..context.global_entered]);
         }
 
+        /// The engine adopts the route deadline when this callback returns or flushes.
+        fn applyRouteTimeout(context: *Context, entry: *const Route) !void {
+            const ms = entry.timeout_ms orelse return;
+            const raw = context.response.context orelse return;
+            try raw.setRequestTimeout(ms);
+        }
+
         fn callRoute(context: *Context, entry: *const Route) !void {
+            try applyRouteTimeout(context, entry);
             context.route_middleware = entry.middleware;
             if (try runBefore(context, entry.middleware, &context.route_entered) == .respond) return;
             if (context.cancelled.load(.acquire)) return error.Cancelled;
@@ -748,6 +767,28 @@ test "App registration is instance-owned, copies paths and rolls back endpoints"
     const other = try Application.init(.{ .allocator = std.testing.allocator, .io = std.testing.io, .shared = &shared, .server = .{ .connections = 1, .shards = 1 } });
     defer other.deinit();
     try std.testing.expectEqual(@as(usize, 0), other.routes_len);
+}
+
+test "route timeouts require the server bound and are stored per route" {
+    const Shared = struct {};
+    const Application = App(Shared);
+    const H = struct {
+        fn get(_: *Application.Context) !void {}
+    };
+    var shared: Shared = .{};
+    const disabled = try Application.init(.{ .allocator = std.testing.allocator, .io = std.testing.io, .shared = &shared, .server = .{ .connections = 1, .shards = 1 } });
+    defer disabled.deinit();
+    try std.testing.expectError(error.InvalidRouteTimeout, disabled.routeWith("GET", "/events", H.get, .{ .timeout_ms = 60_000 }));
+    try std.testing.expectEqual(@as(usize, 0), disabled.routes_len);
+
+    const app = try Application.init(.{ .allocator = std.testing.allocator, .io = std.testing.io, .shared = &shared, .server = .{ .connections = 1, .shards = 1, .timeout_ms = 5000, .max_timeout_ms = 60_000 } });
+    defer app.deinit();
+    try std.testing.expectError(error.InvalidRouteTimeout, app.routeWith("GET", "/events", H.get, .{ .timeout_ms = 60_001 }));
+    try std.testing.expectError(error.InvalidRouteTimeout, app.routeWith("GET", "/events", H.get, .{ .timeout_ms = 0 }));
+    try app.routeWith("GET", "/events", H.get, .{ .timeout_ms = 60_000 });
+    try app.route("GET", "/plain", H.get);
+    try std.testing.expectEqual(@as(?u32, 60_000), app.routes[0].timeout_ms);
+    try std.testing.expectEqual(@as(?u32, null), app.routes[1].timeout_ms);
 }
 
 test "App startup budget covers application storage before sockets exist" {
