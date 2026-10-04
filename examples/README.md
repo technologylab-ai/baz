@@ -47,7 +47,7 @@ before delivery; only terminal shutdown establishes released storage.
 
 ## Typed CLI options with process initialization
 
-All 24 public examples use [zli](https://github.com/renerocksai/zli) through
+All 26 public examples use [zli](https://github.com/renerocksai/zli) through
 [shared executable support](support.zig). The main App demonstration and all five
 wire fixtures use the same parser with their own typed option structs. Each
 entry point receives Zig 0.17's `std.process.Init`:
