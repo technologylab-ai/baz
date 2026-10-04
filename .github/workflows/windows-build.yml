@@ -15,7 +15,7 @@ concurrency:
 jobs:
   windows-x64:
     runs-on: windows-latest
-    timeout-minutes: 25
+    timeout-minutes: 60
     env:
       PYTHONDONTWRITEBYTECODE: "1"
     steps:

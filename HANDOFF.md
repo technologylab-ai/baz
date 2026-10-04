@@ -36,7 +36,7 @@ The final URL graph has separate package-consumer checks.
 Hosted native CI records the published branch's Linux, Mac, and Windows results.
 Earlier receipts in this file retain their original compiler, revision, and platform scope.
 No performance measurement was performed for this migration.
-The separate Zig wiki remains on 0.16.0 and receives the agent migration guide after these ports.
+The user also authorized the separate Zig wiki's full 0.17.0 upgrade and agent migration guide.
 
 ## Earlier baseline — 2026-09-06
 
