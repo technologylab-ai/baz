@@ -27,11 +27,12 @@ jobs:
           python3 - <<'PYTHON'
           import hashlib, json, os, pathlib, platform, tarfile, urllib.request
           version = pathlib.Path('.zig-version').read_text().strip()
-          assert version == '0.16.0', 'Expected exact Zig 0.16.0'
+          assert version == '0.17.0', 'Expected exact Zig 0.17.0'
           architecture = {'x86_64': 'x86_64', 'arm64': 'aarch64', 'aarch64': 'aarch64'}[platform.machine()]
           system = {'Linux': 'linux', 'Darwin': 'macos'}[platform.system()]
-          with urllib.request.urlopen('https://ziglang.org/download/index.json', timeout=30) as response:
-              artifact = json.load(response)[version][f'{architecture}-{system}']
+          metadata = json.loads(pathlib.Path('.github/zig-release.json').read_text())
+          assert metadata['version'] == version
+          artifact = metadata['artifacts'][f'{architecture}-{system}']
           assert artifact['tarball'].startswith('https://ziglang.org/')
           directory = pathlib.Path(os.environ['RUNNER_TEMP']) / 'baz-zig'
           directory.mkdir()

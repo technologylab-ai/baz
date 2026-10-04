@@ -1,6 +1,6 @@
 # Baz module contracts
 
-Use exact Zig 0.16.0.
+Use exact Zig 0.17.0.
 The public `baz` module exports App, Request, Response, response limits, and parsing helpers.
 The [API guide](APP-API.md) describes those contracts.
 The [ownership guide](OWNERSHIP.md) describes their lifetimes.

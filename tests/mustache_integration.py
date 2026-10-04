@@ -32,7 +32,7 @@ class MustacheServer(wire.Server):
     def __enter__(self):
         super().__enter__()
         try:
-            wire.require(any("optimize=ReleaseSafe" in line for line in self.lines),
+            wire.require(any("optimize=safe" in line for line in self.lines),
                          "Mustache wire checks require a ReleaseSafe binary")
         except BaseException:
             self.__exit__(*sys.exc_info())

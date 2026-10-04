@@ -34,7 +34,7 @@ try app.routeContinuation("GET", "/stream", State, start, advance, .{});
 Run [the complete example](../examples/continuations.zig):
 
 ```sh
-zig build run-continuations -Doptimize=ReleaseSafe -- --port 8080 --execution workers --workers 1
+zig build run-continuations -Doptimize=safe -- --port 8080 --execution workers --workers 1
 curl -N http://localhost:8080/stream
 ```
 

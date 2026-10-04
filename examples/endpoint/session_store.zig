@@ -231,7 +231,7 @@ test "tokens reject malformed and noncanonical text without clearing a session" 
     var store = Store(1).init(@splat(5));
     defer store.deinit();
     const token = try store.create(std.math.maxInt(Identity), 0, 100);
-    for ([_][]const u8{ "", token[0..63], &([_]u8{'g'} ** 64), &([_]u8{'A'} ** 64) }) |invalid| {
+    for ([_][]const u8{ "", token[0..63], &@as([64]u8, @splat('g')), &@as([64]u8, @splat('A')) }) |invalid| {
         try std.testing.expectError(error.InvalidToken, store.authenticate(invalid, 0));
         try std.testing.expectError(error.InvalidToken, store.revoke(invalid));
     }

@@ -5,7 +5,7 @@ pub fn build(b: *std.Build) void {
         @panic("Use exactly the Zig release in .zig-version");
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
-    if (optimize == .ReleaseFast or optimize == .ReleaseSmall) {
+    if (optimize == .fast or optimize == .small) {
         @panic("This MVP requires Debug or ReleaseSafe so its invariants remain enabled");
     }
     const engine = b.dependency("bounded_http", .{
@@ -29,15 +29,15 @@ pub fn build(b: *std.Build) void {
     docs_module.addImport("zli", zli);
     const docs_object = b.addObject(.{ .name = "baz", .root_module = docs_module });
     const prepare_docs = b.addSystemCommand(&.{"python3"});
-    prepare_docs.addFileArg(b.path("tools/prepare_api_docs.py"));
-    prepare_docs.addDirectoryArg(docs_object.getEmittedDocs());
-    const prepared_docs = prepare_docs.addOutputDirectoryArg("api");
+    prepare_docs.addFileArg2(b.path("tools/prepare_api_docs.py"), .{});
+    prepare_docs.addDirectoryArg2(docs_object.getEmittedDocs(), .{});
+    const prepared_docs = prepare_docs.addOutputDirectoryArg2("api", .{});
     prepare_docs.addArgs(&.{
-        b.fmt("baz/{s}", .{std.fs.path.basename(module.root_source_file.?.getPath(b))}),
+        "baz/baz.zig",
         "std/std.zig",
-        b.fmt("bounded_http/{s}", .{std.fs.path.basename(engine.root_source_file.?.getPath(b))}),
-        b.fmt("mustache_engine/{s}", .{std.fs.path.basename(mustache.root_source_file.?.getPath(b))}),
-        b.fmt("zli/{s}", .{std.fs.path.basename(zli.root_source_file.?.getPath(b))}),
+        "bounded_http/server.zig",
+        "mustache_engine/mustache.zig",
+        "zli/zli.zig",
     });
     const install_docs = b.addInstallDirectory(.{
         .source_dir = prepared_docs,
@@ -52,8 +52,8 @@ pub fn build(b: *std.Build) void {
     // for Linux Debug only. ReleaseSafe uses its default toolchain selection.
     const app_exe = b.addExecutable(.{
         .name = "baz",
-        .use_llvm = if (target.result.os.tag == .linux and optimize == .Debug) true else null,
-        .use_lld = if (target.result.os.tag == .linux and optimize == .Debug) true else null,
+        .use_llvm = if (target.result.os.tag == .linux and optimize == .debug) true else null,
+        .use_lld = if (target.result.os.tag == .linux and optimize == .debug) true else null,
         .root_module = b.createModule(.{
             .root_source_file = b.path("src/app_demo.zig"),
             .target = target,
@@ -64,15 +64,15 @@ pub fn build(b: *std.Build) void {
     });
     b.installArtifact(app_exe);
     const app_run = b.addRunArtifact(app_exe);
-    if (b.args) |args| app_run.addArgs(args);
+    app_run.addPassthruArgs();
     b.step("run-app", "Run the application API example").dependOn(&app_run.step);
     b.step("run", "Run the application API example").dependOn(&app_run.step);
     const verify = b.step("verify", "Compile and test the exact-version MVP");
     const check = b.step("check", "Compile all framework tests and examples without executing target binaries");
     const stream_fixture = b.addExecutable(.{
         .name = "baz-streaming",
-        .use_llvm = if (target.result.os.tag == .linux and optimize == .Debug) true else null,
-        .use_lld = if (target.result.os.tag == .linux and optimize == .Debug) true else null,
+        .use_llvm = if (target.result.os.tag == .linux and optimize == .debug) true else null,
+        .use_lld = if (target.result.os.tag == .linux and optimize == .debug) true else null,
         .root_module = b.createModule(.{
             .root_source_file = b.path("src/streaming_demo.zig"),
             .target = target,
@@ -94,8 +94,8 @@ pub fn build(b: *std.Build) void {
     });
     const borrow_fixture = b.addExecutable(.{
         .name = "baz-borrow",
-        .use_llvm = if (target.result.os.tag == .linux and optimize == .Debug) true else null,
-        .use_lld = if (target.result.os.tag == .linux and optimize == .Debug) true else null,
+        .use_llvm = if (target.result.os.tag == .linux and optimize == .debug) true else null,
+        .use_lld = if (target.result.os.tag == .linux and optimize == .debug) true else null,
         .root_module = b.createModule(.{
             .root_source_file = b.path("src/borrow_demo.zig"),
             .target = target,
@@ -109,8 +109,8 @@ pub fn build(b: *std.Build) void {
     verify.dependOn(&borrow_fixture.step);
     const cookie_fixture = b.addExecutable(.{
         .name = "baz-cookies",
-        .use_llvm = if (target.result.os.tag == .linux and optimize == .Debug) true else null,
-        .use_lld = if (target.result.os.tag == .linux and optimize == .Debug) true else null,
+        .use_llvm = if (target.result.os.tag == .linux and optimize == .debug) true else null,
+        .use_lld = if (target.result.os.tag == .linux and optimize == .debug) true else null,
         .root_module = b.createModule(.{
             .root_source_file = b.path("examples/cookie_fixture.zig"),
             .target = target,
@@ -124,8 +124,8 @@ pub fn build(b: *std.Build) void {
     verify.dependOn(&cookie_fixture.step);
     const middleware_fixture = b.addExecutable(.{
         .name = "baz-middleware",
-        .use_llvm = if (target.result.os.tag == .linux and optimize == .Debug) true else null,
-        .use_lld = if (target.result.os.tag == .linux and optimize == .Debug) true else null,
+        .use_llvm = if (target.result.os.tag == .linux and optimize == .debug) true else null,
+        .use_lld = if (target.result.os.tag == .linux and optimize == .debug) true else null,
         .root_module = b.createModule(.{
             .root_source_file = b.path("examples/middleware_fixture.zig"),
             .target = target,
@@ -141,8 +141,8 @@ pub fn build(b: *std.Build) void {
     for ([_][]const u8{ "hello", "hello2", "hello_json", "simple_router", "routes", "serve", "sendfile", "senderror", "accept", "app_basic", "app_auth", "app_errors", "endpoint", "endpoint_auth", "middleware", "middleware_with_endpoint", "userpass_session", "cookies", "http_params", "bindataformpost", "streaming", "mustache", "continuations", "jobs", "runtime_file", "decoded_forms" }) |name| {
         const example = b.addExecutable(.{
             .name = name,
-            .use_llvm = if (target.result.os.tag == .linux and optimize == .Debug) true else null,
-            .use_lld = if (target.result.os.tag == .linux and optimize == .Debug) true else null,
+            .use_llvm = if (target.result.os.tag == .linux and optimize == .debug) true else null,
+            .use_lld = if (target.result.os.tag == .linux and optimize == .debug) true else null,
             .root_module = b.createModule(.{
                 .root_source_file = b.path(b.fmt("examples/{s}.zig", .{name})),
                 .target = target,
@@ -155,12 +155,12 @@ pub fn build(b: *std.Build) void {
         examples.dependOn(&install_example.step);
         b.step(name, b.fmt("Build and install {s}", .{name})).dependOn(&install_example.step);
         const run_example = b.addRunArtifact(example);
-        if (b.args) |args| run_example.addArgs(args);
+        run_example.addPassthruArgs();
         b.step(b.fmt("run-{s}", .{name}), b.fmt("Run {s}", .{name})).dependOn(&run_example.step);
         verify.dependOn(&example.step);
         check.dependOn(&example.step);
     }
-    const format = b.addFmt(.{ .paths = &.{ "build.zig", "build.zig.zon", "src", "examples" }, .check = true });
+    const format = b.addFmt(.{ .paths = b.pathList(&.{ "build.zig", "build.zig.zon", "src", "examples" }), .check = true });
     verify.dependOn(&format.step);
     check.dependOn(&format.step);
     const version = b.addSystemCommand(&.{ "python3", "tools/check_version.py" });
@@ -174,8 +174,8 @@ pub fn build(b: *std.Build) void {
         if (std.mem.eql(u8, step, "test")) verify.dependOn(&consumer.step) else check.dependOn(&consumer.step);
     }
     const test_step = b.step("test", "Run framework unit tests");
-    for ([_][]const u8{ "examples/endpoint/session_store.zig", "examples/endpoint/session_options.zig", "src/continuation.zig", "src/mailbox.zig", "src/sse.zig", "examples/endpoint/job_store.zig", "examples/jobs.zig", "src/params.zig", "src/form.zig", "src/cookies.zig", "src/request.zig", "src/multipart.zig", "src/response.zig", "src/router.zig", "src/mustache.zig", "src/App.zig", "src/baz.zig" }) |path| {
-        const tests = b.addTest(.{ .use_llvm = if (target.result.os.tag == .linux and optimize == .Debug) true else null, .use_lld = if (target.result.os.tag == .linux and optimize == .Debug) true else null, .root_module = b.createModule(.{
+    for ([_][]const u8{ "examples/endpoint/session_store.zig", "examples/endpoint/session_options.zig", "src/static_bytes.zig", "src/continuation.zig", "src/mailbox.zig", "src/sse.zig", "examples/endpoint/job_store.zig", "examples/jobs.zig", "src/params.zig", "src/form.zig", "src/cookies.zig", "src/request.zig", "src/multipart.zig", "src/response.zig", "src/router.zig", "src/mustache.zig", "src/App.zig", "src/baz.zig" }) |path| {
+        const tests = b.addTest(.{ .use_llvm = if (target.result.os.tag == .linux and optimize == .debug) true else null, .use_lld = if (target.result.os.tag == .linux and optimize == .debug) true else null, .root_module = b.createModule(.{
             .root_source_file = b.path(path),
             .target = target,
             .optimize = optimize,

@@ -180,7 +180,7 @@ fn decimal(comptime T: type, raw: []const u8) !T {
 }
 
 fn jobHandle(raw: []const u8) !jobs.Handle {
-    const separator = std.mem.indexOfScalar(u8, raw, '-') orelse return error.InvalidId;
+    const separator = std.mem.findScalar(u8, raw, '-') orelse return error.InvalidId;
     const generation = try decimal(u64, raw[separator + 1 ..]);
     if (generation == 0) return error.InvalidId;
     return .{ .slot = try decimal(u16, raw[0..separator]), .generation = generation };

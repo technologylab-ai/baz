@@ -9,7 +9,7 @@ standard `std.Io.Writer`, flush, do finite work or sleep, then write again.
 The [runnable example](../examples/streaming.zig) sends three updates:
 
 ```sh
-zig build run-streaming -Doptimize=ReleaseSafe -- --port 8080
+zig build run-streaming -Doptimize=safe -- --port 8080
 curl -N http://127.0.0.1:8080/
 ```
 

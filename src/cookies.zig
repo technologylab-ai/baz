@@ -431,8 +431,10 @@ test "cookie parser rejects malformed pairs and checks exact bounds before publi
 }
 
 test "iterator respects accepted custom limits above the defaults" {
-    const raw = "a" ** 257 ++ "=" ++ "x" ** 4097;
-    const view = try parse(raw, .{ .max_name_bytes = 257, .max_value_bytes = 4097 });
+    const name: [257]u8 = @splat('a');
+    const value: [4097]u8 = @splat('x');
+    const raw = name ++ [_]u8{'='} ++ value;
+    const view = try parse(&raw, .{ .max_name_bytes = 257, .max_value_bytes = 4097 });
     var it = view.iterator();
     const item = it.next().?;
     try std.testing.expectEqual(@as(usize, 257), item.name_raw.len);
@@ -492,7 +494,7 @@ test "all Set-Cookie errors preserve destination including overlapping option st
         .{ .options = .{ .domain = "example..test" }, .expected = error.InvalidCookieDomain },
         .{ .options = .{ .domain = "example.test:80" }, .expected = error.InvalidCookieDomain },
         .{ .options = .{ .domain = "ex\xffmple.test" }, .expected = error.InvalidCookieDomain },
-        .{ .options = .{ .domain = "a" ** 64 ++ ".test" }, .expected = error.InvalidCookieDomain },
+        .{ .options = .{ .domain = &(@as([64]u8, @splat('a')) ++ ".test".*) }, .expected = error.InvalidCookieDomain },
         .{ .options = .{ .expires = max_expiry + 1 }, .expected = error.InvalidCookieExpiry },
         .{ .options = .{ .same_site = .none }, .expected = error.InsecureCookie },
         .{ .name = "__Host-id", .expected = error.InvalidCookiePrefix },

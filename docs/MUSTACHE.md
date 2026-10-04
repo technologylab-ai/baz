@@ -1,7 +1,7 @@
 # Mustache templates
 
 Baz renders Mustache with a [pure Zig, MIT-licensed library](https://github.com/technologylab-ai/mustache-zig),
-ported to exact Zig 0.16.0 and extended with explicit rendering limits.
+ported to exact Zig 0.17.0 and extended with explicit rendering limits.
 Parse templates once at startup. Pass ordinary typed Zig data to a handler;
 render directly into its reserved response storage.
 
@@ -13,7 +13,7 @@ This is a preview of the rendered page. Run the [complete example](../examples/m
 locally to use the greeting form:
 
 ```sh
-zig build run-mustache -Doptimize=ReleaseSafe -- --port 8080
+zig build run-mustache -Doptimize=safe -- --port 8080
 # Open http://127.0.0.1:8080/ in your browser.
 ```
 
@@ -123,7 +123,7 @@ are excluded explicitly. Those compatibility checks are independent of the
 framework's HTTP ownership tests.
 
 `zig build verify` checks Baz and its independent package consumer in Debug or
-ReleaseSafe. After `zig build install examples -Doptimize=ReleaseSafe`, run
+ReleaseSafe. After `zig build install examples -Doptimize=safe`, run
 `python3 tests/mustache_integration.py` for 12 HTTP groups: inline and fixed
 workers, HTML/HEAD, explicit decoding and escaping, partials, malformed raw targets
 with connection close, application input errors with keep-alive recovery,

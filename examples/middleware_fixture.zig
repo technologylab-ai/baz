@@ -30,7 +30,7 @@ const Record = struct {
 
     fn snapshot(self: *const Record) Snapshot {
         var result: Snapshot = undefined;
-        inline for (std.meta.fields(Snapshot)) |field| @field(result, field.name) = @field(self, field.name).load(.acquire);
+        inline for (@typeInfo(Snapshot).@"struct".field_names) |field_name| @field(result, field_name) = @field(self, field_name).load(.acquire);
         return result;
     }
 };
@@ -273,8 +273,8 @@ pub fn main(init: std.process.Init) !void {
     var total: Snapshot = .{ .trace = 0, .initialized = 0, .handlers = 0, .afters = 0, .cleanups = 0, .locals_cleaned = 0, .cancelled = 0, .errors = 0, .sleeping = 0, .bad_address = 0 };
     for (&shared.records) |*item| {
         const snapshot = item.snapshot();
-        inline for (std.meta.fields(Snapshot)) |field| {
-            if (comptime !std.mem.eql(u8, field.name, "trace")) @field(total, field.name) += @field(snapshot, field.name);
+        inline for (@typeInfo(Snapshot).@"struct".field_names) |field_name| {
+            if (comptime !std.mem.eql(u8, field_name, "trace")) @field(total, field_name) += @field(snapshot, field_name);
         }
     }
     const receipt = try std.json.Stringify.valueAlloc(init.gpa, total, .{});

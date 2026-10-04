@@ -43,7 +43,7 @@ test "consumer parses Mustache partials and publishes an escaped HTML response" 
     try std.testing.expect(!writer.began);
     try std.testing.expectEqual(engine.api.Action.finish, try response.finish());
     try std.testing.expectEqualStrings("<h1>&lt;Hello&gt;</h1><p>Rene / Baz</p><p>Caro / Baz</p>", writer.committed());
-    try std.testing.expect(std.mem.indexOf(u8, arena[0..writer.body_start], "Content-Type: text/html; charset=utf-8\r\n") != null);
+    try std.testing.expect(std.mem.find(u8, arena[0..writer.body_start], "Content-Type: text/html; charset=utf-8\r\n") != null);
 }
 
 test "consumer can borrow cookie tokens and publish cookies with an empty redirect" {
@@ -64,7 +64,7 @@ test "consumer can borrow cookie tokens and publish cookies with an empty redire
     _ = try response.finish();
     try std.testing.expectEqual(@as(u16, 303), writer.status);
     try std.testing.expectEqualStrings("", writer.committed());
-    try std.testing.expect(std.mem.indexOf(u8, arena[0..writer.body_start], "Max-Age=3600") != null);
+    try std.testing.expect(std.mem.find(u8, arena[0..writer.body_start], "Max-Age=3600") != null);
 }
 
 test "consumer registers typed locals and copied route middleware" {

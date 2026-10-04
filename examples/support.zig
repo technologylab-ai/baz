@@ -29,7 +29,7 @@ pub fn Options(comptime workers_required: bool) type {
         shards: u8 = 1,
 
         pub const help =
-            \\Baz example — Zig 0.16.0
+            \\Baz example — Zig 0.17.0
             \\Usage: EXAMPLE [options]
             \\
             \\  -h, --help                    Show this help and exit

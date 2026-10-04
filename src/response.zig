@@ -170,7 +170,7 @@ pub const Response = struct {
         }
         if (location.len == 0) return error.InvalidRedirect;
         for (location, 0..) |byte, index| {
-            if (byte <= 0x20 or byte >= 0x7f or std.mem.indexOfScalar(u8, "\\\"<>^`{|}", byte) != null) return error.InvalidRedirect;
+            if (byte <= 0x20 or byte >= 0x7f or std.mem.findScalar(u8, "\\\"<>^`{|}", byte) != null) return error.InvalidRedirect;
             if (byte == '%' and (location.len - index < 3 or
                 !std.ascii.isHex(location[index + 1]) or !std.ascii.isHex(location[index + 2])))
                 return error.InvalidRedirect;
@@ -567,9 +567,13 @@ pub const Stream = struct {
     /// arbitrary source operation already in progress. Runtime file I/O belongs
     /// on an application worker. Existing response limits and flush waits apply.
     pub fn copyFrom(self: *Stream, reader: *std.Io.Reader, scratch: []u8) !usize {
-        errdefer |err| {
+        return self.copyFromInner(reader, scratch) catch |err| {
             if (self.response.stream_error == null) self.response.stream_error = err;
-        }
+            return err;
+        };
+    }
+
+    fn copyFromInner(self: *Stream, reader: *std.Io.Reader, scratch: []u8) !usize {
         try self.response.checkStream();
         if (scratch.len == 0) return error.EmptyScratchBuffer;
         if (overlap(scratch, reader.buffer) or overlap(scratch, self.response.storage))
@@ -713,7 +717,7 @@ test "continuation snapshots retain detached metadata and publish only on return
     try testing.expectError(error.InvalidState, response.continuationWait());
     try testing.expectEqual(api.Action.flush, try response.continuationFlush());
     try testing.expectEqualStrings("abcbc", fixture.writer.committed());
-    try testing.expect(std.mem.indexOf(u8, fixture.arena[0..fixture.writer.body_start], "X-Retained: yes\r\n") != null);
+    try testing.expect(std.mem.find(u8, fixture.arena[0..fixture.writer.body_start], "X-Retained: yes\r\n") != null);
     try testing.expectError(error.InvalidState, response.resumeSnapshot());
     try testing.expectError(error.InvalidState, response.header("X-Late", "no"));
     fixture.drained();
@@ -1068,8 +1072,8 @@ test "draft copies stack metadata and body and preserves earlier frozen bytes" {
     try testing.expectEqualStrings(prefix, arena[0..prefix.len]);
     try testing.expectEqualStrings("Hello", writer.committed());
     const head = arena[writer.base..writer.body_start];
-    try testing.expect(std.mem.indexOf(u8, head, "Content-Type: text/plain\r\n") != null);
-    try testing.expect(std.mem.indexOf(u8, head, "X-Note: original\r\nSet-Cookie: a=1\r\nSet-Cookie: b=2\r\n\r\n") != null);
+    try testing.expect(std.mem.find(u8, head, "Content-Type: text/plain\r\n") != null);
+    try testing.expect(std.mem.find(u8, head, "X-Note: original\r\nSet-Cookie: a=1\r\nSet-Cookie: b=2\r\n\r\n") != null);
     try testing.expectEqual(@as(usize, 5), writer.draft_copy_bytes);
     try testing.expectError(error.InvalidState, response.finish());
     try testing.expectError(error.InvalidState, response.errorResponse(500));
@@ -1090,7 +1094,7 @@ test "header bounds and injection failures leave the unpublished draft usable" {
     try testing.expectError(error.ResponseLimit, response.header("Y", "b"));
     try response.text(200, "ok");
     _ = try response.finish();
-    try testing.expect(std.mem.indexOf(u8, arena[0..writer.body_start], "X: a\r\n\r\n") != null);
+    try testing.expect(std.mem.find(u8, arena[0..writer.body_start], "X: a\r\n\r\n") != null);
     try testing.expectEqualStrings("ok", writer.committed());
 }
 
@@ -1111,7 +1115,7 @@ test "JSON exact fit and overflow never publish an incomplete success" {
     _ = try response.errorResponse(500);
     try testing.expectEqual(@as(u16, 500), writer.status);
     try testing.expectEqualStrings("", writer.committed());
-    try testing.expect(std.mem.indexOf(u8, arena[0..writer.buffered], "\"ab") == null);
+    try testing.expect(std.mem.find(u8, arena[0..writer.buffered], "\"ab") == null);
 }
 
 test "failed custom serializer executes once and custom mapper discards all draft fields" {
@@ -1137,8 +1141,8 @@ test "failed custom serializer executes once and custom mapper discards all draf
     try response.text(409, "conflict");
     _ = try response.finish();
     const wire = arena[0..writer.buffered];
-    try testing.expect(std.mem.indexOf(u8, wire, "private") == null);
-    try testing.expect(std.mem.indexOf(u8, wire, "X-Error: mapped\r\n") != null);
+    try testing.expect(std.mem.find(u8, wire, "private") == null);
+    try testing.expect(std.mem.find(u8, wire, "X-Error: mapped\r\n") != null);
     try testing.expectEqualStrings("conflict", writer.committed());
 }
 
@@ -1167,11 +1171,11 @@ test "response states bodyless statuses HEAD and explicit borrowing retain contr
     try response.text(304, "");
     _ = try response.finish();
     try testing.expectEqual(@as(usize, 0), writer.bodyBytes());
-    try testing.expect(std.mem.indexOf(u8, arena[0..writer.buffered], "Content-Length") == null);
+    try testing.expect(std.mem.find(u8, arena[0..writer.buffered], "Content-Length") == null);
 }
 
 test "large immutable borrows retain their pointer without body staging or arena copies" {
-    const asset = "0123456789abcdef" ** (5 * 1024 * 1024 / 16);
+    const asset: [:0]const u8 = &(comptime @import("static_bytes.zig").repeat("0123456789abcdef", 5 * 1024 * 1024 / 16));
     const prefix = "older frozen response";
     const cache = testCache();
     for ([_]bool{ false, true }) |head_only| {
@@ -1195,14 +1199,14 @@ test "large immutable borrows retain their pointer without body staging or arena
         try testing.expect(!writer.copied_borrow);
         try testing.expectEqualStrings(prefix, arena[0..prefix.len]);
         const head = arena[writer.base..writer.body_start];
-        try testing.expect(std.mem.indexOf(u8, head, "Content-Length: 5242880\r\n") != null);
-        try testing.expect(std.mem.indexOf(u8, head, "X-Asset: retained\r\nX-After: prepared\r\n") != null);
+        try testing.expect(std.mem.find(u8, head, "Content-Length: 5242880\r\n") != null);
+        try testing.expect(std.mem.find(u8, head, "X-Asset: retained\r\nX-After: prepared\r\n") != null);
         try testing.expectError(error.InvalidState, response.errorResponse(500));
     }
 }
 
 test "borrow totals reject one excess byte before publication and preserve fallback" {
-    const asset = "retained" ** 1024;
+    const asset: [:0]const u8 = &(comptime @import("static_bytes.zig").repeat("retained", 1024));
     var arena: [1024]u8 = undefined;
     const cache = testCache();
     var writer = api.Writer.init(&arena, &cache, 0);
@@ -1216,7 +1220,7 @@ test "borrow totals reject one excess byte before publication and preserve fallb
     try testing.expect(!response.prepared and response.borrowed == null and !writer.began and !writer.frozen);
     try testing.expectEqual(api.Action.finish, try response.errorResponse(500));
     try testing.expectEqualStrings("Internal Server Error", writer.committed());
-    try testing.expect(std.mem.indexOf(u8, arena[0..writer.buffered], "X-Private") == null);
+    try testing.expect(std.mem.find(u8, arena[0..writer.buffered], "X-Private") == null);
     writer.release();
     writer.open(0, true, false);
     response = try Response.initWithLimit(&writer, .{ .header_bytes = 0, .body_bytes = 0 }, asset.len);
@@ -1284,7 +1288,7 @@ test "Mustache writes directly to unpublished storage and selects the whole HTML
     _ = try response.finish();
     try testing.expectEqualStrings("Hello &lt;&gt;", writer.committed());
     try testing.expectEqual(@as(usize, 14), writer.draft_copy_bytes);
-    try testing.expect(std.mem.indexOf(u8, arena[0..writer.body_start], "Content-Type: text/html; charset=utf-8\r\n") != null);
+    try testing.expect(std.mem.find(u8, arena[0..writer.body_start], "Content-Type: text/html; charset=utf-8\r\n") != null);
 }
 
 test "Mustache overflow work exhaustion and bodyless status keep prefixes private" {
@@ -1300,7 +1304,7 @@ test "Mustache overflow work exhaustion and bodyless status keep prefixes privat
         var response = try Response.init(&writer, .{ .header_bytes = 0, .body_bytes = 16 });
         switch (failure) {
             0 => try testing.expectError(error.WriteFailed, response.mustache(200, &template, .{ .name = "<&>" })),
-            1 => try testing.expectError(error.WorkLimitExceeded, response.mustache(200, &budgeted, .{ .rows = [_]bool{true} ** 100 })),
+            1 => try testing.expectError(error.WorkLimitExceeded, response.mustache(200, &budgeted, .{ .rows = @as([100]bool, @splat(true)) })),
             2 => try testing.expectError(error.InvalidResponse, response.mustache(204, &template, .{ .name = "x" })),
             else => unreachable,
         }
@@ -1308,7 +1312,7 @@ test "Mustache overflow work exhaustion and bodyless status keep prefixes privat
         try response.text(500, "fallback");
         _ = try response.finish();
         try testing.expectEqualStrings("fallback", writer.committed());
-        try testing.expect(std.mem.indexOf(u8, arena[0..writer.buffered], "private") == null);
+        try testing.expect(std.mem.find(u8, arena[0..writer.buffered], "private") == null);
         writer.release();
     }
 }
@@ -1327,8 +1331,8 @@ test "cookie headers copy metadata once, repeat independently, and coexist with 
     try testing.expect(!writer.began);
     _ = try response.finish();
     const head = arena[0..writer.body_start];
-    try testing.expect(std.mem.indexOf(u8, head, "Set-Cookie: sid=original; Path=/; HttpOnly; SameSite=Lax\r\n") != null);
-    try testing.expect(std.mem.indexOf(u8, head, "Set-Cookie: old=; Path=/app; Domain=example.test; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Secure; HttpOnly; SameSite=Strict\r\n") != null);
+    try testing.expect(std.mem.find(u8, head, "Set-Cookie: sid=original; Path=/; HttpOnly; SameSite=Lax\r\n") != null);
+    try testing.expect(std.mem.find(u8, head, "Set-Cookie: old=; Path=/app; Domain=example.test; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Secure; HttpOnly; SameSite=Strict\r\n") != null);
     try testing.expectError(error.InvalidState, response.setCookie("late", "x", .{}));
 }
 
@@ -1389,7 +1393,7 @@ test "redirect validates destination and status atomically and leaves cookie hea
         _ = try response.finish();
         try testing.expectEqual(status, writer.status);
         try testing.expectEqualStrings("", writer.committed());
-        try testing.expect(std.mem.indexOf(u8, arena[0..writer.body_start], "Location: /home?x=%20#ok\r\nSet-Cookie: after=yes;") != null);
+        try testing.expect(std.mem.find(u8, arena[0..writer.body_start], "Location: /home?x=%20#ok\r\nSet-Cookie: after=yes;") != null);
         writer.release();
     }
 }

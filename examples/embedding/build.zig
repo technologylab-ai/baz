@@ -5,8 +5,8 @@ pub fn build(b: *std.Build) void {
     const optimize = b.standardOptimizeOption(.{});
     const framework = b.dependency("baz", .{ .target = target, .optimize = optimize });
     const tests = b.addTest(.{
-        .use_llvm = if (target.result.os.tag == .linux and optimize == .Debug) true else null,
-        .use_lld = if (target.result.os.tag == .linux and optimize == .Debug) true else null,
+        .use_llvm = if (target.result.os.tag == .linux and optimize == .debug) true else null,
+        .use_lld = if (target.result.os.tag == .linux and optimize == .debug) true else null,
         .root_module = b.createModule(.{
             .root_source_file = b.path("src/main.zig"),
             .target = target,

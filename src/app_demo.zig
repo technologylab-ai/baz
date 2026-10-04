@@ -165,8 +165,8 @@ fn invalidHeader(ctx: *Context) !void {
 }
 
 fn tooLarge(ctx: *Context) !void {
-    const bytes = "x" ** 9000;
-    return ctx.response.text(200, bytes);
+    const bytes: [9000]u8 = @splat('x');
+    return ctx.response.text(200, &bytes);
 }
 
 fn noResponse(_: *Context) !void {}

@@ -1,6 +1,6 @@
 # Baz — Bounded Async Zap
 
-Use exact Zig 0.16.0 from `.zig-version`. Baz consumes the separate [bounded/http](https://technologylab-ai.github.io/bounded-http/)
+Use exact Zig 0.17.0 from `.zig-version`. Baz consumes the separate [bounded/http](https://technologylab-ai.github.io/bounded-http/)
 engine through its exported `bounded_http` module. Keep engine parser, transport and scheduler changes in that dependency
 and submit an upstream PR. This repository owns App, routing, request/form views,
 responses, examples and their tests. The [Zig wiki](https://github.com/technologylab-ai/zigllmwiki)

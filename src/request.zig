@@ -345,7 +345,7 @@ test "request cookie helpers validate every field and borrow exact raw token byt
     try std.testing.expectError(error.DuplicateCookie, request.cookie("sid"));
     try std.testing.expectEqualStrings("false", (try request.cookie("flag")).?);
     try std.testing.expectEqual(null, try request.cookie("missing"));
-    const offset = std.mem.indexOf(u8, wire, "001%20+==").?;
+    const offset = std.mem.find(u8, wire, "001%20+==").?;
     try std.testing.expectEqual(wire[offset..].ptr, view.firstRaw("sid").?.value_raw.ptr);
     try std.testing.expectEqualStrings("raw", view.firstRaw("q").?.value_raw);
     try std.testing.expectError(error.TooManyCookies, request.cookiesWithLimits(.{ .max_pairs = 3 }));

@@ -8,7 +8,7 @@ The overview, guides, diagrams, examples, and measurements are specific to Baz.
 
 ## Build and preview
 
-Use Python 3 and exact Zig 0.16.0 from `.zig-version`. The first build fetches
+Use Python 3 and exact Zig 0.17.0 from `.zig-version`. The first build fetches
 checksum-pinned Zig dependencies; no Node package installation is needed:
 
 ```sh
@@ -146,14 +146,14 @@ runtime or performance evidence. Windows platform claims are backed by [Baz’s 
 
 ## Generated API reference
 
-`zig build docs -Doptimize=ReleaseSafe` installs standalone Zig Autodoc at
+`zig build docs -Doptimize=safe` installs standalone Zig Autodoc at
 `zig-out/docs/api/`. The website builder runs this step before publishing the
 viewer at `api/index.html`, including its JavaScript, WebAssembly, and source
 archive. The documentation module shares the public module’s source and build options,
 with an additional docs-only zli import for the example CLI reference.
 `src/baz.zig` is the documented package entry point; `@import("baz")` is unchanged.
 
-Zig 0.16.0's `std.Build.Step.Compile.getEmittedDocs()` emits the viewer. Autodoc
+Zig 0.17.0's `std.Build.Step.Compile.getEmittedDocs()` emits the viewer. Autodoc
 recognizes `root.zig` or a file matching the module name; otherwise it uses the
 first source archive member for that module (`lib/docs/wasm/main.zig`, `unpack`).
 Baz now follows the name convention. The imported engine and Mustache modules

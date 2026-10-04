@@ -24,9 +24,9 @@ COPYFILE_DISABLE=1 tar --no-xattrs --exclude=.git --exclude=.zig-cache --exclude
             "$(uname -n)" "$(uname -m)" "$(uname -r)" "$(zig version)" \
             "$(cat /proc/sys/kernel/io_uring_disabled)"
         cat /etc/os-release
-        timeout 600 zig build verify -Doptimize=Debug -j2 --summary all
-        timeout 600 zig build verify -Doptimize=ReleaseSafe -j2 --summary all
-        timeout 600 zig build install examples -Doptimize=ReleaseSafe -j2
+        timeout 600 zig build verify -Doptimize=debug -j2 --summary all
+        timeout 600 zig build verify -Doptimize=safe -j2 --summary all
+        timeout 600 zig build install examples -Doptimize=safe -j2
         PYTHONDONTWRITEBYTECODE=1 timeout 120 python3 tests/app_integration.py
         PYTHONDONTWRITEBYTECODE=1 timeout 120 python3 tests/examples_integration.py
     '

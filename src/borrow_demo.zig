@@ -4,7 +4,10 @@ const zli = @import("zli");
 const baz = @import("baz");
 const support = @import("example_support");
 
-const asset = "\x00\x01\x7f\x80\xffBAZ\r\nasset!" ** (5 * 1024 * 1024 / 16);
+// Arrays of u8 have no padding, so these immutable blocks expose the exact
+// repeated byte payload without importing a framework-owned source file.
+const asset_blocks: [5 * 1024 * 1024 / 16][16]u8 = @splat("\x00\x01\x7f\x80\xffBAZ\r\nasset!".*);
+const asset: []const u8 = std.mem.asBytes(&asset_blocks);
 const Shared = struct {
     asset_bytes: []const u8 = asset,
     asset_requests: std.atomic.Value(u32) = .init(0),

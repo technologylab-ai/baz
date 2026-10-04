@@ -2,7 +2,7 @@
 
 Status: composition MVP merged and natively qualified; bounded notifications, SSE
 and a complete application are natively qualified candidates, 2026-09-07.
-Exact target: Zig 0.16.0. See the [implemented API](APP-API.md),
+Exact target: Zig 0.17.0. See the [implemented API](APP-API.md),
 [21 example ports](../examples/README.md), and
 [composition native receipt](../reports/2026-09-07-composition.md) for exact evidence and limits.
 
@@ -56,7 +56,7 @@ Inspect Git state before editing; do not overwrite another session's work.
 | Topic | Working decision |
 | --- | --- |
 | Product | Baz (Bounded Async Zap), package/import `baz`, external dependency/import `bounded_http`. Repository: [technologylab-ai/baz](https://github.com/technologylab-ai/baz), with its [Pages documentation](https://technologylab-ai.github.io/baz/). [bounded/http](https://technologylab-ai.github.io/bounded-http/) stays independently usable. No Zap source-compatibility layer. |
-| Platform/version | Exact Zig 0.16.0; plain HTTP/1.1 on Linux, macOS, and native Windows x64. Public bind addresses need later qualification. TLS is out of scope. |
+| Platform/version | Exact Zig 0.17.0; plain HTTP/1.1 on Linux, macOS, and native Windows x64. Public bind addresses need later qualification. TLS is out of scope. |
 | Windows | Supported natively on x64 with CI: Debug/ReleaseSafe verification, 14 App groups, 20 ported-example groups, 14 streaming groups, and three shard/shutdown cases. Windows performance remains deferred; Baz remains experimental. |
 | App | Real instances; typed Shared; borrowed endpoint instances; startup-only registration; one routing/context model. |
 | Input | Raw immutable slices, ordered duplicates, no coercion, no bracket-array syntax, no merged query/body/JSON bag. |
@@ -385,9 +385,9 @@ Baseline commands once the host is reserved and exact compiler is selected:
 
 ```sh
 zig version
-zig build verify -Doptimize=Debug
-zig build verify -Doptimize=ReleaseSafe
-zig build install examples -Doptimize=ReleaseSafe
+zig build verify -Doptimize=debug
+zig build verify -Doptimize=safe
+zig build install examples -Doptimize=safe
 python3 tests/app_integration.py
 python3 tests/examples_integration.py
 python3 tests/streaming_integration.py

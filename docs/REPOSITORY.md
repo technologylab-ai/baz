@@ -36,7 +36,7 @@ sharding revision. Read [HANDOFF.md](../HANDOFF.md) for the next API work.
 
 ## CI and publication
 
-[CI](../.github/workflows/ci.yml) installs exact Zig 0.16.0 from the official download index and verifies the archive checksum.
+[CI](../.github/workflows/ci.yml) installs exact Zig 0.17.0 using signature-verified archive checksums in `.github/zig-release.json`.
 It runs Debug and ReleaseSafe verification on GitHub-hosted Linux and macOS runners.
 It also builds and exercises all supported examples with ReleaseSafe binaries.
 Hosted logs are retained for 14 days; preserve material runtime evidence in dated reports.

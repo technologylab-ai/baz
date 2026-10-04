@@ -243,7 +243,7 @@ pub fn AppWithLocals(comptime Shared: type, comptime Locals: type) type {
         }
 
         /// Typed callbacks return between flushes and timed waits. State defaults
-        /// are initialized once, before middleware; optional State.deinit(*State,
+        /// are initialized once, before middleware. Optional public State.deinit(*State,
         /// *Context) runs once before locals cleanup, including failed startup.
         /// State and Locals cannot back borrowed output or retain Context/writers.
         pub fn routeContinuation(self: *Self, method: []const u8, path: []const u8, comptime State: type, comptime start_handler: *const fn (*Context, *State) anyerror!continuation.Step, comptime resume_handler: *const fn (*Context, *State, continuation.Event) anyerror!continuation.Step, options: RouteOptions) !void {
@@ -288,7 +288,7 @@ pub fn AppWithLocals(comptime Shared: type, comptime Locals: type) type {
         pub fn bindWith(self: *Self, method: []const u8, path: []const u8, instance: anytype, comptime handler: anytype, options: RouteOptions) !void {
             const Pointer = @TypeOf(instance);
             const info = @typeInfo(Pointer);
-            if (info != .pointer or info.pointer.size != .one or info.pointer.is_const)
+            if (info != .pointer or info.pointer.size != .one or info.pointer.attrs.@"const")
                 @compileError("a bound endpoint must be a mutable single-item pointer");
             const Adapter = struct {
                 fn call(opaque_instance: ?*anyopaque, context: *Context) anyerror!void {
@@ -301,6 +301,7 @@ pub fn AppWithLocals(comptime Shared: type, comptime Locals: type) type {
 
         /// Register conventional endpoint methods atomically. No base struct,
         /// path field or per-endpoint error-policy field is required.
+        /// Discovery requires public get, post, put, delete, patch, head or options methods.
         pub fn endpoint(self: *Self, path: []const u8, instance: anytype) !void {
             return self.endpointWith(path, instance, .{});
         }
@@ -727,8 +728,8 @@ test "App registration is instance-owned, copies paths and rolls back endpoints"
     const Shared = struct { count: usize = 0 };
     const Application = App(Shared);
     const Endpoint = struct {
-        fn get(_: *@This(), _: *Application.Context) !void {}
-        fn post(_: *@This(), _: *Application.Context) !void {}
+        pub fn get(_: *@This(), _: *Application.Context) !void {}
+        pub fn post(_: *@This(), _: *Application.Context) !void {}
     };
     var shared: Shared = .{};
     const app = try Application.init(.{ .allocator = std.testing.allocator, .io = std.testing.io, .shared = &shared, .server = .{ .connections = 1, .shards = 1 }, .max_routes = 2 });
@@ -940,6 +941,127 @@ test "typed locals, middleware unwinding, early responses and error cleanup run 
         try std.testing.expectEqualStrings(trace, shared.trace[0..shared.used]);
         try std.testing.expectEqual(@as(u16, if (mode == 0 or mode == 8) 200 else if (mode == 2) 401 else 500), writer.status);
         writer.release();
+    }
+}
+
+test "endpoint discovery requires public conventional methods" {
+    const Shared = struct {};
+    const Application = App(Shared);
+    const PrivateEndpoint = struct {
+        fn get(_: *@This(), _: *Application.Context) !void {}
+    };
+    var shared: Shared = .{};
+    const app = try Application.init(.{ .allocator = std.testing.allocator, .io = std.testing.io, .shared = &shared, .server = .{ .connections = 1, .shards = 1 } });
+    defer app.deinit();
+    var endpoint: PrivateEndpoint = .{};
+    try std.testing.expectError(error.NoEndpointMethods, app.endpoint("/private", &endpoint));
+    try std.testing.expectEqual(@as(usize, 0), app.routes_len);
+}
+
+test "public continuation deinit runs once before locals on finish failures and cancellation" {
+    const Shared = struct {
+        mode: usize = 0,
+        starts: usize = 0,
+        resumes: usize = 0,
+        initialized: usize = 0,
+        state_cleanups: usize = 0,
+        locals_cleanups: usize = 0,
+    };
+    const Locals = struct { state_cleaned: bool = false };
+    const Application = AppWithLocals(Shared, Locals);
+    const State = struct {
+        marker: u8 = 61,
+        pub fn deinit(self: *@This(), ctx: *Application.Context) void {
+            std.debug.assert(self.marker == (if (ctx.shared.mode >= 4) @as(u8, 61) else @as(u8, 62)));
+            std.debug.assert(!ctx.locals.state_cleaned);
+            ctx.locals.state_cleaned = true;
+            ctx.shared.state_cleanups += 1;
+        }
+    };
+    const H = struct {
+        fn initialize(ctx: *Application.Context) !void {
+            ctx.shared.initialized += 1;
+            if (ctx.shared.mode == 4) return error.InitFailure;
+        }
+        fn cleanupLocals(ctx: *Application.Context) void {
+            std.debug.assert(ctx.locals.state_cleaned);
+            ctx.shared.locals_cleanups += 1;
+        }
+        fn start(ctx: *Application.Context, state: *State) !continuation.Step {
+            std.debug.assert(state.marker == 61);
+            state.marker = 62;
+            ctx.shared.starts += 1;
+            if (ctx.shared.mode == 1) return error.StartFailure;
+            if (ctx.shared.mode == 0) {
+                try ctx.response.text(200, "done");
+                return .finish;
+            }
+            return .{ .wait = 1 };
+        }
+        fn callResume(ctx: *Application.Context, state: *State, event: continuation.Event) !continuation.Step {
+            std.debug.assert(state.marker == 62 and event == .timer);
+            ctx.shared.resumes += 1;
+            return error.ResumeFailure;
+        }
+    };
+    var shared: Shared = .{};
+    const app = try Application.init(.{
+        .allocator = std.testing.allocator,
+        .io = std.testing.io,
+        .shared = &shared,
+        .server = .{ .connections = 1, .shards = 1 },
+        .response = .{ .header_bytes = 0, .body_bytes = 32 },
+        .max_continuations = 1,
+        .max_continuation_state_bytes = 64,
+        .init_locals = H.initialize,
+        .cleanup_locals = H.cleanupLocals,
+    });
+    defer app.deinit();
+    try app.routeContinuation("GET", "/", State, H.start, H.callResume, .{});
+    var parser = engine.api.http.Parser.init(.{});
+    var request = (try parser.parse("GET / HTTP/1.1\r\nHost: localhost\r\n\r\n")).?;
+    var arena: [2048]u8 = undefined;
+    var cache: engine.api.HeaderCache = .{};
+    cache.refresh("Sun, 06 Sep 2026 12:00:00 GMT");
+    var writer = engine.api.Writer.init(&arena, &cache, 0);
+    var state: [8]usize = @splat(0);
+    var cancelled: std.atomic.Value(bool) = .init(false);
+    for (0..6) |mode| {
+        shared.mode = mode;
+        shared.starts = 0;
+        shared.resumes = 0;
+        shared.initialized = 0;
+        cancelled.store(mode == 5, .release);
+        writer.open(0, true, false);
+        var ctx: engine.api.Context = .{ .request = &request, .writer = &writer, .event = .request, .state = &state, .application = app, .cancelled = &cancelled };
+        const action = Application.dispatch(&ctx);
+        if (mode == 2 or mode == 3) {
+            try std.testing.expectEqual(engine.api.Action.wait, action);
+            try std.testing.expectEqual(@as(usize, 1), app.continuations.live());
+            try std.testing.expectEqual(mode, shared.state_cleanups);
+            if (mode == 3) cancelled.store(true, .release);
+            ctx.event = if (mode == 3) .cancelled else .timer;
+            try std.testing.expectEqual(if (mode == 3) engine.api.Action.close else .finish, Application.dispatch(&ctx));
+        } else {
+            try std.testing.expectEqual(engine.api.Action.finish, action);
+        }
+        try std.testing.expectEqual(@as(usize, @intFromBool(mode < 4)), shared.starts);
+        try std.testing.expectEqual(@as(usize, @intFromBool(mode == 2)), shared.resumes);
+        try std.testing.expectEqual(@as(usize, @intFromBool(mode != 5)), shared.initialized);
+        try std.testing.expectEqual(mode + 1, shared.state_cleanups);
+        try std.testing.expectEqual(mode + 1, shared.locals_cleanups);
+        try std.testing.expectEqual(@as(usize, 0), app.continuations.live());
+        try std.testing.expectEqual(@as(usize, 0), state[0]);
+        try std.testing.expectEqual(@as(usize, 0), state[1]);
+        if (mode == 3) {
+            // Closing a cancelled wait publishes no output snapshot to release.
+            try std.testing.expect(!writer.frozen);
+            try std.testing.expectEqual(@as(usize, 0), writer.reserved);
+            try std.testing.expect(writer.borrowed == null);
+        } else {
+            try std.testing.expect(writer.frozen);
+            writer.release();
+        }
     }
 }
 

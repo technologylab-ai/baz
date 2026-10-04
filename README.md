@@ -4,7 +4,7 @@
 
 [Website & documentation](https://technologylab-ai.github.io/baz/) · [API reference](https://technologylab-ai.github.io/baz/api/) · [All guides](docs/GUIDES.md) · [API guide](docs/APP-API.md) · [26 examples](examples/README.md)
 
-A **pure Zig** successor to [Zap](https://github.com/zigzap/zap), built in **Zig 0.16.0**
+A **pure Zig** successor to [Zap](https://github.com/zigzap/zap), built in **Zig 0.17.0**
 on [bounded/http](https://technologylab-ai.github.io/bounded-http/). It keeps Zap's typed
 App and endpoint ergonomics, with explicit memory ownership and simpler request
 data.
@@ -41,7 +41,7 @@ The first implementation provides:
 - **Mustache templates:** parse once at startup, render typed data directly into
   reserved HTML response storage. See the [guide](docs/MUSTACHE.md) and
   [greeting form and user-card example](examples/mustache.zig).
-  [Verified natively on Linux, macOS, and Windows](reports/2026-09-06-mustache.md).
+  [Earlier Zig 0.16 native evidence](reports/2026-09-06-mustache.md).
 - **SSE and producer notifications:** encode events into a standard writer,
   wake retained callbacks, and choose explicit queue and replay limits.
   [SSE guide](docs/SSE.md) · [complete job application](docs/JOBS.md) ·
@@ -73,6 +73,11 @@ See the [repository record](docs/REPOSITORY.md) for branches, history, CI, and p
 
 ## Platform support
 
+The Zig 0.17 migration pins the engine, Mustache, and zli to their matching ports.
+Local macOS and native `omarx1` checks cover Debug/Safe verification and the Python wire suites.
+The earlier feature receipts below retain their original Zig 0.16 compiler scope.
+Use this branch's native CI results for the current compiler and dependency graph.
+
 **Linux, macOS, and native Windows x64 are supported.** Baz adds native Windows
 support beyond [Zap’s facil.io-based platform support](https://github.com/zigzap/zap/blob/master/README.md).
 Both the framework and its [bounded/http](https://technologylab-ai.github.io/bounded-http/) engine are written in Zig.
@@ -83,7 +88,7 @@ Both the framework and its [bounded/http](https://technologylab-ai.github.io/bou
 | macOS | **kqueue** |
 | Windows x64 | **IOCP** |
 
-All three platforms passed Debug and ReleaseSafe verification, the independent
+The earlier Zig 0.16 baseline passed Debug and ReleaseSafe verification on all three platforms, the independent
 package consumer, all 14 App groups, all 20 ported-example groups, and all 14
 streaming groups—including the runnable example—plus nine large-borrow groups.
 Windows also passed three
@@ -97,7 +102,7 @@ experimental status; this is correctness coverage, not production qualification.
 Watch a response arrive incrementally:
 
 ```sh
-zig build run-streaming -Doptimize=ReleaseSafe -- --port 8080
+zig build run-streaming -Doptimize=safe -- --port 8080
 # In another terminal; use curl.exe on Windows:
 curl -N http://127.0.0.1:8080/
 ```
@@ -113,10 +118,10 @@ retained memory, bounded by the total response limit rather than staging capacit
 It selects the whole body; inserting a borrowed image between streaming writes
 is [currently unsupported](docs/STREAMING.md#current-limit-borrowed-bodies-cannot-be-inserted-into-a-stream).
 
-Use exact Zig 0.16.0 from [.zig-version](.zig-version), with Python 3 installed:
+Use exact Zig 0.17.0 from [.zig-version](.zig-version), with Python 3 installed:
 
 ```sh
-zig build run-app -Doptimize=ReleaseSafe -- --port 8080
+zig build run-app -Doptimize=safe -- --port 8080
 ```
 
 In another terminal (use `curl.exe` on Windows):
@@ -132,12 +137,12 @@ There are [21 ports of Zap's examples](examples/README.md), including endpoints,
 authentication, middleware, sessions, Mustache, JSON, query/form data and uploads:
 
 ```sh
-zig build examples -Doptimize=ReleaseSafe
+zig build examples -Doptimize=safe
 ./zig-out/bin/hello --port 8080
-zig build run-http_params -Doptimize=ReleaseSafe -- --port 8080
+zig build run-http_params -Doptimize=safe -- --port 8080
 ```
 
-All examples use [zli](https://github.com/renerocksai/zli) with Zig 0.16
+All examples use [zli](https://github.com/renerocksai/zli) with Zig 0.17
 `std.process.Init` for typed startup options and `--help`. Both `--port 8080`
 and `--port=8080` work. See the [CLI guide](examples/README.md#typed-cli-options-with-process-initialization).
 

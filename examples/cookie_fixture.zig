@@ -85,7 +85,7 @@ fn rejectedCookie(ctx: *Context) !void {
         .insecure => ctx.response.setCookie("bad", "x", .{ .same_site = .none }),
         .secure_prefix => ctx.response.setCookie("__Secure-token", "x", .{}),
         .host_prefix => ctx.response.setCookie("__Host-token", "x", .{ .secure = true, .path = "/elsewhere" }),
-        .header_limit => ctx.response.setCookie("huge", "x" ** 1024, .{}),
+        .header_limit => ctx.response.setCookie("huge", &@as([1024]u8, @splat('x')), .{}),
     };
     if (attempted) |_| {
         return error.ExpectedCookieFailure;

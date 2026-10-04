@@ -7,7 +7,7 @@ after releasing a slot. The walkthrough explains each action and expected result
 
 [streaming.zig](streaming.zig) demonstrates Baz's incremental response writer.
 It writes, flushes, sleeps, and writes again before the handler returns.
-Run `zig build run-streaming -Doptimize=ReleaseSafe -- --port 8080`, then use
+Run `zig build run-streaming -Doptimize=safe -- --port 8080`, then use
 `curl -N http://127.0.0.1:8080/` in another terminal.
 See the [streaming guide](../docs/STREAMING.md) for its worker and lifetime bounds.
 [continuations.zig](continuations.zig) adds typed callbacks that release the executor
@@ -28,9 +28,9 @@ framework import and [shared executable support](support.zig); there is no
 facil.io dependency. Names retain the original build targets for easy comparison.
 
 ```sh
-zig build examples -Doptimize=ReleaseSafe
+zig build examples -Doptimize=safe
 ./zig-out/bin/hello --port 8080
-zig build run-http_params -Doptimize=ReleaseSafe -- --port 8080
+zig build run-http_params -Doptimize=safe -- --port 8080
 python3 tests/examples_integration.py
 ```
 
@@ -50,7 +50,7 @@ before delivery; only terminal shutdown establishes released storage.
 All 24 public examples use [zli](https://github.com/renerocksai/zli) through
 [shared executable support](support.zig). The main App demonstration and all five
 wire fixtures use the same parser with their own typed option structs. Each
-entry point receives Zig 0.16's `std.process.Init`:
+entry point receives Zig 0.17's `std.process.Init`:
 
 ```zig
 pub fn main(init: std.process.Init) !void {
@@ -66,7 +66,7 @@ server flags and [app_demo.zig](../src/app_demo.zig) for a complete direct use.
 and enum fields reject unknown values.
 
 Both `--port 8080` and `--port=8080` work. Public examples also accept `-p 8080`.
-Use `zig build run-hello -Doptimize=ReleaseSafe -- --help` to see the options
+Use `zig build run-hello -Doptimize=safe -- --help` to see the options
 without starting a server. Help is handwritten in the struct, not generated.
 Unknown, missing, and repeated options are errors. Explicit `--workers N` is
 independent of its position relative to `--execution workers`; when omitted,
@@ -80,7 +80,7 @@ The framework module itself does not import zli. The dependency uses Apache-2.0;
 Baz's own code remains MIT.
 
 The finite CLI regression suite is `python3 tests/cli_integration.py` after
-`zig build install examples -Doptimize=ReleaseSafe`. It checks help and invalid
+`zig build install examples -Doptimize=safe`. It checks help and invalid
 arguments before startup, both option spellings, worker defaults, and shutdown.
 
 | Original target | Port | Preserved purpose and deliberate adaptation |
@@ -131,7 +131,7 @@ The renderer writes directly into the reserved response draft, with no allocated
 rendered string. See the [guide](../docs/MUSTACHE.md) for limits, escaping, and copying.
 
 ```sh
-zig build run-mustache -Doptimize=ReleaseSafe -- --port 8080
+zig build run-mustache -Doptimize=safe -- --port 8080
 python3 tests/mustache_integration.py
 ```
 
@@ -154,8 +154,8 @@ remaining qualification. The engine remains a standalone case study.
 
 ## Application recipes
 
-- `zig build runtime_file -Doptimize=ReleaseSafe`: runtime downloads at `/download`, selected with `--file PATH`.
-- `zig build decoded_forms -Doptimize=ReleaseSafe`: ordered decoded form fields using a caller-owned arena on workers.
+- `zig build runtime_file -Doptimize=safe`: runtime downloads at `/download`, selected with `--file PATH`.
+- `zig build decoded_forms -Doptimize=safe`: ordered decoded form fields using a caller-owned arena on workers.
 - `hello --bind-address 0.0.0.0`: explicit IPv4 LAN binding with the usual connection limits.
 - `app_errors`: custom error presentation using `web.defaultErrorStatus` for other failures.
 
