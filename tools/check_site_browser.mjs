@@ -204,12 +204,12 @@ try {
   await check('example-filters', async () => {
     await navigate('examples.html');
     await evaluate('document.querySelector("#examples").scrollIntoView({behavior:"instant"})');
-    for (const [group,count] of [['data',3],['composition',6],['app',4],['routing',5],['responses',8],['all',26]]) {
+    for (const [group,count] of [['data',3],['composition',7],['app',4],['routing',5],['responses',8],['all',27]]) {
       await click(`button[data-filter="${group}"]`);
       assert.equal(await evaluate('document.querySelectorAll(".example-card:not([hidden])").length'),count);
-      assert.equal(await evaluate('document.querySelector("#example-count").textContent'),`${count} of 26 examples`);
+      assert.equal(await evaluate('document.querySelector("#example-count").textContent'),`${count} of 27 examples`);
     }
-    return {groups:6,total:26};
+    return {groups:6,total:27};
   });
   await check('desktop-diagrams-and-benchmark', async () => {
     await navigate('design.html');
@@ -401,11 +401,11 @@ try {
     await writeFile(path.join(output,'baz-print.pdf'),Buffer.from(pdf.data,'base64'));
     await send('Emulation.setEmulatedMedia',{media:''}); await send('Emulation.setScriptExecutionDisabled',{value:true});
     await navigate('examples.html');
-    assert.equal(await evaluate('document.querySelectorAll(".example-card:not([hidden])").length'),26);
+    assert.equal(await evaluate('document.querySelectorAll(".example-card:not([hidden])").length'),27);
     await navigate('get-started.html');
     assert(await evaluate('document.querySelector(".language-zig").textContent.includes("percentDecodeInto")'));
     assert(await evaluate('[...document.querySelectorAll("[role=tabpanel]")].every(panel => !panel.hidden && getComputedStyle(panel).display !== "none")'));
-    await send('Emulation.setScriptExecutionDisabled',{value:false}); return {printBytes:Buffer.from(pdf.data,'base64').length,noJsExamples:26};
+    await send('Emulation.setScriptExecutionDisabled',{value:false}); return {printBytes:Buffer.from(pdf.data,'base64').length,noJsExamples:27};
   });
   await check('all-pages-mobile-desktop-and-legacy-links', async () => {
     const names = ['index','get-started','design','examples','performance','roadmap','guides'];

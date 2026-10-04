@@ -1,5 +1,6 @@
 //! Typed continuations release the callback thread between writes and timer events.
 //! Try `curl -N localhost:8080/stream` with inline execution or one worker.
+//! `/long-stream` outlives the 3-second server deadline with its own route timeout.
 const std = @import("std");
 const web = @import("baz");
 const support = @import("example_support");
@@ -18,7 +19,16 @@ fn start(ctx: *Context, _: *State) !Step {
 }
 
 fn advance(ctx: *Context, state: *State, event: web.continuation.Event) !Step {
-    if (event == .flushed) return .{ .wait = 500 * std.time.ns_per_ms };
+    return step(ctx, state, event, 500 * std.time.ns_per_ms);
+}
+
+/// Two 2-second pauses exceed `timeout_ms`; the route's `timeout_ms` covers them.
+fn advanceSlowly(ctx: *Context, state: *State, event: web.continuation.Event) !Step {
+    return step(ctx, state, event, 2 * std.time.ns_per_s);
+}
+
+fn step(ctx: *Context, state: *State, event: web.continuation.Event, pause_ns: u64) !Step {
+    if (event == .flushed) return .{ .wait = pause_ns };
     state.completed += 1;
     var output = try ctx.response.resumeSnapshot();
     if (state.completed == 2) {
@@ -33,6 +43,8 @@ pub fn main(init: std.process.Init) !void {
     var shared: fixture.Shared = .{};
     var config = try support.config(init);
     config.timeout_ms = 3000;
+    // Routes may select a longer deadline up to this bound.
+    config.max_timeout_ms = 10_000;
     config.shutdown_ms = 1000;
     const app = try Application.init(.{
         .allocator = init.gpa,
@@ -48,6 +60,7 @@ pub fn main(init: std.process.Init) !void {
     });
     defer app.deinit();
     try app.routeContinuation("GET", "/stream", State, start, advance, .{});
+    try app.routeContinuation("GET", "/long-stream", State, start, advanceSlowly, .{ .timeout_ms = 10_000 });
     try fixture.register(app);
     try support.run(app, init);
     fixture.report(&shared);

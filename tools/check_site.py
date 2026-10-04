@@ -73,7 +73,7 @@ def check(output, documents, document_urls):
     index = (output / 'index.html').read_text()
     examples = (output / 'examples.html').read_text()
     performance = (output / 'performance.html').read_text()
-    assert len(re.findall(r'class="example-card"', examples)) == 26
+    assert len(re.findall(r'class="example-card"', examples)) == 27
     assert 'class="example-card"' not in index
     assert '@@' not in ''.join((output / name).read_text() for name in pages)
     for name in pages:
@@ -82,7 +82,7 @@ def check(output, documents, document_urls):
     assert len(pages) == 9, 'Expected seven topic pages, the reader, and the API reference'
     assert all(text in performance for text in ['1.038×', '1.771×', '0.629×', '1.025×'])
     assert all((output / document_urls.get(name, name)).read_bytes() == (Path(__file__).resolve().parents[1] / name).read_bytes() for name in documents), 'Copied document changed'
-    print('Site checks passed: links, anchors, diagrams, 26 examples, four benchmark profiles, and document identity.')
+    print('Site checks passed: links, anchors, diagrams, 27 examples, four benchmark profiles, and document identity.')
 
 
 if __name__ == '__main__':

@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Baz over tailscale serve</title>
+<style>
+  :root { color-scheme: light dark; font-family: system-ui, sans-serif; }
+  body { max-width: 36rem; margin: 2rem auto; padding: 0 1rem; line-height: 1.5; }
+  code { font-size: 0.95em; }
+  output { font-weight: 600; }
+</style>
+</head>
+<body>
+<h1>Baz over <code>tailscale serve</code></h1>
+<p>Signed in as <output id="who">…</output></p>
+<p>Tick <output id="tick">–</output> · connection <output id="opens">0</output></p>
+<p>Each stream ends after ten ticks, before the server deadline. The browser
+reconnects and continues from the last tick with <code>Last-Event-ID</code>.</p>
+<script>
+  const $ = (id) => document.getElementById(id);
+  fetch('/whoami').then((r) => r.json()).then((me) => {
+    $('who').textContent = me.name ? `${me.name} (${me.login})` : me.login;
+  });
+  let opens = 0;
+  const events = new EventSource('/events');
+  events.onopen = () => { $('opens').textContent = ++opens; };
+  events.addEventListener('tick', (e) => { $('tick').textContent = JSON.parse(e.data).tick; });
+</script>
+</body>
+</html>

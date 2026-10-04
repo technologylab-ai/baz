@@ -37,7 +37,7 @@ reader, and identifies the current page. Longer pages also have local section li
 | `index.html` | Compact introduction, native platforms, streaming feature, and next steps |
 | `get-started.html` | Setup commands, App basics, streaming, body borrowing, and the live-job application |
 | `design.html` | Zap heritage, engine boundary, raw request data, ownership diagrams, limits, and backpressure |
-| `examples.html` | All 26 filterable example cards, Mustache introduction, and build commands |
+| `examples.html` | All 27 filterable example cards, Mustache introduction, and build commands |
 | `performance.html` | Original comparison, four profiles, chart, methodology, limitations, and evidence |
 | `roadmap.html` | Implemented, planned, and deferred work, with native verification scope |
 | `api/index.html` | Source-generated types, functions, search, and source browser |
@@ -70,7 +70,7 @@ All page URLs and asset paths are relative, including under the `/baz/` Pages pr
 | App excerpt | `Hello` in [app_demo.zig](../src/app_demo.zig), extracted at build time |
 | Streaming excerpt | `progress` in [streaming.zig](../examples/streaming.zig), extracted at build time |
 | Avoid-body-copies handler | App types and complete `index` handler in [serve.zig](../examples/serve.zig), extracted from the compiled example; copy avoidance leads the explanation, with the small-body threshold stated beside the example and the separate 5 MiB fixture backing the large-body evidence |
-| Example cards | The catalog in [build_pages.py](../tools/build_pages.py), linked to all 26 compiled examples |
+| Example cards | The catalog in [build_pages.py](../tools/build_pages.py), linked to all 27 compiled examples |
 | Benchmark chart and table | Original [Mac](../reports/2026-09-06-basic-zap/macos-summary.json) and [Linux](../reports/2026-09-06-basic-zap/linux-summary.json) summaries; medians checked against recorded trial rates |
 | Diagrams | [Raw parameters](diagrams/parameters.svg), [package boundary](diagrams/layers.svg), [response lifetime](diagrams/lifetime.svg) |
 | Reader content | Repository Markdown and source files, copied unchanged from an explicit allowlist |

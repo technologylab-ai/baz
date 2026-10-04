@@ -12,6 +12,7 @@ App, or explore a complete example to see the pieces working together.
 - [Mustache templates](MUSTACHE.md) — Render HTML from startup-owned templates and typed data.
 - [Cookies, redirects, and sessions](COOKIES.md) — Read cookies, choose expiry and scope, and manage session lifetimes.
 - [Middleware and request locals](MIDDLEWARE.md) — Share authentication and other request work through ordered hooks.
+- [HTTPS with tailscale serve](HTTPS.md) — Publish a loopback App over HTTPS on your tailnet and admit users by Tailscale identity.
 
 ## Send live updates
 

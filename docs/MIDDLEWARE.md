@@ -34,7 +34,7 @@ executor's blocking and allocation constraints. Runnable examples are
 
 The application copies global [`Options.middleware`](https://technologylab-ai.github.io/baz/api/#baz.App.AppWithLocals.Options) and per-route descriptors into
 startup storage. `max_middleware` bounds their combined count, default 128 and
-maximum 4,096. [`routeWith`](https://technologylab-ai.github.io/baz/api/#baz.App.AppWithLocals.routeWith), [`bindWith`](https://technologylab-ai.github.io/baz/api/#baz.App.AppWithLocals.bindWith), and [`endpointWith`](https://technologylab-ai.github.io/baz/api/#baz.App.AppWithLocals.endpointWith) accept [`RouteOptions`](https://technologylab-ai.github.io/baz/api/#baz.App.AppWithLocals.RouteOptions);
+maximum 4,096. [`routeWith`](https://technologylab-ai.github.io/baz/api/#baz.App.AppWithLocals.routeWith), [`bindWith`](https://technologylab-ai.github.io/baz/api/#baz.App.AppWithLocals.bindWith), and [`endpointWith`](https://technologylab-ai.github.io/baz/api/#baz.App.AppWithLocals.endpointWith) accept [`RouteOptions`](https://technologylab-ai.github.io/baz/api/#baz.App.AppWithLocals.RouteOptions) (middleware and an optional per-route `timeout_ms`);
 endpoint registration copies its chain per method and rolls back atomically on
 failure. Bound instances and shared services remain borrowed through App teardown.
 
