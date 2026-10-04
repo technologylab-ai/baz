@@ -121,7 +121,7 @@ class CliServer(wire.Server):
             wire.require(0 < self.port <= 65535, "invalid bound CLI port")
             ready = [line for line in self.lines if line.startswith("READY ")]
             wire.require(len(ready) == 1, "CLI server emitted repeated READY records")
-            wire.require("optimize=ReleaseSafe" in ready[0], "CLI startup gates require ReleaseSafe")
+            wire.require("optimize=safe" in ready[0], "CLI startup gates require ReleaseSafe")
             wire.require("execution=" + self.expected_execution + " " in ready[0],
                          "CLI execution selection changed: " + ready[0])
         except BaseException:
@@ -231,7 +231,7 @@ def run(directory):
 
     return dict(passed=len(exits) + len(startups), executables=len(binaries),
                 exit_cases=exits, startup_cases=startups,
-                platform=platform.platform(), optimize="ReleaseSafe",
+                platform=platform.platform(), optimize="safe",
                 performance_comparison=False)
 
 

@@ -3,7 +3,7 @@
 //! https://<node>.<tailnet>.ts.net:<port> with a real certificate and adds identity
 //! headers, which a route middleware checks against `--login`.
 //!
-//!   zig build run-tailscale_https -Doptimize=ReleaseSafe -- --port 8080 --login you@example.com
+//!   zig build run-tailscale_https -Doptimize=safe -- --port 8080 --login you@example.com
 //!   tailscale serve --bg --https=8443 http://127.0.0.1:8080
 //!
 //! Read docs/HTTPS.md for the trust model and a generic reverse-proxy alternative.
@@ -24,7 +24,7 @@ const Options = struct {
     tick_ms: u32 = 1000,
 
     pub const help =
-        \\Baz example — Zig 0.16.0
+        \\Baz example — Zig 0.17.0
         \\Usage: tailscale_https --login you@example.com [options]
         \\
         \\  -h, --help                    Show this help and exit

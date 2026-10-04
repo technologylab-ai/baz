@@ -8,14 +8,14 @@ The engine's [GitHub Pages documentation](https://technologylab-ai.github.io/bou
 covers architecture, embedding, and ownership.
 Baz consumes a pinned external engine package; it does not contain engine sources.
 See the [dependency boundary](DEPENDENCY.md) and [extraction plan](APP-API-ROADMAP.md#api-08--migration-examples-and-successor-mvp-qualification).
-This experimental API uses exact Zig **0.16.0**, the Linux io_uring /
+This experimental API uses exact Zig **0.17.0**, the Linux io_uring /
 macOS kqueue / Windows IOCP HTTP engine, caller-supplied `std.Io`, and bounded standard memory
 readers/writers. An owned `std.Io` provider is deferred until after the API MVP.
 
 Run the maintained, compiled [example](../src/app_demo.zig):
 
 ```sh
-zig build -Doptimize=ReleaseSafe
+zig build -Doptimize=safe
 ./zig-out/bin/baz --port 8080
 curl 'http://127.0.0.1:8080/hello?name=Hello%20Zig'
 curl 'http://127.0.0.1:8080/users/a%2Fb'

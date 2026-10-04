@@ -1,4 +1,4 @@
-/* Zig keywords match lib/std/zig/tokenizer.zig in the exact 0.16.0 release. */
+/* Zig keywords match lib/std/zig/tokenizer.zig in the exact 0.17.0 release. */
 hljs.registerLanguage('zig', h => ({
   name: 'Zig', keywords: {
     keyword: 'addrspace align allowzero and anyframe anytype asm break callconv catch comptime const continue defer else enum errdefer error export extern fn for if inline noalias noinline nosuspend opaque or orelse packed pub resume return linksection struct suspend switch test threadlocal try union unreachable var volatile while',

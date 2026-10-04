@@ -191,17 +191,17 @@ fn longLength(ctx: *Context) !void {
 }
 
 fn largeWrite(ctx: *Context) !void {
-    const bytes = "s" ** 8193;
+    const bytes: [8193]u8 = @splat('s');
     var stream = try ctx.response.stream(200, "text/plain", .{});
     try stream.writeAll(bytes[0 .. ctx.shared.chunk_bytes + 1]);
     try stream.finish();
 }
 
 fn cumulativeLimit(ctx: *Context) !void {
-    const bytes = "b" ** 512;
+    const bytes: [512]u8 = @splat('b');
     var stream = try ctx.response.stream(200, "text/plain", .{});
     for (0..3) |_| {
-        try stream.writeAll(bytes);
+        try stream.writeAll(&bytes);
         try stream.flush();
     }
     try stream.finish();
@@ -224,7 +224,7 @@ fn sleeping(ctx: *Context) !void {
 fn pressure(ctx: *Context) !void {
     _ = ctx.shared.started.fetchAdd(1, .release);
     defer _ = ctx.shared.finished.fetchAdd(1, .release);
-    const bytes = "p" ** 8192;
+    const bytes: [8192]u8 = @splat('p');
     var stream = try ctx.response.stream(200, "application/octet-stream", .{});
     // This upper bound exceeds socket buffers. The wire gate stops reading.
     for (0..8192) |_| {

@@ -8,7 +8,9 @@
     "files_sha256": {
       "marked.js": "69451c8541c9c1e7a4bf3ffc6f73c4d89633de92bfbe3e484dfe182ef8091f88",
       "marked-LICENSE": "8e3a3f82f59a60958f56ca08f445647c32a4733dc7ca6c2c46f6eb898471ab9c"
-    }
+    },
+    "revision": "f92422d83d524138cfb5ab9e7b7e4952a9445c8d",
+    "source": "https://github.com/technologylab-ai/bounded-http/tree/f92422d83d524138cfb5ab9e7b7e4952a9445c8d"
   },
   {
     "package": "@highlightjs/cdn-assets",
@@ -19,7 +21,9 @@
     "files_sha256": {
       "highlight.js": "8ab71eb09c51f501e5e25157d9cff100e46cc29bcbfc744d0b746d451fca7f53",
       "highlight-LICENSE": "6c081431591d9df696c82dc598fe1423765b8a299b200ed00b281afd0f64c490"
-    }
+    },
+    "revision": "f92422d83d524138cfb5ab9e7b7e4952a9445c8d",
+    "source": "https://github.com/technologylab-ai/bounded-http/tree/f92422d83d524138cfb5ab9e7b7e4952a9445c8d"
   },
   {
     "package": "dompurify",
@@ -31,28 +35,30 @@
       "purify.js": "f263b05369e050fa175d4ecb9c9358eb4253602d510297adfb31df48b2f1c4d5",
       "purify-LICENSE": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
       "purify-LICENSE-MPL": "fab3dd6bdab226f1c08630b1dd917e11fcb4ec5e1e020e2c16f83a0a13863e85"
-    }
+    },
+    "revision": "f92422d83d524138cfb5ab9e7b7e4952a9445c8d",
+    "source": "https://github.com/technologylab-ai/bounded-http/tree/f92422d83d524138cfb5ab9e7b7e4952a9445c8d"
   },
   {
     "name": "Zig Autodoc and standard library",
-    "version": "0.16.0",
-    "source": "https://ziglang.org/download/0.16.0/",
+    "version": "0.17.0",
+    "source": "https://ziglang.org/download/0.17.0/",
     "files_sha256": {
       "zig-LICENSE": "5c537d6853e005298a285d508cff9ac7192cea23576c840d485b2b586a7ff177"
     }
   },
   {
     "name": "Mustache source archive notice",
-    "revision": "22487e4082537aa5b707dd902def866d990fdea1",
-    "source": "https://github.com/technologylab-ai/mustache-zig/tree/22487e4082537aa5b707dd902def866d990fdea1",
+    "revision": "f46006f04a6bb4374a34250fb01fe72daf6a39c1",
+    "source": "https://github.com/technologylab-ai/mustache-zig/tree/f46006f04a6bb4374a34250fb01fe72daf6a39c1",
     "files_sha256": {
       "mustache-LICENSE": "33f9d4e30896bb820c52d1565f6f38638ea891b0ba95d89c6de1ad7c051984c1"
     }
   },
   {
     "name": "zli source archive notice",
-    "revision": "4f17b1f1eacda7b87c49461e34b1520c392788b2",
-    "source": "https://github.com/renerocksai/zli/tree/4f17b1f1eacda7b87c49461e34b1520c392788b2",
+    "revision": "36dfe7c506117af0e52533feb549282362b77e2a",
+    "source": "https://github.com/renerocksai/zli/tree/36dfe7c506117af0e52533feb549282362b77e2a",
     "files_sha256": {
       "zli-LICENSE": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
     }

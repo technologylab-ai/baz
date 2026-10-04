@@ -2,7 +2,7 @@
 
 Serve LAN clients, download runtime files, decode ordered form fields, and keep
 Baz's error classifications in a custom hook. These conveniences keep resource
-ownership explicit. Use exact Zig 0.16.0.
+ownership explicit. Use exact Zig 0.17.0.
 
 ## Reach your application from the LAN
 
@@ -25,7 +25,7 @@ is involved. Connection limits and [backpressure](LIMITS.md) still apply.
 Try the hello example:
 
 ```sh
-zig build hello -Doptimize=ReleaseSafe
+zig build hello -Doptimize=safe
 ./zig-out/bin/hello --bind-address 0.0.0.0 --port 8080 --connections 16
 ```
 
@@ -39,7 +39,7 @@ An embedded asset is useful when the file is known at compilation. For a file
 created later, run the [runtime download example](../examples/runtime_file.zig):
 
 ```sh
-zig build runtime_file -Doptimize=ReleaseSafe
+zig build runtime_file -Doptimize=safe
 ./zig-out/bin/runtime_file --file ./export.zip --port 8080
 curl --output downloaded.zip http://127.0.0.1:8080/download
 curl --head http://127.0.0.1:8080/download
@@ -67,7 +67,7 @@ staging buffer waits for transport progress. This is not an OS zero-copy operati
 
 The raw stream writer has no writable destination buffer. Consequently,
 `file_reader.interface.streamRemaining(stream.writer())` can fail with
-`WriterBufferUnavailable` in Zig 0.16.0's file-reader fallback. Use `copyFrom` for
+`WriterBufferUnavailable` in Zig 0.17.0's file-reader fallback. Use `copyFrom` for
 that transfer. Standard writer `writeAll`, `print`, and `flush` remain available.
 
 Source and sink failures are sticky: [`stream.failure()`](https://technologylab-ai.github.io/baz/api/#baz.Stream.failure) retains the error, and
@@ -127,7 +127,7 @@ matching the original encoded names.
 Try the [decoded form example](../examples/decoded_forms.zig):
 
 ```sh
-zig build decoded_forms -Doptimize=ReleaseSafe
+zig build decoded_forms -Doptimize=safe
 ./zig-out/bin/decoded_forms --port 8080
 curl --data 'name=Alice+Smith&%6eame=Bob%2BJones&flag&empty=' http://127.0.0.1:8080/
 ```

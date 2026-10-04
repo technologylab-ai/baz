@@ -15,7 +15,7 @@ REPOSITORY = 'https://github.com/technologylab-ai/baz'
 # Pages does not serve dot-prefixed paths. Keep the reader's canonical file name.
 DOCUMENT_URLS = {'.zig-version': 'docs/zig-version.txt'}
 PAGES = {
-    'index': ('Overview', 'Baz — Bounded Async Zap', 'Pure Zig 0.16.0, typed applications, streaming responses, and explicit memory boundaries.', []),
+    'index': ('Overview', 'Baz — Bounded Async Zap', 'Pure Zig 0.17.0, typed applications, streaming responses, and explicit memory boundaries.', []),
     'get-started': ('Get started', 'Build your first App', 'Run Baz, explore a typed endpoint, stream updates, and send borrowed file bodies.', [('start', 'Run the demo'), ('app-example', 'App basics'), ('streaming', 'Streaming'), ('borrowed', 'Avoid body copies')]),
     'design': ('Design', 'How Baz fits together', 'The Zap heritage, HTTP engine, request data, ownership, limits, and backpressure.', [('idea', 'The idea'), ('engine', 'HTTP engine'), ('data', 'Request data'), ('limits', 'Limits & backpressure')]),
     'examples': ('Examples', 'Learn from working code', 'Explore all 27 maintained Baz examples, from a first route to a complete live application.', []),
@@ -230,7 +230,7 @@ def api_page(source):
     shell = shell.replace('</head>', '<link rel="stylesheet" href="../docs/api.css">\n'
                           '<script defer src="main.js"></script>\n<script defer src="../docs/api.js"></script>\n</head>')
     intro = '<header class="page-intro"><p class="eyebrow">Baz / Reference</p><h1>API reference</h1></header>'
-    content = '<p class="api-intro">Types, functions, and source, generated with Zig 0.16.0. '
+    content = '<p class="api-intro">Types, functions, and source, generated with Zig 0.17.0. '
     content += '<a href="../guides.html">Read the guides</a> for walkthroughs and ownership rules.</p>'
     content += '<nav class="api-shortcuts" aria-label="API shortcuts">' + ''.join(
         '<a href="#baz.{0}">{0}</a>'.format(name) for name in ['App', 'Request', 'Response', 'Stream', 'Mailbox', 'sse', 'mustache']) + '</nav>'
@@ -239,7 +239,7 @@ def api_page(source):
     content += '<a href="../docs/read.html?file=src/baz.zig">Read the public source</a> or '
     content += '<a href="../guides.html">browse the guides</a>.</p></noscript>'
     content += '<div class="api-viewer">' + viewer + '</div>'
-    values = {'TITLE': 'API reference · Baz', 'DESCRIPTION': 'Source-generated Baz types, functions, and documentation for Zig 0.16.0.',
+    values = {'TITLE': 'API reference · Baz', 'DESCRIPTION': 'Source-generated Baz types, functions, and documentation for Zig 0.17.0.',
               'CANONICAL': 'https://technologylab-ai.github.io/baz/api/', 'PAGE_CLASS': 'topic-page api-page',
               'NAVIGATION': navigation('api', '../'), 'PAGE_INTRO': intro, 'CONTENT': content, 'LEGACY_SCRIPT': ''}
     for key, value in values.items():
@@ -249,9 +249,9 @@ def api_page(source):
 
 def build():
     version = subprocess.check_output(['zig', 'version'], text=True).strip()
-    if version != (ROOT / '.zig-version').read_text().strip() or version != '0.16.0':
-        raise ValueError('The API reference requires exact Zig 0.16.0')
-    subprocess.run(['zig', 'build', 'docs', '-Doptimize=ReleaseSafe', '-j2'], cwd=ROOT, check=True)
+    if version != (ROOT / '.zig-version').read_text().strip() or version != '0.17.0':
+        raise ValueError('The API reference requires exact Zig 0.17.0')
+    subprocess.run(['zig', 'build', 'docs', '-Doptimize=safe', '-j2'], cwd=ROOT, check=True)
     api_source = ROOT / 'zig-out/docs/api'
     revision = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
     if not re.fullmatch('[0-9a-f]{40}', revision):

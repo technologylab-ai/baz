@@ -154,7 +154,7 @@ cookie value, just like an opaque token. Baz does not verify signatures or inter
 claims; JWT verification and expiry policy belong to the application or a separately
 chosen library. Merely reading a cookie never authenticates it.
 
-Run `zig build run-userpass_session -Doptimize=ReleaseSafe -- --port 8080`, then open
+Run `zig build run-userpass_session -Doptimize=safe -- --port 8080`, then open
 `http://localhost:8080/login`. The public demo credentials are `zap` / `awesome`.
 The styled [login](../examples/assets/session_login.html) and
 [protected page](../examples/assets/session_home.html) are separate embedded assets.

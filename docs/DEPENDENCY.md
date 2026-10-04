@@ -101,7 +101,7 @@ No throughput comparison is rerun solely for package naming or documentation.
 The [zli fork](https://github.com/renerocksai/zli), pinned to
 `4f17b1f1eacda7b87c49461e34b1520c392788b2` from its [Init adapter PR](https://github.com/renerocksai/zli/pull/1), supplies typed command-line
 parsing for all public examples and the App/streaming/borrow fixture executables.
-Its [`parseInit(init, Options)`](https://technologylab-ai.github.io/baz/api/#zli.parseInit) entry point consumes Zig 0.16 `std.process.Init`,
+Its [`parseInit(init, Options)`](https://technologylab-ai.github.io/baz/api/#zli.parseInit) entry point consumes Zig 0.17 `std.process.Init`,
 using the supplied I/O and process arena. The [example guide](../examples/README.md#typed-cli-options-with-process-initialization)
 records syntax, ownership, and startup behavior.
 
@@ -117,7 +117,7 @@ Baz build graph. No zli code runs on the request I/O loop.
 Baz's public [`web.mustache`](https://technologylab-ai.github.io/baz/api/#baz.mustache) adapter consumes the immutable URL/hash-pinned
 [pure Zig Mustache fork](https://github.com/technologylab-ai/mustache-zig). The
 module is imported internally as `mustache_engine`; consumers use Baz's wrapper.
-The library is MIT licensed and requires exact Zig 0.16.0. We maintain this fork
+The library is MIT licensed and requires exact Zig 0.17.0. We maintain this fork
 for Baz's requirements; upstream is not required to adopt those constraints.
 No upstream PR is planned for these changes. Its parser/runtime
 changes and core-spec tests belong in that separate repository. Baz owns startup

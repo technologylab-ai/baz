@@ -3,7 +3,7 @@
 See Baz's connection limit for yourself. Open two connections, try a third,
 then release a slot and try again. You control each step from your terminal.
 
-**Allow about five minutes.** You need two terminals, exact Zig 0.16.0, Python 3,
+**Allow about five minutes.** You need two terminals, exact Zig 0.17.0, Python 3,
 and a checkout of Baz. The client uses Python's standard library; there are no
 Python packages to install. The website is your guide; the server and clients
 run locally on your machine.
@@ -22,12 +22,12 @@ cd baz
 ```
 
 If you already have a checkout, open it in your terminal and run `git pull --ff-only`
-to get this walkthrough. Check `zig version`: it must print `0.16.0`.
+to get this walkthrough. Check `zig version`: it must print `0.17.0`.
 
 In **terminal 1**, from the Baz directory, run:
 
 ```sh
-zig build run-app -Doptimize=ReleaseSafe -- --port 8080 --connections 2 --shards 1 --timeout-ms 300000
+zig build run-app -Doptimize=safe -- --port 8080 --connections 2 --shards 1 --timeout-ms 300000
 ```
 
 Wait for a line beginning `READY port=8080`. Leave this terminal running.
@@ -38,7 +38,7 @@ The first build may take longer while Zig fetches dependencies and compiles.
 | `--connections 2` | Reserve two admitted connection slots. |
 | `--shards 1` | Use one I/O owner for this small exercise. |
 | `--timeout-ms 300000` | Give yourself five minutes between actions before idle connections expire. This is a walkthrough setting, not a deployment recommendation. |
-| `-Doptimize=ReleaseSafe` | Keep runtime safety checks enabled. This exercise measures no performance. |
+| `-Doptimize=safe` | Keep runtime safety checks enabled. This exercise measures no performance. |
 
 Use only the walkthrough client against this port during the exercise. Browser
 tabs can open their own connections, which would also count toward the two slots.

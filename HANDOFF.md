@@ -23,7 +23,22 @@ before Baz #6 once their final checks pass.
 The user explicitly deferred the custom `std.Io` prototype on 2026-09-07.
 Standard caller `std.Io` and the engine's existing native backends remain in use.
 
-# Baz handoff — 2026-09-06
+# Baz handoff — Zig 0.17 migration, 2026-10-04
+
+The `feat/zig-0.17` branch now requires exact Zig 0.17.0.
+Its manifest pins matching engine, Mustache, and zli ports to immutable URL hashes.
+Engine parser and transport changes are upstream in the separate engine branch.
+The migration preserves preallocation, borrowing, cancellation, and assertion requirements.
+Public endpoint and state-cleanup hooks are explicit under the new `@hasDecl` visibility rule.
+
+Local macOS and native `omarx1` gates passed Debug/Safe verification and all maintained Python wire suites.
+The final URL graph has separate package-consumer checks.
+Hosted native CI records the published branch's Linux, Mac, and Windows results.
+Earlier receipts in this file retain their original compiler, revision, and platform scope.
+No performance measurement was performed for this migration.
+The user also authorized the separate Zig wiki's full 0.17.0 upgrade and agent migration guide.
+
+## Earlier baseline — 2026-09-06
 
 Work from the independent `baz` repository, primary branch `main`.
 Public repository: <https://github.com/technologylab-ai/baz>.

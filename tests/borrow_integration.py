@@ -45,7 +45,7 @@ class BorrowServer(wire.Server):
     def __enter__(self):
         super().__enter__()
         try:
-            wire.require(any("optimize=ReleaseSafe" in line for line in self.lines),
+            wire.require(any("optimize=safe" in line for line in self.lines),
                          "borrowed-body wire gates require a ReleaseSafe binary")
         except BaseException:
             import sys
@@ -252,7 +252,7 @@ def main():
     args = parser.parse_args()
     cases = run(args.server.resolve())
     result = dict(passed=len(cases), cases=cases, platform=platform.platform(),
-                  optimize="ReleaseSafe", performance_comparison=False,
+                  optimize="safe", performance_comparison=False,
                   asset=dict(bytes=ASSET_SIZE, sha256=ASSET_SHA256, client_maximum=CLIENT_LIMIT))
     if args.json:
         args.json.parent.mkdir(parents=True, exist_ok=True)

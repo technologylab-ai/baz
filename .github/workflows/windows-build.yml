@@ -15,7 +15,7 @@ concurrency:
 jobs:
   windows-x64:
     runs-on: windows-latest
-    timeout-minutes: 25
+    timeout-minutes: 60
     env:
       PYTHONDONTWRITEBYTECODE: "1"
     steps:
@@ -26,9 +26,10 @@ jobs:
         run: |
           $ErrorActionPreference = "Stop"
           $version = (Get-Content -Raw .zig-version).Trim()
-          if ($version -cne "0.16.0") { throw "Expected the exact Zig 0.16.0 baseline" }
-          $index = Invoke-RestMethod https://ziglang.org/download/index.json -TimeoutSec 30
-          $artifact = $index.PSObject.Properties[$version].Value.PSObject.Properties["x86_64-windows"].Value
+          if ($version -cne "0.17.0") { throw "Expected the exact Zig 0.17.0 baseline" }
+          $metadata = Get-Content -Raw .github/zig-release.json | ConvertFrom-Json
+          if ($metadata.version -cne $version) { throw 'Compiler metadata version mismatch' }
+          $artifact = $metadata.artifacts.PSObject.Properties["x86_64-windows"].Value
           $url = [string] $artifact.tarball
           $expected = ([string] $artifact.shasum).ToLowerInvariant()
           if ($url -notmatch '^https://ziglang\.org/' -or $expected -notmatch '^[0-9a-f]{64}$') {
@@ -61,7 +62,7 @@ jobs:
             Set-Content "$env:RUNNER_TEMP/baz-windows-logs/environment.txt"
           Get-CimInstance Win32_OperatingSystem | Select-Object Caption, Version, BuildNumber, OSArchitecture |
             ConvertTo-Json | Add-Content "$env:RUNNER_TEMP/baz-windows-logs/environment.txt"
-          foreach ($mode in @("Debug", "ReleaseSafe")) {
+          foreach ($mode in @("debug", "safe")) {
             & zig build verify "-Doptimize=$mode" -j2 --summary all 2>&1 |
               Tee-Object "$env:RUNNER_TEMP/baz-windows-logs/$mode.log"
             if ($LASTEXITCODE -ne 0) { throw "$mode verification failed" }
@@ -71,7 +72,7 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = "Stop"
-          & zig build install examples -Doptimize=ReleaseSafe -j2 --summary all 2>&1 |
+          & zig build install examples -Doptimize=safe -j2 --summary all 2>&1 |
             Tee-Object "$env:RUNNER_TEMP/baz-windows-logs/install.log"
           if ($LASTEXITCODE -ne 0) { throw "ReleaseSafe example installation failed" }
           foreach ($suite in @("cli_integration", "app_integration", "examples_integration", "streaming_integration", "borrow_integration", "mustache_integration", "cookies_integration", "middleware_integration", "session_integration", "continuations_integration", "jobs_integration", "windows_smoke")) {

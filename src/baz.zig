@@ -1,4 +1,4 @@
-//! Baz — Bounded Async Zap. Experimental application API for exact Zig 0.16.0.
+//! Baz — Bounded Async Zap. Experimental application API for exact Zig 0.17.0.
 //!
 //! Start with `App(Shared)` for typed routes and endpoints, or `AppWithLocals`
 //! for middleware with request-local state. `Request` borrows request input;

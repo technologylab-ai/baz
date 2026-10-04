@@ -20,7 +20,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 25
+    timeout-minutes: 60
     env:
       PYTHONDONTWRITEBYTECODE: "1"
     steps:
@@ -32,11 +32,12 @@ jobs:
           python3 - <<'PYTHON'
           import hashlib, json, os, pathlib, platform, tarfile, urllib.request
           version = pathlib.Path('.zig-version').read_text().strip()
-          assert version == '0.16.0', 'Expected exact Zig 0.16.0'
+          assert version == '0.17.0', 'Expected exact Zig 0.17.0'
           architecture = {'x86_64': 'x86_64', 'arm64': 'aarch64', 'aarch64': 'aarch64'}[platform.machine()]
           system = {'Linux': 'linux', 'Darwin': 'macos'}[platform.system()]
-          with urllib.request.urlopen('https://ziglang.org/download/index.json', timeout=30) as response:
-              artifact = json.load(response)[version][f'{architecture}-{system}']
+          metadata = json.loads(pathlib.Path('.github/zig-release.json').read_text())
+          assert metadata['version'] == version
+          artifact = metadata['artifacts'][f'{architecture}-{system}']
           assert artifact['tarball'].startswith('https://ziglang.org/')
           directory = pathlib.Path(os.environ['RUNNER_TEMP']) / 'baz-zig'
           directory.mkdir()
@@ -58,9 +59,9 @@ jobs:
           packet="$RUNNER_TEMP/baz-ci"
           mkdir -p "$packet"
           { git rev-parse HEAD; uname -a; zig version; python3 --version; } > "$packet/environment.log"
-          zig build verify -Doptimize=Debug -j2 --summary all 2>&1 | tee "$packet/debug.log"
-          zig build verify -Doptimize=ReleaseSafe -j2 --summary all 2>&1 | tee "$packet/release-safe.log"
-          zig build install examples -Doptimize=ReleaseSafe -j2 2>&1 | tee "$packet/install.log"
+          zig build verify -Doptimize=debug -j2 --summary all 2>&1 | tee "$packet/debug.log"
+          zig build verify -Doptimize=safe -j2 --summary all 2>&1 | tee "$packet/release-safe.log"
+          zig build install examples -Doptimize=safe -j2 2>&1 | tee "$packet/install.log"
           python3 tests/cli_integration.py --json "$packet/cli.json" 2>&1 | tee "$packet/cli.log"
           python3 tests/app_integration.py 2>&1 | tee "$packet/app.log"
           python3 tests/examples_integration.py 2>&1 | tee "$packet/examples.log"

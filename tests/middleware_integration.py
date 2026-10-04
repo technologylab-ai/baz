@@ -41,7 +41,7 @@ class MiddlewareServer(wire.Server):
     def __enter__(self):
         super().__enter__()
         try:
-            wire.require(any("optimize=ReleaseSafe" in line for line in self.lines), "middleware gates require ReleaseSafe")
+            wire.require(any("optimize=safe" in line for line in self.lines), "middleware gates require ReleaseSafe")
         except BaseException:
             self.__exit__(*sys.exc_info())
             raise

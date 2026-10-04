@@ -34,7 +34,7 @@ class StreamServer(wire.Server):
     def __enter__(self):
         super().__enter__()
         try:
-            wire.require(any("optimize=ReleaseSafe" in line for line in self.lines),
+            wire.require(any("optimize=safe" in line for line in self.lines),
                          "streaming wire gates require a ReleaseSafe binary")
         except BaseException:
             import sys
@@ -349,7 +349,7 @@ def run(binary, example=None):
 
     if example is not None:
         with ExampleServer(example, workers=2) as server:
-            wire.require(any("optimize=ReleaseSafe" in line for line in server.lines),
+            wire.require(any("optimize=safe" in line for line in server.lines),
                          "streaming example gate requires a ReleaseSafe binary")
             with server.connect() as sock:
                 reader = StreamReader(sock)
@@ -374,7 +374,7 @@ def main():
     args = parser.parse_args()
     cases = run(args.server.resolve(), args.example.resolve())
     result = dict(passed=len(cases), cases=cases, platform=platform.platform(),
-                  optimize="ReleaseSafe", performance_comparison=False)
+                  optimize="safe", performance_comparison=False)
     if args.json:
         args.json.parent.mkdir(parents=True, exist_ok=True)
         args.json.write_text(json.dumps(result, indent=2) + "\n")

@@ -172,8 +172,8 @@ test "empty template fits empty output and immutable template can be reused afte
 }
 
 test "parser rejects excessive dotted recursion before post-parse validation" {
-    const source = "{{" ++ "a." ** 1000 ++ "a}}";
-    try std.testing.expectError(error.DepthLimitExceeded, Template.init(std.testing.allocator, source, .{}));
+    const source = comptime "{{".* ++ @import("static_bytes.zig").repeat("a.", 1000) ++ "a}}".*;
+    try std.testing.expectError(error.DepthLimitExceeded, Template.init(std.testing.allocator, &source, .{}));
 }
 
 test "empty delimiter declarations return an ordinary parse error" {

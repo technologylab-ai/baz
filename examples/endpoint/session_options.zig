@@ -12,7 +12,7 @@ pub const Options = struct {
 
     pub const aliases = .{ .port = "p" };
     pub const help =
-        \\Baz session example — Zig 0.16.0
+        \\Baz session example — Zig 0.17.0
         \\Usage: userpass_session [options]
         \\
         \\  -h, --help                    Show this help and exit

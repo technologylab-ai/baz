@@ -4,7 +4,7 @@ Run a small application that combines Baz's Mustache templates, cookie sessions,
 and notification-driven server-sent events:
 
 ```sh
-zig build run-jobs -Doptimize=ReleaseSafe -- --port 8080 --execution workers --workers 1
+zig build run-jobs -Doptimize=safe -- --port 8080 --execution workers --workers 1
 ```
 
 Open `http://localhost:8080`. Sign in as **zap / awesome** or **baz / awesome**,

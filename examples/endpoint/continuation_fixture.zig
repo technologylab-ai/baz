@@ -38,7 +38,7 @@ const Record = struct {
 
     fn snapshot(self: *const Record) Snapshot {
         var result: Snapshot = undefined;
-        inline for (std.meta.fields(Snapshot)) |field| @field(result, field.name) = @field(self, field.name).load(.acquire);
+        inline for (@typeInfo(Snapshot).@"struct".field_names) |field_name| @field(result, field_name) = @field(self, field_name).load(.acquire);
         return result;
     }
 };
@@ -213,7 +213,7 @@ pub fn report(shared: *const Shared) void {
     var totals: Snapshot = std.mem.zeroes(Snapshot);
     for (&shared.records) |*record| {
         const current = record.snapshot();
-        inline for (std.meta.fields(Snapshot)) |field| @field(totals, field.name) += @field(current, field.name);
+        inline for (@typeInfo(Snapshot).@"struct".field_names) |field_name| @field(totals, field_name) += @field(current, field_name);
     }
     std.debug.print("CONTINUATIONS {f}\n", .{std.json.fmt(totals, .{})});
 }

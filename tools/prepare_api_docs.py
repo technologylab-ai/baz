@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Normalize Zig 0.16 Autodoc's filename/order-based module root selection.
+"""Normalize Zig 0.17 Autodoc's filename/order-based module root selection.
 
 The viewer chooses root.zig, <module>.zig, or the first file in each module.
 Baz uses baz.zig; two dependencies use different root names. Keep every source byte and
@@ -59,7 +59,7 @@ def prepare(source, destination, roots):
     for name in FILES[:-1]:
         shutil.copyfile(source / name, destination / name)
     manifest = normalize_archive(source / 'sources.tar', destination / 'sources.tar', roots)
-    manifest['generator'] = 'Zig 0.16.0 Autodoc'
+    manifest['generator'] = 'Zig 0.17.0 Autodoc'
     manifest['files_sha256'] = {name: hashlib.sha256((destination / name).read_bytes()).hexdigest() for name in FILES}
     (destination / 'api-build.json').write_text(json.dumps(manifest, indent=2) + '\n')
 
